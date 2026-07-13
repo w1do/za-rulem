@@ -1,0 +1,61 @@
+---
+import Layout from './Layout.astro';
+import Header from '../components/shared/header/Header.astro';
+import Footer from '../components/shared/footer/Footer.astro';
+
+const { frontmatter } = Astro.props;
+const seoTitle = frontmatter.seo?.title ?? `${frontmatter.title} — блог «За рулём»`;
+const seoDescription = frontmatter.seo?.description ?? frontmatter.description;
+const dateLabel = frontmatter.date
+	? new Date(frontmatter.date).toLocaleDateString('ru-RU', {
+			day: 'numeric',
+			month: 'long',
+			year: 'numeric',
+		})
+	: '';
+---
+
+<Layout title={seoTitle} description={seoDescription} ogImage={frontmatter.image}>
+	<Header />
+
+	<div class="page-header dark-section bg-section">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<nav class="breadcrumb-nav">
+						<a href="/blog">Блог</a> / <span>{frontmatter.title}</span>
+					</nav>
+					<div class="section-title">
+						<span class="section-sub-title">{frontmatter.category} · {dateLabel}</span>
+						<h1>{frontmatter.title}</h1>
+						<p>{frontmatter.description}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="blog-single dark-section bg-section">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 offset-lg-2">
+					{
+						frontmatter.image && (
+							<figure class="blog-single-image">
+								<img src={frontmatter.image} alt={frontmatter.imageAlt ?? frontmatter.title} />
+							</figure>
+						)
+					}
+					<div class="post-body service-entry">
+						<slot />
+					</div>
+					<div class="blog-single-footer">
+						<a href="/#contact" class="btn-default btn-highlighted">Нужна помощь на дороге — вызвать</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<Footer />
+</Layout>

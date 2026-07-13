@@ -1,0 +1,57 @@
+---
+// Главное меню сайта. Пункты вынесены в массив для переиспользования и лёгкого расширения.
+const menu = [
+	{ label: 'Главная', href: '/' },
+	{
+		label: 'Услуги',
+		href: '/services',
+		children: [
+			{ label: 'Прикурить авто', href: '/services/tehpomosch/prikurit-avto' },
+			{ label: 'Замена аккумулятора', href: '/services/tehpomosch/zamena-akkumulyatora' },
+			{ label: 'Отогрев автомобиля', href: '/services/tehpomosch/otogrev-avto' },
+		],
+	},
+	{ label: 'Блог', href: '/blog' },
+	{ label: 'О сервисе', href: '/#about' },
+	{ label: 'Контакты', href: '/#contact' },
+];
+---
+
+<div class="collapse navbar-collapse main-menu">
+	<div class="nav-menu-wrapper">
+		<ul class="navbar-nav mr-auto" id="menu">
+			{
+				menu.map((item) =>
+					item.children ? (
+						<li class="nav-item submenu">
+							<a class="nav-link" href={item.href}>
+								{item.label}
+							</a>
+							<ul>
+								{item.children.map((child) => (
+									<li class="nav-item">
+										<a class="nav-link" href={child.href}>
+											{child.label}
+										</a>
+									</li>
+								))}
+							</ul>
+						</li>
+					) : (
+						<li class="nav-item">
+							<a class="nav-link" href={item.href}>
+								{item.label}
+							</a>
+						</li>
+					),
+				)
+			}
+		</ul>
+	</div>
+
+	<!-- Header Btn Start -->
+	<div class="header-btn">
+		<a href="/#contact" class="btn-default btn-highlighted">Вызвать помощь</a>
+	</div>
+	<!-- Header Btn End -->
+</div>

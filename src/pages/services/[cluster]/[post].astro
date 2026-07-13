@@ -1,0 +1,19 @@
+---
+import { getCollection, render } from 'astro:content';
+import ServiceLandingLayout from '../../../layouts/ServiceLandingLayout.astro';
+
+export async function getStaticPaths() {
+	const entries = await getCollection('serviceLanding');
+	return entries.map((entry) => ({
+		params: { cluster: entry.data.cluster, post: entry.id.split('/').pop() },
+		props: { entry },
+	}));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<ServiceLandingLayout frontmatter={entry.data}>
+	<Content />
+</ServiceLandingLayout>

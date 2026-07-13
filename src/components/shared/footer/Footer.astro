@@ -1,0 +1,129 @@
+---
+// Общий подвал сайта. Структура перенесена из шаблона, изменены только тексты и ссылки.
+const quickLinks = [
+	{ label: 'Главная', href: '/' },
+	{ label: 'О сервисе', href: '/#about' },
+	{ label: 'Услуги', href: '/services' },
+	{ label: 'Блог', href: '/blog' },
+	{ label: 'Контакты', href: '/#contact' },
+];
+
+const serviceLinks = [
+	{ label: 'Прикурить авто', href: '/services/tehpomosch/prikurit-avto' },
+	{ label: 'Замена аккумулятора', href: '/services/tehpomosch/zamena-akkumulyatora' },
+	{ label: 'Отогрев автомобиля', href: '/services/tehpomosch/otogrev-avto' },
+	{ label: 'Подвоз топлива', href: '/services/tehpomosch/podvoz-topliva' },
+	{ label: 'Все услуги', href: '/services' },
+];
+---
+
+<!-- Main Footer Start -->
+<div class="main-footer-gold bg-section dark-section">
+	<div class="container">
+		<div class="row">
+			<div class="col-xl-3">
+				<!-- About Footer Start -->
+				<div class="about-footer-gold">
+					<!-- Footer Logo Start -->
+					<div class="footer-logo-gold">
+						<img src="/images/logo.svg" alt="За рулём — техпомощь Тюмень" />
+					</div>
+					<!-- Footer Logo End -->
+
+					<!-- About Footer Content Start -->
+					<div class="about-footer-content-gold">
+						<p>
+							Я — мастер техпомощи на дороге в Тюмени. Приезжаю на вызов круглосуточно:
+							прикурю автомобиль, заменю аккумулятор, отогрею машину в мороз и выручу
+							в других дорожных ситуациях.
+						</p>
+					</div>
+					<!-- About Footer Content End -->
+
+					<!-- Footer Social List Start -->
+					<div class="footer-social-links-gold">
+						<ul>
+							<li><a href="https://vk.com" aria-label="ВКонтакте"><i class="fa-brands fa-vk"></i></a></li>
+							<li><a href="https://t.me" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a></li>
+							<li><a href="https://wa.me/79088712026" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a></li>
+						</ul>
+					</div>
+					<!-- Footer Social List End -->
+				</div>
+				<!-- About Footer End -->
+			</div>
+
+			<div class="col-xl-9">
+				<!-- Footer Links Box Start -->
+				<div class="footer-links-box-gold">
+					<!-- Footer Link Start -->
+					<div class="footer-links-gold footer-quick-links-gold">
+						<h2>Навигация</h2>
+						<ul>
+							{quickLinks.map((link) => (
+								<li><a href={link.href}>{link.label}</a></li>
+							))}
+						</ul>
+					</div>
+					<!-- Footer Link End -->
+
+					<!-- Footer Link Start -->
+					<div class="footer-links-gold footer-service-links-gold">
+						<h2>Услуги</h2>
+						<ul>
+							{serviceLinks.map((link) => (
+								<li><a href={link.href}>{link.label}</a></li>
+							))}
+						</ul>
+					</div>
+					<!-- Footer Link End -->
+
+					<!-- Footer Link Start -->
+					<div class="footer-links-gold footer-contact-box-gold">
+						<h2>Контакты</h2>
+						<div class="footer-contact-info-list-gold">
+							<ul>
+								<li><img src="/images/icon-phone-accent.svg" alt="Телефон" /><a href="tel:+79088712026">+7 908 871-20-26</a></li>
+								<li><img src="/images/icon-location-accent.svg" alt="Адрес" />Тюмень и Тюменская область, выезд 24/7</li>
+							</ul>
+						</div>
+					</div>
+					<!-- Footer Link End -->
+
+					<!-- Footer Link Start -->
+					<div class="footer-links-gold footer-newsletter-form-box-gold">
+						<h2>Нужна помощь на дороге?</h2>
+						<div class="about-footer-content-gold">
+							<p>Оставьте заявку — перезвоню в течение пары минут и выеду на место.</p>
+						</div>
+						<a href="/#contact" class="btn-default btn-highlighted">Оставить заявку</a>
+					</div>
+					<!-- Footer Link End -->
+				</div>
+				<!-- Footer Links Box End -->
+			</div>
+
+			<div class="col-xl-12">
+				<!-- Footer Copyright Start -->
+				<div class="footer-copyright-gold">
+					<!-- Footer Copyright Text Start -->
+					<div class="footer-copyright-text-gold">
+						<p>© 2026 «За рулём» — техпомощь на дороге в Тюмени. Все права защищены.</p>
+					</div>
+					<!-- Footer Copyright Text End -->
+
+					<!-- Footer Privacy Policy Start -->
+					<div class="footer-privacy-policy-gold">
+						<ul>
+							<li><a href="/#contact">Политика конфиденциальности</a></li>
+							<li><a href="/#contact">Условия обслуживания</a></li>
+						</ul>
+					</div>
+					<!-- Footer Privacy Policy End -->
+				</div>
+				<!-- Footer Copyright End -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Main Footer End -->

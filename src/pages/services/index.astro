@@ -1,0 +1,60 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/shared/header/Header.astro';
+import Footer from '../../components/shared/footer/Footer.astro';
+
+const services = (await getCollection('services')).sort((a, b) =>
+	(a.data.no ?? '99').localeCompare(b.data.no ?? '99'),
+);
+---
+
+<Layout
+	title="Услуги техпомощи на дороге в Тюмени — выезд 24/7"
+	description="Все услуги автопомощи в Тюмени: прикурить авто, замена аккумулятора, отогрев, подвоз топлива, вскрытие. Приеду на место круглосуточно."
+>
+	<Header />
+
+	<div class="page-header dark-section bg-section">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="section-title">
+						<span class="section-sub-title">Техпомощь · Тюмень</span>
+						<h1>Услуги техпомощи на дороге</h1>
+						<p>
+							Помогаю водителям Тюмени и области в дорожных ситуациях: завожу авто,
+							меняю аккумулятор, отогреваю машину в мороз, привожу топливо и вскрываю
+							автомобиль без повреждений. Выезжаю круглосуточно.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="our-service dark-section bg-section">
+		<div class="container">
+			<div class="row">
+				{
+					services.map((service) => (
+						<div class="col-lg-4 col-md-6">
+							<a href={`/services/${service.id}`} class="service-item box-border-gradiant">
+								<div class="icon-box">
+									<img src={service.data.icon ?? '/images/icon-service-1.svg'} alt={service.data.title} />
+								</div>
+								<div class="service-item-content">
+									<h3>{service.data.title}</h3>
+									<p>{service.data.description}</p>
+									<span class="service-offer-item-link">Подробнее →</span>
+								</div>
+							</a>
+						</div>
+					))
+				}
+			</div>
+		</div>
+	</div>
+
+	<Footer />
+</Layout>

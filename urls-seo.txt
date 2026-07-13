@@ -1,0 +1,19 @@
+# Карта страниц сайта za-rulem (техпомощь на дороге в Тюмени)
+# Обновляется при создании/удалении страниц.
+
+# Главная
+/
+
+# Услуги (кластер)
+/services
+/services/tehpomosch
+/services/tehpomosch/prikurit-avto
+/services/tehpomosch/zamena-akkumulyatora
+/services/tehpomosch/otogrev-avto
+/services/tehpomosch/podvoz-topliva
+
+# Блог
+/blog
+/blog/pochemu-ne-zavoditsya-avto-v-moroz
+/blog/kak-pravilno-prikurit-avtomobil
+/blog/kak-vybrat-akkumulyator

@@ -1,11 +1,69 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import Header from '../components/shared/header/Header.astro';
+import Footer from '../components/shared/footer/Footer.astro';
+import CallbackForm from '../components/forms/CallbackForm.tsx';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import HomeHero from '../components/home/HomeHero.astro';
+import HomeAbout from '../components/home/HomeAbout.astro';
+import HomeServices from '../components/home/HomeServices.astro';
+import HomeWhyChoose from '../components/home/HomeWhyChoose.astro';
+import HomeFleets from '../components/home/HomeFleets.astro';
+import HomeWhatWeDo from '../components/home/HomeWhatWeDo.astro';
+import HomeCollection from '../components/home/HomeCollection.astro';
+import HomeDrivers from '../components/home/HomeDrivers.astro';
+import HomeHowItWork from '../components/home/HomeHowItWork.astro';
+import HomeTestimonials from '../components/home/HomeTestimonials.astro';
+import HomePricing from '../components/home/HomePricing.astro';
+import HomeBlog from '../components/home/HomeBlog.astro';
 ---
 
-<Layout>
-	<Welcome />
+<Layout
+	title="Техпомощь на дороге в Тюмени — выезд 24/7 | За рулём"
+	description="Автопомощь на дороге в Тюмени: прикурю авто, заменю аккумулятор, отогрею машину, привезу топливо, вскрою автомобиль. Приезжаю круглосуточно за 20–40 минут."
+	ogTitle="За рулём — техпомощь на дороге в Тюмени"
+	ogDescription="Круглосуточная автопомощь в Тюмени и области. Звоните — приеду и заведу вашу машину."
+	keywords="техпомощь тюмень, автопомощь на дороге, прикурить авто, замена аккумулятора с выездом, отогрев автомобиля"
+>
+	<Header />
+
+	<HomeHero />
+	<HomeAbout />
+	<HomeServices />
+	<HomeWhyChoose />
+	<HomeFleets />
+	<HomeWhatWeDo />
+	<HomeCollection />
+	<HomeDrivers />
+	<HomeHowItWork />
+	<HomeTestimonials />
+	<HomePricing />
+	<HomeBlog />
+
+	<!-- Contact Section Start -->
+	<div class="contact-us dark-section bg-section" id="contact">
+		<div class="container">
+			<div class="row section-row">
+				<div class="col-lg-12">
+					<!-- Section Title Start -->
+					<div class="section-title">
+						<span class="section-sub-title">Оставить заявку</span>
+						<h2>Нужна помощь на дороге прямо сейчас?</h2>
+						<p>
+							Опишите ситуацию и оставьте номер — я перезвоню в течение пары минут
+							и выеду к вам в Тюмени или области. Можно позвонить сразу:
+							<a href="tel:+79088712026">+7 908 871-20-26</a>.
+						</p>
+					</div>
+					<!-- Section Title End -->
+				</div>
+				<div class="col-lg-8 offset-lg-2">
+					<CallbackForm client:visible subject="Заявка с главной страницы" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Contact Section End -->
+
+	<Footer />
 </Layout>

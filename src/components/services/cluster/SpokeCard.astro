@@ -1,0 +1,16 @@
+---
+const { title, description, excerpt, icon = '/images/icon-service-1.svg', url } = Astro.props;
+---
+
+<div class="col-lg-4 col-md-6">
+	<a href={url} class="service-offer-item box-border-gradiant">
+		<div class="icon-box">
+			<img src={icon} alt={title} />
+		</div>
+		<div class="service-offer-item-content">
+			<h3>{title}</h3>
+			<p>{excerpt ?? description}</p>
+			<span class="service-offer-item-link">Подробнее →</span>
+		</div>
+	</a>
+</div>
