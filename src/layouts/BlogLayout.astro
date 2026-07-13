@@ -2,6 +2,9 @@
 import Layout from './Layout.astro';
 import Header from '../components/shared/header/Header.astro';
 import Footer from '../components/shared/footer/Footer.astro';
+import BlogSingleHeader from '../components/blog/BlogSingleHeader.astro';
+import BlogSingleImage from '../components/blog/BlogSingleImage.astro';
+import BlogPostTagLinks from '../components/blog/BlogPostTagLinks.astro';
 
 const { frontmatter } = Astro.props;
 const seoTitle = frontmatter.seo?.title ?? `${frontmatter.title} — блог «За рулём»`;
@@ -18,44 +21,38 @@ const dateLabel = frontmatter.date
 <Layout title={seoTitle} description={seoDescription} ogImage={frontmatter.image}>
 	<Header />
 
-	<div class="page-header dark-section bg-section">
+	<BlogSingleHeader title={frontmatter.title} author={frontmatter.author} dateLabel={dateLabel} />
+
+	<!-- Page Single Post Start -->
+	<div class="page-single-post">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-12">
-					<nav class="breadcrumb-nav">
-						<a href="/blog">Блог</a> / <span>{frontmatter.title}</span>
-					</nav>
-					<div class="section-title">
-						<span class="section-sub-title">{frontmatter.category} · {dateLabel}</span>
-						<h1>{frontmatter.title}</h1>
-						<p>{frontmatter.description}</p>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="blog-single dark-section bg-section">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-8 offset-lg-2">
 					{
 						frontmatter.image && (
-							<figure class="blog-single-image">
-								<img src={frontmatter.image} alt={frontmatter.imageAlt ?? frontmatter.title} />
-							</figure>
+							<BlogSingleImage
+								image={frontmatter.image}
+								imageAlt={frontmatter.imageAlt ?? frontmatter.title}
+							/>
 						)
 					}
-					<div class="post-body service-entry">
-						<slot />
+
+					<!-- Post Single Content Start -->
+					<div class="post-content">
+						<!-- Post Entry Start -->
+						<div class="post-entry">
+							<slot />
+						</div>
+						<!-- Post Entry End -->
+
+						<BlogPostTagLinks tags={frontmatter.tags} />
 					</div>
-					<div class="blog-single-footer">
-						<a href="/#contact" class="btn-default btn-highlighted">Нужна помощь на дороге — вызвать</a>
-					</div>
+					<!-- Post Single Content End -->
 				</div>
 			</div>
 		</div>
 	</div>
+	<!-- Page Single Post End -->
 
 	<Footer />
 </Layout>

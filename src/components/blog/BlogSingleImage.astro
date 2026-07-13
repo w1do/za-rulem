@@ -1,0 +1,12 @@
+---
+// Обложка статьи (перенос блока "Post Featured Image" из source/blog-single.html).
+const { image, imageAlt } = Astro.props;
+---
+
+<!-- Post Featured Image Start -->
+<div class="post-image">
+	<figure class="image-anime reveal">
+		<img src={image} alt={imageAlt} />
+	</figure>
+</div>
+<!-- Post Featured Image End -->

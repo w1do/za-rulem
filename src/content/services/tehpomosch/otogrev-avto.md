@@ -8,7 +8,7 @@ seo:
   description: "Отогрею автомобиль в мороз в Тюмени: прогрею двигатель и топливную систему тепловым оборудованием, безопасно запущу мотор и объясню причину отказа."
 excerpt: "Отогрею двигатель и топливную систему, чтобы вернуть запуск в мороз."
 dateLabel: "5 минут чтения"
-image: /images/service-single-image.jpg
+image: /images/services/service-1.jpg
 imageAlt: "Отогрев автомобиля тепловым оборудованием в Тюмени"
 icon: /images/icon-service-3.svg
 order: 3

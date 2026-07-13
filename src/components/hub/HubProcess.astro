@@ -1,0 +1,47 @@
+---
+// Блок «Как проходит вызов» хаба. Шаги берутся из frontmatter услуги.
+// Разметка перенесена из шаблона (how-it-work-gold), как на главной.
+const {
+	subtitle = 'Как проходит вызов',
+	title = 'Я приезжаю на помощь за несколько простых шагов',
+	steps = [],
+} = Astro.props;
+---
+
+{
+	steps.length > 0 && (
+		<div class="how-it-work-gold dark-section bg-section">
+			<div class="container">
+				<div class="row section-row">
+					<div class="col-xl-12">
+						<div class="section-title section-title-center">
+							<span class="section-sub-title wow fadeInUp">{subtitle}</span>
+							<h2 class="text-anime-style-3" data-cursor="-opaque">{title}</h2>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					{steps.map((step, i) => (
+						<div class="col-xl-3 col-md-6">
+							<div class="how-it-work-item-gold wow fadeInUp" data-wow-delay={i === 0 ? undefined : `${i * 0.2}s`}>
+								<div class="how-it-work-header-gold">
+									<div class="icon-box">
+										<img src={`/images/icon-how-it-work-${(i % 3) + 1}-gold.svg`} alt={step.title} />
+									</div>
+									<div class="how-it-work-no-gold">
+										<h3>{String(i + 1).padStart(2, '0')}</h3>
+									</div>
+								</div>
+								<div class="how-it-work-body-gold">
+									<h3>{step.title}</h3>
+									{step.description && <p>{step.description}</p>}
+								</div>
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+		</div>
+	)
+}

@@ -1,0 +1,130 @@
+---
+// Вводный блок хаба (стиль about-us из шаблона). Заголовок и описание берутся
+// из frontmatter услуги, а тело pillar-страницы выводится через <slot />.
+const {
+	subtitle = 'О сервисе',
+	title = 'Я помогаю решить проблему с автомобилем прямо на дороге',
+	description = 'Я выезжаю на помощь в Тюмени и Тюменской области: запускаю автомобиль, меняю аккумулятор, отогреваю машину, подвожу топливо и вскрываю авто.',
+} = Astro.props;
+---
+
+<!-- About Us Section Start -->
+<div class="about-us">
+	<div class="container">
+		<div class="row">
+			<div class="col-xl-6">
+				<!-- About Us Image Box Start -->
+				<div class="about-us-image-box wow fadeInUp">
+					<!-- About Us Image Start -->
+					<div class="about-us-image">
+						<figure class="image-anime">
+							<img src="/images/about-us-image.jpg" alt="Техпомощь на дороге в Тюмени" />
+						</figure>
+					</div>
+					<!-- About Us Image End -->
+
+					<!-- About Us Video Box Start -->
+					<div class="about-us-video-box">
+						<!-- About Us Video Start -->
+						<div class="about-us-video">
+							<figure class="image-anime">
+								<img src="/images/about-us-video-image.jpg" alt="Круглосуточная автопомощь" />
+							</figure>
+							<div class="video-play-button">
+								<a href="https://www.youtube.com/watch?v=Y-x0efG1seA" class="popup-video bg-effect" data-cursor-text="Смотреть">
+									<i class="fa-solid fa-play"></i>
+								</a>
+							</div>
+						</div>
+						<!-- About Us Video End -->
+
+						<!-- About Us Video Box Content Start -->
+						<div class="about-us-video-box-content">
+							<!--  Satisfaction Client Image Start -->
+							<div class="satisfy-client-images">
+								<div class="satisfy-client-image">
+									<figure class="image-anime">
+										<img src="/images/author-1.jpg" alt="Отзыв о техпомощи" />
+									</figure>
+								</div>
+								<div class="satisfy-client-image">
+									<figure class="image-anime">
+										<img src="/images/author-2.jpg" alt="Отзыв о техпомощи" />
+									</figure>
+								</div>
+								<div class="satisfy-client-image">
+									<figure class="image-anime">
+										<img src="/images/author-3.jpg" alt="Отзыв о техпомощи" />
+									</figure>
+								</div>
+								<div class="satisfy-client-image add-more">
+									<h2><span class="counter">24</span>/7</h2>
+								</div>
+							</div>
+							<!-- Satisfaction Client  Image End -->
+
+							<!--About Satisfy Client Title Start -->
+							<div class="about-satisfy-client-title">
+								<p>Работаю круглосуточно</p>
+							</div>
+							<!--About Satisfy Client Title End -->
+						</div>
+						<!-- About Us Video Box Content End -->
+					</div>
+					<!-- About Us Video Box End -->
+				</div>
+				<!-- About Us Image Box End -->
+			</div>
+
+			<div class="col-xl-6">
+				<!-- About Us Content Start -->
+				<div class="about-us-content">
+					<!-- Section Title Start -->
+					<div class="section-title">
+						<span class="section-sub-title wow fadeInUp">{subtitle}</span>
+						<h2 class="text-anime-style-3" data-cursor="-opaque">{title}</h2>
+						<p class="wow fadeInUp" data-wow-delay="0.2s">{description}</p>
+					</div>
+					<!-- Section Title End -->
+
+					<!-- Hub Intro Body Text Start -->
+					<div class="post-body wow fadeInUp" data-wow-delay="0.3s">
+						<slot />
+					</div>
+					<!-- Hub Intro Body Text End -->
+
+					<!-- About Us Footer Start -->
+					<div class="about-us-footer wow fadeInUp" data-wow-delay="0.8s">
+						<!-- About Us Button Start -->
+						<div class="about-us-btn">
+							<a href="/contacts" class="btn-default">Вызвать помощь</a>
+						</div>
+						<!-- About Us Button End -->
+
+						<!-- About Us Author Box Start -->
+						<div class="about-us-author-box">
+							<!-- About Author Image Start -->
+							<div class="about-us-author-image">
+								<figure class="image-anime">
+									<img src="/images/author-1.jpg" alt="Мастер За рулём" />
+								</figure>
+							</div>
+							<!-- About Author Image End -->
+
+							<!-- About Author Content Start -->
+							<div class="about-us-author-content">
+								<h3>За рулём</h3>
+								<p>Мастер техпомощи</p>
+							</div>
+							<!-- About Author Content End -->
+						</div>
+						<!-- About Us Author Box End -->
+					</div>
+					<!-- About Us Footer End -->
+				</div>
+				<!-- About Us Content End -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- About Us Section End -->

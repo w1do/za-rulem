@@ -1,10 +1,10 @@
 ---
-import SpokeCard from './SpokeCard.astro';
-const { spokes = [], title = 'Направления услуги' } = Astro.props;
+import ServiceCard from '../ServiceCard.astro';
+const { spokes = [], title = 'Мои услуги в этом направлении' } = Astro.props;
 ---
 
 <div class="cluster-spokes">
-	<div class="row">
+	<div class="row section-row">
 		<div class="col-lg-12">
 			<div class="section-title">
 				<span class="section-sub-title">Что входит в направление</span>
@@ -12,17 +12,21 @@ const { spokes = [], title = 'Направления услуги' } = Astro.pro
 			</div>
 		</div>
 	</div>
-	<div class="row service-offer-item-list">
-		{
-			spokes.map((spoke) => (
-				<SpokeCard
-					title={spoke.title}
-					description={spoke.description}
-					excerpt={spoke.excerpt}
-					icon={spoke.icon}
-					url={spoke.url}
-				/>
-			))
-		}
+	<!-- page Services Start -->
+	<div class="page-services">
+		<div class="row">
+			{
+				spokes.map((spoke, i) => (
+					<ServiceCard
+						title={spoke.title}
+						description={spoke.excerpt ?? spoke.description}
+						icon={spoke.icon}
+						url={spoke.url}
+						delay={i % 3 === 0 ? undefined : `${(i % 3) * 0.2}s`}
+					/>
+				))
+			}
+		</div>
 	</div>
+	<!-- page Services End -->
 </div>

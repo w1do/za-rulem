@@ -1,0 +1,45 @@
+---
+const {
+	title = 'Как я работаю',
+	description,
+	image = '/images/service-process-image.jpg',
+	steps = [],
+} = Astro.props;
+---
+
+{
+	steps.length > 0 && (
+		<div class="service-process-box">
+			<h2 class="text-anime-style-3">{title}</h2>
+			{description && <p class="wow fadeInUp">{description}</p>}
+
+			<!-- Service Process Image Content Start -->
+			<div class="service-process-image-content">
+				<!-- Service Process Image Start -->
+				<div class="service-process-image">
+					<figure class="image-anime reveal">
+						<img src={image} alt={title} />
+					</figure>
+				</div>
+				<!-- Service Process Image End -->
+
+				<!-- Service Process Content Box Start -->
+				<div class="service-process-content-box">
+					{steps.map((step, i) => (
+						<div class="service-process-item wow fadeInUp" data-wow-delay={`${(i + 1) * 0.2}s`}>
+							<div class="icon-box">
+								<img src={`/images/icon-service-process-${(i % 3) + 1}.svg`} alt={step.title} />
+							</div>
+							<div class="service-process-item-content">
+								<h3>{step.title}</h3>
+								{step.description && <p>{step.description}</p>}
+							</div>
+						</div>
+					))}
+				</div>
+				<!-- Service Process Content Box End -->
+			</div>
+			<!-- Service Process Image Content End -->
+		</div>
+	)
+}

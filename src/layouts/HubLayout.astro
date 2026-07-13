@@ -1,0 +1,73 @@
+---
+// Макет хаба услуги — полноценный лендинг (как страница «О сервисе»).
+// Принимает frontmatter услуги (pillar) и список её посадочных страниц (spokes)
+// и собирает страницу из hub-компонентов. Тело pillar выводится через <slot />.
+import Layout from './Layout.astro';
+import Header from '../components/shared/header/Header.astro';
+import Footer from '../components/shared/footer/Footer.astro';
+
+import HubPageHeader from '../components/hub/HubPageHeader.astro';
+import HubIntro from '../components/hub/HubIntro.astro';
+import HubServices from '../components/hub/HubServices.astro';
+import HubApproach from '../components/hub/HubApproach.astro';
+import HubWhyChoose from '../components/hub/HubWhyChoose.astro';
+import HubWhatWeDo from '../components/hub/HubWhatWeDo.astro';
+import HubProcess from '../components/hub/HubProcess.astro';
+import HubCta from '../components/hub/HubCta.astro';
+import HubExpertise from '../components/hub/HubExpertise.astro';
+import HubFaqs from '../components/hub/HubFaqs.astro';
+import HubTestimonials from '../components/hub/HubTestimonials.astro';
+
+const { frontmatter, spokes = [] } = Astro.props;
+
+const seoTitle = frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь в Тюмени`;
+const seoDescription = frontmatter.seo?.description ?? frontmatter.description;
+const keywords = Array.isArray(frontmatter.tags) ? frontmatter.tags.join(', ') : undefined;
+
+// Карточки услуг для перелинковки на посадочные страницы.
+const services = spokes.map((spoke) => ({
+	title: spoke.title,
+	description: spoke.excerpt ?? spoke.description,
+	icon: spoke.icon,
+	url: spoke.url,
+}));
+
+// Шаги процесса из frontmatter услуги.
+const process = frontmatter.process;
+const steps = process
+	? [
+			{ title: process.step1Title, description: process.step1Desc },
+			{ title: process.step2Title, description: process.step2Desc },
+			{ title: process.step3Title, description: process.step3Desc },
+			{ title: process.step4Title, description: process.step4Desc },
+		].filter((s) => s.title)
+	: [];
+---
+
+<Layout title={seoTitle} description={seoDescription} keywords={keywords}>
+	<Header />
+
+	<HubPageHeader title={frontmatter.title} />
+
+	<HubIntro description={frontmatter.description}>
+		<slot />
+	</HubIntro>
+
+	<HubServices services={services} />
+
+	<HubApproach />
+
+	<HubWhyChoose />
+
+	<HubWhatWeDo />
+
+	<HubExpertise />
+
+	<HubCta />
+
+	<HubFaqs faqs={frontmatter.faqs} />
+
+	<HubTestimonials />
+
+	<Footer />
+</Layout>

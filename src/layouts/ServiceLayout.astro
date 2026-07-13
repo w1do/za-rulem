@@ -2,204 +2,83 @@
 import Layout from './Layout.astro';
 import Header from '../components/shared/header/Header.astro';
 import Footer from '../components/shared/footer/Footer.astro';
-import ClusterSpokes from '../components/services/cluster/ClusterSpokes.astro';
-import CallbackForm from '../components/forms/CallbackForm.tsx';
+import ServicePageHeader from '../components/services/single/ServicePageHeader.astro';
+import ServiceSidebar from '../components/services/single/ServiceSidebar.astro';
+import ServiceSingleImage from '../components/services/single/ServiceSingleImage.astro';
+import ServiceWhyChoose from '../components/services/single/ServiceWhyChoose.astro';
+import ServiceFeatures from '../components/services/single/ServiceFeatures.astro';
+import ServiceProcess from '../components/services/single/ServiceProcess.astro';
+import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 
 const { frontmatter, spokes = [] } = Astro.props;
 const seoTitle = frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь в Тюмени`;
 const seoDescription = frontmatter.seo?.description ?? frontmatter.description;
+
+const image = frontmatter.image ?? '/images/service-single-image.jpg';
+const imageAlt = frontmatter.title;
+
+const sidebarLinks = spokes.map((spoke) => ({ title: spoke.title, url: spoke.url }));
+
 const process = frontmatter.process;
-const pricing = frontmatter.pricing;
 const steps = process
 	? [
-			{ t: process.step1Title, d: process.step1Desc },
-			{ t: process.step2Title, d: process.step2Desc },
-			{ t: process.step3Title, d: process.step3Desc },
-			{ t: process.step4Title, d: process.step4Desc },
-		].filter((s) => s.t)
+			{ title: process.step1Title, description: process.step1Desc },
+			{ title: process.step2Title, description: process.step2Desc },
+			{ title: process.step3Title, description: process.step3Desc },
+			{ title: process.step4Title, description: process.step4Desc },
+		].filter((s) => s.title)
 	: [];
 ---
 
 <Layout title={seoTitle} description={seoDescription}>
 	<Header />
 
-	<!-- Page Hero Start -->
-	<div class="page-header dark-section bg-section">
+	<ServicePageHeader title={frontmatter.title} />
+
+	<!-- Page Service Single Start -->
+	<div class="page-service-single">
 		<div class="container">
 			<div class="row">
-				<div class="col-lg-12">
-					<div class="section-title">
-						<span class="section-sub-title">Услуги техпомощи · Тюмень</span>
-						<h1>{frontmatter.title}</h1>
-						<p>{frontmatter.description}</p>
+				<div class="col-lg-4">
+					<ServiceSidebar links={sidebarLinks} />
+				</div>
+
+				<div class="col-lg-8">
+					<!-- Service Single Content Start -->
+					<div class="service-single-content">
+						<ServiceSingleImage image={image} alt={imageAlt} />
+
+						<!-- Service Entry Start -->
+						<div class="service-entry post-body">
+							<slot />
+
+							<ServiceWhyChoose
+								title={frontmatter.featuresTitle}
+								description={frontmatter.featuresDescription}
+								items={frontmatter.features}
+							/>
+
+							<ServiceFeatures
+								title={frontmatter.offersTitle}
+								description={frontmatter.offersDescription}
+								items={frontmatter.offers}
+							/>
+
+							<ServiceProcess
+								title={process?.title}
+								steps={steps}
+							/>
+						</div>
+						<!-- Service Entry End -->
+
+						<ServiceFaqs faqs={frontmatter.faqs} />
 					</div>
-					<div class="hero-content-btn-gold">
-						<a href="/#contact" class="btn-default btn-highlighted">Вызвать помощь</a>
-						<a href="tel:+79088712026" class="btn-default">+7 908 871-20-26</a>
-					</div>
+					<!-- Service Single Content End -->
 				</div>
 			</div>
 		</div>
 	</div>
-	<!-- Page Hero End -->
-
-	<!-- Service Body Start -->
-	<div class="page-service-single dark-section bg-section">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="service-entry post-body">
-						<slot />
-					</div>
-				</div>
-			</div>
-
-			{spokes.length > 0 && <ClusterSpokes spokes={spokes} />}
-
-			{
-				frontmatter.offers.length > 0 && (
-					<div class="row">
-						<div class="col-lg-12">
-							<div class="section-title">
-								<h2>{frontmatter.offersTitle ?? 'Что я предлагаю'}</h2>
-								{frontmatter.offersDescription && <p>{frontmatter.offersDescription}</p>}
-							</div>
-						</div>
-						{frontmatter.offers.map((offer) => (
-							<div class="col-lg-6">
-								<div class="service-item">
-									<div class="icon-box">
-										<img src={offer.icon} alt={offer.title} />
-									</div>
-									<div class="service-item-content">
-										<h3>{offer.title}</h3>
-										<p>{offer.description}</p>
-									</div>
-								</div>
-							</div>
-						))}
-					</div>
-				)
-			}
-
-			{
-				frontmatter.features.length > 0 && (
-					<div class="row">
-						<div class="col-lg-12">
-							<div class="section-title">
-								<h2>{frontmatter.featuresTitle ?? 'Почему обращаются ко мне'}</h2>
-								{frontmatter.featuresDescription && <p>{frontmatter.featuresDescription}</p>}
-							</div>
-							<ul class="why-choose-list">
-								{frontmatter.features.map((f) => (
-									<li>{f}</li>
-								))}
-							</ul>
-						</div>
-					</div>
-				)
-			}
-
-			{
-				steps.length > 0 && (
-					<div class="row">
-						<div class="col-lg-12">
-							<div class="section-title">
-								<h2>{process.title ?? 'Как я работаю'}</h2>
-							</div>
-						</div>
-						{steps.map((s, i) => (
-							<div class="col-lg-3 col-md-6">
-								<div class="how-it-work-item">
-									<h3>0{i + 1}. {s.t}</h3>
-									<p>{s.d}</p>
-								</div>
-							</div>
-						))}
-					</div>
-				)
-			}
-
-			{
-				pricing && pricing.items.length > 0 && (
-					<div class="row">
-						<div class="col-lg-12">
-							<div class="section-title">
-								<h2>{pricing.title ?? 'Цены'}</h2>
-							</div>
-						</div>
-						{pricing.items.map((item) => (
-							<div class="col-lg-4 col-md-6">
-								<div class="pricing-item">
-									<h3>{item.title}</h3>
-									<div class="pricing-price">
-										<h2>{item.price}</h2>
-									</div>
-									{item.description && <p>{item.description}</p>}
-									<ul>
-										{item.features.map((f) => (
-											<li>{f}</li>
-										))}
-									</ul>
-									<a href="/#contact" class="btn-default btn-highlighted">Заказать</a>
-								</div>
-							</div>
-						))}
-					</div>
-				)
-			}
-
-			{
-				frontmatter.faqs.length > 0 && (
-					<div class="row">
-						<div class="col-lg-12">
-							<div class="section-title">
-								<h2>Частые вопросы</h2>
-							</div>
-							<div class="faq-accordion" id="serviceFaq">
-								{frontmatter.faqs.map((faq, i) => (
-									<div class="accordion-item">
-										<div class="accordion-header" id={`faqHead${i}`}>
-											<button
-												class="accordion-button collapsed"
-												type="button"
-												data-bs-toggle="collapse"
-												data-bs-target={`#faqBody${i}`}
-											>
-												{faq.question}
-											</button>
-										</div>
-										<div
-											id={`faqBody${i}`}
-											class="accordion-collapse collapse"
-											data-bs-parent="#serviceFaq"
-										>
-											<div class="accordion-body">
-												<p>{faq.answer}</p>
-											</div>
-										</div>
-									</div>
-								))}
-							</div>
-						</div>
-					</div>
-				)
-			}
-
-			<!-- Contact CTA Start -->
-			<div class="row" id="contact">
-				<div class="col-lg-12">
-					<div class="section-title">
-						<h2>Оставьте заявку — перезвоню за пару минут</h2>
-						<p>Опишите ситуацию, и я выеду на место в Тюмени и области.</p>
-					</div>
-					<CallbackForm client:visible subject={`Заявка: ${frontmatter.title}`} />
-				</div>
-			</div>
-			<!-- Contact CTA End -->
-		</div>
-	</div>
-	<!-- Service Body End -->
+	<!-- Page Service Single End -->
 
 	<Footer />
 </Layout>

@@ -1,6 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
-import ServiceLayout from '../../../layouts/ServiceLayout.astro';
+import HubLayout from '../../../layouts/HubLayout.astro';
 
 export async function getStaticPaths() {
 	const hubs = await getCollection('services', ({ data }) => data.hub === true);
@@ -28,6 +28,6 @@ const { pillar, spokes } = Astro.props;
 const { Content } = await render(pillar);
 ---
 
-<ServiceLayout frontmatter={pillar.data} spokes={spokes}>
+<HubLayout frontmatter={pillar.data} spokes={spokes}>
 	<Content />
-</ServiceLayout>
+</HubLayout>

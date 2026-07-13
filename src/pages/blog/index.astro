@@ -3,70 +3,48 @@ import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/shared/header/Header.astro';
 import Footer from '../../components/shared/footer/Footer.astro';
+import BlogPageHeader from '../../components/blog/BlogPageHeader.astro';
+import PostCard from '../../components/blog/PostCard.astro';
+import BlogPagination from '../../components/blog/BlogPagination.astro';
 
 const posts = (await getCollection('blog')).sort(
 	(a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf(),
 );
+
+const POSTS_PER_PAGE = 9;
+const totalPages = Math.max(1, Math.ceil(posts.length / POSTS_PER_PAGE));
 ---
 
 <Layout
-	title="Блог о техпомощи на дороге — советы автовладельцам Тюмени"
+	title="Блог о техпомощи на дороге — советы автовладельцам Тюмени | За рулём"
 	description="Разбираю частые дорожные ситуации: почему не заводится авто, как прикурить машину, что делать в мороз и как выбрать аккумулятор. Опыт мастера из Тюмени."
+	keywords="блог техпомощь тюмень, не заводится авто, как прикурить машину, отогрев авто, выбор аккумулятора"
 >
 	<Header />
 
-	<div class="page-header dark-section bg-section">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="section-title">
-						<span class="section-sub-title">Блог · Техпомощь Тюмень</span>
-						<h1>Полезное для водителей</h1>
-						<p>
-							Делюсь опытом выездов: разбираю поломки на дороге, объясняю, как действовать
-							до приезда мастера, и помогаю не растеряться в сложной ситуации.
-						</p>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+	<BlogPageHeader title="Блог" breadcrumb="Блог" />
 
-	<div class="our-blog dark-section bg-section">
+	<!-- Page Blog Start -->
+	<div class="page-blog">
 		<div class="container">
 			<div class="row">
 				{
-					posts.map((post) => (
-						<div class="col-lg-4 col-md-6">
-							<div class="post-item">
-								{post.data.image && (
-									<div class="post-featured-image">
-										<a href={`/blog/${post.id}`}>
-											<figure class="image-anime">
-												<img src={post.data.image} alt={post.data.imageAlt ?? post.data.title} />
-											</figure>
-										</a>
-									</div>
-								)}
-								<div class="post-item-body">
-									<div class="post-item-content">
-										<span class="post-category">{post.data.category}</span>
-										<h3>
-											<a href={`/blog/${post.id}`}>{post.data.title}</a>
-										</h3>
-										<p>{post.data.description}</p>
-									</div>
-									<a href={`/blog/${post.id}`} class="readmore-btn">
-										Читать →
-									</a>
-								</div>
-							</div>
-						</div>
+					posts.map((post, i) => (
+						<PostCard
+							title={post.data.title}
+							image={post.data.image}
+							imageAlt={post.data.imageAlt}
+							url={`/blog/${post.id}`}
+							delay={i % 3 === 0 ? undefined : `${(i % 3) * 0.2}s`}
+						/>
 					))
 				}
+
+				<BlogPagination currentPage={1} totalPages={totalPages} basePath="/blog" />
 			</div>
 		</div>
 	</div>
+	<!-- Page Blog End -->
 
 	<Footer />
 </Layout>

@@ -1,0 +1,22 @@
+---
+// Нижний блок статьи с тегами и соцшерингом
+// (перенос блока "Post Tag Links" из source/blog-single.html).
+import BlogPostTags from './BlogPostTags.astro';
+import BlogPostShare from './BlogPostShare.astro';
+
+const { tags = [] } = Astro.props;
+---
+
+<!-- Post Tag Links Start -->
+<div class="post-tag-links">
+	<div class="row align-items-center">
+		<div class="col-lg-8">
+			<BlogPostTags tags={tags} />
+		</div>
+
+		<div class="col-lg-4">
+			<BlogPostShare />
+		</div>
+	</div>
+</div>
+<!-- Post Tag Links End -->

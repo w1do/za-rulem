@@ -8,7 +8,7 @@ seo:
   description: "Прикурю автомобиль в Тюмени при севшем аккумуляторе: приеду с бустером или проводами, безопасно запущу двигатель и проверю причину разряда АКБ."
 excerpt: "Запущу двигатель от бустера или проводов, если сел аккумулятор."
 dateLabel: "5 минут чтения"
-image: /images/service-single-image.jpg
+image: /images/services/service-3.jpg
 imageAlt: "Запуск автомобиля с севшим аккумулятором в Тюмени"
 icon: /images/icon-service-1.svg
 order: 1

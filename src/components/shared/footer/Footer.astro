@@ -2,17 +2,18 @@
 // Общий подвал сайта. Структура перенесена из шаблона, изменены только тексты и ссылки.
 const quickLinks = [
 	{ label: 'Главная', href: '/' },
-	{ label: 'О сервисе', href: '/#about' },
+	{ label: 'О сервисе', href: '/about' },
 	{ label: 'Услуги', href: '/services' },
 	{ label: 'Блог', href: '/blog' },
-	{ label: 'Контакты', href: '/#contact' },
+	{ label: 'Контакты', href: '/contacts' },
 ];
 
 const serviceLinks = [
 	{ label: 'Прикурить авто', href: '/services/tehpomosch/prikurit-avto' },
 	{ label: 'Замена аккумулятора', href: '/services/tehpomosch/zamena-akkumulyatora' },
 	{ label: 'Отогрев автомобиля', href: '/services/tehpomosch/otogrev-avto' },
-	{ label: 'Подвоз топлива', href: '/services/tehpomosch/podvoz-topliva' },
+	{ label: 'Подвоз бензина', href: '/services/toplivo/podvoz-benzina' },
+	{ label: 'Подвоз дизеля', href: '/services/toplivo/podvoz-dizelya' },
 	{ label: 'Все услуги', href: '/services' },
 ];
 ---
@@ -96,7 +97,7 @@ const serviceLinks = [
 						<div class="about-footer-content-gold">
 							<p>Оставьте заявку — перезвоню в течение пары минут и выеду на место.</p>
 						</div>
-						<a href="/#contact" class="btn-default btn-highlighted">Оставить заявку</a>
+						<a href="/contacts" class="btn-default btn-highlighted">Оставить заявку</a>
 					</div>
 					<!-- Footer Link End -->
 				</div>
@@ -115,8 +116,8 @@ const serviceLinks = [
 					<!-- Footer Privacy Policy Start -->
 					<div class="footer-privacy-policy-gold">
 						<ul>
-							<li><a href="/#contact">Политика конфиденциальности</a></li>
-							<li><a href="/#contact">Условия обслуживания</a></li>
+ 						<li><a href="/contacts">Политика конфиденциальности</a></li>
+ 						<li><a href="/contacts">Условия обслуживания</a></li>
 						</ul>
 					</div>
 					<!-- Footer Privacy Policy End -->

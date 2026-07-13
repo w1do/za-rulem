@@ -8,7 +8,7 @@ seo:
   description: "Заменю аккумулятор с выездом в Тюмени: подберу АКБ по ёмкости и полярности, установлю на месте, проверю клеммы и уверенный запуск двигателя."
 excerpt: "Подберу и установлю подходящий аккумулятор прямо у автомобиля."
 dateLabel: "5 минут чтения"
-image: /images/service-single-image.jpg
+image: /images/services/service-2.jpg
 imageAlt: "Замена аккумулятора с выездом к автомобилю в Тюмени"
 icon: /images/icon-service-2.svg
 order: 2

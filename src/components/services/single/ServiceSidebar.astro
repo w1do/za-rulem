@@ -1,0 +1,71 @@
+---
+const { title = 'Мои услуги', links = [] } = Astro.props;
+---
+
+<!-- Page Single Sidebar Start -->
+<div class="page-single-sidebar">
+	<!-- Page Category List Start -->
+	<div class="page-category-list wow fadeInUp">
+		<h2 class="page-category-list-title">{title}</h2>
+		<ul>
+			{
+				links.map((link) => (
+					<li><a href={link.url}>{link.title}</a></li>
+				))
+			}
+		</ul>
+	</div>
+	<!-- Page Category List End -->
+
+	<!-- Sidebar CTA Box Start -->
+	<div class="sidebar-cta-box wow fadeInUp" data-wow-delay="0.25s">
+		<!-- Sidebar CTA Review Body Start -->
+		<div class="sidebar-cta-review-body">
+			<!-- Review Rating Box Start -->
+			<div class="sidebar-cta-review-counter">
+				<h2><span class="counter">24</span>/7</h2>
+				<i class="fa-solid fa-star"></i>
+			</div>
+			<!-- Review Rating Box End -->
+
+			<!-- Sidebar CTA Client Box Start -->
+			<div class="sidebar-cta-client-box">
+				<!-- Satisfy Client Images Start -->
+				<div class="satisfy-client-images">
+					<div class="satisfy-client-image">
+						<figure class="image-anime">
+							<img src="/images/author-1.jpg" alt="Отзыв о техпомощи" />
+						</figure>
+					</div>
+					<div class="satisfy-client-image">
+						<figure class="image-anime">
+							<img src="/images/author-2.jpg" alt="Отзыв о техпомощи" />
+						</figure>
+					</div>
+					<div class="satisfy-client-image">
+						<figure class="image-anime">
+							<img src="/images/author-3.jpg" alt="Отзыв о техпомощи" />
+						</figure>
+					</div>
+				</div>
+				<!-- Satisfy Client Images End -->
+
+				<!-- Satisfy CTA Client Content Start -->
+				<div class="sidebar-cta-client-content">
+					<p>Выезжаю по Тюмени и области</p>
+				</div>
+				<!-- Satisfy CTA Client Content End -->
+			</div>
+			<!-- Sidebar CTA Client Box End -->
+		</div>
+		<!-- Sidebar CTA Review Body End -->
+
+		<!-- Sidebar CTA Contact Button Start -->
+		<div class="sidebar-cta-contact-btn">
+			<a href="tel:+79088712026"><i class="fa-solid fa-phone"></i> +7 908 871-20-26</a>
+		</div>
+		<!-- Sidebar CTA Contact Button End -->
+	</div>
+	<!-- Sidebar CTA Box End -->
+</div>
+<!-- Page Single Sidebar End -->

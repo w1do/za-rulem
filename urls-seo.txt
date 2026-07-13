@@ -4,6 +4,10 @@
 # Главная
 /
 
+# Информационные страницы
+/about
+/contacts
+
 # Услуги (кластер)
 /services
 /services/tehpomosch
@@ -11,6 +15,10 @@
 /services/tehpomosch/zamena-akkumulyatora
 /services/tehpomosch/otogrev-avto
 /services/tehpomosch/podvoz-topliva
+/services/tehpomosch/vytaschit-iz-gryazi-lebedkoy
+/services/toplivo
+/services/toplivo/podvoz-benzina
+/services/toplivo/podvoz-dizelya
 
 # Блог
 /blog

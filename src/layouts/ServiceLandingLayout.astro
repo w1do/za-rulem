@@ -3,7 +3,10 @@ import { getCollection, getEntry } from 'astro:content';
 import Layout from './Layout.astro';
 import Header from '../components/shared/header/Header.astro';
 import Footer from '../components/shared/footer/Footer.astro';
-import CallbackForm from '../components/forms/CallbackForm.tsx';
+import ServicePageHeader from '../components/services/single/ServicePageHeader.astro';
+import ServiceSidebar from '../components/services/single/ServiceSidebar.astro';
+import ServiceSingleImage from '../components/services/single/ServiceSingleImage.astro';
+import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 
 const { frontmatter } = Astro.props;
 const cluster = frontmatter.cluster;
@@ -17,114 +20,50 @@ const siblings = (
 	.sort((a, b) => a.data.order - b.data.order)
 	.map((entry) => ({
 		title: entry.data.title,
-		url: `/services/${cluster}/${entry.id.split('/').pop()}`,
+		url: `/services/${entry.id}`,
 	}));
+
+const sidebarLinks = [{ title: `Все услуги: ${hubTitle}`, url: hubUrl }, ...siblings];
 
 const seoTitle = frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь в Тюмени`;
 const seoDescription = frontmatter.seo?.description ?? frontmatter.description;
 const faqs = frontmatter.faqs ?? [];
+const image = frontmatter.image ?? '/images/service-single-image.jpg';
+const imageAlt = frontmatter.imageAlt ?? frontmatter.title;
 ---
 
 <Layout title={seoTitle} description={seoDescription}>
 	<Header />
 
-	<!-- Landing Hero Start -->
-	<div class="page-header dark-section bg-section">
+	<ServicePageHeader title={frontmatter.title} />
+
+	<!-- Page Service Single Start -->
+	<div class="page-service-single">
 		<div class="container">
 			<div class="row">
-				<div class="col-lg-12">
-					<nav class="breadcrumb-nav">
-						<a href="/services">Услуги</a> / <a href={hubUrl}>{hubTitle}</a> /
-						<span>{frontmatter.title}</span>
-					</nav>
-					<div class="section-title">
-						<span class="section-sub-title">{hubTitle} · Тюмень</span>
-						<h1>{frontmatter.title}</h1>
-						<p>{frontmatter.description}</p>
-					</div>
-					<div class="hero-content-btn-gold">
-						<a href="/#contact" class="btn-default btn-highlighted">Вызвать помощь</a>
-						<a href="tel:+79088712026" class="btn-default">+7 908 871-20-26</a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Landing Hero End -->
-
-	<!-- Landing Body Start -->
-	<div class="page-service-single dark-section bg-section">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-8">
-					<div class="service-entry post-body">
-						<slot />
-					</div>
-
-					{
-						faqs.length > 0 && (
-							<div class="faq-accordion" id="landingFaq">
-								<div class="section-title">
-									<h2>Частые вопросы</h2>
-								</div>
-								{faqs.map((faq, i) => (
-									<div class="accordion-item">
-										<div class="accordion-header">
-											<button
-												class="accordion-button collapsed"
-												type="button"
-												data-bs-toggle="collapse"
-												data-bs-target={`#lfaq${i}`}
-											>
-												{faq.question}
-											</button>
-										</div>
-										<div id={`lfaq${i}`} class="accordion-collapse collapse" data-bs-parent="#landingFaq">
-											<div class="accordion-body">
-												<p>{faq.answer}</p>
-											</div>
-										</div>
-									</div>
-								))}
-							</div>
-						)
-					}
-				</div>
-
 				<div class="col-lg-4">
-					<aside class="service-sidebar">
-						<div class="sidebar-widget">
-							<h3>Услуги направления</h3>
-							<ul>
-								<li><a href={hubUrl}>Все услуги направления «{hubTitle}»</a></li>
-								{siblings.map((s) => (
-									<li><a href={s.url}>{s.title}</a></li>
-								))}
-							</ul>
-						</div>
-						<div class="sidebar-widget sidebar-cta">
-							<h3>Срочно нужна помощь?</h3>
-							<p>Звоните круглосуточно — выезжаю по Тюмени и области.</p>
-							<a href="tel:+79088712026" class="btn-default btn-highlighted">+7 908 871-20-26</a>
-						</div>
-					</aside>
+					<ServiceSidebar links={sidebarLinks} />
 				</div>
-			</div>
 
-			<!-- Contact CTA Start -->
-			<div class="row" id="contact">
-				<div class="col-lg-12">
-					<div class="section-title">
-						<h2>Оставьте заявку на выезд</h2>
-						<p>Опишите ситуацию — перезвоню в течение пары минут.</p>
+				<div class="col-lg-8">
+					<!-- Service Single Content Start -->
+					<div class="service-single-content">
+						<ServiceSingleImage image={image} alt={imageAlt} />
+
+						<!-- Service Entry Start -->
+						<div class="service-entry post-body">
+							<slot />
+						</div>
+						<!-- Service Entry End -->
+
+						<ServiceFaqs faqs={faqs} />
 					</div>
-					<CallbackForm client:visible subject={`Заявка: ${frontmatter.title}`} />
+					<!-- Service Single Content End -->
 				</div>
 			</div>
-			<!-- Contact CTA End -->
 		</div>
 	</div>
-	<!-- Landing Body End -->
+	<!-- Page Service Single End -->
 
 	<Footer />
 </Layout>

@@ -1,0 +1,28 @@
+---
+// Шапка страницы статьи (перенос блока "Page Header Section" из source/blog-single.html).
+const { title, author, dateLabel } = Astro.props;
+---
+
+<!-- Page Header Section Start -->
+<div class="page-header parallaxie">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<!-- Page Header Box Start -->
+				<div class="page-header-box">
+					<h1 class="text-anime-style-3" data-cursor="-opaque">{title}</h1>
+					<nav class="wow fadeInUp">
+						<div class="post-single-meta wow fadeInUp">
+							<ol class="breadcrumb">
+								<li><i class="fa-regular fa-user"></i> {author}</li>
+								{dateLabel && <li><i class="fa-regular fa-clock"></i> {dateLabel}</li>}
+							</ol>
+						</div>
+					</nav>
+				</div>
+				<!-- Page Header Box End -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Page Header Section End -->

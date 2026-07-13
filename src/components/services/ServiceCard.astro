@@ -1,0 +1,30 @@
+---
+// Карточка отдельной услуги для каталога /services.
+// Разметка перенесена из шаблона (source/services.html — блок service-item).
+const {
+	title,
+	description,
+	icon = '/images/icon-service-1.svg',
+	url,
+	delay,
+} = Astro.props;
+---
+
+<div class="col-xl-4 col-md-6">
+	<!-- Service Item Start -->
+	<div class="service-item wow fadeInUp" data-wow-delay={delay}>
+		<div class="icon-box">
+			<img src={icon} alt={title} />
+		</div>
+		<div class="service-item-body">
+			<div class="service-item-content">
+				<h2><a href={url}>{title}</a></h2>
+				<p>{description}</p>
+			</div>
+			<div class="service-item-btn">
+				<a href={url} class="readmore-btn">Подробнее</a>
+			</div>
+		</div>
+	</div>
+	<!-- Service Item End -->
+</div>

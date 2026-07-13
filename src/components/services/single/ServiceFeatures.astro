@@ -1,0 +1,33 @@
+---
+const { title = 'Что я предлагаю', description, items = [] } = Astro.props;
+---
+
+{
+	items.length > 0 && (
+		<div class="service-features-box">
+			<h2 class="text-anime-style-3">{title}</h2>
+			{description && <p class="wow fadeInUp">{description}</p>}
+
+			<!-- Service Feature Item List Start -->
+			<div class="service-feature-item-list">
+				{items.map((item, i) => (
+					<div class="service-feature-item wow fadeInUp" data-wow-delay={`${(i + 1) * 0.2}s`}>
+						<div class="icon-box">
+							<img src={item.icon} alt={item.title} />
+						</div>
+						<div class="service-feature-item-content">
+							<h3>{item.title}</h3>
+						</div>
+					</div>
+				))}
+			</div>
+			<!-- Service Feature Item List End -->
+
+			<!-- Section Footer Text Start -->
+			<div class="section-footer-text wow fadeInUp" data-wow-delay="0.8s">
+				<p><span>24/7</span> Опишите ситуацию, и я выеду на место. <a href="/contacts">Оставить заявку.</a></p>
+			</div>
+			<!-- Section Footer Text End -->
+		</div>
+	)
+}

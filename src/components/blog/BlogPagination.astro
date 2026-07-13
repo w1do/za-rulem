@@ -1,0 +1,31 @@
+---
+// Пагинация списка блога (перенос блока "Page Pagination" из source/blog.html).
+const { currentPage = 1, totalPages = 1, basePath = '/blog' } = Astro.props;
+
+const pageUrl = (page: number) => (page <= 1 ? basePath : `${basePath}/page/${page}`);
+const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+const prevPage = currentPage > 1 ? currentPage - 1 : null;
+const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+---
+
+<div class="col-lg-12">
+	<!-- Page Pagination Start -->
+	<div class="page-pagination wow fadeInUp" data-wow-delay="0.4s">
+		<ul class="pagination">
+			<li>
+				<a href={prevPage ? pageUrl(prevPage) : '#'}><i class="fa-solid fa-angle-left"></i></a>
+			</li>
+			{
+				pages.map((page) => (
+					<li class={page === currentPage ? 'active' : undefined}>
+						<a href={pageUrl(page)}>{page}</a>
+					</li>
+				))
+			}
+			<li>
+				<a href={nextPage ? pageUrl(nextPage) : '#'}><i class="fa-solid fa-angle-right"></i></a>
+			</li>
+		</ul>
+	</div>
+	<!-- Page Pagination End -->
+</div>

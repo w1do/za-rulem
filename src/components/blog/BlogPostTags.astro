@@ -1,0 +1,13 @@
+---
+// Теги статьи (перенос блока "Post Tags" из source/blog-single.html).
+const { tags = [] } = Astro.props;
+---
+
+<!-- Post Tags Start -->
+<div class="post-tags wow fadeInUp" data-wow-delay="0.5s">
+	<span class="tag-links">
+		Теги:
+		{tags.map((tag: string) => <a href="#">{tag}</a>)}
+	</span>
+</div>
+<!-- Post Tags End -->

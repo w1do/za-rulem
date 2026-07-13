@@ -1,0 +1,38 @@
+---
+// Карточка поста для списка блога.
+// Разметка перенесена из шаблона (source/blog.html — блок post-item).
+const { title, image, imageAlt, url, delay } = Astro.props;
+---
+
+<div class="col-xl-4 col-md-6">
+	<!-- Post Item Start -->
+	<div class="post-item wow fadeInUp" data-wow-delay={delay}>
+		{
+			image && (
+				<div class="post-featured-image">
+					<a href={url} data-cursor-text="Читать">
+						<figure class="image-anime">
+							<img src={image} alt={imageAlt ?? title} />
+						</figure>
+					</a>
+				</div>
+			)
+		}
+		<!-- Post Item Body Start -->
+		<div class="post-item-body">
+			<!-- Post Item Content Start -->
+			<div class="post-item-content">
+				<h2><a href={url}>{title}</a></h2>
+			</div>
+			<!-- Post Item Content End -->
+
+			<!-- Post Item Readmore Button Start-->
+			<div class="post-item-btn">
+				<a href={url} class="readmore-btn">Читать статью</a>
+			</div>
+			<!-- Post Item Readmore Button End-->
+		</div>
+		<!-- Post Item Body End -->
+	</div>
+	<!-- Post Item End -->
+</div>

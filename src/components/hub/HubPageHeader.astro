@@ -1,0 +1,28 @@
+---
+// Шапка хаба услуги. Разметка перенесена из шаблона (page-header parallaxie),
+// как на странице «О сервисе», с хлебными крошками до раздела услуг.
+const { title = 'Техпомощь на дороге в Тюмени', breadcrumb = 'Техпомощь' } = Astro.props;
+---
+
+<!-- Page Header Section Start -->
+<div class="page-header parallaxie">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<!-- Page Header Box Start -->
+				<div class="page-header-box">
+					<h1 class="text-anime-style-3" data-cursor="-opaque">{title}</h1>
+					<nav class="wow fadeInUp">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="/">главная</a></li>
+							<li class="breadcrumb-item"><a href="/services">услуги</a></li>
+							<li class="breadcrumb-item active" aria-current="page">{breadcrumb}</li>
+						</ol>
+					</nav>
+				</div>
+				<!-- Page Header Box End -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Page Header Section End -->

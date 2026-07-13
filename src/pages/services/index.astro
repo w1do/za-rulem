@@ -3,58 +3,70 @@ import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/shared/header/Header.astro';
 import Footer from '../../components/shared/footer/Footer.astro';
+import ServiceCard from '../../components/services/ServiceCard.astro';
 
-const services = (await getCollection('services')).sort((a, b) =>
-	(a.data.no ?? '99').localeCompare(b.data.no ?? '99'),
+// Каталог показывает отдельные услуги (spokes), а не хабы-кластеры.
+const spokes = (await getCollection('serviceLanding')).sort(
+	(a, b) => a.data.order - b.data.order,
 );
+
+const cards = spokes.map((entry, i) => ({
+	title: entry.data.title,
+	description: entry.data.excerpt ?? entry.data.description,
+	icon: entry.data.icon,
+	url: `/services/${entry.id}`,
+	delay: i % 3 === 0 ? undefined : `${(i % 3) * 0.2}s`,
+}));
 ---
 
 <Layout
-	title="Услуги техпомощи на дороге в Тюмени — выезд 24/7"
+	title="Услуги техпомощи на дороге в Тюмени — выезд 24/7 | За рулём"
 	description="Все услуги автопомощи в Тюмени: прикурить авто, замена аккумулятора, отогрев, подвоз топлива, вскрытие. Приеду на место круглосуточно."
+	keywords="услуги техпомощи тюмень, прикурить авто, замена аккумулятора с выездом, отогрев автомобиля, подвоз топлива"
 >
 	<Header />
 
-	<div class="page-header dark-section bg-section">
+	<!-- Page Header Section Start -->
+	<div class="page-header parallaxie">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-12">
-					<div class="section-title">
-						<span class="section-sub-title">Техпомощь · Тюмень</span>
-						<h1>Услуги техпомощи на дороге</h1>
-						<p>
-							Помогаю водителям Тюмени и области в дорожных ситуациях: завожу авто,
-							меняю аккумулятор, отогреваю машину в мороз, привожу топливо и вскрываю
-							автомобиль без повреждений. Выезжаю круглосуточно.
-						</p>
+					<!-- Page Header Box Start -->
+					<div class="page-header-box">
+						<h1 class="text-anime-style-3" data-cursor="-opaque">Мои услуги</h1>
+						<nav class="wow fadeInUp">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href="/">главная</a></li>
+								<li class="breadcrumb-item active" aria-current="page">Услуги</li>
+							</ol>
+						</nav>
 					</div>
+					<!-- Page Header Box End -->
 				</div>
 			</div>
 		</div>
 	</div>
+	<!-- Page Header Section End -->
 
-	<div class="our-service dark-section bg-section">
+	<!-- page Services Start -->
+	<div class="page-services">
 		<div class="container">
 			<div class="row">
 				{
-					services.map((service) => (
-						<div class="col-lg-4 col-md-6">
-							<a href={`/services/${service.id}`} class="service-item box-border-gradiant">
-								<div class="icon-box">
-									<img src={service.data.icon ?? '/images/icon-service-1.svg'} alt={service.data.title} />
-								</div>
-								<div class="service-item-content">
-									<h3>{service.data.title}</h3>
-									<p>{service.data.description}</p>
-									<span class="service-offer-item-link">Подробнее →</span>
-								</div>
-							</a>
-						</div>
+					cards.map((card) => (
+						<ServiceCard
+							title={card.title}
+							description={card.description}
+							icon={card.icon}
+							url={card.url}
+							delay={card.delay}
+						/>
 					))
 				}
 			</div>
 		</div>
 	</div>
+	<!-- page Services End -->
 
 	<Footer />
 </Layout>
