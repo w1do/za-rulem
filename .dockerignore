@@ -1,0 +1,16 @@
+node_modules
+dist
+.DS_Store
+.git
+.env
+.gitignore
+README.md
+.junie
+.ai
+/source
+/seo
+/docs
+AGENTS.md
+idea.md
+plan.md
+SUMMARY.md
