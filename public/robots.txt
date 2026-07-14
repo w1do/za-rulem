@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://za-rulem.ru/sitemap.xml
