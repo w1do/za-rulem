@@ -58,8 +58,8 @@
 	--divider-color				: #0000001A;
 	--dark-divider-color		: #FFFFFF1A;
 	--error-color				: rgb(230, 87, 87);
-	--default-font				: "Public Sans", sans-serif;
-	--accent-font				: "Mona Sans", sans-serif;
+	--default-font				: "Montserrat", sans-serif;
+	--accent-font				: "Montserrat", sans-serif;
 }
 
 /************************************/
@@ -469,7 +469,7 @@ a:focus{
 	display: inline-block;
 	font-size: 14px;
 	font-weight: 600;
-	text-transform: capitalize;
+	text-transform: uppercase;
 	line-height: normal;
     color: var(--primary-color);
 	background-color: var(--secondary-color);
