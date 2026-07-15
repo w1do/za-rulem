@@ -1,3 +1,45 @@
+---
+interface WhatWeCounter {
+	value: string;
+	title: string;
+}
+
+interface Props {
+	subtitle?: string;
+	title?: string;
+	description?: string;
+	counters?: WhatWeCounter[];
+	checklist?: string[];
+	infoTitle?: string;
+	infoText?: string;
+	ctaText?: string;
+	ctaHref?: string;
+	authorName?: string;
+	authorText?: string;
+}
+
+const {
+	subtitle = 'Как я работаю',
+	title = 'Решаю дорожные проблемы на месте',
+	description = 'Определяю причину поломки на месте и сразу берусь за дело: завожу двигатель, меняю аккумулятор, отогреваю авто или безопасно гружу его на эвакуатор.',
+	counters = [
+		{ value: '0.98', title: 'Довожу помощь до результата' },
+		{ value: '0.85', title: 'Выезжаю с полным оборудованием' },
+	],
+	checklist = [
+		'Принимаю заявку и сразу выезжаю',
+		'Работаю круглосуточно, без выходных',
+		'Помогаю на месте или подаю эвакуатор',
+	],
+	infoTitle = 'Работаю по всей Тюмени',
+	infoText = 'Выезжаю в любую точку города и области, оцениваю проблему на месте и выбираю безопасный способ вернуть авто в движение.',
+	ctaText = 'Связаться со мной',
+	ctaHref = '/contacts',
+	authorName = 'Я — «За рулём»',
+	authorText = 'Я помогаю на дороге',
+} = Astro.props;
+---
+
     <!-- What We Do Section Start -->
     <div class="what-we-do-gold">
         <div class="container">
@@ -29,49 +71,26 @@
                     <div class="what-we-do-content-gold">
                         <!-- Section Title Start -->
                         <div class="section-title">
-                            <span class="section-sub-title wow fadeInUp">Что я делаю</span>
-                            <h2 class="text-anime-style-3" data-cursor="-opaque">Я решаю задачи на дороге в Тюмени</h2>
-                            <p class="wow fadeInUp" data-wow-delay="0.2s">Я оказываю техпомощь на дороге: запускаю двигатель, меняю аккумулятор, отогреваю автомобиль и безопасно эвакуирую его.</p>
+                            <span class="section-sub-title wow fadeInUp">{subtitle}</span>
+                            <h2 class="text-anime-style-3" data-cursor="-opaque">{title}</h2>
+                            <p class="wow fadeInUp" data-wow-delay="0.2s">{description}</p>
                         </div>
                         <!-- Section Title End -->
 
                         <!-- What We Counter List Start -->
                         <div class="what-we-counter-list-gold">
-                            <!-- What We Counter Item Start -->
+                            {counters.map((counter) => (
                             <div class="what-we-counter-item-gold">
-                                <!-- What We Counter Circle Start -->
-                                <div class="circle" data-size="90" data-value="0.98">
+                                <div class="circle" data-size="90" data-value={counter.value}>
                                     <div class="progress_value">
                                         <span class="pro_data"></span><span>%</span>
                                     </div>
                                 </div>
-                                <!-- What We Counter Circle End -->
-
-                                <!-- What We Counter Item Title Start -->
                                 <div class="what-we-counter-item-title-gold">
-                                    <h3>Я довожу помощь до результата</h3>
+                                    <h3>{counter.title}</h3>
                                 </div>
-                                <!-- What We Counter Item Title End -->
                             </div>
-                            <!-- What We Counter Item End -->
-
-                            <!-- What We Counter Item Start -->
-                            <div class="what-we-counter-item-gold">
-                                <!-- What We Counter Circle Start -->
-                                <div class="circle" data-size="90" data-value="0.85">
-                                    <div class="progress_value">
-                                        <span class="pro_data"></span><span>%</span>
-                                    </div>
-                                </div>
-                                <!-- What We Counter Circle End -->
-
-                                <!-- What We Counter Item Title Start -->
-                                <div class="what-we-counter-item-title-gold">
-                                    <h3>Я выезжаю с оборудованием</h3>
-                                </div>
-                                <!-- What We Counter Item Title End -->
-                            </div>
-                            <!-- What We Counter Item End -->
+                            ))}
                         </div>
                         <!-- What We Counter List End -->
 
@@ -80,9 +99,9 @@
                             <!-- What We Body List Start -->
                             <div class="what-we-body-list-gold">
                                 <ul>
-                                    <li>Я принимаю заявку и быстро выезжаю</li>
-                                    <li>Я работаю круглосуточно</li>
-                                    <li>Я помогаю на месте и эвакуирую авто</li>
+                                    {checklist.map((point) => (
+                                    <li>{point}</li>
+                                    ))}
                                 </ul>
                             </div>
                             <!-- What We Body List End -->
@@ -94,11 +113,11 @@
                                         <img src="/images/icon-what-we-do-1-gold.svg" alt="">
                                     </div>
                                     <div class="what-we-info-header-title-gold">
-                                        <h3>Я помогаю в городе</h3>
+                                        <h3>{infoTitle}</h3>
                                     </div>
                                 </div>
                                 <div class="what-we-info-content-gold">
-                                    <p>Я приезжаю по Тюмени, оцениваю проблему на месте и выбираю безопасный способ вернуть авто в движение.</p>
+                                    <p>{infoText}</p>
                                 </div>
                             </div>
                             <!--What We Item Box End -->
@@ -109,7 +128,7 @@
                         <div class="what-we-footer-gold wow fadeInUp" data-wow-delay="0.6s">
                             <!-- Why Choose Us Button Start -->
                             <div class="what-we-btn-gold">
-                                <a href="/#contact" class="btn-default">Связаться со мной</a>
+                                <a href={ctaHref} class="btn-default">{ctaText}</a>
                             </div>
                             <!-- Why Choose Button End -->
 
@@ -125,8 +144,8 @@
 
                                 <!-- Why Choose Author Content Start -->
                                 <div class="why-choose-author-content-gold">
-                                    <h3>Я — «За рулём»</h3>
-                                    <p>Я помогаю на дороге</p>
+                                    <h3>{authorName}</h3>
+                                    <p>{authorText}</p>
                                 </div>
                                 <!-- Why Choose Author Content Start -->
                             </div>

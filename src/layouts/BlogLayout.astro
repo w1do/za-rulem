@@ -5,6 +5,7 @@ import Footer from '../components/shared/footer/Footer.astro';
 import BlogSingleHeader from '../components/blog/BlogSingleHeader.astro';
 import BlogSingleImage from '../components/blog/BlogSingleImage.astro';
 import BlogPostTagLinks from '../components/blog/BlogPostTagLinks.astro';
+import { articleNode, breadcrumbNode } from '../lib/seo';
 
 const { frontmatter } = Astro.props;
 const seoTitle = frontmatter.seo?.title ?? `${frontmatter.title} — блог «За рулём»`;
@@ -16,9 +17,33 @@ const dateLabel = frontmatter.date
 			year: 'numeric',
 		})
 	: '';
+
+const publishedIso = frontmatter.date ? new Date(frontmatter.date).toISOString() : undefined;
+const jsonLd = [
+	articleNode({
+		title: frontmatter.title,
+		description: frontmatter.description,
+		url: Astro.url.pathname,
+		image: frontmatter.image,
+		author: frontmatter.author,
+		datePublished: publishedIso,
+		dateModified: publishedIso,
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Блог', url: '/blog' },
+		{ name: frontmatter.title, url: Astro.url.pathname },
+	]),
+];
 ---
 
-<Layout title={seoTitle} description={seoDescription} ogImage={frontmatter.image}>
+<Layout
+	title={seoTitle}
+	description={seoDescription}
+	ogImage={frontmatter.image}
+	ogType="article"
+	jsonLd={jsonLd}
+>
 	<Header />
 
 	<BlogSingleHeader title={frontmatter.title} author={frontmatter.author} dateLabel={dateLabel} />

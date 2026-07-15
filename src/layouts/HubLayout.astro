@@ -17,12 +17,27 @@ import HubCta from '../components/hub/HubCta.astro';
 import HubExpertise from '../components/hub/HubExpertise.astro';
 import HubFaqs from '../components/hub/HubFaqs.astro';
 import HubTestimonials from '../components/hub/HubTestimonials.astro';
+import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
 
 const { frontmatter, spokes = [] } = Astro.props;
 
 const seoTitle = frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь в Тюмени`;
 const seoDescription = frontmatter.seo?.description ?? frontmatter.description;
 const keywords = Array.isArray(frontmatter.tags) ? frontmatter.tags.join(', ') : undefined;
+
+const jsonLd = [
+	serviceNode({
+		name: frontmatter.title,
+		description: frontmatter.description,
+		url: Astro.url.pathname,
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Услуги', url: '/services' },
+		{ name: frontmatter.title, url: Astro.url.pathname },
+	]),
+	faqNode(frontmatter.faqs),
+].filter(Boolean);
 
 // Карточки услуг для перелинковки на посадочные страницы.
 const services = spokes.map((spoke) => ({
@@ -44,7 +59,7 @@ const steps = process
 	: [];
 ---
 
-<Layout title={seoTitle} description={seoDescription} keywords={keywords}>
+<Layout title={seoTitle} description={seoDescription} keywords={keywords} jsonLd={jsonLd}>
 	<Header />
 
 	<HubPageHeader title={frontmatter.title} />

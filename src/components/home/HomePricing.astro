@@ -1,3 +1,67 @@
+---
+interface PricingPlan {
+	icon: string;
+	title: string;
+	text: string;
+	price: string;
+	priceUnit: string;
+	features: string[];
+	ctaText: string;
+	ctaHref: string;
+}
+
+interface Props {
+	subtitle?: string;
+	title?: string;
+	plans?: PricingPlan[];
+	benefits?: string[];
+}
+
+const benefitIcons = [
+	'/images/icon-pricing-benefit-1.svg',
+	'/images/icon-pricing-benefit-2.svg',
+	'/images/icon-pricing-benefit-3.svg',
+];
+
+const {
+	subtitle = 'Цены на техпомощь',
+	title = 'Понятная стоимость выезда',
+	plans = [
+		{
+			icon: '/images/icon-pricing-1-gold.svg',
+			title: 'Прикурить авто',
+			text: 'Запущу автомобиль от внешнего источника питания прямо на месте поломки.',
+			price: 'от 800 ₽',
+			priceUnit: '/выезд',
+			features: ['Выезд по Тюмени', 'Запуск двигателя', 'Проверка заряда аккумулятора'],
+			ctaText: 'Заказать помощь',
+			ctaHref: '/contacts',
+		},
+		{
+			icon: '/images/icon-pricing-2-gold.svg',
+			title: 'Замена аккумулятора',
+			text: 'Заменю аккумулятор с выездом, а новую батарею подберу по вашему авто.',
+			price: 'от 500 ₽',
+			priceUnit: '+ запчасть',
+			features: ['Выезд по Тюмени', 'Снятие старого аккумулятора', 'Установка новой запчасти'],
+			ctaText: 'Заказать помощь',
+			ctaHref: '/contacts',
+		},
+		{
+			icon: '/images/icon-pricing-3-gold.svg',
+			title: 'Отогрев и эвакуатор',
+			text: 'Отогрею автомобиль или подам эвакуатор при серьёзной неисправности.',
+			price: 'от 1 500 ₽',
+			priceUnit: '/выезд',
+			features: ['Выезд к автомобилю', 'Отогрев двигателя и замков', 'Эвакуация по согласованному маршруту'],
+			ctaText: 'Заказать помощь',
+			ctaHref: '/contacts',
+		},
+	],
+	benefits = ['Цена до начала работ', 'Без скрытых доплат', 'Помощь круглосуточно'],
+} = Astro.props;
+---
+
 <!-- Pricing Plan Section Start -->
 <div class="our-pricing-gold bg-section">
     <div class="container">
@@ -5,29 +69,30 @@
             <div class="col-xl-12">
                 <!-- Section Title Start -->
                 <div class="section-title section-title-center">
-                    <span class="section-sub-title wow fadeInUp">Мои цены на техпомощь</span>
-                    <h2 class="text-anime-style-3" data-cursor="-opaque">Понятная стоимость помощи на дороге</h2>
+                    <span class="section-sub-title wow fadeInUp">{subtitle}</span>
+                    <h2 class="text-anime-style-3" data-cursor="-opaque">{title}</h2>
                 </div>
                 <!-- Section Title End -->
             </div>
         </div>
 
         <div class="row">
+            {plans.map((plan, index) => (
             <div class="col-xl-4 col-md-6">
                 <!-- Pricing Item Start -->
-                <div class="pricing-item-gold wow fadeInUp">
+                <div class="pricing-item-gold wow fadeInUp" data-wow-delay={index === 0 ? undefined : `${index * 0.2}s`}>
                     <!-- Pricing Item Header Start -->
                     <div class="pricing-item-header-gold">
                         <div class="icon-box">
-                            <img src="/images/icon-pricing-1-gold.svg" alt="">
+                            <img src={plan.icon} alt="" />
                         </div>
                         <div class="pricing-item-content-gold">
-                            <span class="pricing-item-title-gold">Прикурить автомобиль</span>
-                            <p>Я запускаю автомобиль от внешнего источника питания на месте поломки.</p>
-                            <h2>от 800 ₽<sub>/выезд</sub></h2>
+                            <span class="pricing-item-title-gold">{plan.title}</span>
+                            <p>{plan.text}</p>
+                            <h2>{plan.price}<sub>{plan.priceUnit}</sub></h2>
                         </div>
                         <div class="pricing-item-btn-gold">
-                            <a href="/#contact" class="btn-default">Заказать помощь</a>
+                            <a href={plan.ctaHref} class="btn-default">{plan.ctaText}</a>
                         </div>
                     </div>
                     <!-- Pricing Item Header End -->
@@ -36,89 +101,24 @@
                     <div class="pricing-item-list-gold">
                         <h3>В услугу входит:</h3>
                         <ul>
-                            <li>Выезд по Тюмени</li>
-                            <li>Запуск двигателя</li>
-                            <li>Проверка запуска аккумулятора</li>
+                            {plan.features.map((feature) => (
+                            <li>{feature}</li>
+                            ))}
                         </ul>
                     </div>
                     <!-- Pricing Item List End -->
                 </div>
                 <!-- Pricing Item End -->
             </div>
-
-            <div class="col-xl-4 col-md-6">
-                <!-- Pricing Item Start -->
-                <div class="pricing-item-gold wow fadeInUp" data-wow-delay="0.2s">
-                    <!-- Pricing Item Header Start -->
-                    <div class="pricing-item-header-gold">
-                        <div class="icon-box">
-                            <img src="/images/icon-pricing-2-gold.svg" alt="">
-                        </div>
-                        <div class="pricing-item-content-gold">
-                            <span class="pricing-item-title-gold">Замена аккумулятора</span>
-                            <p>Я заменяю аккумулятор на месте, а запчасть подбираю по автомобилю.</p>
-                            <h2>от 500 ₽<sub>+ запчасть</sub></h2>
-                        </div>
-                        <div class="pricing-item-btn-gold">
-                            <a href="/#contact" class="btn-default">Заказать помощь</a>
-                        </div>
-                    </div>
-                    <!-- Pricing Item Header End -->
-
-                    <!-- Pricing Item List Start -->
-                    <div class="pricing-item-list-gold">
-                        <h3>В услугу входит:</h3>
-                        <ul>
-                            <li>Выезд по Тюмени</li>
-                            <li>Снятие старого аккумулятора</li>
-                            <li>Установка новой запчасти</li>
-                        </ul>
-                    </div>
-                    <!-- Pricing Item List End -->
-                </div>
-                <!-- Pricing Item End -->
-            </div>
-
-            <div class="col-xl-4 col-md-6">
-                <!-- Pricing Item Start -->
-                <div class="pricing-item-gold wow fadeInUp" data-wow-delay="0.4s">
-                    <!-- Pricing Item Header Start -->
-                    <div class="pricing-item-header-gold">
-                        <div class="icon-box">
-                            <img src="/images/icon-pricing-3-gold.svg" alt="">
-                        </div>
-                        <div class="pricing-item-content-gold">
-                            <span class="pricing-item-title-gold">Отогрев и эвакуатор</span>
-                            <p>Я отогреваю автомобиль или организую эвакуацию при серьёзной неисправности.</p>
-                            <h2>от 1 500 ₽<sub>/выезд</sub></h2>
-                        </div>
-                        <div class="pricing-item-btn-gold">
-                            <a href="/#contact" class="btn-default">Заказать помощь</a>
-                        </div>
-                    </div>
-                    <!-- Pricing Item Header End -->
-
-                    <!-- Pricing Item List Start -->
-                    <div class="pricing-item-list-gold">
-                        <h3>В услугу входит:</h3>
-                        <ul>
-                            <li>Выезд к автомобилю</li>
-                            <li>Отогрев двигателя и замков</li>
-                            <li>Эвакуация по согласованному маршруту</li>
-                        </ul>
-                    </div>
-                    <!-- Pricing Item List End -->
-                </div>
-                <!-- Pricing Item End -->
-            </div>
+            ))}
 
             <div class="col-lg-12">
                 <!-- Pricing Benifit List Start -->
                 <div class="pricing-benefit-list-gold wow fadeInUp" data-wow-delay="0.6s">
                     <ul>
-                        <li><img src="/images/icon-pricing-benefit-1.svg" alt="">Цена до начала работ</li>
-                        <li><img src="/images/icon-pricing-benefit-2.svg" alt="">Без скрытых доплат</li>
-                        <li><img src="/images/icon-pricing-benefit-3.svg" alt="">Помощь в удобное время</li>
+                        {benefits.map((benefit, index) => (
+                        <li><img src={benefitIcons[index] ?? benefitIcons[0]} alt="" />{benefit}</li>
+                        ))}
                     </ul>
                 </div>
                 <!-- Pricing Benifit List End -->

@@ -1,4 +1,51 @@
 ---
+interface ServiceItem {
+	icon: string;
+	title: string;
+	text: string;
+	href: string;
+}
+
+interface Props {
+	subtitle?: string;
+	title?: string;
+	services?: ServiceItem[];
+	footerText?: string;
+	footerLinkText?: string;
+	footerLinkHref?: string;
+	rating?: string;
+	ratingText?: string;
+}
+
+const {
+	subtitle = 'Услуги техпомощи на дороге',
+	title = 'Помогу при любой поломке авто в Тюмени',
+	services = [
+		{
+			icon: '/images/icon-service-1.svg',
+			title: 'Прикурить авто',
+			text: 'Сел аккумулятор — подам питание и запущу двигатель на месте за несколько минут.',
+			href: '/services',
+		},
+		{
+			icon: '/images/icon-service-2.svg',
+			title: 'Замена аккумулятора с выездом',
+			text: 'Проверю АКБ, подберу и установлю новую батарею прямо у вашего авто.',
+			href: '/services',
+		},
+		{
+			icon: '/images/icon-service-3.svg',
+			title: 'Отогрев автомобиля',
+			text: 'Отогрею замёрзший двигатель и салон и заведу машину без риска для узлов.',
+			href: '/services',
+		},
+	],
+	footerText = 'Ещё вскрою авто, привезу топливо или подам эвакуатор —',
+	footerLinkText = 'посмотреть все услуги',
+	footerLinkHref = '/services',
+	rating = '4.9',
+	ratingText = 'Отзывы о моей работе',
+} = Astro.props;
 ---
 
     <!-- Our Service Section Start -->
@@ -8,70 +55,34 @@
                 <div class="col-xl-12">
                     <!-- Section Title Start -->
                     <div class="section-title section-title-center">
-                        <span class="section-sub-title wow fadeInUp">Услуги техпомощи на дороге</span>
-                        <h2 class="text-anime-style-3" data-cursor="-opaque">Я помогу при поломке автомобиля в Тюмени</h2>
+                        <span class="section-sub-title wow fadeInUp">{subtitle}</span>
+                        <h2 class="text-anime-style-3" data-cursor="-opaque">{title}</h2>
                     </div>
                     <!-- Section Title End -->
                 </div>
             </div>
 
             <div class="row">
+                {services.map((service, index) => (
                 <div class="col-xl-4 col-md-6">
                     <!-- Service Item Start -->
-                    <div class="service-item wow fadeInUp">
+                    <div class="service-item wow fadeInUp" data-wow-delay={index === 0 ? undefined : `${index * 0.2}s`}>
                         <div class="icon-box">
-                            <img src="/images/icon-service-1.svg" alt="">
+                            <img src={service.icon} alt="" />
                         </div>
                         <div class="service-item-body">
                             <div class="service-item-content">
-                                <h2><a href="/services">Прикурить автомобиль</a></h2> 
-                                <p>Я запущу двигатель с помощью пускового оборудования, если аккумулятор разрядился на дороге.</p>
+                                <h2><a href={service.href}>{service.title}</a></h2> 
+                                <p>{service.text}</p>
                             </div>
                             <div class="service-item-btn">
-                                <a href="/services" class="readmore-btn">Подробнее</a>
+                                <a href={service.href} class="readmore-btn">Подробнее</a>
                             </div>
                         </div>
                     </div>
                     <!-- Service Item End -->
                 </div>
-
-                <div class="col-xl-4 col-md-6">
-                    <!-- Service Item Start -->
-                    <div class="service-item wow fadeInUp" data-wow-delay="0.2s">
-                        <div class="icon-box">
-                            <img src="/images/icon-service-2.svg" alt="">
-                        </div>
-                        <div class="service-item-body">
-                            <div class="service-item-content">
-                                <h2><a href="/services">Замена аккумулятора</a></h2> 
-                                <p>Я проверю аккумулятор, подберу замену и установлю новую батарею на месте в Тюмени.</p>
-                            </div>
-                            <div class="service-item-btn">
-                                <a href="/services" class="readmore-btn">Подробнее</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Service Item End -->
-                </div>
-
-                <div class="col-xl-4 col-md-6">
-                    <!-- Service Item Start -->
-                    <div class="service-item wow fadeInUp" data-wow-delay="0.4s">
-                        <div class="icon-box">
-                            <img src="/images/icon-service-3.svg" alt="">
-                        </div>
-                        <div class="service-item-body">
-                            <div class="service-item-content">
-                                <h2><a href="/services">Отогрев автомобиля</a></h2> 
-                                <p>Я аккуратно отогрею замёрзший автомобиль и помогу запустить двигатель без лишнего риска.</p>
-                            </div>
-                            <div class="service-item-btn">
-                                <a href="/services" class="readmore-btn">Подробнее</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Service Item End -->
-                </div>
+                ))}
 
                 <div class="col-lg-12">
                     <!-- Section Footer Text Start -->
@@ -88,9 +99,9 @@
                             </div>
                         </div>
                         <!-- Satisfy Client Images End -->
-                        <p>Я также выполню вскрытие автомобиля, подвоз топлива или эвакуацию — <a href="/services">посмотреть все услуги</a></p>
+                        <p>{footerText} <a href={footerLinkHref}>{footerLinkText}</a></p>
                         <ul>
-                            <li><span class="counter">4.9</span></li>
+                            <li><span class="counter">{rating}</span></li>
                             <li>
                                 <i class="fa-solid fa-star"></i>
                                 <i class="fa-solid fa-star"></i>
@@ -98,7 +109,7 @@
                                 <i class="fa-solid fa-star"></i>
                                 <i class="fa-solid fa-star"></i>
                             </li>
-                            <li>Отзывы о моей работе</li>
+                            <li>{ratingText}</li>
                         </ul>
                     </div>
                     <!-- Section Footer Text End -->

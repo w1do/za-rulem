@@ -7,6 +7,8 @@
 # Информационные страницы
 /about
 /contacts
+/privacy-policy
+/terms
 
 # Услуги (кластер)
 /services

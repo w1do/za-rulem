@@ -3,12 +3,29 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/shared/header/Header.astro';
 import Footer from '../components/shared/footer/Footer.astro';
 import ContactForm from '../components/forms/ContactForm.tsx';
+
+import { webPageNode, breadcrumbNode } from '../lib/seo';
+
+const jsonLd = [
+	webPageNode({
+		type: 'ContactPage',
+		name: 'Контакты — вызов автопомощи и техпомощи в Тюмени',
+		description:
+			'Как вызвать автопомощь и техпомощь на дороге в Тюмени и области: телефон +7 908 871-20-26, выезд круглосуточно. Оставьте заявку — перезвоню в течение пары минут.',
+		url: '/contacts',
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Контакты', url: '/contacts' },
+	]),
+];
 ---
 
 <Layout
 	title="Контакты — техпомощь на дороге в Тюмени | За рулём"
 	description="Свяжитесь со мной для вызова техпомощи в Тюмени и области: телефон +7 908 871-20-26, выезд круглосуточно. Оставьте заявку — перезвоню в течение пары минут."
 	keywords="контакты техпомощь тюмень, вызвать автопомощь тюмень, телефон техпомощь на дороге"
+	jsonLd={jsonLd}
 >
 	<Header />
 

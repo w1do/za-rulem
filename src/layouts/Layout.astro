@@ -1,11 +1,15 @@
 ---
+import { SITE, baseGraph } from '../lib/seo';
+
 export interface Props {
 	title: string;
 	description: string;
 	ogTitle?: string;
 	ogDescription?: string;
 	ogImage?: string;
+	ogType?: string;
 	keywords?: string;
+	jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
 }
 
 const {
@@ -14,10 +18,21 @@ const {
 	ogTitle,
 	ogDescription,
 	ogImage = '/images/logo.svg',
+	ogType = 'website',
 	keywords,
+	jsonLd,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImageAbsolute = new URL(ogImage, Astro.site).href;
+
+// Единый граф структурированных данных: базовые узлы (WebSite + LocalBusiness)
+// объединяются со страничными узлами, переданными через проп jsonLd.
+const pageNodes = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
+const structuredData = {
+	'@context': 'https://schema.org',
+	'@graph': [...baseGraph(), ...pageNodes],
+};
 ---
 
 <!doctype html>
@@ -36,12 +51,23 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
 		<link rel="canonical" href={canonical} />
 
 		<!-- Open Graph -->
-		<meta property="og:type" content="website" />
+		<meta property="og:type" content={ogType} />
+		<meta property="og:site_name" content={SITE.brand} />
 		<meta property="og:title" content={ogTitle ?? title} />
 		<meta property="og:description" content={ogDescription ?? description} />
-		<meta property="og:image" content={ogImage} />
+		<meta property="og:image" content={ogImageAbsolute} />
+		<meta property="og:image:alt" content={ogTitle ?? title} />
 		<meta property="og:url" content={canonical} />
 		<meta property="og:locale" content="ru_RU" />
+
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={ogTitle ?? title} />
+		<meta name="twitter:description" content={ogDescription ?? description} />
+		<meta name="twitter:image" content={ogImageAbsolute} />
+
+		<!-- Structured Data (JSON-LD / Schema.org) -->
+		<script type="application/ld+json" set:html={JSON.stringify(structuredData)} is:inline />
 
 		<!-- Favicon Icon -->
 		<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.png" />

@@ -7,6 +7,7 @@ import ServicePageHeader from '../components/services/single/ServicePageHeader.a
 import ServiceSidebar from '../components/services/single/ServiceSidebar.astro';
 import ServiceSingleImage from '../components/services/single/ServiceSingleImage.astro';
 import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
+import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
 
 const { frontmatter } = Astro.props;
 const cluster = frontmatter.cluster;
@@ -30,9 +31,24 @@ const seoDescription = frontmatter.seo?.description ?? frontmatter.description;
 const faqs = frontmatter.faqs ?? [];
 const image = frontmatter.image ?? '/images/service-single-image.jpg';
 const imageAlt = frontmatter.imageAlt ?? frontmatter.title;
+
+const jsonLd = [
+	serviceNode({
+		name: frontmatter.title,
+		description: frontmatter.description,
+		url: Astro.url.pathname,
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Услуги', url: '/services' },
+		{ name: hubTitle, url: hubUrl },
+		{ name: frontmatter.title, url: Astro.url.pathname },
+	]),
+	faqNode(faqs),
+].filter(Boolean);
 ---
 
-<Layout title={seoTitle} description={seoDescription}>
+<Layout title={seoTitle} description={seoDescription} jsonLd={jsonLd}>
 	<Header />
 
 	<ServicePageHeader title={frontmatter.title} />

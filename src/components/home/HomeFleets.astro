@@ -1,3 +1,91 @@
+---
+interface FleetSlide {
+	image: string;
+	alt?: string;
+	cursor?: string;
+	label: string;
+	price: string;
+	priceUnit?: string;
+	amenities: string[];
+	href: string;
+}
+
+interface Props {
+	subtitle?: string;
+	title?: string;
+	slides?: FleetSlide[];
+	footerText?: string;
+	footerLinkText?: string;
+	footerLinkHref?: string;
+}
+
+const amenityIcons = ['/images/icon-amenity-item-1.svg', '/images/icon-amenity-item-2.svg'];
+
+const {
+	subtitle = 'Направления выезда',
+	title = 'Чем помогу на дороге в Тюмени',
+	slides = [
+		{
+			image: '/images/fleets-image-1.jpg',
+			cursor: 'Замена аккумулятора',
+			label: 'Замена аккумулятора',
+			price: 'от 1 500 ₽',
+			priceUnit: '/выезд',
+			amenities: ['Привезу батарею', 'Установлю на месте'],
+			href: '/services/tehpomosch/zamena-akkumulyatora',
+		},
+		{
+			image: '/images/fleets-image-2.jpg',
+			cursor: 'Отогрев авто',
+			label: 'Отогрев авто',
+			price: 'от 2 000 ₽',
+			priceUnit: '/выезд',
+			amenities: ['Отогрею двигатель', 'Заведу на месте'],
+			href: '/services/tehpomosch/otogrev-avto',
+		},
+		{
+			image: '/images/fleets-image-3.jpg',
+			cursor: 'Автоэлектрик и диагностика',
+			label: 'Автоэлектрик и диагностика',
+			price: 'от 1 500 ₽',
+			priceUnit: '/выезд',
+			amenities: ['Найду причину поломки', 'Проверю электрику авто'],
+			href: '/services/tehpomosch',
+		},
+		{
+			image: '/images/fleets-image-4.jpg',
+			cursor: 'Подвоз топлива',
+			label: 'Подвоз топлива',
+			price: 'от 1 000 ₽',
+			priceUnit: '/выезд',
+			amenities: ['Привезу бензин или дизель', 'Помогу запустить авто'],
+			href: '/services/tehpomosch/podvoz-topliva',
+		},
+		{
+			image: '/images/fleets-image-5.jpg',
+			cursor: 'Вызвать эвакуатор',
+			label: 'Эвакуатор',
+			price: 'от 2 500 ₽',
+			priceUnit: '/выезд',
+			amenities: ['Погружу автомобиль', 'Доставлю по адресу'],
+			href: '/services/tehpomosch',
+		},
+		{
+			image: '/images/fleets-image-1.jpg',
+			cursor: 'Прикурить авто',
+			label: 'Прикурить авто',
+			price: 'от 800 ₽',
+			priceUnit: '/выезд',
+			amenities: ['Подам питание', 'Запущу двигатель'],
+			href: '/services/tehpomosch/prikurit-avto',
+		},
+	],
+	footerText = 'Собрал все услуги техпомощи на дороге —',
+	footerLinkText = 'посмотреть все услуги',
+	footerLinkHref = '/services',
+} = Astro.props;
+---
+
     <!-- Our Fleets Section Start -->
     <div class="our-fleets bg-section">
         <div class="container">
@@ -5,8 +93,8 @@
                 <div class="col-xl-12">
                     <!-- Section Title Start -->
                     <div class="section-title section-title-center">
-                        <span class="section-sub-title wow fadeInUp">Мои услуги</span>
-                        <h2 class="text-anime-style-3" data-cursor="-opaque">Я помогаю на дороге в Тюмени</h2>
+                        <span class="section-sub-title wow fadeInUp">{subtitle}</span>
+                        <h2 class="text-anime-style-3" data-cursor="-opaque">{title}</h2>
                     </div>
                     <!-- Section Title End -->
                 </div>
@@ -18,15 +106,14 @@
                     <div class="fleets-slider wow fadeInUp" data-wow-delay="0.2s">
                         <div class="swiper">
                             <div class="swiper-wrapper">
-
-                                <!-- Fleets Slide Start -->
+                                {slides.map((slide) => (
                                 <div class="swiper-slide">
                                     <div class="fleets-item">
                                         <!-- Fleets Item Image Start -->
                                         <div class="fleets-item-image">
-                                            <a href="/services" data-cursor-text="Я помогаю подвезти топливо">
+                                            <a href={slide.href} data-cursor-text={slide.cursor}>
                                                 <figure>
-                                                    <img src="/images/services/service-4.jpg" alt="Привезти топливо">
+                                                    <img src={slide.image} alt={slide.alt ?? slide.label} />
                                                 </figure>
                                             </a>
                                         </div>
@@ -34,7 +121,7 @@
 
                                         <!-- Fleets Item Button Start -->
                                         <div class="fleets-item-btn">
-                                            <a href="/services"><img src="/images/arrow-primary.svg" alt=""></a>
+                                            <a href={slide.href}><img src="/images/arrow-primary.svg" alt="" /></a>
                                         </div>
                                         <!-- Project Item Button End -->
 
@@ -42,16 +129,17 @@
                                         <div class="fleets-item-body">
                                             <!-- Fleets Item Content Start -->
                                             <div class="fleets-item-content">
-                                                <p>Я прикуриваю авто</p>
-                                                <h2>от 1 200 ₽ <sub>/выезд</sub></h2>
+                                                <p>{slide.label}</p>
+                                                <h2>{slide.price} <sub>{slide.priceUnit}</sub></h2>
                                             </div>
                                             <!-- Fleets Item Content End -->
 
                                             <!-- Fleets Amenity Item List Start -->
                                             <div class="fleets-amenity-item-list">
                                                 <ul>
-                                                    <li><img src="/images/icon-amenity-item-1.svg" alt="">Я подаю питание</li>
-                                                    <li><img src="/images/icon-amenity-item-2.svg" alt="">Я запускаю двигатель</li>
+                                                    {slide.amenities.map((amenity, index) => (
+                                                    <li><img src={amenityIcons[index] ?? amenityIcons[0]} alt="" />{amenity}</li>
+                                                    ))}
                                                 </ul>
                                             </div>
                                             <!-- Fleets Amenity Item List End -->
@@ -59,260 +147,7 @@
                                         <!-- Fleets Item Header Box End -->
                                     </div>
                                 </div>
-                                <!-- Fleets Slide End -->
-
-
-                                <!-- Fleets Slide Start -->
-                                <div class="swiper-slide">
-                                    <div class="fleets-item">
-                                        <!-- Fleets Item Image Start -->
-                                        <div class="fleets-item-image">
-                                            <a href="/services" data-cursor-text="Я помогаю">
-                                                <figure>
-                                                    <img src="/images/fleets-image-1.jpg" alt="">
-                                                </figure>
-                                            </a>
-                                        </div>
-                                        <!-- Fleets Item Image End -->
-
-                                        <!-- Fleets Item Button Start -->
-                                        <div class="fleets-item-btn">
-                                            <a href="/services"><img src="/images/arrow-primary.svg" alt=""></a>
-                                        </div>
-                                        <!-- Project Item Button End -->
-                                         
-                                        <!-- Fleets Item Body Start -->
-                                        <div class="fleets-item-body">
-                                            <!-- Fleets Item Content Start -->
-                                            <div class="fleets-item-content">
-                                                <p>Я прикуриваю авто</p>
-                                                <h2>от 800 ₽ <sub>/выезд</sub></h2>
-                                            </div>
-                                            <!-- Fleets Item Content End -->
-
-                                            <!-- Fleets Amenity Item List Start -->
-                                            <div class="fleets-amenity-item-list">
-                                                <ul>
-                                                    <li><img src="/images/icon-amenity-item-1.svg" alt="">Я подаю питание</li>
-                                                    <li><img src="/images/icon-amenity-item-2.svg" alt="">Я запускаю двигатель</li>
-                                                </ul>
-                                            </div>
-                                            <!-- Fleets Amenity Item List End -->
-                                        </div>
-                                        <!-- Fleets Item Header Box End -->
-                                    </div>
-                                </div>
-                                <!-- Fleets Slide End -->
-
-                                <!-- Fleets Slide Start -->
-                                <div class="swiper-slide">
-                                    <div class="fleets-item">
-                                        <!-- Fleets Item Image Start -->
-                                        <div class="fleets-item-image">
-                                            <a href="/services" data-cursor-text="Я помогаю">
-                                                <figure>
-                                                    <img src="/images/fleets-image-2.jpg" alt="">
-                                                </figure>
-                                            </a>
-                                        </div>
-                                        <!-- Fleets Item Image End -->
-
-                                        <!-- Fleets Item Button Start -->
-                                        <div class="fleets-item-btn">
-                                            <a href="/services"><img src="/images/arrow-primary.svg" alt=""></a>
-                                        </div>
-                                        <!-- Project Item Button End -->
-
-                                        <!-- Fleets Item Body Start -->
-                                        <div class="fleets-item-body">
-                                            <!-- Fleets Item Content Start -->
-                                            <div class="fleets-item-content">
-                                                <p>Я заменяю аккумулятор</p>
-                                                <h2>от 1 500 ₽ <sub>/выезд</sub></h2>
-                                            </div>
-                                            <!-- Fleets Item Content End -->
-
-                                            <!-- Fleets Amenity Item List Start -->
-                                            <div class="fleets-amenity-item-list">
-                                                <ul>
-                                                    <li><img src="/images/icon-amenity-item-1.svg" alt="">Я привожу аккумулятор</li>
-                                                    <li><img src="/images/icon-amenity-item-2.svg" alt="">Я устанавливаю на месте</li>
-                                                </ul>
-                                            </div>
-                                            <!-- Fleets Amenity Item List End -->
-                                        </div>
-                                        <!-- Fleets Item Header Box End -->
-                                    </div>
-                                </div>
-                                <!-- Fleets Slide End -->
-
-                                <!-- Fleets Slide Start -->
-                                <div class="swiper-slide">
-                                    <div class="fleets-item">
-                                        <!-- Fleets Item Image Start -->
-                                        <div class="fleets-item-image">
-                                            <a href="/services" data-cursor-text="Я помогаю">
-                                                <figure>
-                                                    <img src="/images/fleets-image-3.jpg" alt="">
-                                                </figure>
-                                            </a>
-                                        </div>
-                                        <!-- Fleets Item Image End -->
-
-                                        <!-- Fleets Item Button Start -->
-                                        <div class="fleets-item-btn">
-                                            <a href="/services"><img src="/images/arrow-primary.svg" alt=""></a>
-                                        </div>
-                                        <!-- Project Item Button End -->
-
-                                        <!-- Fleets Item Body Start -->
-                                        <div class="fleets-item-body">
-                                            <!-- Fleets Item Content Start -->
-                                            <div class="fleets-item-content">
-                                                <p>Я отогреваю авто</p>
-                                                <h2>от 2 000 ₽ <sub>/выезд</sub></h2>
-                                            </div>
-                                            <!-- Fleets Item Content End -->
-
-                                            <!-- Fleets Amenity Item List Start -->
-                                            <div class="fleets-amenity-item-list">
-                                                <ul>
-                                                    <li><img src="/images/icon-amenity-item-1.svg" alt="">Я отогреваю двигатель</li>
-                                                    <li><img src="/images/icon-amenity-item-2.svg" alt="">Я запускаю авто на месте</li>
-                                                </ul>
-                                            </div>
-                                            <!-- Fleets Amenity Item List End -->
-                                        </div>
-                                        <!-- Fleets Item Header Box End -->
-                                    </div>
-                                </div>
-                                <!-- Fleets Slide End -->
-
-                                <!-- Fleets Slide Start -->
-                                <div class="swiper-slide">
-                                    <div class="fleets-item">
-                                        <!-- Fleets Item Image Start -->
-                                        <div class="fleets-item-image">
-                                            <a href="/services" data-cursor-text="Я помогаю">
-                                                <figure>
-                                                    <img src="/images/fleets-image-4.jpg" alt="">
-                                                </figure>
-                                            </a>
-                                        </div>
-                                        <!-- Fleets Item Image End -->
-
-                                        <!-- Fleets Item Button Start -->
-                                        <div class="fleets-item-btn">
-                                            <a href="/services"><img src="/images/arrow-primary.svg" alt=""></a>
-                                        </div>
-                                        <!-- Project Item Button End -->
-
-                                        <!-- Fleets Item Body Start -->
-                                        <div class="fleets-item-body">
-                                            <!-- Fleets Item Content Start -->
-                                            <div class="fleets-item-content">
-                                                <p>Я эвакуирую авто</p>
-                                                <h2>от 2 500 ₽ <sub>/выезд</sub></h2>
-                                            </div>
-                                            <!-- Fleets Item Content End -->
-
-                                            <!-- Fleets Amenity Item List Start -->
-                                            <div class="fleets-amenity-item-list">
-                                                <ul>
-                                                    <li><img src="/images/icon-amenity-item-1.svg" alt="">Я погружаю автомобиль</li>
-                                                    <li><img src="/images/icon-amenity-item-2.svg" alt="">Я доставляю до места</li>
-                                                </ul>
-                                            </div>
-                                            <!-- Fleets Amenity Item List End -->
-                                        </div>
-                                        <!-- Fleets Item Header Box End -->
-                                    </div>
-                                </div>
-                                <!-- Fleets Slide End -->
-
-                                <!-- Fleets Slide Start -->
-                                <div class="swiper-slide">
-                                    <div class="fleets-item">
-                                        <!-- Fleets Item Image Start -->
-                                        <div class="fleets-item-image">
-                                            <a href="/services" data-cursor-text="Я помогаю">
-                                                <figure>
-                                                    <img src="/images/fleets-image-5.jpg" alt="">
-                                                </figure>
-                                            </a>
-                                        </div>
-                                        <!-- Fleets Item Image End -->
-
-                                        <!-- Fleets Item Button Start -->
-                                        <div class="fleets-item-btn">
-                                            <a href="/services"><img src="/images/arrow-primary.svg" alt=""></a>
-                                        </div>
-                                        <!-- Project Item Button End -->
-
-                                        <!-- Fleets Item Body Start -->
-                                        <div class="fleets-item-body">
-                                            <!-- Fleets Item Content Start -->
-                                            <div class="fleets-item-content">
-                                                <p>Я вскрываю авто</p>
-                                                <h2>от 1 500 ₽ <sub>/выезд</sub></h2>
-                                            </div>
-                                            <!-- Fleets Item Content End -->
-
-                                            <!-- Fleets Amenity Item List Start -->
-                                            <div class="fleets-amenity-item-list">
-                                                <ul>
-                                                    <li><img src="/images/icon-amenity-item-1.svg" alt="">Я открываю без повреждений</li>
-                                                    <li><img src="/images/icon-amenity-item-2.svg" alt="">Я работаю с замками авто</li>
-                                                </ul>
-                                            </div>
-                                            <!-- Fleets Amenity Item List End -->
-                                        </div>
-                                        <!-- Fleets Item Header Box End -->
-                                    </div>
-                                </div>
-                                <!-- Fleets Slide End -->
-
-                                <!-- Fleets Slide Start -->
-                                <div class="swiper-slide">
-                                    <div class="fleets-item">
-                                        <!-- Fleets Item Image Start -->
-                                        <div class="fleets-item-image">
-                                            <a href="/services" data-cursor-text="Я помогаю">
-                                                <figure>
-                                                    <img src="/images/fleets-image-1.jpg" alt="">
-                                                </figure>
-                                            </a>
-                                        </div>
-                                        <!-- Fleets Item Image End -->
-
-                                        <!-- Fleets Item Button Start -->
-                                        <div class="fleets-item-btn">
-                                            <a href="/services"><img src="/images/arrow-primary.svg" alt=""></a>
-                                        </div>
-                                        <!-- Project Item Button End -->
-
-                                        <!-- Fleets Item Body Start -->
-                                        <div class="fleets-item-body">
-                                            <!-- Fleets Item Content Start -->
-                                            <div class="fleets-item-content">
-                                                <p>Я подвожу топливо</p>
-                                                <h2>от 1 000 ₽ <sub>/выезд</sub></h2>
-                                            </div>
-                                            <!-- Fleets Item Content End -->
-
-                                            <!-- Fleets Amenity Item List Start -->
-                                            <div class="fleets-amenity-item-list">
-                                                <ul>
-                                                    <li><img src="/images/icon-amenity-item-1.svg" alt="">Я привожу нужное топливо</li>
-                                                    <li><img src="/images/icon-amenity-item-2.svg" alt="">Я помогаю запустить авто</li>
-                                                </ul>
-                                            </div>
-                                            <!-- Fleets Amenity Item List End -->
-                                        </div>
-                                        <!-- Fleets Item Header Box End -->
-                                    </div>
-                                </div>
-                                <!-- Fleets Slide End -->
+                                ))}
                             </div>
                             <div class="fleets-pagination"></div>
                         </div>
@@ -335,7 +170,7 @@
                             </div>
                         </div>
                         <!-- Satisfy Client Images End -->    
-                        <p>Я собрал услуги техпомощи на дороге — <a href="/services">я показываю все услуги</a></p>
+                        <p>{footerText} <a href={footerLinkHref}>{footerLinkText}</a></p>
                     </div>
                     <!-- Section Footer Text End -->
                 </div>

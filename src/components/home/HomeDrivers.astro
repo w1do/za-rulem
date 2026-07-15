@@ -1,3 +1,49 @@
+---
+interface DriverItem {
+	image: string;
+	title: string;
+	text: string;
+	href: string;
+}
+
+interface Props {
+	subtitle?: string;
+	title?: string;
+	drivers?: DriverItem[];
+	footerText?: string;
+	footerLinkText?: string;
+	footerLinkHref?: string;
+}
+
+const {
+	subtitle = 'Форматы выезда',
+	title = 'Подберу выезд под вашу ситуацию',
+	drivers = [
+		{
+			image: '/images/driver/ekip-1.jpg',
+			title: 'Выезд на прикуривание',
+			text: 'Приеду и заведу авто с разряженным аккумулятором.',
+			href: '/services',
+		},
+		{
+			image: '/images/driver/ekip-2.jpg',
+			title: 'Выезд на замену аккумулятора',
+			text: 'Привезу и установлю новую батарею на месте.',
+			href: '/services',
+		},
+		{
+			image: '/images/driver/ekip-3.jpg',
+			title: 'Выезд на эвакуацию',
+			text: 'Погружу и доставлю авто по нужному адресу.',
+			href: '/services',
+		},
+	],
+	footerText = 'Поддерживаю полный спектр техпомощи на дороге —',
+	footerLinkText = 'все услуги',
+	footerLinkHref = '/services',
+} = Astro.props;
+---
+
     <!-- Our Driver Section Start -->
     <div class="our-driver">
         <div class="container">
@@ -5,32 +51,33 @@
                 <div class="col-lg-12">
                     <!-- Section Title Start -->
                     <div class="section-title section-title-center">
-                        <span class="section-sub-title wow fadeInUp">Если я на выезде</span>
-                        <h2 class="text-anime-style-3" data-cursor="-opaque">Отправлю экипаж посвободней</h2>
+                        <span class="section-sub-title wow fadeInUp">{subtitle}</span>
+                        <h2 class="text-anime-style-3" data-cursor="-opaque">{title}</h2>
                     </div>
                     <!-- Section Title End -->
                 </div>
             </div>
 
             <div class="row">
+                {drivers.map((driver, index) => (
                 <div class="col-xl-4 col-md-6">
                     <!-- Driver Item Start -->
-                    <div class="driver-item wow fadeInUp">
+                    <div class="driver-item wow fadeInUp" data-wow-delay={index === 0 ? undefined : `${index * 0.2}s`}>
                         <!-- Driver Item Image Start -->
                         <div class="driver-item-image">
-                            <a href="/services" data-cursor-text="Подробнее">
+                            <a href={driver.href} data-cursor-text="Подробнее">
                                 <figure class="image-anime">
-                                    <img src="/images/driver/ekip-1.jpg" alt="">
+                                    <img src={driver.image} alt="" />
                                 </figure>
                             </a>
 
                             <!-- Driver Item Social List Start -->
                             <div class="driver-item-social-list">
                                 <ul>
-                                    <li><a href="/contact"><i class="fa-brands fa-dribbble"></i></a></li>
-                                    <li><a href="/contact"><i class="fa-brands fa-x-twitter"></i></a></li>
-                                    <li><a href="/contact"><i class="fab fa-facebook-f"></i></a></li>
-                                    <li><a href="/contact"><i class="fa-brands fa-instagram"></i></a></li>
+                                    <li><a href="/contacts"><i class="fa-brands fa-dribbble"></i></a></li>
+                                    <li><a href="/contacts"><i class="fa-brands fa-x-twitter"></i></a></li>
+                                    <li><a href="/contacts"><i class="fab fa-facebook-f"></i></a></li>
+                                    <li><a href="/contacts"><i class="fa-brands fa-instagram"></i></a></li>
                                 </ul>
                             </div>
                             <!-- Driver Item Social List End -->
@@ -39,81 +86,14 @@
 
                         <!-- Driver Item Content Start -->
                         <div class="driver-item-content">
-                            <h2><a href="/services">Экипаж прикуривания</a></h2>
-                            <p>Я выезжаю на прикуривание автомобиля</p>
+                            <h2><a href={driver.href}>{driver.title}</a></h2>
+                            <p>{driver.text}</p>
                         </div>
                         <!-- Driver Item Content End -->
                     </div>
                     <!-- Driver Item End -->
                 </div>
-
-                <div class="col-xl-4 col-md-6">
-                    <!-- Driver Item Start -->
-                    <div class="driver-item wow fadeInUp" data-wow-delay="0.2s">
-                        <!-- Driver Item Image Start -->
-                        <div class="driver-item-image">
-                            <a href="/services" data-cursor-text="Подробнее">
-                                <figure class="image-anime">
-                                    <img src="/images/driver/ekip-2.jpg" alt="">
-                                </figure>
-                            </a>
-
-                            <!-- Driver Item Social List Start -->
-                            <div class="driver-item-social-list">
-                                <ul>
-                                    <li><a href="/#contact"><i class="fa-brands fa-dribbble"></i></a></li>
-                                    <li><a href="/#contact"><i class="fa-brands fa-x-twitter"></i></a></li>
-                                    <li><a href="/#contact"><i class="fab fa-facebook-f"></i></a></li>
-                                    <li><a href="/#contact"><i class="fa-brands fa-instagram"></i></a></li>
-                                </ul>
-                            </div>
-                            <!-- Driver Item Social List End -->
-                        </div>
-                        <!-- Driver Item Image End -->
-
-                        <!-- Driver Item Content Start -->
-                        <div class="driver-item-content">
-                            <h2><a href="/services">Экипаж замены аккумулятора</a></h2>
-                            <p>Я меняю аккумулятор на месте</p>
-                        </div>
-                        <!-- Driver Item Content End -->
-                    </div>
-                    <!-- Driver Item End -->
-                </div>
-
-                <div class="col-xl-4 col-md-6">
-                    <!-- Driver Item Start -->
-                    <div class="driver-item wow fadeInUp" data-wow-delay="0.4s">
-                        <!-- Driver Item Image Start -->
-                        <div class="driver-item-image">
-                            <a href="/services" data-cursor-text="Подробнее">
-                                <figure class="image-anime">
-                                    <img src="/images/driver/ekip-3.jpg" alt="">
-                                </figure>
-                            </a>
-
-                            <!-- Driver Item Social List Start -->
-                            <div class="driver-item-social-list">
-                                <ul>
-                                    <li><a href="/#contact"><i class="fa-brands fa-dribbble"></i></a></li>
-                                    <li><a href="/#contact"><i class="fa-brands fa-x-twitter"></i></a></li>
-                                    <li><a href="/#contact"><i class="fab fa-facebook-f"></i></a></li>
-                                    <li><a href="/#contact"><i class="fa-brands fa-instagram"></i></a></li>
-                                </ul>
-                            </div>
-                            <!-- Driver Item Social List End -->
-                        </div>
-                        <!-- Driver Item Image End -->
-
-                        <!-- Driver Item Content Start -->
-                        <div class="driver-item-content">
-                            <h2><a href="/services">Экипаж эвакуации</a></h2>
-                            <p>Я организую эвакуацию автомобиля</p>
-                        </div>
-                        <!-- Driver Item Content End -->
-                    </div>
-                    <!-- Driver Item End -->
-                </div>
+                ))}
 
                 <div class="col-lg-12">
                     <!-- Section Footer Text Start -->
@@ -130,7 +110,7 @@
                             </div>
                         </div>
                         <!-- Satisfy Client Images End -->    
-                        <p>Я поддерживаю полный спектр техпомощи на дороге — <a href="/services">все услуги</a></p>
+                        <p>{footerText} <a href={footerLinkHref}>{footerLinkText}</a></p>
                     </div>
                     <!-- Section Footer Text End -->
                 </div>

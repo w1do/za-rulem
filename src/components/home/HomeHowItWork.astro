@@ -1,3 +1,56 @@
+---
+interface WorkStep {
+	icon: string;
+	number: string;
+	title: string;
+	text: string;
+}
+
+interface Props {
+	subtitle?: string;
+	title?: string;
+	steps?: WorkStep[];
+	footerList?: string[];
+	footerText?: string;
+	footerLinkText?: string;
+	footerLinkHref?: string;
+}
+
+const {
+	subtitle = 'Как вызвать помощь',
+	title = 'Три шага — и я уже в пути',
+	steps = [
+		{
+			icon: '/images/icon-how-it-work-1-gold.svg',
+			number: '01',
+			title: 'Принимаю заявку',
+			text: 'Уточняю поломку и называю цену до выезда.',
+		},
+		{
+			icon: '/images/icon-how-it-work-2-gold.svg',
+			number: '02',
+			title: 'Фиксирую адрес',
+			text: 'Отмечаю точку в Тюмени и строю быстрый маршрут.',
+		},
+		{
+			icon: '/images/icon-how-it-work-3-gold.svg',
+			number: '03',
+			title: 'Оказываю помощь',
+			text: 'Прикуриваю, ремонтирую, отогреваю или эвакуирую авто.',
+		},
+	],
+	footerList = [
+		'Прикуривание автомобиля',
+		'Замена аккумулятора',
+		'Эвакуация автомобиля',
+		'Подвоз топлива',
+	],
+	footerText = 'Быстро организую помощь на дороге в любое время.',
+	footerLinkText = 'Вызвать помощь',
+	footerLinkHref = '/contacts',
+} = Astro.props;
+---
+
     <!-- How It Work Section Start -->
     <div class="how-it-work-gold dark-section bg-section">
         <div class="container">
@@ -5,70 +58,34 @@
                 <div class="col-xl-12">
                     <!-- Section Title Start -->
                     <div class="section-title section-title-center">
-                        <span class="section-sub-title wow fadeInUp">Как вызвать помощь</span>
-                        <h2 class="text-anime-style-3" data-cursor="-opaque">Я приезжаю на помощь после трёх простых шагов</h2>
+                        <span class="section-sub-title wow fadeInUp">{subtitle}</span>
+                        <h2 class="text-anime-style-3" data-cursor="-opaque">{title}</h2>
                     </div>
                     <!-- Section Title End -->
                 </div>
             </div>
 
             <div class="row">
+                {steps.map((step, index) => (
                 <div class="col-xl-4 col-md-6">
                     <!-- How It Work Item Start -->
-                    <div class="how-it-work-item-gold wow fadeInUp">
+                    <div class="how-it-work-item-gold wow fadeInUp" data-wow-delay={index === 0 ? undefined : `${index * 0.2}s`}>
                         <div class="how-it-work-header-gold">
                             <div class="icon-box">
-                                <img src="/images/icon-how-it-work-1-gold.svg" alt="">
+                                <img src={step.icon} alt="" />
                             </div>
                             <div class="how-it-work-no-gold">
-                                <h3>01</h3>
+                                <h3>{step.number}</h3>
                             </div>
                         </div>
                         <div class="how-it-work-body-gold">
-                            <h3>Я принимаю заявку</h3>
-                            <p>Я уточняю причину остановки и нужный вид техпомощи.</p>
+                            <h3>{step.title}</h3>
+                            <p>{step.text}</p>
                         </div>
                     </div>
                     <!-- How It Work Item End -->
                 </div>
-
-                <div class="col-xl-4 col-md-6">
-                    <!-- How It Work Item Start -->
-                    <div class="how-it-work-item-gold wow fadeInUp" data-wow-delay="0.2s">
-                        <div class="how-it-work-header-gold">
-                            <div class="icon-box">
-                                <img src="/images/icon-how-it-work-2-gold.svg" alt="">
-                            </div>
-                            <div class="how-it-work-no-gold">
-                                <h3>02</h3>
-                            </div>
-                        </div>
-                        <div class="how-it-work-body-gold">
-                            <h3>Я фиксирую адрес</h3>
-                            <p>Я фиксирую точку в Тюмени и рассчитываю маршрут экипажа.</p>
-                        </div>
-                    </div>
-                    <!-- How It Work Item End -->
-                </div>
-
-                <div class="col-xl-4 col-md-6">
-                    <!-- How It Work Item Start -->
-                    <div class="how-it-work-item-gold wow fadeInUp" data-wow-delay="0.4s">
-                        <div class="how-it-work-header-gold">
-                            <div class="icon-box">
-                                <img src="/images/icon-how-it-work-3-gold.svg" alt="">
-                            </div>
-                            <div class="how-it-work-no-gold">
-                                <h3>03</h3>
-                            </div>
-                        </div>
-                        <div class="how-it-work-body-gold">
-                            <h3>Я оказываю помощь</h3>
-                            <p>Я выезжаю на прикуривание, ремонт, отогрев или эвакуацию.</p>
-                        </div>
-                    </div>
-                    <!-- How It Work Item End -->
-                </div>
+                ))}
 
                 <div class="col-lg-12">
                     <!-- How It Work Footer Start -->
@@ -76,10 +93,9 @@
                         <!-- How It Footer List Start -->
                         <div class="how-it-footer-list-gold">
                             <ul>
-                                <li>Прикуривание автомобиля</li>
-                                <li>Замена аккумулятора</li>
-                                <li>Эвакуация автомобиля</li>
-                                <li>Подвоз топлива</li>
+                                {footerList.map((point) => (
+                                <li>{point}</li>
+                                ))}
                             </ul>
                         </div>
                         <!-- How It Footer List End -->
@@ -98,7 +114,7 @@
                                 </div>
                             </div>
                             <!-- Satisfy Client Images End -->    
-                            <p>Я быстро организую помощь на дороге. <a href="/#contact">Вызвать помощь</a></p>
+                            <p>{footerText} <a href={footerLinkHref}>{footerLinkText}</a></p>
                         </div>
                         <!-- Section Footer Text End -->
                     </div>

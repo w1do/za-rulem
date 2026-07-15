@@ -1,3 +1,36 @@
+---
+interface CollectionCategory {
+	icon: string;
+	title: string;
+	image: string;
+}
+
+interface Props {
+	subtitle?: string;
+	title?: string;
+	description?: string;
+	ctaText?: string;
+	ctaHref?: string;
+	categories?: CollectionCategory[];
+}
+
+const {
+	subtitle = 'Категории техпомощи',
+	title = 'Все услуги помощи на дороге в одном месте',
+	description = 'Выезжаю по любому направлению: прикуривание, замена аккумулятора, отогрев, эвакуация, автоэлектрик и диагностика или подвоз топлива — выбирайте нужное и звоните.',
+	ctaText = 'Вызвать помощь',
+	ctaHref = '/contacts',
+	categories = [
+		{ icon: '/images/icon-car-collection-1-gold.svg', title: 'Прикурить автомобиль', image: '/images/car-collection-image-1-gold.png' },
+		{ icon: '/images/icon-car-collection-2-gold.svg', title: 'Заменить аккумулятор', image: '/images/car-collection-image-2-gold.png' },
+		{ icon: '/images/icon-car-collection-3-gold.svg', title: 'Отогреть автомобиль', image: '/images/car-collection-image-3-gold.png' },
+		{ icon: '/images/icon-car-collection-4-gold.svg', title: 'Эвакуировать автомобиль', image: '/images/car-collection-image-4-gold.png' },
+		{ icon: '/images/icon-car-collection-5-gold.svg', title: 'Автоэлектрик и диагностика', image: '/images/car-collection-image-5-gold.png' },
+		{ icon: '/images/icon-car-collection-6-gold.svg', title: 'Подвезти топливо', image: '/images/car-collection-image-6-gold.png' },
+	],
+} = Astro.props;
+---
+
     <!-- Car Collection Section Start -->
     <div class="car-collection-gold dark-section bg-section">
         <div class="container">
@@ -7,15 +40,15 @@
                     <div class="car-collection-content-gold">
                         <!-- Section Title Start -->
                         <div class="section-title">
-                            <span class="section-sub-title wow fadeInUp">Категории техпомощи</span>
-                            <h2 class="text-anime-style-3" data-cursor="-opaque">Я собрал основные услуги помощи на дороге в Тюмени</h2>
-                            <p class="wow fadeInUp" data-wow-delay="0.2s">Я выезжаю, когда автомобилю требуется прикуривание, замена аккумулятора, отогрев, эвакуация, вскрытие или подвоз топлива.</p>
+                            <span class="section-sub-title wow fadeInUp">{subtitle}</span>
+                            <h2 class="text-anime-style-3" data-cursor="-opaque">{title}</h2>
+                            <p class="wow fadeInUp" data-wow-delay="0.2s">{description}</p>
                         </div>
                         <!-- Section Title End -->
 
                         <!-- Car Collection Button Start -->
                         <div class="car-collection-btn-gold wow fadeInUp" data-wow-delay="0.4s">
-                            <a href="/#contact" class="btn-default btn-highlighted">Вызвать помощь</a>
+                            <a href={ctaHref} class="btn-default btn-highlighted">{ctaText}</a>
                         </div>
                         <!-- Car Collection Button End -->
                     </div>
@@ -25,101 +58,21 @@
                 <div class="col-xl-6">
                     <!-- Cat Collection Box List Start -->
                     <div class="car-collection-box-list-gold">
-                        <!-- Car Collection Box Start -->
-                        <div class="car-collection-box-gold wow fadeInUp">
+                        {categories.map((category, index) => (
+                        <div class="car-collection-box-gold wow fadeInUp" data-wow-delay={index === 0 ? undefined : `${index * 0.2}s`}>
                             <div class="icon-box">
-                                <img src="/images/icon-car-collection-1-gold.svg" alt="">
+                                <img src={category.icon} alt="" />
                             </div>
                             <div class="car-collection-title-gold">
-                                <h3>Прикурить автомобиль</h3>
+                                <h3>{category.title}</h3>
                             </div>
                             <div class="collection-image-gold">
                                 <figure>
-                                    <img src="/images/car-collection-image-1-gold.png" alt="">
+                                    <img src={category.image} alt="" />
                                 </figure>
                             </div>
                         </div>
-                        <!-- Car Collection Box End -->
-
-                        <!-- Car Collection Box Start -->
-                        <div class="car-collection-box-gold wow fadeInUp" data-wow-delay="0.2s">
-                            <div class="icon-box">
-                                <img src="/images/icon-car-collection-2-gold.svg" alt="">
-                            </div>
-                            <div class="car-collection-title-gold">
-                                <h3>Заменить аккумулятор</h3>
-                            </div>
-                            <div class="collection-image-gold">
-                                <figure>
-                                    <img src="/images/car-collection-image-2-gold.png" alt="">
-                                </figure>
-                            </div>
-                        </div>
-                        <!-- Car Collection Box End -->
-
-                        <!-- Car Collection Box Start -->
-                        <div class="car-collection-box-gold wow fadeInUp" data-wow-delay="0.4s">
-                            <div class="icon-box">
-                                <img src="/images/icon-car-collection-3-gold.svg" alt="">
-                            </div>
-                            <div class="car-collection-title-gold">
-                                <h3>Отогреть автомобиль</h3>
-                            </div>
-                            <div class="collection-image-gold">
-                                <figure>
-                                    <img src="/images/car-collection-image-3-gold.png" alt="">
-                                </figure>
-                            </div>
-                        </div>
-                        <!-- Car Collection Box End -->
-
-                        <!-- Car Collection Box Start -->
-                        <div class="car-collection-box-gold wow fadeInUp" data-wow-delay="0.6s">
-                            <div class="icon-box">
-                                <img src="/images/icon-car-collection-4-gold.svg" alt="">
-                            </div>
-                            <div class="car-collection-title-gold">
-                                <h3>Эвакуировать автомобиль</h3>
-                            </div>
-                            <div class="collection-image-gold">
-                                <figure>
-                                    <img src="/images/car-collection-image-4-gold.png" alt="">
-                                </figure>
-                            </div>
-                        </div>
-                        <!-- Car Collection Box End -->
-
-                        <!-- Car Collection Box Start -->
-                        <div class="car-collection-box-gold wow fadeInUp" data-wow-delay="0.8s">
-                            <div class="icon-box">
-                                <img src="/images/icon-car-collection-5-gold.svg" alt="">
-                            </div>
-                            <div class="car-collection-title-gold">
-                                <h3>Вскрыть автомобиль</h3>
-                            </div>
-                            <div class="collection-image-gold">
-                                <figure>
-                                    <img src="/images/car-collection-image-5-gold.png" alt="">
-                                </figure>
-                            </div>
-                        </div>
-                        <!-- Car Collection Box End -->
-
-                        <!-- Car Collection Box Start -->
-                        <div class="car-collection-box-gold wow fadeInUp" data-wow-delay="1s">
-                            <div class="icon-box">
-                                <img src="/images/icon-car-collection-6-gold.svg" alt="">
-                            </div>
-                            <div class="car-collection-title-gold">
-                                <h3>Подвезти топливо</h3>
-                            </div>
-                            <div class="collection-image-gold">
-                                <figure>
-                                    <img src="/images/car-collection-image-6-gold.png" alt="">
-                                </figure>
-                            </div>
-                        </div>
-                        <!-- Car Collection Box End -->
+                        ))}
                     </div>
                     <!-- Cat Collection Box List End -->
                 </div>

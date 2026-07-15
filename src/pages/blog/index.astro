@@ -13,12 +13,30 @@ const posts = (await getCollection('blog')).sort(
 
 const POSTS_PER_PAGE = 9;
 const totalPages = Math.max(1, Math.ceil(posts.length / POSTS_PER_PAGE));
+
+import { webPageNode, breadcrumbNode, itemListNode } from '../../lib/seo';
+
+const jsonLd = [
+	webPageNode({
+		type: 'Blog',
+		name: 'Блог о техпомощи на дороге — советы автовладельцам Тюмени',
+		description:
+			'Разбираю частые дорожные ситуации: почему не заводится авто, как прикурить машину, что делать в мороз и как выбрать аккумулятор. Опыт мастера автопомощи из Тюмени.',
+		url: '/blog',
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Блог', url: '/blog' },
+	]),
+	itemListNode(posts.map((post) => ({ name: post.data.title, url: `/blog/${post.id}` }))),
+];
 ---
 
 <Layout
 	title="Блог о техпомощи на дороге — советы автовладельцам Тюмени | За рулём"
 	description="Разбираю частые дорожные ситуации: почему не заводится авто, как прикурить машину, что делать в мороз и как выбрать аккумулятор. Опыт мастера из Тюмени."
 	keywords="блог техпомощь тюмень, не заводится авто, как прикурить машину, отогрев авто, выбор аккумулятора"
+	jsonLd={jsonLd}
 >
 	<Header />
 

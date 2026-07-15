@@ -1,3 +1,44 @@
+---
+interface WhyChooseItem {
+	icon: string;
+	title: string;
+	text: string;
+}
+
+interface Props {
+	subtitle?: string;
+	title?: string;
+	description?: string;
+	items?: WhyChooseItem[];
+	ctaText?: string;
+	ctaHref?: string;
+	authorName?: string;
+	authorText?: string;
+}
+
+const {
+	subtitle = 'Почему выбирают меня',
+	title = 'Почему мне доверяют помощь на дороге',
+	description = 'Приезжаю быстро, с полным набором оборудования, и берусь за любую поломку — от разряженного аккумулятора до эвакуации авто. Цену называю сразу, работаю круглосуточно и без выходных.',
+	items = [
+		{
+			icon: '/images/icon-why-choose-body-1-gold.svg',
+			title: 'Решаю любую поломку',
+			text: 'Прикурю авто, заменю аккумулятор, отогрею или вскрою машину, подам эвакуатор — всё в одних руках.',
+		},
+		{
+			icon: '/images/icon-why-choose-body-2-gold.svg',
+			title: 'Приеду быстро и назову цену',
+			text: 'Согласую адрес и стоимость по телефону и выезжаю сразу — обычно я на месте за 20–40 минут.',
+		},
+	],
+	ctaText = 'Связаться со мной',
+	ctaHref = '/contacts',
+	authorName = 'Я — «За рулём»',
+	authorText = 'Я помогаю на дороге',
+} = Astro.props;
+---
+
     <!-- Why Choose Us Section Start -->
     <div class="why-choose-us-gold">
         <div class="container">
@@ -7,45 +48,29 @@
                     <div class="why-choose-content-gold">
                         <!-- Section Title Start -->
                         <div class="section-title">
-                            <span class="section-sub-title wow fadeInUp">Почему я помогаю на дороге</span>
-                            <h2 class="text-anime-style-3" data-cursor="-opaque">Почему мне доверяют помощь на дороге</h2>
-                            <p class="wow fadeInUp" data-wow-delay="0.2s">Я приезжаю в Тюмени с нужным оборудованием, быстро оцениваю ситуацию и помогаю вернуть автомобиль в движение без лишнего ожидания.</p>
+                            <span class="section-sub-title wow fadeInUp">{subtitle}</span>
+                            <h2 class="text-anime-style-3" data-cursor="-opaque">{title}</h2>
+                            <p class="wow fadeInUp" data-wow-delay="0.2s">{description}</p>
                         </div>
                         <!-- Section Title End -->
 
                         <!-- Why Choose Items List Start -->
                         <div class="why-choose-items-list-gold">
-                            <!-- Why Choose Item Start -->
-                            <div class="why-choose-item-gold wow fadeInUp" data-wow-delay="0.4s">
+                            {items.map((item, index) => (
+                            <div class="why-choose-item-gold wow fadeInUp" data-wow-delay={`${0.4 + index * 0.2}s`}>
                                 <div class="why-choose-item-header-gold">
                                     <div class="icon-box">
-                                        <img src="/images/icon-why-choose-body-1-gold.svg" alt="">
+                                        <img src={item.icon} alt="" />
                                     </div>
                                     <div class="why-choose-item-title-gold">
-                                        <h3>Я работаю с разными поломками</h3>
+                                        <h3>{item.title}</h3>
                                     </div>
                                 </div>
                                 <div class="why-choose-item-content-gold">
-                                    <p>Я помогаю прикурить авто, заменить аккумулятор, отогреть машину и решить другие задачи на дороге.</p>
+                                    <p>{item.text}</p>
                                 </div>
                             </div>
-                            <!-- Why Choose Item End -->
-
-                            <!-- Why Choose Item Start -->
-                            <div class="why-choose-item-gold wow fadeInUp" data-wow-delay="0.6s">
-                                <div class="why-choose-item-header-gold">
-                                    <div class="icon-box">
-                                        <img src="/images/icon-why-choose-body-2-gold.svg" alt="">
-                                    </div>
-                                    <div class="why-choose-item-title-gold">
-                                        <h3>Я быстро принимаю заявку</h3>
-                                    </div>
-                                </div>
-                                <div class="why-choose-item-content-gold">
-                                    <p>Я согласовываю адрес и задачу по телефону, называю стоимость до выезда и приезжаю в согласованное время.</p>
-                                </div>
-                            </div>
-                            <!-- Why Choose Item End -->
+                            ))}
                         </div>
                         <!-- Why Choose Items List End -->
 
@@ -53,7 +78,7 @@
                         <div class="why-choose-footer-gold wow fadeInUp" data-wow-delay="0.8s">
                             <!-- Why Choose Us Button Start -->
                             <div class="why-choose-btn-gold">
-                                <a href="/#contact" class="btn-default">Связаться со мной</a>
+                                <a href={ctaHref} class="btn-default">{ctaText}</a>
                             </div>
                             <!-- Why Choose Button End -->
 
@@ -69,8 +94,8 @@
 
                                 <!-- Why Choose Author Content Start -->
                                 <div class="why-choose-author-content-gold">
-                                    <h3>Я — «За рулём»</h3>
-                                    <p>Я помогаю на дороге</p>
+                                    <h3>{authorName}</h3>
+                                    <p>{authorText}</p>
                                 </div>
                                 <!-- Why Choose Author Content Start -->
                             </div>

@@ -1,4 +1,49 @@
 ---
+interface HeroBenefit {
+	icon: string;
+	title: string;
+	text: string;
+}
+
+interface Props {
+	subtitle?: string;
+	title?: string;
+	description?: string;
+	ctaText?: string;
+	ctaHref?: string;
+	reviewText?: string;
+	counterValue?: string;
+	counterText?: string;
+	benefits?: HeroBenefit[];
+}
+
+const {
+	subtitle = 'Техпомощь на дороге в Тюмени 24/7',
+	title = 'Срочная автопомощь на дороге в Тюмени с выездом',
+	description = 'Приеду за 20–40 минут и заведу вашу машину: прикурю авто, заменю аккумулятор с выездом, отогрею двигатель, вскрою салон, привезу топливо или подам эвакуатор. Работаю круглосуточно по Тюмени. Звоните: +7 908 871-20-26.',
+	ctaText = 'Вызвать помощь',
+	ctaHref = '/contacts',
+	reviewText = 'Круглосуточно на связи с водителями Тюмени',
+	counterValue = '6',
+	counterText = 'Шесть видов техпомощи на дороге — приеду с готовым оборудованием и решу проблему на месте.',
+	benefits = [
+		{
+			icon: '/images/icon-hero-info-list-1-gold.svg',
+			title: '01. Позвоните мне',
+			text: 'Опишите поломку по телефону — подскажу решение и назову цену до выезда.',
+		},
+		{
+			icon: '/images/icon-hero-info-list-2-gold.svg',
+			title: '02. Я выезжаю',
+			text: 'Уточню адрес в Тюмени и сразу выезжаю к вам с нужным оборудованием.',
+		},
+		{
+			icon: '/images/icon-hero-info-list-3-gold.svg',
+			title: '03. Завожу на месте',
+			text: 'Прикурю авто, заменю аккумулятор или подам эвакуатор, если ремонт на месте невозможен.',
+		},
+	],
+} = Astro.props;
 ---
 
     <!-- Hero Section Start -->
@@ -10,15 +55,15 @@
                     <div class="hero-content-gold">
                         <!-- Section Title Start -->
                         <div class="section-title">
-                            <span class="section-sub-title wow fadeInUp">Техпомощь на дороге в Тюмени</span>
-                            <h1 class="text-anime-style-3" data-cursor="-opaque">Я быстро помогу вернуть автомобиль в движение</h1>
-                            <p class="wow fadeInUp" data-wow-delay="0.2s">Я приеду по Тюмени и помогу на дороге: прикурю автомобиль, заменю аккумулятор, выполню отогрев, вскрытие, подвоз топлива или эвакуацию. Я принимаю вызовы по телефону +7 908 871-20-26.</p>
+                            <span class="section-sub-title wow fadeInUp">{subtitle}</span>
+                            <h1 class="text-anime-style-3" data-cursor="-opaque">{title}</h1>
+                            <p class="wow fadeInUp" data-wow-delay="0.2s">{description}</p>
                         </div>
                         <!-- Section Title End -->
                         
                         <!-- Hero Content Button Start -->
                         <div class="hero-content-btn-gold wow fadeInUp" data-wow-delay="0.4s">
-                            <a href="/#contact" class="btn-default btn-highlighted">Вызвать помощь</a>
+                            <a href={ctaHref} class="btn-default btn-highlighted">{ctaText}</a>
                         </div>
                         <!-- Hero Content Button End -->
                     </div>
@@ -32,7 +77,7 @@
                         <div class="hero-client-review-box-gold">
                             <!-- Hero Client Review Counter Start -->
                             <div class="hero-client-review-counter-gold">
-                                <p>Я на связи с водителями в Тюмени</p>
+                                <p>{reviewText}</p>
                             </div>
                             <!-- Hero Client Review Counter End -->
 
@@ -65,8 +110,8 @@
 
                         <!-- Hero Client Counter Box Start -->
                         <div class="hero-client-counter-box-gold">
-                            <h2><span class="counter">6</span>+</h2>
-                            <p>Я оказываю шесть видов техпомощи на дороге в Тюмени и приеду с нужным оборудованием.</p>
+                            <h2><span class="counter">{counterValue}</span>+</h2>
+                            <p>{counterText}</p>
                         </div>
                         <!-- Hero Client Counter Box End -->
                     </div>
@@ -76,41 +121,17 @@
                 <div class="col-lg-12">
                     <!-- Hero Benefit Item List Start -->
                     <div class="hero-benefit-item-list-gold">
-                        <!-- Hero Benefit Item Start -->
-                        <div class="hero-benefit-item-gold wow fadeInUp">
+                        {benefits.map((item, index) => (
+                        <div class="hero-benefit-item-gold wow fadeInUp" data-wow-delay={index === 0 ? undefined : `${index * 0.2}s`}>
                             <div class="icon-box">
-                                <img src="/images/icon-hero-info-list-1-gold.svg" alt="">
+                                <img src={item.icon} alt="" />
                             </div>
                             <div class="hero-benefit-item-content-gold">
-                                <h3>01. Я приеду к автомобилю</h3>
-                                <p>Я уточню адрес в Тюмени и направлюсь к автомобилю с необходимыми инструментами.</p>
+                                <h3>{item.title}</h3>
+                                <p>{item.text}</p>
                             </div>
                         </div>
-                        <!-- Hero Benefit Item End -->
-
-                        <!-- Hero Benefit Item Start -->
-                        <div class="hero-benefit-item-gold wow fadeInUp" data-wow-delay="0.2s">
-                            <div class="icon-box">
-                                <img src="/images/icon-hero-info-list-2-gold.svg" alt="">
-                            </div>
-                            <div class="hero-benefit-item-content-gold">
-                                <h3>02. Я отвечу на звонок</h3>
-                                <p>Я выслушаю описание неисправности, подскажу решение и согласую порядок помощи.</p>
-                            </div>
-                        </div>
-                        <!-- Hero Benefit Item End -->
-
-                        <!-- Hero Benefit Item Start -->
-                        <div class="hero-benefit-item-gold wow fadeInUp" data-wow-delay="0.4s">
-                            <div class="icon-box">
-                                <img src="/images/icon-hero-info-list-3-gold.svg" alt="">
-                            </div>
-                            <div class="hero-benefit-item-content-gold">
-                                <h3>03. Я помогу на месте</h3>
-                                <p>Я запущу двигатель, отогрею автомобиль или организую эвакуацию, если ремонт на месте невозможен.</p>
-                            </div>
-                        </div>
-                        <!-- Hero Benefit Item End -->
+                        ))}
                     </div>
                     <!-- Hero Benefit Item List End -->
                 </div>

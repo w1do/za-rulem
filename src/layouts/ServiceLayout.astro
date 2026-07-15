@@ -9,6 +9,7 @@ import ServiceWhyChoose from '../components/services/single/ServiceWhyChoose.ast
 import ServiceFeatures from '../components/services/single/ServiceFeatures.astro';
 import ServiceProcess from '../components/services/single/ServiceProcess.astro';
 import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
+import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
 
 const { frontmatter, spokes = [] } = Astro.props;
 const seoTitle = frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь в Тюмени`;
@@ -16,6 +17,20 @@ const seoDescription = frontmatter.seo?.description ?? frontmatter.description;
 
 const image = frontmatter.image ?? '/images/service-single-image.jpg';
 const imageAlt = frontmatter.title;
+
+const jsonLd = [
+	serviceNode({
+		name: frontmatter.title,
+		description: frontmatter.description,
+		url: Astro.url.pathname,
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Услуги', url: '/services' },
+		{ name: frontmatter.title, url: Astro.url.pathname },
+	]),
+	faqNode(frontmatter.faqs),
+].filter(Boolean);
 
 const sidebarLinks = spokes.map((spoke) => ({ title: spoke.title, url: spoke.url }));
 
@@ -30,7 +45,7 @@ const steps = process
 	: [];
 ---
 
-<Layout title={seoTitle} description={seoDescription}>
+<Layout title={seoTitle} description={seoDescription} jsonLd={jsonLd}>
 	<Header />
 
 	<ServicePageHeader title={frontmatter.title} />

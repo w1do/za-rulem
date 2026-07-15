@@ -1,3 +1,50 @@
+---
+interface Review {
+	title: string;
+	text: string;
+	author: string;
+	authorRole: string;
+	image: string;
+}
+
+interface Props {
+	subtitle?: string;
+	title?: string;
+	intro?: string;
+	satisfyText?: string;
+	reviews?: Review[];
+	footerText?: string;
+	footerLinkText?: string;
+	footerLinkHref?: string;
+}
+
+const {
+	subtitle = 'Отзывы водителей',
+	title = 'Надёжная техпомощь в любой ситуации',
+	intro = 'Цену подтверждаю делом: приезжаю на место поломки в Тюмени и возвращаю автомобиль в движение — прикуриваю, меняю аккумулятор, отогреваю двигатель и подаю эвакуатор.',
+	satisfyText = 'Мне доверяют автомобили',
+	reviews = [
+		{
+			title: 'Я быстро вернул автомобиль в движение',
+			text: 'Я обратился за помощью после разряда аккумулятора во дворе. Мне быстро прикурили автомобиль, проверили запуск двигателя и объяснили, что сделать дальше. Я остался доволен точным приездом и аккуратной работой.',
+			author: 'Алексей',
+			authorRole: "Замена аккума. советую",
+			image: '/images/author-3.jpg',
+		},
+		{
+			title: 'Я получил помощь в сильный мороз',
+			text: 'Я не смогла завести машину утром после ночной стоянки. Мне помогли отогреть двигатель, запустить автомобиль и проверить аккумулятор. Я получил понятные рекомендации и спокойно продолжила поездку.',
+			author: 'Марина',
+			authorRole: 'Отогрев авто',
+			image: '/images/author-2.jpg',
+		},
+	],
+	footerText = 'Помогаю вернуть автомобиль на дорогу —',
+	footerLinkText = 'Читать отзывы',
+	footerLinkHref = '/blog',
+} = Astro.props;
+---
+
 <!-- Our Testimonials Section Start -->
 <div class="our-testimonials-gold">
     <div class="container">
@@ -5,8 +52,8 @@
             <div class="col-xl-6">
                 <!-- Section Title Start -->
                 <div class="section-title">
-                    <span class="section-sub-title wow fadeInUp">Мой опыт помощи на дороге</span>
-                    <h2 class="text-anime-style-3" data-cursor="-opaque">Надёжная техпомощь в любой ситуации</h2>
+                    <span class="section-sub-title wow fadeInUp">{subtitle}</span>
+                    <h2 class="text-anime-style-3" data-cursor="-opaque">{title}</h2>
                 </div>
                 <!-- Section Title End -->
             </div>
@@ -14,7 +61,7 @@
             <div class="col-xl-6">
                 <!-- Section Title Content Start -->
                 <div class="section-title-content wow fadeInUp" data-wow-delay="0.2s">
-                    <p>Я приезжаю на место поломки в Тюмени и помогаю вернуть автомобиль в движение: прикуриваю, меняю аккумулятор, отогреваю двигатель и решаю другие дорожные проблемы.</p>
+                    <p>{intro}</p>
                 </div>
                 <!-- Section Title Content End -->
             </div>
@@ -59,7 +106,7 @@
 
                         <!-- Satisfy Client Content Start -->
                         <div class="testimonial-client-content-gold">
-                            <p>Мне доверяют автомобили</p>
+                            <p>{satisfyText}</p>
                         </div>
                         <!-- Satisfy Client Content End -->
                     </div>
@@ -73,13 +120,14 @@
                 <div class="testimonial-slider-gold wow fadeInUp" data-wow-delay="0.2s">
                     <div class="swiper">
                         <div class="swiper-wrapper" data-cursor-text="Перетащить">
+                            {reviews.map((review) => (
                             <div class="swiper-slide">
                                 <!-- Testimonial Item Start -->
                                 <div class="testimonial-item-gold">
                                     <!-- Testimonial Item Header Start -->
                                     <div class="testimonial-item-header-gold">
                                         <div class="testimonial-item-quote-gold">
-                                            <img src="/images/icon-quote-gold.svg" alt="">
+                                            <img src="/images/icon-quote-gold.svg" alt="" />
                                         </div>
                                         <div class="testimonial-item-rating-gold">
                                             <i class="fa-solid fa-star"></i>
@@ -95,8 +143,8 @@
                                     <div class="testimonial-item-body-gold">
                                         <!-- Testimonial Item Content Start -->
                                         <div class="testimonail-item-content-gold">
-                                            <h2>Я быстро вернул автомобиль в движение</h2>
-                                            <p>Я обратился за помощью после разряда аккумулятора во дворе. Мне быстро прикурили автомобиль, проверили запуск двигателя и объяснили, что сделать дальше. Я остался доволен точным приездом и аккуратной работой.</p>
+                                            <h2>{review.title}</h2>
+                                            <p>{review.text}</p>
                                         </div>
                                         <!-- Testimonial Item Content End -->
 
@@ -105,15 +153,15 @@
                                             <!-- Testimonial Author Image Start -->
                                             <div class="testimonial-author-image-gold">
                                                 <figure class="image-anime">
-                                                    <img src="/images/author-1.jpg" alt="">
+                                                    <img src={review.image} alt="" />
                                                 </figure>
                                             </div>
                                             <!-- Testimonial Author Image End -->
 
                                             <!-- Testimonial Author Content Start -->
                                             <div class="testimonial-author-content-gold">
-                                                <h2>Алексей</h2>
-                                                <p>Водитель в Тюмени</p>
+                                                <h2>{review.author}</h2>
+                                                <p>{review.authorRole}</p>
                                             </div>
                                             <!-- Testimonial Author Content End -->
                                         </div>
@@ -123,57 +171,7 @@
                                 </div>
                                 <!-- Testimonial Item End -->
                             </div>
-
-                            <div class="swiper-slide">
-                                <!-- Testimonial Item Start -->
-                                <div class="testimonial-item-gold">
-                                    <!-- Testimonial Item Header Start -->
-                                    <div class="testimonial-item-header-gold">
-                                        <div class="testimonial-item-quote-gold">
-                                            <img src="/images/icon-quote-gold.svg" alt="">
-                                        </div>
-                                        <div class="testimonial-item-rating-gold">
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star"></i>
-                                        </div>
-                                    </div>
-                                    <!-- Testimonial Item Header End -->
-
-                                    <!-- Testimonial Item Body Start -->
-                                    <div class="testimonial-item-body-gold">
-                                        <!-- Testimonial Item Content Start -->
-                                        <div class="testimonail-item-content-gold">
-                                            <h2>Я получил помощь в сильный мороз</h2>
-                                            <p>Я не смог завести машину утром после ночной стоянки. Мне помогли отогреть двигатель, запустить автомобиль и проверить аккумулятор. Я получил понятные рекомендации и спокойно продолжил поездку.</p>
-                                        </div>
-                                        <!-- Testimonial Item Content End -->
-
-                                        <!-- Testimonial Author Box Start -->
-                                        <div class="testimonial-author-box-gold">
-                                            <!-- Testimonial Author Image Start -->
-                                            <div class="testimonial-author-image-gold">
-                                                <figure class="image-anime">
-                                                    <img src="/images/author-2.jpg" width="50" height="50" alt="">
-                                                </figure>
-                                            </div>
-                                            <!-- Testimonial Author Image End -->
-
-                                            <!-- Testimonial Author Content Start -->
-                                            <div class="testimonial-author-content-gold">
-                                                <h2>Марина</h2>
-                                                <p>Автовладелец в Тюмени</p>
-                                            </div>
-                                            <!-- Testimonial Author Content End -->
-                                        </div>
-                                        <!-- Testimonial Author Box End -->
-                                    </div>
-                                    <!-- Testimonial Item Body Start -->
-                                </div>
-                                <!-- Testimonial Item End -->
-                            </div>
+                            ))}
                         </div>
                         <div class="testimonial-btn-gold">
                             <div class="testimonial-button-prev-gold"></div>
@@ -199,7 +197,7 @@
                         </div>
                     </div>
                     <!-- Satisfy Client Images End -->    
-                    <p>Я помогаю вернуть автомобиль на дорогу. - <a href="/blog">Читать отзывы</a></p>
+                    <p>{footerText} <a href={footerLinkHref}>{footerLinkText}</a></p>
                 </div>
                 <!-- Section Footer Text End -->
             </div>
