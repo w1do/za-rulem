@@ -2,6 +2,7 @@
 interface WhatWeCounter {
 	value: string;
 	title: string;
+	displayValue?: string;
 }
 
 interface Props {
@@ -78,15 +79,23 @@ const {
                         <!-- Section Title End -->
 
                         <!-- What We Counter List Start -->
-                        <div class="what-we-counter-list-gold">
-                            {counters.map((counter) => (
-                            <div class="what-we-counter-item-gold">
-                                <div class="circle" data-size="90" data-value={counter.value}>
-                                    <div class="progress_value">
-                                        <span class="pro_data"></span><span>%</span>
-                                    </div>
-                                </div>
-                                <div class="what-we-counter-item-title-gold">
+                  						<div class="what-we-counter-list-gold">
+							{counters.map((counter) => (
+							<div class="what-we-counter-item-gold">
+								{counter.displayValue ? (
+								<div class="circle" data-size="90">
+									<div class="progress_value">
+										<span>{counter.displayValue}</span>
+									</div>
+								</div>
+								) : (
+								<div class="circle" data-size="90" data-value={counter.value}>
+									<div class="progress_value">
+										<span class="pro_data"></span><span>%</span>
+									</div>
+								</div>
+								)}
+								<div class="what-we-counter-item-title-gold">
                                     <h3>{counter.title}</h3>
                                 </div>
                             </div>

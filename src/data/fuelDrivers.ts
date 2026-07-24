@@ -3,8 +3,11 @@ export type DriverStatus = 'free' | 'busy' | 'driving';
 export interface FuelDriver {
 	id: number;
 	slug: string;
+	citySlug: string;
+	serviceSlug: string;
 	name: string;
 	district: string;
+	districtSeo: string;
 	deliveryTime: string;
 	speed: 'fast' | 'wait';
 	price: string;
@@ -27,7 +30,7 @@ const nameSlugs = [
 ];
 
 const districts = ['Мыс', 'Центр', 'Заречный', 'КПД', 'Ватутино', 'Тюменский', 'Дом Обороны'];
-const districtSlugs = ['mys', 'centr', 'zarechnyy', 'kpd', 'vatutino', 'tyumenskiy', 'dom-oborony'];
+const districtSeo = ['на Мысу', 'в центре Тюмени', 'в Заречном', 'на КПД', 'в Ватутино', 'в Тюменском', 'в Доме Обороны'];
 const services = [
 	'Отстою очередь на заправке',
 	'Привезу на дом бензин',
@@ -62,9 +65,12 @@ export const fuelDrivers: FuelDriver[] = names.map((name, index) => {
 	const fast = index % 3 !== 1;
 	return {
 		id: index + 1,
-		slug: `${nameSlugs[index]}-dostavka-benzina-${districtSlugs[index % districtSlugs.length]}`,
+		slug: nameSlugs[index],
+		citySlug: 'tyumen',
+		serviceSlug: 'binzin',
 		name,
 		district: districts[index % districts.length],
+		districtSeo: districtSeo[index % districtSeo.length],
 		deliveryTime: fast ? (index % 2 === 0 ? 'от 1–2 часов' : 'от 2–3 часов') : 'от 2–5 часов',
 		speed: fast ? 'fast' : 'wait',
 		price: `${5_500 + (index % 6) * 500}`.replace(/(\d)(?=(\d{3})+$)/g, '$1 '),
@@ -74,3 +80,6 @@ export const fuelDrivers: FuelDriver[] = names.map((name, index) => {
 		reason: reasons[index % reasons.length],
 	};
 });
+
+export const getFuelDriverPath = (driver: FuelDriver) =>
+	`/drivers/${driver.citySlug}/${driver.serviceSlug}/${driver.slug}`;

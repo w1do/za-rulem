@@ -1,6 +1,6 @@
 ---
 import type { FuelDriver } from '../../data/fuelDrivers';
-import { fuelLabels, statusLabels } from '../../data/fuelDrivers';
+import { fuelLabels, getFuelDriverPath, statusLabels } from '../../data/fuelDrivers';
 
 interface Props {
 	driver: FuelDriver;
@@ -20,7 +20,7 @@ const { driver } = Astro.props;
 	<header class="fuel-driver-card__header">
 		<div class="fuel-driver-card__avatar" aria-hidden="true">{driver.name.slice(0, 1)}</div>
 		<div>
-			<h3><a href={`/drivers/${driver.slug}`}>{driver.name}</a></h3>
+			<h3><a href={getFuelDriverPath(driver)}>{driver.name}</a></h3>
 			<p>{driver.district}, Тюмень</p>
 		</div>
 	</header>
@@ -36,7 +36,7 @@ const { driver } = Astro.props;
 	</div>
 	<p class="fuel-driver-card__service">{driver.service}</p>
 	<a
-		href={`/drivers/${driver.slug}`}
+		href={getFuelDriverPath(driver)}
 		class="fuel-driver-card__action"
 	>
 		Подробнее о водителе

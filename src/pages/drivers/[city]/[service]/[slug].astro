@@ -1,25 +1,28 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Header from '../../components/shared/header/Header.astro';
-import Footer from '../../components/shared/footer/Footer.astro';
-import HomeHero from '../../components/home/HomeHero.astro';
-import HomeAbout from '../../components/home/HomeAbout.astro';
-import HomeServices from '../../components/home/HomeServices.astro';
-import HomeWhyChoose from '../../components/home/HomeWhyChoose.astro';
-import HomeFleets from '../../components/home/HomeFleets.astro';
-import HomeWhatWeDo from '../../components/home/HomeWhatWeDo.astro';
-import HomeCollection from '../../components/home/HomeCollection.astro';
-import HomeDrivers from '../../components/home/HomeDrivers.astro';
-import HomeHowItWork from '../../components/home/HomeHowItWork.astro';
-import HomeTestimonials from '../../components/home/HomeTestimonials.astro';
-import HomePricing from '../../components/home/HomePricing.astro';
-import HomeBlog from '../../components/home/HomeBlog.astro';
-import ServiceFaqs from '../../components/services/single/ServiceFaqs.astro';
-import { fuelDrivers, fuelLabels, statusLabels, type FuelDriver } from '../../data/fuelDrivers';
-import { breadcrumbNode, faqNode, serviceNode } from '../../lib/seo';
+import Layout from '../../../../layouts/Layout.astro';
+import Header from '../../../../components/shared/header/Header.astro';
+import Footer from '../../../../components/shared/footer/Footer.astro';
+import HomeHero from '../../../../components/home/HomeHero.astro';
+import HomeAbout from '../../../../components/home/HomeAbout.astro';
+import HomeServices from '../../../../components/home/HomeServices.astro';
+import HomeWhyChoose from '../../../../components/home/HomeWhyChoose.astro';
+import HomeFleets from '../../../../components/home/HomeFleets.astro';
+import HomeWhatWeDo from '../../../../components/home/HomeWhatWeDo.astro';
+import HomeCollection from '../../../../components/home/HomeCollection.astro';
+import HomeDrivers from '../../../../components/home/HomeDrivers.astro';
+import HomeHowItWork from '../../../../components/home/HomeHowItWork.astro';
+import HomeTestimonials from '../../../../components/home/HomeTestimonials.astro';
+import HomePricing from '../../../../components/home/HomePricing.astro';
+import HomeBlog from '../../../../components/home/HomeBlog.astro';
+import ServiceFaqs from '../../../../components/services/single/ServiceFaqs.astro';
+import { fuelDrivers, fuelLabels, getFuelDriverPath, statusLabels, type FuelDriver } from '../../../../data/fuelDrivers';
+import { breadcrumbNode, faqNode, serviceNode } from '../../../../lib/seo';
 
 export function getStaticPaths() {
-	return fuelDrivers.map((driver) => ({ params: { slug: driver.slug }, props: { driver } }));
+	return fuelDrivers.map((driver) => ({
+		params: { city: driver.citySlug, service: driver.serviceSlug, slug: driver.slug },
+		props: { driver },
+	}));
 }
 
 interface Props { driver: FuelDriver }
@@ -27,8 +30,8 @@ interface Props { driver: FuelDriver }
 const { driver } = Astro.props;
 const fuelList = driver.fuels.map((fuel) => fuelLabels[fuel]);
 const fuelText = fuelList.join(', ');
-const pageUrl = `/drivers/${driver.slug}`;
-const orderTitle = `Вызвать водителя ${driver.name}`;
+const pageUrl = getFuelDriverPath(driver);
+const orderTitle = 'Вызвать водителя';
 
 const services = [
 	{ icon: '/images/icon-service-1.svg', title: 'Доставка топлива', text: `${driver.name} привезёт ${fuelText} к автомобилю в районе ${driver.district}, по Тюмени, на дачу или к месту остановки на трассе.`, href: '/contacts', linkText: 'Заказать топливо' },
@@ -63,10 +66,10 @@ const jsonLd = [
 ---
 
 <Layout
-	title={`${driver.name} — доставка бензина в Тюмени от ${driver.price} ₽`}
-	description={`${driver.name} доставит ${fuelText} в район ${driver.district} и по Тюмени ${driver.deliveryTime}. Помощь при поломке и буксировка. Вызов от ${driver.price} ₽.`}
-	ogTitle={`${driver.name} — доставка топлива и помощь на дороге`}
-	ogDescription={`Вызвать водителя в Тюмени: ${fuelText}, выезд ${driver.deliveryTime}, цена от ${driver.price} ₽.`}
+	title={`${driver.name} — доставка бензина ${driver.districtSeo} от ${driver.price} ₽`}
+	description={`${driver.name} доставляет бензин ${driver.districtSeo}: ${fuelText}, выезд ${driver.deliveryTime}, цена от ${driver.price} ₽. Помощь на дороге и буксировка в Тюмени.`}
+	ogTitle={`${driver.name} — доставка бензина ${driver.districtSeo}`}
+	ogDescription={`${fuelText} ${driver.districtSeo}, выезд ${driver.deliveryTime}, цена от ${driver.price} ₽. Вызвать водителя в Тюмени.`}
 	keywords={`доставка бензина ${driver.district}, водитель ${driver.name} тюмень, привезти бензин тюмень, доставка топлива на дорогу, помощь на дороге ${driver.district}, подвоз топлива тюмень`}
 	jsonLd={jsonLd}
 >
@@ -136,7 +139,7 @@ const jsonLd = [
 		subtitle="Как оформить вызов"
 		title="Сначала расчёт, затем подтверждение выезда"
 		description="В заявке укажите геолокацию, телефон, автомобиль и проблему. Водитель проверит расстояние, подберёт топливо или оборудование и сообщит полный расчёт."
-		counters={[{ value: driver.deliveryTime.includes('1') ? '1' : '2', title: 'Минимальный ориентир в часах' }, { value: driver.price.replaceAll(' ', ''), title: 'Стоимость выезда от, ₽' }]}
+		counters={[{ value: '1', displayValue: '1 ч', title: 'Время ожидания' }, { value: '2800', displayValue: '2800', title: 'Стоимость выезда' }]}
 		checklist={['Передать точную геолокацию', 'Согласовать топливо или работу', 'Подтвердить цену и срок']}
 		infoTitle="Что сообщить водителю"
 		infoText="Назовите марку автомобиля, признаки поломки, остаток топлива и безопасное место ожидания. На трассе добавьте направление, километр и ближайший ориентир."
@@ -172,7 +175,7 @@ const jsonLd = [
 	/>
 	<HomeHowItWork
 		subtitle="Три шага до помощи"
-		title={`Как вызвать водителя ${driver.name}`}
+		title="Как вызвать водителя"
 		steps={steps}
 		footerList={['Точный адрес', 'Марка автомобиля', 'Описание проблемы', 'Телефон для связи']}
 		footerText="Чем точнее исходные данные, тем быстрее водитель подтвердит маршрут, оборудование и стоимость."
@@ -193,7 +196,7 @@ const jsonLd = [
 	/>
 	<HomePricing
 		subtitle="Стоимость помощи"
-		title={`Выезд водителя от ${driver.price} ₽`}
+		title={`Выезд водителя`}
 		plans={[
 			{ icon: '/images/icon-pricing-1-gold.svg', title: 'Доставка топлива', text: `Подвоз ${fuelText} к месту остановки.`, price: driver.price, priceUnit: '₽ от', features: ['Топливо оплачивается отдельно', `Район ${driver.district}`, 'Объём согласуется заранее'], ctaText: 'Заказать топливо', ctaHref: '/contacts' },
 			{ icon: '/images/icon-pricing-2-gold.svg', title: 'Помощь на месте', text: 'Запуск двигателя и доступные дорожные работы.', price: driver.price, priceUnit: '₽ от', features: ['Причина уточняется заранее', 'Расходники оплачиваются отдельно', 'Работа после согласования'], ctaText: 'Вызвать помощь', ctaHref: '/contacts' },
