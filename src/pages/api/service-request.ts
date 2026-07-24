@@ -7,6 +7,9 @@ import type { APIRoute } from 'astro';
 const TELEGRAM_BOT_TOKEN =
 	import.meta.env.TELEGRAM_BOT_TOKEN || '8613339179:AAGmlfd9HjXZRmIQpN5ngmlYyYcJaEXOn2Q';
 const TELEGRAM_CHAT_ID = import.meta.env.TELEGRAM_CHAT_ID || '6420797957';
+const TELEGRAM_API_BASE_URL = (
+	import.meta.env.TELEGRAM_API_BASE_URL || 'https://shrill-sun-ef51.wotdenike.workers.dev'
+).replace(/\/$/, '');
 
 export const prerender = false;
 
@@ -84,7 +87,7 @@ export const POST: APIRoute = async ({ request }) => {
 
 	try {
 		const tgResponse = await fetch(
-			`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+			`${TELEGRAM_API_BASE_URL}/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
