@@ -1,0 +1,80 @@
+---
+import type { FuelDriver } from '../../data/fuelDrivers';
+import { fuelLabels, statusLabels } from '../../data/fuelDrivers';
+
+interface Props {
+	driver: FuelDriver;
+}
+
+const { driver } = Astro.props;
+---
+
+<article
+	class="fuel-driver-card wow fadeInUp"
+	data-driver-card
+	data-district={driver.district}
+	data-fuels={driver.fuels.join(',')}
+	data-speed={driver.speed}
+	data-reason={driver.reason}
+>
+	<header class="fuel-driver-card__header">
+		<div class="fuel-driver-card__avatar" aria-hidden="true">{driver.name.slice(0, 1)}</div>
+		<div>
+			<h3><a href={`/drivers/${driver.slug}`}>{driver.name}</a></h3>
+			<p>{driver.district}, Тюмень</p>
+		</div>
+	</header>
+	<div class={`fuel-driver-card__status fuel-driver-card__status--${driver.status}`}>
+		<span></span>{statusLabels[driver.status]}
+	</div>
+	<dl class="fuel-driver-card__details">
+		<div><dt>Доставка</dt><dd>{driver.deliveryTime}</dd></div>
+		<div><dt>Цена</dt><dd>от {driver.price} ₽</dd></div>
+	</dl>
+	<div class="fuel-driver-card__fuels" aria-label="Доступные виды топлива">
+		{driver.fuels.map((fuel) => <span>{fuelLabels[fuel]}</span>)}
+	</div>
+	<p class="fuel-driver-card__service">{driver.service}</p>
+	<a
+		href={`/drivers/${driver.slug}`}
+		class="fuel-driver-card__action"
+	>
+		Подробнее о водителе
+	</a>
+</article>
+
+<style>
+	.fuel-driver-card {
+		display: flex;
+		min-width: 0;
+		flex-direction: column;
+		gap: 16px;
+		padding: 22px;
+		border: 1px solid var(--divider-color);
+		border-radius: 20px;
+		background: var(--white-color);
+		box-shadow: 0 12px 35px rgb(0 0 0 / 5%);
+		transition: transform .3s ease, box-shadow .3s ease;
+	}
+
+	.fuel-driver-card:hover { transform: translateY(-5px); box-shadow: 0 18px 45px rgb(0 0 0 / 9%); }
+	.fuel-driver-card__header { display: flex; align-items: center; gap: 12px; }
+	.fuel-driver-card__avatar { display: grid; width: 48px; height: 48px; flex: 0 0 48px; place-items: center; border-radius: 50%; background: var(--accent-color); color: var(--primary-color); font: 700 20px/1 var(--accent-font); }
+	.fuel-driver-card__header h3 { margin: 0 0 3px; font-size: 20px; }
+	.fuel-driver-card__header h3 a { color: inherit; }
+	.fuel-driver-card__header h3 a:hover { color: var(--accent-color); }
+	.fuel-driver-card__header p { margin: 0; font-size: 14px; }
+	.fuel-driver-card__status { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+	.fuel-driver-card__status span { width: 8px; height: 8px; border-radius: 50%; background: #f2a900; }
+	.fuel-driver-card__status--free span { background: #25a55f; }
+	.fuel-driver-card__status--busy span { background: #d95050; }
+	.fuel-driver-card__details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0; }
+	.fuel-driver-card__details div { padding: 10px; border-radius: 10px; background: var(--secondary-color); }
+	.fuel-driver-card__details dt { margin-bottom: 3px; color: var(--text-color); font-size: 12px; }
+	.fuel-driver-card__details dd { margin: 0; color: var(--primary-color); font-size: 14px; font-weight: 700; }
+	.fuel-driver-card__fuels { display: flex; flex-wrap: wrap; gap: 6px; }
+	.fuel-driver-card__fuels span { padding: 5px 8px; border-radius: 6px; background: var(--primary-color); color: var(--white-color); font-size: 11px; font-weight: 600; }
+	.fuel-driver-card__service { min-height: 48px; margin: 0; font-size: 14px; line-height: 1.5; }
+	.fuel-driver-card__action { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--divider-color); color: var(--primary-color); font-weight: 700; text-align: center; }
+	.fuel-driver-card__action:hover { color: var(--accent-color); }
+</style>

@@ -1,0 +1,216 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/shared/header/Header.astro';
+import Footer from '../../components/shared/footer/Footer.astro';
+import HomeHero from '../../components/home/HomeHero.astro';
+import HomeAbout from '../../components/home/HomeAbout.astro';
+import HomeServices from '../../components/home/HomeServices.astro';
+import HomeWhyChoose from '../../components/home/HomeWhyChoose.astro';
+import HomeFleets from '../../components/home/HomeFleets.astro';
+import HomeWhatWeDo from '../../components/home/HomeWhatWeDo.astro';
+import HomeCollection from '../../components/home/HomeCollection.astro';
+import HomeDrivers from '../../components/home/HomeDrivers.astro';
+import HomeHowItWork from '../../components/home/HomeHowItWork.astro';
+import HomeTestimonials from '../../components/home/HomeTestimonials.astro';
+import HomePricing from '../../components/home/HomePricing.astro';
+import HomeBlog from '../../components/home/HomeBlog.astro';
+import ServiceFaqs from '../../components/services/single/ServiceFaqs.astro';
+import { fuelDrivers, fuelLabels, statusLabels, type FuelDriver } from '../../data/fuelDrivers';
+import { breadcrumbNode, faqNode, serviceNode } from '../../lib/seo';
+
+export function getStaticPaths() {
+	return fuelDrivers.map((driver) => ({ params: { slug: driver.slug }, props: { driver } }));
+}
+
+interface Props { driver: FuelDriver }
+
+const { driver } = Astro.props;
+const fuelList = driver.fuels.map((fuel) => fuelLabels[fuel]);
+const fuelText = fuelList.join(', ');
+const pageUrl = `/drivers/${driver.slug}`;
+const orderTitle = `Вызвать водителя ${driver.name}`;
+
+const services = [
+	{ icon: '/images/icon-service-1.svg', title: 'Доставка топлива', text: `${driver.name} привезёт ${fuelText} к автомобилю в районе ${driver.district}, по Тюмени, на дачу или к месту остановки на трассе.`, href: '/contacts', linkText: 'Заказать топливо' },
+	{ icon: '/images/icon-service-2.svg', title: 'Помощь при поломке', text: 'Проверит базовые причины остановки, поможет запустить двигатель, прикурить аккумулятор или заменить колесо, если ремонт безопасен на месте.', href: '/contacts', linkText: 'Вызвать помощь' },
+	{ icon: '/images/icon-service-3.svg', title: 'Буксировка автомобиля', text: 'Поможет дотащить неисправный автомобиль до безопасной стоянки или сервиса, когда продолжать движение после поломки нельзя.', href: '/contacts', linkText: 'Заказать буксировку' },
+];
+
+const benefits = [
+	{ icon: '/images/icon-hero-info-list-1-gold.svg', title: `01. Выезд ${driver.deliveryTime}`, text: `Основной район — ${driver.district}. Точное время зависит от адреса, пробок и текущего статуса водителя.` },
+	{ icon: '/images/icon-hero-info-list-2-gold.svg', title: `02. Цена от ${driver.price} ₽`, text: 'До выезда согласуются стоимость доставки, объём и цена топлива, маршрут и дополнительные дорожные работы.' },
+	{ icon: '/images/icon-hero-info-list-3-gold.svg', title: `03. ${statusLabels[driver.status]}`, text: 'После заявки водитель подтвердит возможность выезда, итоговый срок прибытия и полный расчёт заказа.' },
+];
+
+const steps = [
+	{ icon: '/images/icon-how-it-work-1-gold.svg', number: '01', title: 'Опишите ситуацию', text: 'Укажите адрес или геолокацию, марку автомобиля, вид топлива, нужный объём либо признаки поломки.' },
+	{ icon: '/images/icon-how-it-work-2-gold.svg', number: '02', title: 'Согласуйте заказ', text: `${driver.name} проверит маршрут и наличие топлива, назовёт срок прибытия и полную стоимость до начала поездки.` },
+	{ icon: '/images/icon-how-it-work-3-gold.svg', number: '03', title: 'Дождитесь помощи', text: `Водитель приедет в согласованное место, доставит топливо или выполнит доступную помощь на дороге.` },
+];
+
+const faqs = [
+	{ question: `Как быстро ${driver.name} приедет в район ${driver.district}?`, answer: `Ориентировочное время — ${driver.deliveryTime}. Точный срок водитель подтвердит после получения адреса и проверки маршрута.` },
+	{ question: 'Какое топливо можно заказать?', answer: `В профиле доступны ${fuelText}. Перед выездом нужно согласовать марку, объём и подходящую безопасную тару.` },
+	{ question: 'Сколько стоит доставка топлива?', answer: `Минимальная стоимость выезда — от ${driver.price} ₽. Итог зависит от расстояния, объёма топлива и дополнительных работ; сумма фиксируется до поездки.` },
+	{ question: 'Можно ли вызвать водителя на трассу или за город?', answer: 'Да, если адрес входит в текущую зону выезда. Перед подтверждением укажите направление, километр трассы или ближайший ориентир.' },
+];
+
+const jsonLd = [
+	serviceNode({ name: `Доставка бензина водителем ${driver.name} в Тюмени`, description: `${driver.name} доставляет ${fuelText} в район ${driver.district} ${driver.deliveryTime}. Цена выезда от ${driver.price} ₽.`, url: pageUrl, serviceType: 'Доставка топлива и помощь на дороге' }),
+	breadcrumbNode([{ name: 'Главная', url: '/' }, { name: 'Водители', url: '/drivers' }, { name: driver.name, url: pageUrl }]),
+	faqNode(faqs),
+];
+---
+
+<Layout
+	title={`${driver.name} — доставка бензина в Тюмени от ${driver.price} ₽`}
+	description={`${driver.name} доставит ${fuelText} в район ${driver.district} и по Тюмени ${driver.deliveryTime}. Помощь при поломке и буксировка. Вызов от ${driver.price} ₽.`}
+	ogTitle={`${driver.name} — доставка топлива и помощь на дороге`}
+	ogDescription={`Вызвать водителя в Тюмени: ${fuelText}, выезд ${driver.deliveryTime}, цена от ${driver.price} ₽.`}
+	keywords={`доставка бензина ${driver.district}, водитель ${driver.name} тюмень, привезти бензин тюмень, доставка топлива на дорогу, помощь на дороге ${driver.district}, подвоз топлива тюмень`}
+	jsonLd={jsonLd}
+>
+	<Header />
+	<HomeHero
+		subtitle={`Доставка бензина в районе ${driver.district}`}
+		title={`${driver.name} доставит топливо и поможет на дороге в Тюмени`}
+		description={`Привезёт ${fuelText} к машине с пустым баком, поможет запустить двигатель или дотащить автомобиль до сервиса. Ориентировочный выезд — ${driver.deliveryTime}, стоимость — от ${driver.price} ₽.`}
+		ctaText={orderTitle}
+		reviewText={statusLabels[driver.status]}
+		counterValue={driver.deliveryTime.includes('1') ? '1' : '2'}
+		counterText="часа — минимальный ориентир прибытия."
+		benefits={benefits}
+	/>
+	<HomeAbout
+		subtitle={`Водитель ${driver.name}`}
+		title={`Выезд в район ${driver.district}, по Тюмени и за город`}
+		taskTitle="С какой проблемой можно обратиться"
+		taskText="Закончился бензин или дизель, автомобиль заглох, разрядился аккумулятор, повреждено колесо либо машину нужно дотащить до сервиса."
+		principleTitle="Что согласуется до выезда"
+		principleText={`Адрес, задача, марка и объём топлива, срок прибытия и итоговая цена. Текущий ориентир: ${driver.deliveryTime}, от ${driver.price} ₽.`}
+		counters={[
+			{ value: String(fuelList.length), suffix: '', label: 'Марки топлива' },
+			{ value: driver.price.replaceAll(' ', ''), suffix: '₽', label: 'Минимальная цена' },
+			{ value: '3', suffix: '', label: 'Направления помощи' },
+			{ value: '1', suffix: '', label: 'Заявка до выезда' },
+		]}
+		footerText="Нужна доставка топлива или помощь с автомобилем —"
+		footerLinkText="вызвать водителя"
+	/>
+	<HomeServices
+		subtitle="Услуги водителя"
+		title={`Чем ${driver.name} поможет на дороге`}
+		services={services}
+		footerText="Опишите место остановки и задачу, чтобы водитель проверил возможность выезда —"
+		footerLinkText="оставить заявку"
+		footerLinkHref="/contacts"
+		rating={fuelList.length.toString()}
+		ratingText="марки топлива доступны в профиле"
+	/>
+	<HomeWhyChoose
+		subtitle="Условия выезда"
+		title="Срок и стоимость известны до начала поездки"
+		description={`Основная зона водителя — район ${driver.district}. Для другого района Тюмени, пригорода или трассы время и цена рассчитываются после получения точки остановки.`}
+		items={[
+			{ icon: '/images/icon-why-choose-body-1-gold.svg', title: 'Точный заказ', text: 'Марка, объём топлива, адрес и состояние машины уточняются до покупки на АЗС.' },
+			{ icon: '/images/icon-why-choose-body-2-gold.svg', title: 'Понятный расчёт', text: 'Отдельно фиксируются топливо, доставка, загородный пробег и дополнительные дорожные работы.' },
+		]}
+		ctaText={orderTitle}
+		authorName={driver.name}
+		authorText={`Водитель, район ${driver.district}`}
+	/>
+	<HomeFleets
+		subtitle="Доступная помощь"
+		title="Топливо, запуск двигателя и буксировка"
+		slides={[
+			{ image: '/images/fleets-image-4.jpg', label: 'Доставка топлива', price: driver.price, priceUnit: '₽ от', amenities: [fuelText, `Район ${driver.district}`], href: '/contacts' },
+			{ image: '/images/fleets-image-1.jpg', label: 'Запуск двигателя', price: driver.price, priceUnit: '₽ от', amenities: ['Разряжен аккумулятор', 'Автомобиль не заводится'], href: '/contacts' },
+			{ image: '/images/fleets-image-3.jpg', label: 'Помощь при поломке', price: driver.price, priceUnit: '₽ от', amenities: ['Проверка на месте', 'Безопасная мелкая помощь'], href: '/contacts' },
+			{ image: '/images/fleets-image-5.jpg', label: 'Буксировка', price: driver.price, priceUnit: '₽ от', amenities: ['До стоянки или сервиса', 'Цена по маршруту'], href: '/contacts' },
+		]}
+		footerText="Итоговая услуга и стоимость подтверждаются до выезда —"
+		footerLinkText="вызвать водителя"
+		footerLinkHref="/contacts"
+	/>
+	<HomeWhatWeDo
+		subtitle="Как оформить вызов"
+		title="Сначала расчёт, затем подтверждение выезда"
+		description="В заявке укажите геолокацию, телефон, автомобиль и проблему. Водитель проверит расстояние, подберёт топливо или оборудование и сообщит полный расчёт."
+		counters={[{ value: driver.deliveryTime.includes('1') ? '1' : '2', title: 'Минимальный ориентир в часах' }, { value: driver.price.replaceAll(' ', ''), title: 'Стоимость выезда от, ₽' }]}
+		checklist={['Передать точную геолокацию', 'Согласовать топливо или работу', 'Подтвердить цену и срок']}
+		infoTitle="Что сообщить водителю"
+		infoText="Назовите марку автомобиля, признаки поломки, остаток топлива и безопасное место ожидания. На трассе добавьте направление, километр и ближайший ориентир."
+		ctaText={orderTitle}
+		authorName={driver.name}
+		authorText={statusLabels[driver.status]}
+	/>
+	<HomeCollection
+		subtitle="Когда нужен выезд"
+		title="Дорожные ситуации, с которыми можно обратиться"
+		description="Вызов подходит, когда бак пуст, двигатель не запускается, аккумулятор разряжен, колесо повреждено или автомобиль нельзя безопасно продолжать вести."
+		ctaText={orderTitle}
+		categories={[
+			{ icon: '/images/icon-car-collection-1-gold.svg', title: 'Доставка бензина', image: '/images/car-collection-image-1-gold.png' },
+			{ icon: '/images/icon-car-collection-2-gold.svg', title: 'Запуск двигателя', image: '/images/car-collection-image-2-gold.png' },
+			{ icon: '/images/icon-car-collection-3-gold.svg', title: 'Помощь при поломке', image: '/images/car-collection-image-3-gold.png' },
+			{ icon: '/images/icon-car-collection-4-gold.svg', title: 'Буксировка и эвакуация', image: '/images/car-collection-image-4-gold.png' },
+			{ icon: '/images/icon-car-collection-5-gold.svg', title: 'Диагностика мотора', image: '/images/car-collection-image-5-gold.png' },
+			{ icon: '/images/icon-car-collection-6-gold.svg', title: 'Доставка дизеля', image: '/images/car-collection-image-6-gold.png' },
+		]}
+	/>
+	<HomeDrivers
+		subtitle="География выезда"
+		title={`Где ${driver.name} оказывает помощь`}
+		drivers={[
+			{ image: '/images/driver/ekip-1.jpg', title: `Район ${driver.district}`, text: `Основная зона с ориентиром прибытия ${driver.deliveryTime}.`, href: '/contacts' },
+			{ image: '/images/driver/ekip-2.jpg', title: 'Другие районы Тюмени', text: 'Выезд подтверждается после проверки адреса, маршрута и дорожной обстановки.', href: '/contacts' },
+			{ image: '/images/driver/ekip-3.jpg', title: 'Пригород и трасса', text: 'Стоимость рассчитывается по расстоянию; нужен точный ориентир места остановки.', href: '/contacts' },
+		]}
+		footerText="Уточните адрес, чтобы проверить доступность выезда —"
+		footerLinkText="оставить заявку"
+		footerLinkHref="/contacts"
+	/>
+	<HomeHowItWork
+		subtitle="Три шага до помощи"
+		title={`Как вызвать водителя ${driver.name}`}
+		steps={steps}
+		footerList={['Точный адрес', 'Марка автомобиля', 'Описание проблемы', 'Телефон для связи']}
+		footerText="Чем точнее исходные данные, тем быстрее водитель подтвердит маршрут, оборудование и стоимость."
+		footerLinkText={orderTitle}
+	/>
+	<HomeTestimonials
+		subtitle="Условия заказа"
+		title="Что фиксируется перед выездом"
+		intro="Заказ подтверждается после согласования задачи, адреса, срока и полной стоимости. Если на месте обнаружится другая неисправность, дополнительные действия отдельно обсуждаются до выполнения."
+		satisfyText="Вызовы помощи на дороге"
+		reviews={[
+			{ title: 'Топливо по согласованной марке', text: `Для доставки доступны ${fuelText}. Марка, объём, стоимость на АЗС и цена доставки подтверждаются до покупки.`, author: driver.name, authorRole: `Водитель, ${driver.district}`, image: '/images/author-3.jpg' },
+			{ title: 'Работа только после расчёта', text: 'Срок и цена не меняются без нового маршрута или дополнительной работы, которую согласовали отдельно.', author: driver.name, authorRole: 'Помощь на дороге', image: '/images/author-2.jpg' },
+		]}
+		footerText="Нужно подтвердить выезд и стоимость —"
+		footerLinkText="связаться с водителем"
+		footerLinkHref="/contacts"
+	/>
+	<HomePricing
+		subtitle="Стоимость помощи"
+		title={`Выезд водителя от ${driver.price} ₽`}
+		plans={[
+			{ icon: '/images/icon-pricing-1-gold.svg', title: 'Доставка топлива', text: `Подвоз ${fuelText} к месту остановки.`, price: driver.price, priceUnit: '₽ от', features: ['Топливо оплачивается отдельно', `Район ${driver.district}`, 'Объём согласуется заранее'], ctaText: 'Заказать топливо', ctaHref: '/contacts' },
+			{ icon: '/images/icon-pricing-2-gold.svg', title: 'Помощь на месте', text: 'Запуск двигателя и доступные дорожные работы.', price: driver.price, priceUnit: '₽ от', features: ['Причина уточняется заранее', 'Расходники оплачиваются отдельно', 'Работа после согласования'], ctaText: 'Вызвать помощь', ctaHref: '/contacts' },
+			{ icon: '/images/icon-pricing-3-gold.svg', title: 'Буксировка', text: 'Доставка машины до стоянки или сервиса.', price: driver.price, priceUnit: '₽ от', features: ['Цена зависит от маршрута', 'Точка назначения заранее', 'Безопасность автомобиля'], ctaText: 'Заказать буксировку', ctaHref: '/contacts' },
+		]}
+		benefits={['Расчёт до выезда', `Прибытие ${driver.deliveryTime}`, statusLabels[driver.status]]}
+	/>
+	<HomeBlog
+		subtitle="Полезно перед вызовом"
+		title="Как подготовиться к помощи на дороге"
+		description="Остановитесь в безопасном месте, включите аварийную сигнализацию, передайте геолокацию и не пытайтесь продолжать движение при риске повреждения двигателя или колеса."
+		posts={[
+			{ image: '/images/post-1.jpg', title: 'Как заказать доставку бензина или дизеля', href: '/services/toplivo', btnText: 'Условия доставки' },
+			{ image: '/images/post-2.jpg', title: 'Какая помощь возможна прямо на дороге', href: '/services/tehpomosch', btnText: 'Виды техпомощи' },
+			{ image: '/images/post-3.jpg', title: `Вызвать водителя ${driver.name} в Тюмени`, href: '/contacts', btnText: 'Оставить заявку' },
+		]}
+	/>
+	<ServiceFaqs faqs={faqs} title={`Вопросы о выезде водителя ${driver.name}`} />
+	<Footer />
+</Layout>

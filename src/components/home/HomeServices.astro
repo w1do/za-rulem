@@ -4,6 +4,7 @@ interface ServiceItem {
 	title: string;
 	text: string;
 	href: string;
+	linkText?: string;
 }
 
 interface Props {
@@ -76,7 +77,7 @@ const {
                                 <p>{service.text}</p>
                             </div>
                             <div class="service-item-btn">
-                                <a href={service.href} class="readmore-btn">Подробнее</a>
+                        								<a href={service.href} class="readmore-btn">{service.linkText ?? 'Подробнее'}</a>
                             </div>
                         </div>
                     </div>
