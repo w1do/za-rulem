@@ -1,5 +1,6 @@
 ---
 import { SITE, baseGraph } from '../lib/seo';
+import ServiceRequestModal from '../components/forms/ServiceRequestModal.tsx';
 
 export interface Props {
 	title: string;
@@ -111,6 +112,120 @@ const structuredData = {
 
 		<slot />
 
+		<div class="cookie-consent" data-cookie-consent hidden>
+			<div class="cookie-consent__content">
+				<p>Мы принимаем cookie, чтобы сайт работал стабильно, а заявка на помощь отправлялась без сбоев.</p>
+				<a href="/privacy-policy" data-skip-service-request>Политика конфиденциальности</a>
+			</div>
+			<button class="cookie-consent__button" type="button" data-cookie-accept>Принять</button>
+		</div>
+
+		<!-- Глобальная универсальная форма заявки -->
+		<ServiceRequestModal client:load />
+
+		<!--
+			Ранний перехват tel / WhatsApp / CTA «Вызвать помощь» и др.
+			Работает до гидрации React-острова и кладёт pending, если модалка ещё не готова.
+		-->
+		<script is:inline>
+			(function () {
+				var COOKIE_KEY = 'za-rulem-cookie-accepted';
+				var OPEN_EVENT = 'za-rulem:open-service-request';
+				var cookieConsent = document.querySelector('[data-cookie-consent]');
+				var cookieAccept = document.querySelector('[data-cookie-accept]');
+
+				if (cookieConsent && localStorage.getItem(COOKIE_KEY) !== 'true') {
+					cookieConsent.hidden = false;
+				}
+
+				if (cookieAccept) {
+					cookieAccept.addEventListener('click', function () {
+						localStorage.setItem(COOKIE_KEY, 'true');
+						if (cookieConsent) cookieConsent.hidden = true;
+					});
+				}
+
+				function isContactsHref(href) {
+					if (!href) return false;
+					try {
+						var url = new URL(href, window.location.origin);
+						var path = url.pathname.replace(/\/+$/, '') || '/';
+						return path === '/contacts';
+					} catch (e) {
+						return href === '/contacts' || /\/contacts\/?(\?|#|$)/.test(href);
+					}
+				}
+
+				function shouldIntercept(anchor) {
+					if (!anchor || !anchor.getAttribute) return false;
+					if (anchor.closest && anchor.closest('[data-service-request-modal]')) return false;
+					if (anchor.hasAttribute('data-skip-service-request')) return false;
+
+					var href = anchor.getAttribute('href') || '';
+					if (href.indexOf('tel:') === 0) return true;
+					if (/wa\.me|api\.whatsapp\.com/i.test(href)) return true;
+					if (anchor.hasAttribute('data-service-request')) return true;
+
+					var isBtn =
+						anchor.classList.contains('btn-default') ||
+						anchor.classList.contains('btn-highlighted');
+					if (isContactsHref(href) && isBtn) return true;
+
+					var text = (anchor.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+					if (
+						isContactsHref(href) &&
+						/(вызвать помощь|заказать доставку|оставить заявку|вызвать эвакуатор)/i.test(text)
+					) {
+						return true;
+					}
+
+					return false;
+				}
+
+				function openFromAnchor(anchor) {
+					var href = anchor.getAttribute('href') || '';
+					var isTel = href.indexOf('tel:') === 0;
+					var isWhatsApp = /wa\.me|api\.whatsapp\.com/i.test(href);
+					var detail = {
+						service: anchor.getAttribute('data-service') || undefined,
+						subject:
+							anchor.getAttribute('data-service-subject') ||
+							(isTel
+								? 'Заявка перед звонком — za-rulem'
+								: isWhatsApp
+									? 'Заявка перед WhatsApp — za-rulem'
+									: 'Заявка с CTA — za-rulem'),
+						title:
+							anchor.getAttribute('data-service-title') ||
+							(isTel || isWhatsApp ? 'Сначала заявка — потом звонок' : 'Заявка на выезд'),
+					};
+
+					if (typeof window.openServiceRequest === 'function') {
+						window.openServiceRequest(detail);
+					} else {
+						window.__pendingServiceRequest = detail;
+						document.dispatchEvent(new CustomEvent(OPEN_EVENT, { detail: detail }));
+					}
+				}
+
+				document.addEventListener(
+					'click',
+					function (event) {
+						var target = event.target;
+						if (!target || !target.closest) return;
+						var anchor = target.closest('a');
+						if (!shouldIntercept(anchor)) return;
+						event.preventDefault();
+						event.stopPropagation();
+						if (typeof event.stopImmediatePropagation === 'function') {
+							event.stopImmediatePropagation();
+						}
+						openFromAnchor(anchor);
+					},
+					true,
+				);
+			})();
+		</script>
 
 		<!-- Yandex.Metrika counter -->
 		<script type="text/javascript">

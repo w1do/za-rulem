@@ -1,0 +1,119 @@
+---
+// Блок цен хаба. Разметка our-pricing-gold из source/index-3 (как HomePricing).
+interface PricingItem {
+	title: string;
+	price: string;
+	description?: string;
+	features?: string[];
+	/** Пометка под ценой, напр. минимум за выезд */
+	priceNote?: string;
+}
+
+interface Props {
+	subtitle?: string;
+	title?: string;
+	items?: PricingItem[];
+	benefits?: string[];
+}
+
+const benefitIcons = [
+	'/images/icon-pricing-benefit-1.svg',
+	'/images/icon-pricing-benefit-2.svg',
+	'/images/icon-pricing-benefit-3.svg',
+];
+
+const pricingIcons = [
+	'/images/icon-pricing-1-gold.svg',
+	'/images/icon-pricing-2-gold.svg',
+	'/images/icon-pricing-3-gold.svg',
+];
+
+const {
+	subtitle = 'Цены на доставку топлива',
+	title = 'Понятная стоимость за литр',
+	items = [],
+	benefits = ['Цена до выезда', 'До 15 л', 'Выезд от 2 800 руб'],
+} = Astro.props;
+
+const defaultPriceNote = 'выезд от 2 800 руб';
+---
+
+{
+	items.length > 0 && (
+		<div class="our-pricing-gold bg-section">
+			<div class="container">
+				<div class="row section-row">
+					<div class="col-xl-12">
+						<div class="section-title section-title-center">
+							<span class="section-sub-title wow fadeInUp">{subtitle}</span>
+							<h2 class="text-anime-style-3" data-cursor="-opaque">
+								{title}
+							</h2>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					{items.map((item, index) => (
+						<div class="col-md-6">
+							<div
+								class="pricing-item-gold wow fadeInUp"
+								data-wow-delay={index === 0 ? undefined : `${index * 0.2}s`}
+							>
+								<div class="pricing-item-header-gold">
+									<div class="icon-box">
+										<img src={pricingIcons[index] ?? pricingIcons[0]} alt="" />
+									</div>
+									<div class="pricing-item-content-gold">
+										<span class="pricing-item-title-gold">{item.title}</span>
+										{item.description && <p>{item.description}</p>}
+										<h2>
+											{item.price}
+											{(item.priceNote || /₽\/л|\/л|\/литр/i.test(item.price)) && (
+												<span class="price-min-note">{item.priceNote ?? defaultPriceNote}</span>
+											)}
+										</h2>
+									</div>
+									<div class="pricing-item-btn-gold">
+										<a
+											href="/contacts"
+											class="btn-default"
+											data-service="toplivo"
+											data-service-title="Заказать доставку топлива"
+										>
+											Заказать доставку
+										</a>
+									</div>
+								</div>
+
+								{(item.features?.length ?? 0) > 0 && (
+									<div class="pricing-item-list-gold">
+										<h3>В услугу входит:</h3>
+										<ul>
+											{item.features!.map((feature) => (
+												<li>{feature}</li>
+											))}
+										</ul>
+									</div>
+								)}
+							</div>
+						</div>
+					))}
+
+					<div class="col-lg-12">
+						<div class="pricing-benefit-list-gold wow fadeInUp" data-wow-delay="0.6s">
+							<ul>
+        {benefits.map((benefit, index) => (
+         <li class={/(от|до)\s*15\s*л|выезд\s+от\s*2\s*800/i.test(benefit) ? 'price-volume-highlight' : undefined}>
+										<img src={benefitIcons[index] ?? benefitIcons[0]} alt="" />
+										{benefit}
+									</li>
+								))}
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	)
+}

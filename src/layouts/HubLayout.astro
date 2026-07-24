@@ -13,13 +13,15 @@ import HubApproach from '../components/hub/HubApproach.astro';
 import HubWhyChoose from '../components/hub/HubWhyChoose.astro';
 import HubWhatWeDo from '../components/hub/HubWhatWeDo.astro';
 import HubProcess from '../components/hub/HubProcess.astro';
+import HubPricing from '../components/hub/HubPricing.astro';
 import HubCta from '../components/hub/HubCta.astro';
 import HubExpertise from '../components/hub/HubExpertise.astro';
 import HubFaqs from '../components/hub/HubFaqs.astro';
 import HubTestimonials from '../components/hub/HubTestimonials.astro';
+import FuelDeliveryCalculator from '../components/calculators/FuelDeliveryCalculator.tsx';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
 
-const { frontmatter, spokes = [] } = Astro.props;
+const { frontmatter, spokes = [], cluster } = Astro.props;
 
 const seoTitle = frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь в Тюмени`;
 const seoDescription = frontmatter.seo?.description ?? frontmatter.description;
@@ -57,6 +59,13 @@ const steps = process
 			{ title: process.step4Title, description: process.step4Desc },
 		].filter((s) => s.title)
 	: [];
+
+const pricing = frontmatter.pricing;
+const pricingItems = pricing?.items ?? [];
+
+const approach = frontmatter.approach;
+const whyChoose = frontmatter.whyChoose;
+const showFuelCalculator = cluster === 'toplivo';
 ---
 
 <Layout title={seoTitle} description={seoDescription} keywords={keywords} jsonLd={jsonLd}>
@@ -64,15 +73,48 @@ const steps = process
 
 	<HubPageHeader title={frontmatter.title} />
 
-	<HubIntro description={frontmatter.description}>
+	<HubIntro title={frontmatter.title} description={frontmatter.description}>
 		<slot />
 	</HubIntro>
 
+	<HubPricing title={pricing?.title} items={pricingItems} />
+
+	{
+		showFuelCalculator && (
+			<div class="fuel-calculator-section bg-section">
+				<div class="container">
+					<FuelDeliveryCalculator client:visible />
+				</div>
+			</div>
+		)
+	}
+
 	<HubServices services={services} />
 
-	<HubApproach />
+	<HubProcess title={process?.title} steps={steps} />
 
-	<HubWhyChoose />
+	<HubApproach
+		subtitle={approach?.subtitle}
+		title={approach?.title}
+		items={approach?.items}
+		image={approach?.image}
+		imageAlt={approach?.imageAlt}
+		footerText={approach?.footerText}
+		footerLinkHref={approach?.footerLinkHref}
+		footerLinkLabel={approach?.footerLinkLabel}
+		footerBadge={approach?.footerBadge}
+	/>
+
+	<HubWhyChoose
+		subtitle={whyChoose?.subtitle}
+		title={whyChoose?.title}
+		items={whyChoose?.items}
+		image1={whyChoose?.image1}
+		image1Alt={whyChoose?.image1Alt}
+		image2={whyChoose?.image2}
+		image2Alt={whyChoose?.image2Alt}
+		counterLabel={whyChoose?.counterLabel}
+	/>
 
 	<HubWhatWeDo />
 

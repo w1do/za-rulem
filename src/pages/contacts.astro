@@ -10,8 +10,8 @@ const jsonLd = [
 	webPageNode({
 		type: 'ContactPage',
 		name: 'Контакты — вызов автопомощи и техпомощи в Тюмени',
-		description:
-			'Как вызвать автопомощь и техпомощь на дороге в Тюмени и области: телефон +7 908 871-20-26, выезд круглосуточно. Оставьте заявку — перезвоню в течение пары минут.',
+  description:
+			'Как вызвать автопомощь и техпомощь на дороге в Тюмени и области: выезд только по заявке, круглосуточно. Оставьте заявку — перезвоню в течение пары минут.',
 		url: '/contacts',
 	}),
 	breadcrumbNode([
@@ -23,7 +23,7 @@ const jsonLd = [
 
 <Layout
 	title="Контакты — техпомощь на дороге в Тюмени | За рулём"
-	description="Свяжитесь со мной для вызова техпомощи в Тюмени и области: телефон +7 908 871-20-26, выезд круглосуточно. Оставьте заявку — перезвоню в течение пары минут."
+ description="Свяжитесь со мной для вызова техпомощи в Тюмени и области: выезд только по заявке, круглосуточно. Оставьте заявку — перезвоню в течение пары минут."
 	keywords="контакты техпомощь тюмень, вызвать автопомощь тюмень, телефон техпомощь на дороге"
 	jsonLd={jsonLd}
 >
@@ -76,14 +76,14 @@ const jsonLd = [
 
 							<!-- Contact Info List Start -->
 							<div class="contact-info-list wow fadeInUp" data-wow-delay="0.2s">
-								<!-- Contact Info Item Start -->
+        <!-- Contact Info Item Start -->
 								<div class="contact-info-item">
 									<div class="icon-box">
-										<img src="/images/icon-phone-primary.svg" alt="Телефон" />
+										<img src="/images/icon-phone-primary.svg" alt="Заявка" />
 									</div>
 									<div class="contact-info-item-content">
-										<p>Звоните круглосуточно:</p>
-										<h3><a href="tel:+79088712026">+7 908 871-20-26</a></h3>
+										<p>Выезд только по заявке:</p>
+										<h3><a href="/contacts" data-service-request data-service-title="Вызвать помощь">Оставить заявку 24/7</a></h3>
 									</div>
 								</div>
 								<!-- Contact Info Item End -->
@@ -144,8 +144,8 @@ const jsonLd = [
 						<span class="section-sub-title wow fadeInUp">Зона выезда</span>
 						<h2 class="text-anime-style-3" data-cursor="-opaque">Работаю по Тюмени и области</h2>
 						<p class="wow fadeInUp" data-wow-delay="0.2s">
-							Выезжаю в любой район Тюмени и по Тюменской области. Позвоните
-							или оставьте заявку — доеду до вас, где бы вы ни остановились.
+       Выезжаю в любой район Тюмени и по Тюменской области. Оставьте
+							заявку — доеду до вас, где бы вы ни остановились.
 						</p>
 					</div>
 					<!-- Section Title End -->

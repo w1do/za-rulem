@@ -1,5 +1,55 @@
 ---
-// Блок «Мой подход» хаба. Разметка перенесена из шаблона (our-apporach bg-section).
+// Блок «Мой подход» хаба. Разметка our-apporach из source. Контент — через props.
+interface ApproachItem {
+	title: string;
+	description: string;
+	points?: string[];
+	icon?: string;
+}
+
+interface Props {
+	subtitle?: string;
+	title?: string;
+	items?: ApproachItem[];
+	image?: string;
+	imageAlt?: string;
+	footerText?: string;
+	footerLinkHref?: string;
+	footerLinkLabel?: string;
+	footerBadge?: string;
+}
+
+const defaultItems: ApproachItem[] = [
+	{
+		title: 'Быстрый выезд',
+		description: 'Я беру трубку сам и выезжаю к машине с нужным оборудованием.',
+		icon: '/images/icon-approach-item-1.svg',
+		points: ['Подача по Тюмени за 20–40 минут', 'Работаю круглосуточно, включая мороз'],
+	},
+	{
+		title: 'Честный расчёт',
+		description: 'Я называю цену до выезда и не навязываю лишние работы.',
+		icon: '/images/icon-approach-item-2.svg',
+		points: ['Оплата наличными или переводом на месте', 'Объясняю причину поломки простыми словами'],
+	},
+];
+
+const {
+	subtitle = 'Мой подход',
+	title = 'Я решаю проблему на месте, без лишнего ожидания',
+	items = defaultItems,
+	image = '/images/approach-image.jpg',
+	imageAlt = 'Выездная автопомощь в Тюмени',
+	footerText = 'Полный список дорожной помощи —',
+	footerLinkHref = '/services',
+	footerLinkLabel = 'смотреть услуги',
+	footerBadge = 'На связи круглосуточно',
+} = Astro.props;
+
+const approachIcons = [
+	'/images/icon-approach-item-1.svg',
+	'/images/icon-approach-item-2.svg',
+];
 ---
 
 <!-- Our Approach Section Start -->
@@ -9,8 +59,8 @@
 			<div class="col-xl-12">
 				<!-- Section Title Start -->
 				<div class="section-title section-title-center">
-					<span class="section-sub-title wow fadeInUp">Мой подход</span>
-					<h2 class="text-anime-style-3" data-cursor="-opaque">Я решаю проблему на месте, без лишнего ожидания</h2>
+					<span class="section-sub-title wow fadeInUp">{subtitle}</span>
+					<h2 class="text-anime-style-3" data-cursor="-opaque">{title}</h2>
 				</div>
 				<!-- Section Title End -->
 			</div>
@@ -20,45 +70,36 @@
 			<div class="col-xl-6">
 				<!-- Approach Item List Start -->
 				<div class="approach-item-list">
-					<!-- Approach Item Start -->
-					<div class="approach-item wow fadeInUp">
-						<div class="approach-item-header">
-							<div class="icon-box">
-								<img src="/images/icon-approach-item-1.svg" alt="Быстрый выезд" />
+					{
+						items.map((item, index) => (
+							<div
+								class="approach-item wow fadeInUp"
+								data-wow-delay={index === 0 ? undefined : `${index * 0.2}s`}
+							>
+								<div class="approach-item-header">
+									<div class="icon-box">
+										<img
+											src={item.icon ?? approachIcons[index] ?? approachIcons[0]}
+											alt={item.title}
+										/>
+									</div>
+									<div class="approach-item-content">
+										<h3>{item.title}</h3>
+										<p>{item.description}</p>
+									</div>
+								</div>
+								{(item.points?.length ?? 0) > 0 && (
+									<div class="approach-item-body-list">
+										<ul>
+											{item.points!.map((point) => (
+												<li>{point}</li>
+											))}
+										</ul>
+									</div>
+								)}
 							</div>
-							<div class="approach-item-content">
-								<h3>Быстрый выезд</h3>
-								<p>Я беру трубку сам и выезжаю к машине с нужным оборудованием.</p>
-							</div>
-						</div>
-						<div class="approach-item-body-list">
-							<ul>
-								<li>Подача по Тюмени за 20–40 минут</li>
-								<li>Работаю круглосуточно, включая мороз</li>
-							</ul>
-						</div>
-					</div>
-					<!-- Approach Item End -->
-
-					<!-- Approach Item Start -->
-					<div class="approach-item wow fadeInUp" data-wow-delay="0.2s">
-						<div class="approach-item-header">
-							<div class="icon-box">
-								<img src="/images/icon-approach-item-2.svg" alt="Честный расчёт" />
-							</div>
-							<div class="approach-item-content">
-								<h3>Честный расчёт</h3>
-								<p>Я называю цену до выезда и не навязываю лишние работы.</p>
-							</div>
-						</div>
-						<div class="approach-item-body-list">
-							<ul>
-								<li>Оплата наличными или переводом на месте</li>
-								<li>Объясняю причину поломки простыми словами</li>
-							</ul>
-						</div>
-					</div>
-					<!-- Approach Item End -->
+						))
+					}
 				</div>
 				<!-- Approach Item List End -->
 			</div>
@@ -67,7 +108,7 @@
 				<!-- Approach Image Start -->
 				<div class="approach-image">
 					<figure class="image-anime reveal">
-						<img src="/images/approach-image.jpg" alt="Выездная автопомощь в Тюмени" />
+						<img src={image} alt={imageAlt} />
 					</figure>
 				</div>
 				<!-- Approach Image End -->
@@ -88,7 +129,10 @@
 						</div>
 					</div>
 					<!-- Satisfy Client Images End -->
-					<p>Полный список дорожной помощи — <a href="/services">смотреть услуги</a></p>
+					<p>
+						{footerText}{' '}
+						<a href={footerLinkHref}>{footerLinkLabel}</a>
+					</p>
 					<ul>
 						<li><span class="counter">24</span>/7</li>
 						<li>
@@ -98,7 +142,7 @@
 							<i class="fa-solid fa-star"></i>
 							<i class="fa-solid fa-star"></i>
 						</li>
-						<li>На связи круглосуточно</li>
+						<li>{footerBadge}</li>
 					</ul>
 				</div>
 				<!-- Section Footer Text End -->

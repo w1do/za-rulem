@@ -67,7 +67,7 @@ export function useCallbackForm(subject = 'Заявка с сайта za-rulem')
 			setValues(initialValues);
 		} catch (err) {
 			setStatus('error');
-			setError('Не удалось отправить заявку. Позвоните мне напрямую: +7 908 871-20-26.');
+   setError('Не удалось отправить заявку. Попробуйте ещё раз через минуту.');
 		}
 	};
 

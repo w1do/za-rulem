@@ -7,9 +7,7 @@ export const SITE = {
 	brand: 'За рулём — техпомощь на дороге в Тюмени',
 	description:
 		'Круглосуточная автопомощь и техпомощь на дороге в Тюмени с выездом: прикурю авто, заменю аккумулятор, отогрею машину, привезу топливо, вскрою автомобиль, вызову эвакуатор.',
-	url: 'https://za-rulem.org',
-	phone: '+7 908 871-20-26',
-	phoneHref: '+79088712026',
+ url: 'https://za-rulem.org',
 	email: 'info@za-rulem.org',
 	logo: 'https://za-rulem.org/images/logo.svg',
 	image: 'https://za-rulem.org/images/logo.svg',
@@ -20,7 +18,7 @@ export const SITE = {
 	areaServed: ['Тюмень', 'Тюменская область'],
 	priceRange: '₽₽',
 	openingHours: 'Mo-Su 00:00-24:00',
-	sameAs: ['https://wa.me/79088712026'],
+	sameAs: [] as string[],
 } as const;
 
 // Идентификаторы узлов графа (для перекрёстных ссылок @id).
@@ -56,10 +54,9 @@ export function businessNode() {
 		'@id': BUSINESS_ID,
 		name: SITE.brand,
 		description: SITE.description,
-		url: `${SITE.url}/`,
+        url: `${SITE.url}/`,
 		image: SITE.image,
 		logo: SITE.logo,
-		telephone: SITE.phone,
 		email: SITE.email,
 		priceRange: SITE.priceRange,
 		currenciesAccepted: 'RUB',
@@ -87,12 +84,12 @@ export function businessNode() {
 		},
 		contactPoint: {
 			'@type': 'ContactPoint',
-			telephone: SITE.phone,
+			url: `${SITE.url}/contacts`,
 			contactType: 'customer service',
 			areaServed: 'RU',
 			availableLanguage: 'Russian',
 		},
-		sameAs: SITE.sameAs,
+		...(SITE.sameAs.length ? { sameAs: SITE.sameAs } : {}),
 	};
 }
 
@@ -147,13 +144,9 @@ export function serviceNode(opts: {
 		serviceType: opts.serviceType ?? 'Техпомощь на дороге',
 		provider: { '@id': BUSINESS_ID },
 		areaServed: SITE.areaServed.map((name) => ({ '@type': 'AdministrativeArea', name })),
-		availableChannel: {
+  availableChannel: {
 			'@type': 'ServiceChannel',
-			servicePhone: {
-				'@type': 'ContactPoint',
-				telephone: SITE.phone,
-				contactType: 'customer service',
-			},
+			serviceUrl: `${SITE.url}/contacts`,
 		},
 	};
 }

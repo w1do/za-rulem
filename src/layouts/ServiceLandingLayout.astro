@@ -7,6 +7,7 @@ import ServicePageHeader from '../components/services/single/ServicePageHeader.a
 import ServiceSidebar from '../components/services/single/ServiceSidebar.astro';
 import ServiceSingleImage from '../components/services/single/ServiceSingleImage.astro';
 import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
+import FuelDeliveryCalculator from '../components/calculators/FuelDeliveryCalculator.tsx';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
 
 const { frontmatter } = Astro.props;
@@ -31,6 +32,7 @@ const seoDescription = frontmatter.seo?.description ?? frontmatter.description;
 const faqs = frontmatter.faqs ?? [];
 const image = frontmatter.image ?? '/images/service-single-image.jpg';
 const imageAlt = frontmatter.imageAlt ?? frontmatter.title;
+const showFuelCalculator = cluster === 'toplivo' && /бензин/i.test(frontmatter.title);
 
 const jsonLd = [
 	serviceNode({
@@ -71,6 +73,8 @@ const jsonLd = [
 							<slot />
 						</div>
 						<!-- Service Entry End -->
+
+						{showFuelCalculator && <FuelDeliveryCalculator client:visible />}
 
 						<ServiceFaqs faqs={faqs} />
 					</div>

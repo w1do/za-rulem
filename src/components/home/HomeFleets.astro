@@ -6,6 +6,8 @@ interface FleetSlide {
 	label: string;
 	price: string;
 	priceUnit?: string;
+	/** Мелкая пометка под ценой (напр. минимум за выезд) */
+	priceNote?: string;
 	amenities: string[];
 	href: string;
 }
@@ -29,7 +31,7 @@ const {
 			image: '/images/fleets-image-1.jpg',
 			cursor: 'Замена аккумулятора',
 			label: 'Замена аккумулятора',
-			price: 'от 1 500 ₽',
+   price: 'от 5 500 ₽',
 			priceUnit: '/выезд',
 			amenities: ['Привезу батарею', 'Установлю на месте'],
 			href: '/services/tehpomosch/zamena-akkumulyatora',
@@ -38,7 +40,7 @@ const {
 			image: '/images/fleets-image-2.jpg',
 			cursor: 'Отогрев авто',
 			label: 'Отогрев авто',
-			price: 'от 2 000 ₽',
+			price: 'от 5 500 ₽',
 			priceUnit: '/выезд',
 			amenities: ['Отогрею двигатель', 'Заведу на месте'],
 			href: '/services/tehpomosch/otogrev-avto',
@@ -47,7 +49,7 @@ const {
 			image: '/images/fleets-image-3.jpg',
 			cursor: 'Автоэлектрик и диагностика',
 			label: 'Автоэлектрик и диагностика',
-			price: 'от 1 500 ₽',
+			price: 'от 5 500 ₽',
 			priceUnit: '/выезд',
 			amenities: ['Найду причину поломки', 'Проверю электрику авто'],
 			href: '/services/tehpomosch',
@@ -56,16 +58,17 @@ const {
 			image: '/images/fleets-image-4.jpg',
 			cursor: 'Подвоз топлива',
 			label: 'Подвоз топлива',
-			price: 'от 1 000 ₽',
-			priceUnit: '/выезд',
-			amenities: ['Привезу бензин или дизель', 'Помогу запустить авто'],
-			href: '/services/tehpomosch/podvoz-topliva',
+			price: 'от 125 ₽',
+			priceUnit: '/л',
+			priceNote: 'выезд от 2 800 руб',
+			amenities: ['92/95/ДТ до дома и на дорогу', 'До 15 л'],
+			href: '/services/toplivo',
 		},
 		{
 			image: '/images/fleets-image-5.jpg',
 			cursor: 'Вызвать эвакуатор',
 			label: 'Эвакуатор',
-			price: 'от 2 500 ₽',
+			price: 'от 5 500 ₽',
 			priceUnit: '/выезд',
 			amenities: ['Погружу автомобиль', 'Доставлю по адресу'],
 			href: '/services/tehpomosch',
@@ -74,7 +77,7 @@ const {
 			image: '/images/fleets-image-1.jpg',
 			cursor: 'Прикурить авто',
 			label: 'Прикурить авто',
-			price: 'от 800 ₽',
+			price: 'от 5 500 ₽',
 			priceUnit: '/выезд',
 			amenities: ['Подам питание', 'Запущу двигатель'],
 			href: '/services/tehpomosch/prikurit-avto',
@@ -130,7 +133,12 @@ const {
                                             <!-- Fleets Item Content Start -->
                                             <div class="fleets-item-content">
                                                 <p>{slide.label}</p>
-                                                <h2>{slide.price} <sub>{slide.priceUnit}</sub></h2>
+                                                <h2>
+                                                    {slide.price} {slide.priceUnit && <sub>{slide.priceUnit}</sub>}
+                                                    {(slide.priceNote || /₽\/л|\/л|\/литр/i.test(`${slide.price}${slide.priceUnit ?? ''}`)) && (
+                                                        <span class="price-min-note">{slide.priceNote ?? 'выезд от 2 800 руб'}</span>
+                                                    )}
+                                                </h2>
                                             </div>
                                             <!-- Fleets Item Content End -->
 
@@ -138,7 +146,10 @@ const {
                                             <div class="fleets-amenity-item-list">
                                                 <ul>
                                                     {slide.amenities.map((amenity, index) => (
-                                                    <li><img src={amenityIcons[index] ?? amenityIcons[0]} alt="" />{amenity}</li>
+                                                    <li class={/(от|до)\s*15\s*л/i.test(amenity) ? 'price-volume-highlight' : undefined}>
+                                                        <img src={amenityIcons[index] ?? amenityIcons[0]} alt="" />
+                                                        {amenity}
+                                                    </li>
                                                     ))}
                                                 </ul>
                                             </div>

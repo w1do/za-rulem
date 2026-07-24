@@ -7,6 +7,7 @@
 # Информационные страницы
 /about
 /contacts
+/fleets
 /privacy-policy
 /terms
 

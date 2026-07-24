@@ -42,6 +42,50 @@ const pricingSchema = z
 	})
 	.optional();
 
+const approachSchema = z
+	.object({
+		subtitle: z.string().optional(),
+		title: z.string().optional(),
+		image: z.string().optional(),
+		imageAlt: z.string().optional(),
+		footerText: z.string().optional(),
+		footerLinkHref: z.string().optional(),
+		footerLinkLabel: z.string().optional(),
+		footerBadge: z.string().optional(),
+		items: z
+			.array(
+				z.object({
+					title: z.string(),
+					description: z.string(),
+					icon: z.string().optional(),
+					points: z.array(z.string()).default([]),
+				}),
+			)
+			.optional(),
+	})
+	.optional();
+
+const whyChooseSchema = z
+	.object({
+		subtitle: z.string().optional(),
+		title: z.string().optional(),
+		image1: z.string().optional(),
+		image1Alt: z.string().optional(),
+		image2: z.string().optional(),
+		image2Alt: z.string().optional(),
+		counterLabel: z.string().optional(),
+		items: z
+			.array(
+				z.object({
+					title: z.string(),
+					description: z.string(),
+					icon: z.string().optional(),
+				}),
+			)
+			.optional(),
+	})
+	.optional();
+
 const seoSchema = z
 	.object({
 		title: z.string().optional(),
@@ -77,6 +121,8 @@ const services = defineCollection({
 		faqs: z.array(faqSchema).default([]),
 		process: processSchema,
 		pricing: pricingSchema,
+		approach: approachSchema,
+		whyChoose: whyChooseSchema,
 	}),
 });
 

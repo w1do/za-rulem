@@ -20,17 +20,17 @@ interface Props {
 const {
 	subtitle = 'Техпомощь на дороге в Тюмени 24/7',
 	title = 'Срочная автопомощь на дороге в Тюмени с выездом',
-	description = 'Приеду за 20–40 минут и заведу вашу машину: прикурю авто, заменю аккумулятор с выездом, отогрею двигатель, вскрою салон, привезу топливо или подам эвакуатор. Работаю круглосуточно по Тюмени. Звоните: +7 908 871-20-26.',
+ description = 'Приеду за 20–40 минут и заведу вашу машину: прикурю авто, заменю аккумулятор с выездом, отогрею двигатель, вскрою салон, привезу топливо или подам эвакуатор. Работаю круглосуточно по Тюмени. Выезд только по заявке на сайте.',
 	ctaText = 'Вызвать помощь',
 	ctaHref = '/contacts',
 	reviewText = 'Круглосуточно на связи с водителями Тюмени',
 	counterValue = '6',
 	counterText = 'Шесть видов техпомощи на дороге — приеду с готовым оборудованием и решу проблему на месте.',
 	benefits = [
-		{
+  {
 			icon: '/images/icon-hero-info-list-1-gold.svg',
-			title: '01. Позвоните мне',
-			text: 'Опишите поломку по телефону — подскажу решение и назову цену до выезда.',
+			title: '01. Оставьте заявку',
+			text: 'Опишите поломку в форме — подскажу решение и назову цену до выезда.',
 		},
 		{
 			icon: '/images/icon-hero-info-list-2-gold.svg',
@@ -63,7 +63,14 @@ const {
                         
                         <!-- Hero Content Button Start -->
                         <div class="hero-content-btn-gold wow fadeInUp" data-wow-delay="0.4s">
-                            <a href={ctaHref} class="btn-default btn-highlighted">{ctaText}</a>
+                            <a
+								href={ctaHref}
+								class="btn-default btn-highlighted"
+								data-service-request
+								data-service-title={ctaText}
+							>
+								{ctaText}
+							</a>
                         </div>
                         <!-- Hero Content Button End -->
                     </div>

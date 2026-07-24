@@ -4828,6 +4828,155 @@ header.main-header .header-sticky.active{
 	color: var(--text-color);
 }
 
+.fuel-calculator{
+	display: grid;
+	grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+	gap: 30px;
+	margin: 40px 0;
+	padding: 34px;
+	background: var(--secondary-color);
+	border-radius: 20px;
+}
+
+.fuel-calculator-section{
+	padding: 120px 0;
+	margin: 30px auto;
+}
+
+.fuel-calculator-section .fuel-calculator{
+	margin: 0;
+}
+
+.fuel-calculator .section-title{
+	margin-bottom: 24px;
+}
+
+.fuel-calculator .section-title h2{
+	font-size: 34px;
+}
+
+.fuel-calculator__controls{
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 12px;
+	margin-bottom: 22px;
+}
+
+.fuel-calculator__fuel{
+	padding: 18px;
+	border: 1px solid transparent;
+	border-radius: 14px;
+	background: var(--white-color);
+	color: var(--primary-color);
+	text-align: left;
+	cursor: pointer;
+	transition: all 0.3s ease-in-out;
+}
+
+.fuel-calculator__fuel span,
+.fuel-calculator__fuel strong{
+	display: block;
+}
+
+.fuel-calculator__fuel span{
+	margin-bottom: 6px;
+	font-weight: 700;
+}
+
+.fuel-calculator__fuel strong{
+	color: var(--accent-color);
+}
+
+.fuel-calculator__fuel.active,
+.fuel-calculator__fuel:hover{
+	border-color: var(--accent-color);
+	box-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
+}
+
+.fuel-calculator__field span{
+	display: block;
+	margin-bottom: 8px;
+	font-weight: 700;
+	color: var(--primary-color);
+}
+
+.fuel-calculator__field .form-control{
+	font-size: 22px;
+	font-weight: 700;
+	line-height: 1.25em;
+	color: var(--primary-color);
+	background: var(--white-color);
+	border: 2px solid var(--accent-color);
+	border-radius: 14px;
+	padding: 18px 20px;
+	box-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
+	outline: none;
+	transition: all 0.3s ease-in-out;
+}
+
+.fuel-calculator__field .form-control:focus{
+	background: var(--bg-color);
+	box-shadow: 0 0 0 4px rgba(255, 183, 0, 0.2), 0 12px 34px rgba(0, 0, 0, 0.08);
+}
+
+.fuel-calculator__field small{
+	display: block;
+	margin-top: 8px;
+	color: var(--text-color);
+}
+
+.fuel-calculator__summary{
+	padding: 28px;
+	background: var(--primary-color);
+	border-radius: 18px;
+}
+
+.fuel-calculator__total{
+	margin-bottom: 22px;
+	padding-bottom: 22px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.fuel-calculator__total span,
+.fuel-calculator__total strong{
+	display: block;
+}
+
+.fuel-calculator__total span{
+	margin-bottom: 8px;
+	color: var(--white-color);
+}
+
+.fuel-calculator__total strong{
+	color: var(--accent-color);
+	font-size: 42px;
+	line-height: 1.1em;
+}
+
+.fuel-calculator__breakdown{
+	margin: 0 0 20px;
+	padding: 0;
+	list-style: none;
+}
+
+.fuel-calculator__breakdown li{
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 10px;
+	color: var(--white-color);
+}
+
+.fuel-calculator__breakdown b{
+	color: var(--accent-color);
+	white-space: nowrap;
+}
+
+.fuel-calculator__summary p{
+	margin-bottom: 20px;
+	color: rgba(255, 255, 255, 0.78);
+}
+
 .google-map{
     padding: 60px 0 120px;
 }
@@ -5339,6 +5488,15 @@ header.main-header .header-sticky.active{
 
 	.section-title p{
 		margin-top: 10px;
+	}
+
+	.fuel-calculator{
+		grid-template-columns: 1fr;
+		padding: 28px;
+	}
+
+	.fuel-calculator .section-title h2{
+		font-size: 30px;
 	}
 
 	.hero{
@@ -6445,13 +6603,25 @@ header.main-header .header-sticky.active{
 		gap: 10px;
 	}
 
-    .service-entry ul li{
-        width: 100%;
-    }
+   	.service-entry ul li{
+		width: 100%;
+	}
 
-    .service-feature-item{
-        width: calc(50% - 10px);
-        padding: 15px;
+	.fuel-calculator{
+		padding: 24px 18px;
+	}
+
+	.fuel-calculator__controls{
+		grid-template-columns: 1fr;
+	}
+
+	.fuel-calculator__total strong{
+		font-size: 34px;
+	}
+
+	.service-feature-item{
+		width: calc(50% - 10px);
+		padding: 15px;
     }
 
 	.service-feature-item .icon-box{
@@ -10100,6 +10270,38 @@ header.main-header .header-sticky.active{
 	bottom: 0;
 }
 
+/* Цена выезда под ценой ₽/л */
+.price-min-note{
+	display: block;
+	margin-top: 6px;
+	font-size: 13px;
+	font-weight: 800;
+	line-height: 1.3;
+	color: #e31c23;
+	letter-spacing: 0.01em;
+}
+
+.fleets-item-content .price-min-note{
+	color: #ff4d54;
+}
+
+/* «До 15 л» — чуть крупнее и жирнее */
+.price-volume-highlight{
+	font-size: 1.08em;
+	font-weight: 800;
+	letter-spacing: 0.01em;
+}
+
+.pricing-benefit-list-gold ul li.price-volume-highlight{
+	font-size: 18px;
+	font-weight: 800;
+}
+
+.fleets-amenity-item-list ul li.price-volume-highlight{
+	font-size: 16px;
+	font-weight: 800;
+}
+
 .pricing-item-btn-gold{
 	margin-top: 30px;
 }
@@ -10746,6 +10948,11 @@ header.main-header .header-sticky.active{
 		padding: 60px 0;
 	}
 
+	.fuel-calculator-section{
+		padding: 60px 0;
+		margin: 20px auto;
+	}
+
 	.pricing-item-gold{
 		padding: 10px;
 	}
@@ -11086,4 +11293,209 @@ header.main-header .header-sticky.active{
 	.footer-privacy-policy-gold ul li::before{
 		right: -18px;
 	}
+}
+
+/* ===== Global service request modal ===== */
+.service-request-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 2147483000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	pointer-events: auto;
+}
+
+.service-request-modal__backdrop {
+	position: absolute;
+	inset: 0;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	background: rgba(15, 23, 42, 0.72);
+	cursor: pointer;
+}
+
+.service-request-modal__dialog {
+	position: relative;
+	z-index: 1;
+	width: min(640px, 100%);
+	max-height: calc(100vh - 40px);
+	overflow: auto;
+	background: #fff;
+	border-radius: 16px;
+	padding: 28px 24px 24px;
+	box-shadow: 0 24px 64px rgba(15, 23, 42, 0.28);
+}
+
+.service-request-modal__header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 18px;
+}
+
+.service-request-modal__eyebrow {
+	display: inline-block;
+	margin-bottom: 8px;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #c9a227;
+}
+
+.service-request-modal__header h2 {
+	margin: 0 0 8px;
+	font-size: 28px;
+	line-height: 1.2;
+	color: #0f172a;
+}
+
+.service-request-modal__header p {
+	margin: 0;
+	color: #475569;
+	font-size: 15px;
+	line-height: 1.5;
+}
+
+.service-request-modal__close {
+	flex: 0 0 auto;
+	width: 40px;
+	height: 40px;
+	border: 0;
+	border-radius: 999px;
+	background: #f1f5f9;
+	color: #0f172a;
+	font-size: 28px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.service-request-modal__label {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	color: #0f172a;
+}
+
+.service-request-modal__location-field {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.service-request-modal__location-btn {
+	align-self: flex-start;
+	white-space: normal;
+	text-align: left;
+}
+
+.service-request-modal__location-btn:disabled {
+	opacity: 0.75;
+	cursor: wait;
+}
+
+.service-request-modal__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	align-items: center;
+}
+
+.service-request-modal .form-group {
+	margin-bottom: 16px;
+}
+
+.service-request-modal select.form-control {
+	appearance: auto;
+}
+
+.service-request-modal__success p {
+	color: #334155;
+}
+
+.cookie-consent {
+	position: fixed;
+	left: 50%;
+	bottom: 24px;
+	z-index: 999;
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	width: min(720px, calc(100% - 32px));
+	padding: 16px 18px;
+	background: var(--primary-color);
+	border: 1px solid rgba(245, 183, 84, 0.45);
+	border-radius: 18px;
+	box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+	transform: translateX(-50%);
+}
+
+.cookie-consent[hidden] {
+	display: none;
+}
+
+.cookie-consent__content {
+	flex: 1 1 auto;
+}
+
+.cookie-consent__content p {
+	margin: 0 0 4px;
+	color: var(--white-color);
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+.cookie-consent__content a {
+	color: var(--accent-color);
+	font-size: 13px;
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.cookie-consent__button {
+	flex: 0 0 auto;
+	padding: 12px 22px;
+	border: 0;
+	border-radius: 999px;
+	background: var(--accent-color);
+	color: var(--primary-color);
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1;
+	cursor: pointer;
+	transition: all 0.3s ease-in-out;
+}
+
+.cookie-consent__button:hover {
+	background: var(--white-color);
+}
+
+@media (max-width: 575px) {
+	.service-request-modal__dialog {
+		padding: 22px 16px 18px;
+	}
+
+	.service-request-modal__header h2 {
+		font-size: 22px;
+	}
+
+	.cookie-consent {
+		bottom: 14px;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 12px;
+		padding: 14px;
+		border-radius: 14px;
+	}
+
+	.cookie-consent__button {
+		width: 100%;
+	}
+
 }

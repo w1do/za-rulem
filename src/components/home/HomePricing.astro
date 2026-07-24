@@ -26,12 +26,12 @@ const benefitIcons = [
 const {
 	subtitle = 'Цены на техпомощь',
 	title = 'Понятная стоимость выезда',
-	plans = [
+ plans = [
 		{
 			icon: '/images/icon-pricing-1-gold.svg',
 			title: 'Прикурить авто',
 			text: 'Запущу автомобиль от внешнего источника питания прямо на месте поломки.',
-			price: 'от 800 ₽',
+			price: 'от 5 500 ₽',
 			priceUnit: '/выезд',
 			features: ['Выезд по Тюмени', 'Запуск двигателя', 'Проверка заряда аккумулятора'],
 			ctaText: 'Заказать помощь',
@@ -41,7 +41,7 @@ const {
 			icon: '/images/icon-pricing-2-gold.svg',
 			title: 'Замена аккумулятора',
 			text: 'Заменю аккумулятор с выездом, а новую батарею подберу по вашему авто.',
-			price: 'от 500 ₽',
+			price: 'от 5 500 ₽',
 			priceUnit: '+ запчасть',
 			features: ['Выезд по Тюмени', 'Снятие старого аккумулятора', 'Установка новой запчасти'],
 			ctaText: 'Заказать помощь',
@@ -51,15 +51,18 @@ const {
 			icon: '/images/icon-pricing-3-gold.svg',
 			title: 'Отогрев и эвакуатор',
 			text: 'Отогрею автомобиль или подам эвакуатор при серьёзной неисправности.',
-			price: 'от 1 500 ₽',
+			price: 'от 5 500 ₽',
 			priceUnit: '/выезд',
 			features: ['Выезд к автомобилю', 'Отогрев двигателя и замков', 'Эвакуация по согласованному маршруту'],
 			ctaText: 'Заказать помощь',
 			ctaHref: '/contacts',
 		},
 	],
-	benefits = ['Цена до начала работ', 'Без скрытых доплат', 'Помощь круглосуточно'],
+	benefits = ['Выезд от 5 500 руб', 'Цена до начала работ', 'Помощь круглосуточно'],
 } = Astro.props;
+
+const isPerLiter = (price: string, unit: string) =>
+	/₽\/л|\/л|\/литр/i.test(`${price}${unit}`);
 ---
 
 <!-- Pricing Plan Section Start -->
@@ -87,9 +90,14 @@ const {
                             <img src={plan.icon} alt="" />
                         </div>
                         <div class="pricing-item-content-gold">
-                            <span class="pricing-item-title-gold">{plan.title}</span>
-                            <p>{plan.text}</p>
-                            <h2>{plan.price}<sub>{plan.priceUnit}</sub></h2>
+                     							<span class="pricing-item-title-gold">{plan.title}</span>
+                     							<p>{plan.text}</p>
+                     							<h2>
+                     								{plan.price}<sub>{plan.priceUnit}</sub>
+                     								{isPerLiter(plan.price, plan.priceUnit) && (
+                     									<span class="price-min-note">выезд от 2 800 руб</span>
+                     								)}
+                     							</h2>
                         </div>
                         <div class="pricing-item-btn-gold">
                             <a href={plan.ctaHref} class="btn-default">{plan.ctaText}</a>
@@ -117,7 +125,9 @@ const {
                 <div class="pricing-benefit-list-gold wow fadeInUp" data-wow-delay="0.6s">
                     <ul>
                         {benefits.map((benefit, index) => (
-                        <li><img src={benefitIcons[index] ?? benefitIcons[0]} alt="" />{benefit}</li>
+                  						<li class={/выезд\s+от\s*(5\s*500|2\s*800)|(от|до)\s*15\s*л/i.test(benefit) ? 'price-volume-highlight' : undefined}>
+                            <img src={benefitIcons[index] ?? benefitIcons[0]} alt="" />{benefit}
+                        </li>
                         ))}
                     </ul>
                 </div>

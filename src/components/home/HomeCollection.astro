@@ -17,7 +17,7 @@ interface Props {
 const {
 	subtitle = 'Категории техпомощи',
 	title = 'Все услуги помощи на дороге в одном месте',
-	description = 'Выезжаю по любому направлению: прикуривание, замена аккумулятора, отогрев, эвакуация, автоэлектрик и диагностика или подвоз топлива — выбирайте нужное и звоните.',
+	description = 'Выезжаю по любому направлению: прикуривание, замена аккумулятора, отогрев, эвакуация, автоэлектрик и диагностика или подвоз топлива — выбирайте нужное и оставляйте заявку.',
 	ctaText = 'Вызвать помощь',
 	ctaHref = '/contacts',
 	categories = [
@@ -48,7 +48,14 @@ const {
 
                         <!-- Car Collection Button Start -->
                         <div class="car-collection-btn-gold wow fadeInUp" data-wow-delay="0.4s">
-                            <a href={ctaHref} class="btn-default btn-highlighted">{ctaText}</a>
+                            <a
+								href={ctaHref}
+								class="btn-default btn-highlighted"
+								data-service-request
+								data-service-title={ctaText}
+							>
+								{ctaText}
+							</a>
                         </div>
                         <!-- Car Collection Button End -->
                     </div>
