@@ -4,6 +4,7 @@ import Header from '../components/shared/header/Header.astro';
 import Footer from '../components/shared/footer/Footer.astro';
 import ContactForm from '../components/forms/ContactForm.tsx';
 import GasMap from '../components/maps/GasMap.tsx';
+import Alert from '../components/shared/Alert.astro';
 import HomeHowItWork from '../components/home/HomeHowItWork.astro';
 import HomeWhyChoose from '../components/home/HomeWhyChoose.astro';
 import HubFaqs from '../components/hub/HubFaqs.astro';
@@ -96,47 +97,82 @@ const faqs = [
 	<!-- Page Header Section End -->
 
 	<!-- Gasoline Map Section Start -->
-	<div class="bg-section py-5 px-5 mb-5 mt-5">
-		<div class="container-fluid ">
+	<div class="about-us gas-intro">
+		<div class="container">
 			<div class="row">
-				<div class="col-lg-12">
-					<div class="section-title">
-						<span class="section-sub-title wow fadeInUp">Карта заправок Тюмени</span>
-						<h2 class="text-anime-style-3" data-cursor="-opaque">Бензин по наличию на АЗС</h2>
-						<p class="wow fadeInUp" data-wow-delay="0.2s">
-							Я отслеживаю актуальное наличие топлива и цены на заправках Тюмени. 
-							Используйте поиск и список слева, чтобы быстро найти нужную марку бензина (АИ-92, АИ-95) или дизельное топливо. 
-							Карта поможет проложить маршрут до ближайшей работающей станции.
-						</p>
+				<div class="col-xl-6">
+					<div class="about-us-image-box wow fadeInUp">
+						<div class="about-us-image">
+							<figure class="image-anime">
+								<img src="/images/blog/azs.jpg" alt="Карта заправок и цены на бензин в Тюмени" />
+							</figure>
+						</div>
+						<div class="about-us-video-box">
+							<div class="about-us-video">
+								<figure class="image-anime">
+									<img src="/images/blog/azs.jpg" alt="Наличие топлива на АЗС Тюмени" />
+								</figure>
+							</div>
+							<div class="about-us-video-box-content">
+								<div class="satisfy-client-images">
+									<div class="satisfy-client-image add-more">
+										<h2><span class="counter">24</span>/7</h2>
+									</div>
+								</div>
+								<div class="about-satisfy-client-title">
+									<p>Данные на карте</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-xl-6">
+					<div class="about-us-content">
+						<div class="section-title">
+							<span class="section-sub-title wow fadeInUp">Карта заправок Тюмени</span>
+							<h2 class="text-anime-style-3" data-cursor="-opaque">Бензин по наличию на АЗС</h2>
+							<p class="wow fadeInUp" data-wow-delay="0.2s">
+								Я отслеживаю актуальное наличие топлива и цены на заправках Тюмени. 
+								Используйте поиск и список слева, чтобы быстро найти нужную марку бензина (АИ-92, АИ-95) или дизельное топливо. 
+								Карта поможет проложить маршрут до ближайшей работающей станции.
+							</p>
+						</div>
+
+						<div class="about-us-body">
+							<div class="about-us-body-item wow fadeInUp" data-wow-delay="0.4s">
+								<div class="icon-box">
+									<img src="/images/icon-about-body-item-1.svg" alt="Поиск АЗС" />
+								</div>
+								<div class="about-us-body-item-content">
+									<h3>Быстрый поиск</h3>
+									<p>Выберите нужное топливо и найдите ближайшую работающую АЗС.</p>
+								</div>
+							</div>
+
+							<div class="about-us-body-item wow fadeInUp" data-wow-delay="0.6s">
+								<div class="icon-box">
+									<img src="/images/icon-about-body-item-2.svg" alt="Цены и наличие топлива" />
+								</div>
+								<div class="about-us-body-item-content">
+									<h3>Цены и наличие</h3>
+									<p>Сравните стоимость топлива, статус станции и информацию об очереди.</p>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<div class="dark-section bg-section">
-		<div class="container-fluid p-5">
-			<div class="row align-items-center">
-				<div class="col-xl-9 col-lg-8">
-					<div class="section-title mb-lg-0">
-						<span class="section-sub-title wow fadeInUp" style="color: var(--accent-color);">Сообщество водителей</span>
-						<h2 class="text-anime-style-3 mb-2" data-cursor="-opaque" style="color: white; font-size: 28px;">Хотите быть в курсе всех заправок, очередей и наличия бензина?</h2>
-						<p class="wow fadeInUp mb-0" data-wow-delay="0.2s" style="color: white; opacity: 0.9;">Вступайте в Telegram и VK группу, давайте развивать сообщество и помогать друг другу в такие непростые времена!</p>
-					</div>
-				</div>
-				<div class="col-xl-3 col-lg-4 text-lg-end mt-4 mt-lg-0">
-					<div class="wow fadeInUp" data-wow-delay="0.4s">
-						<a href="https://t.me/zarulem72" class="btn-default btn-highlighted me-2 mb-2"><i class="fa-brands fa-telegram me-2"></i> Telegram</a>
-						<a href="https://vk.ru/za_rulem72" class="btn-default btn-white mb-2"><i class="fa-brands fa-vk me-2"></i> VK группа</a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+	<Alert />
 
-	<div class="bg-section my-5">
-		<div class="gas-map-card">
-			<GasMap client:only="react" stations={stations} />
+	<div class="gas-map-section bg-section my-5">
+		<div class="container-fluid px-0">
+			<div class="gas-map-card">
+				<GasMap client:only="react" stations={stations} />
+			</div>
 		</div>
 	</div>
 	<script src="https://maps.api.2gis.ru/2.0/loader.js?pkg=full" is:inline></script>
@@ -211,7 +247,7 @@ const faqs = [
 	/>
     <!-- FAQ Section End -->
 
-	<div style="margin-top: 90px; margin-bottom: 90px;">
+	<div class="gas-cta-section">
 		<HubCta 
 			subtitle="Маркетплейс водителей"
 			title="Водители займут место на АЗС для вас"
@@ -231,15 +267,96 @@ const faqs = [
 		/>
 	</div>
 
+	<style is:global>
+		@media (max-width: 767px) {
+			.page-header {
+				padding-top: 110px !important;
+				padding-bottom: 50px !important;
+			}
+			.page-header-box h1 {
+				font-size: clamp(32px, 10vw, 46px) !important;
+				line-height: 1.12;
+			}
+			.gas-intro {
+				margin-top: 30px !important;
+				margin-bottom: 24px !important;
+				padding-top: 40px !important;
+				padding-bottom: 40px !important;
+			}
+			.gas-map-section {
+				margin-top: 24px !important;
+				margin-bottom: 50px !important;
+			}
+			.gas-map-section > .container-fluid {
+				padding-right: 0 !important;
+				padding-left: 0 !important;
+			}
+			.gas-map-card {
+				width: 100%;
+				border-right: 0;
+				border-left: 0;
+				border-radius: 0;
+				overflow: hidden;
+				box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+			}
+			.section-title h2 {
+				font-size: 26px !important;
+			}
+			.container-fluid.px-4 {
+				padding-left: 15px !important;
+				padding-right: 15px !important;
+			}
+			.how-it-work-gold,
+			.why-choose-us-gold,
+			.our-faqs {
+				padding-top: 60px;
+				padding-bottom: 60px;
+			}
+			.how-it-work-item-gold,
+			.why-choose-item-gold,
+			.accordion-item {
+				width: 100%;
+			}
+			.how-it-work-footer-gold,
+			.why-choose-footer-gold,
+			.cta-content-footer {
+				align-items: stretch;
+				flex-direction: column;
+			}
+			.why-choose-btn-gold .btn-default,
+			.cta-content-btn .btn-default,
+			.faqs-btn .btn-default {
+				width: 100%;
+				justify-content: center;
+				text-align: center;
+			}
+			.accordion-button {
+				padding: 18px 48px 18px 18px;
+				font-size: 16px;
+				line-height: 1.4;
+			}
+			.gas-cta-section {
+				margin-top: 50px;
+				margin-bottom: 50px;
+			}
+			.gas-cta-section .cta-box {
+				border-radius: 0;
+			}
+		}
+	</style>
+
 	<Footer />
 </Layout>
 
 <style>
     .gas-map-card {
-        border-radius: 16px;
+        width: 100%;
         overflow: hidden;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-        border: 1px solid var(--divider-color, #0000001a);
+    }
+    .gas-cta-section {
+        margin-top: 90px;
+        margin-bottom: 90px;
     }
     .accordion-button:not(.collapsed) {
         background-color: var(--primary-color, #ffb703);

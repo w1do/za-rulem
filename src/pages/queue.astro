@@ -6,6 +6,7 @@ import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 import AboutCta from '../components/about/AboutCta.astro';
 import QueueFilters from '../components/queues/QueueFilters.astro';
 import QueueDriverCard from '../components/queues/QueueDriverCard.astro';
+import Alert from '../components/shared/Alert.astro';
 import { queueDrivers } from '../data/queueDrivers';
 
 const title = "Занять очередь на АЗС в Тюмени — Лукойл, Газпромнефть, Роснефть";
@@ -46,27 +47,9 @@ const faqs = [
 
 	<!-- Page Fleets Section Start -->
 	<div class="page-fleets">
-		<div class="container">
+		<Alert />
 
-			<div class="dark-section bg-section mb-5">
-				<div class="container-fluid p-5">
-					<div class="row align-items-center">
-						<div class="col-xl-9 col-lg-8">
-							<div class="section-title mb-lg-0">
-								<span class="section-sub-title wow fadeInUp" style="color: var(--accent-color);">Сообщество водителей</span>
-								<h2 class="text-anime-style-3 mb-2" data-cursor="-opaque" style="color: white; font-size: 28px;">Хотите быть в курсе всех заправок, очередей и наличия бензина?</h2>
-								<p class="wow fadeInUp mb-0" data-wow-delay="0.2s" style="color: white; opacity: 0.9;">Вступайте в Telegram и VK группу, давайте развивать сообщество и помогать друг другу в такие непростые времена!</p>
-							</div>
-						</div>
-						<div class="col-xl-3 col-lg-4 text-lg-end mt-4 mt-lg-0">
-							<div class="wow fadeInUp" data-wow-delay="0.4s">
-								<a href="https://t.me/zarulem72" class="btn-default btn-highlighted me-2 mb-2"><i class="fa-brands fa-telegram me-2"></i> Telegram</a>
-								<a href="https://vk.ru/za_rulem72" class="btn-default btn-white mb-2"><i class="fa-brands fa-vk me-2"></i> VK группа</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+		<div class="container mt-5">
 
 			<div class="row fuel-delivery-layout">
 				<div class="col-lg-3">

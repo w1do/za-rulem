@@ -11,6 +11,14 @@ import node from '@astrojs/node';
 export default defineConfig({
   site: 'https://za-rulem.org',
   trailingSlash: 'never',
+  vite: {
+    server: {
+      watch: {
+        usePolling: true,
+        interval: 300,
+      },
+    },
+  },
   integrations: [
     react(),
     sitemap({
