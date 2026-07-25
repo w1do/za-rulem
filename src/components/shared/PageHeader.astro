@@ -1,0 +1,51 @@
+---
+interface BreadcrumbItem {
+	label: string;
+	href?: string;
+}
+
+interface Props {
+	title: string;
+	items: BreadcrumbItem[];
+}
+
+const { title, items } = Astro.props;
+---
+
+<div class="page-header parallaxie">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="page-header-box">
+					<h1 class="text-anime-style-3" data-cursor="-opaque">{title}</h1>
+					<nav class="wow fadeInUp" aria-label="Хлебные крошки">
+						<ol class="breadcrumb">
+							{items.map((item, index) => (
+								<li
+									class:list={['breadcrumb-item', { active: index === items.length - 1 }]}
+									aria-current={index === items.length - 1 ? 'page' : undefined}
+								>
+									{item.href && index !== items.length - 1 ? <a href={item.href}>{item.label}</a> : item.label}
+								</li>
+							))}
+						</ol>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	@media (max-width: 767px) {
+		.page-header {
+			padding-top: 110px !important;
+			padding-bottom: 50px !important;
+		}
+
+		.page-header-box h1 {
+			font-size: clamp(32px, 10vw, 46px) !important;
+			line-height: 1.12;
+		}
+	}
+</style>

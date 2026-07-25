@@ -1,0 +1,75 @@
+---
+interface Feature {
+	icon: string;
+	iconAlt: string;
+	title: string;
+	text: string;
+}
+
+interface Props {
+	subtitle: string;
+	title: string;
+	description: string;
+	image: string;
+	imageAlt: string;
+	badgeText: string;
+	features: Feature[];
+}
+
+const { subtitle, title, description, image, imageAlt, badgeText, features } = Astro.props;
+---
+
+<div class="about-us gas-intro">
+	<div class="container">
+		<div class="row">
+			<div class="col-xl-6">
+				<div class="about-us-image-box wow fadeInUp">
+					<div class="about-us-image">
+						<figure class="image-anime"><img src={image} alt={imageAlt} /></figure>
+					</div>
+					<div class="about-us-video-box">
+						<div class="about-us-video">
+							<figure class="image-anime"><img src={image} alt="Наличие топлива на АЗС Тюмени" /></figure>
+						</div>
+						<div class="about-us-video-box-content">
+							<div class="satisfy-client-images">
+								<div class="satisfy-client-image add-more"><h2><span class="counter">24</span>/7</h2></div>
+							</div>
+							<div class="about-satisfy-client-title"><p>{badgeText}</p></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-xl-6">
+				<div class="about-us-content">
+					<div class="section-title">
+						<span class="section-sub-title wow fadeInUp">{subtitle}</span>
+						<h2 class="text-anime-style-3" data-cursor="-opaque">{title}</h2>
+						<p class="wow fadeInUp" data-wow-delay="0.2s">{description}</p>
+					</div>
+					<div class="about-us-body">
+						{features.map((feature, index) => (
+							<div class="about-us-body-item wow fadeInUp" data-wow-delay={`${0.4 + index * 0.2}s`}>
+								<div class="icon-box"><img src={feature.icon} alt={feature.iconAlt} /></div>
+								<div class="about-us-body-item-content"><h3>{feature.title}</h3><p>{feature.text}</p></div>
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+
+	@media (max-width: 767px) {
+		.gas-intro {
+			margin-top: 30px !important;
+			margin-bottom: 24px !important;
+			padding-top: 40px !important;
+			padding-bottom: 40px !important;
+		}
+	}
+</style>

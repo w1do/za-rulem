@@ -2,14 +2,15 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/shared/header/Header.astro';
 import Footer from '../components/shared/footer/Footer.astro';
-import ContactForm from '../components/forms/ContactForm.tsx';
-import GasMap from '../components/maps/GasMap.tsx';
+import PageHeader from '../components/shared/PageHeader.astro';
 import Alert from '../components/shared/Alert.astro';
+import GasPricesIntro from '../components/gas-prices/GasPricesIntro.astro';
+import GasPricesMapSection from '../components/gas-prices/GasPricesMapSection.astro';
 import HomeHowItWork from '../components/home/HomeHowItWork.astro';
 import HomeWhyChoose from '../components/home/HomeWhyChoose.astro';
 import HubFaqs from '../components/hub/HubFaqs.astro';
 import HubCta from '../components/hub/HubCta.astro';
-import QueueDriverCard from '../components/queues/QueueDriverCard.astro';
+import QueueDriversPreview from '../components/queues/QueueDriversPreview.astro';
 import { gasStationLabels, queueDrivers } from '../data/queueDrivers';
 
 import { webPageNode, breadcrumbNode } from '../lib/seo';
@@ -79,139 +80,28 @@ const queueGasStations = Object.values(gasStationLabels);
 >
 	<Header />
 
-	<!-- Page Header Section Start -->
-	<div class="page-header parallaxie">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<!-- Page Header Box Start -->
-					<div class="page-header-box">
-						<h1 class="text-anime-style-3" data-cursor="-opaque">{pageData.h1}</h1>
-						<nav class="wow fadeInUp">
-							<ol class="breadcrumb">
-								<li class="breadcrumb-item"><a href="/">главная</a></li>
-								<li class="breadcrumb-item active" aria-current="page">цены на бензин</li>
-							</ol>
-						</nav>
-					</div>
-					<!-- Page Header Box End -->
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Page Header Section End -->
+	<PageHeader title={pageData.h1} items={[{ label: 'главная', href: '/' }, { label: 'цены на бензин' }]} />
 
 	<!-- Gasoline Map Section Start -->
-	<div class="about-us gas-intro">
-		<div class="container">
-			<div class="row">
-				<div class="col-xl-6">
-					<div class="about-us-image-box wow fadeInUp">
-						<div class="about-us-image">
-							<figure class="image-anime">
-								<img src="/images/blog/azs.jpg" alt="Карта заправок и цены на бензин в Тюмени" />
-							</figure>
-						</div>
-						<div class="about-us-video-box">
-							<div class="about-us-video">
-								<figure class="image-anime">
-									<img src="/images/blog/azs.jpg" alt="Наличие топлива на АЗС Тюмени" />
-								</figure>
-							</div>
-							<div class="about-us-video-box-content">
-								<div class="satisfy-client-images">
-									<div class="satisfy-client-image add-more">
-										<h2><span class="counter">24</span>/7</h2>
-									</div>
-								</div>
-								<div class="about-satisfy-client-title">
-									<p>Данные на карте</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="col-xl-6">
-					<div class="about-us-content">
-						<div class="section-title">
-							<span class="section-sub-title wow fadeInUp">Карта заправок Тюмени</span>
-							<h2 class="text-anime-style-3" data-cursor="-opaque">Бензин по наличию на АЗС</h2>
-							<p class="wow fadeInUp" data-wow-delay="0.2s">
-								Я отслеживаю актуальное наличие топлива и цены на заправках Тюмени. 
-								Используйте поиск и список слева, чтобы быстро найти нужную марку бензина (АИ-92, АИ-95) или дизельное топливо. 
-								Карта поможет проложить маршрут до ближайшей работающей станции.
-							</p>
-						</div>
-
-						<div class="about-us-body">
-							<div class="about-us-body-item wow fadeInUp" data-wow-delay="0.4s">
-								<div class="icon-box">
-									<img src="/images/icon-about-body-item-1.svg" alt="Поиск АЗС" />
-								</div>
-								<div class="about-us-body-item-content">
-									<h3>Быстрый поиск</h3>
-									<p>Выберите нужное топливо и найдите ближайшую работающую АЗС.</p>
-								</div>
-							</div>
-
-							<div class="about-us-body-item wow fadeInUp" data-wow-delay="0.6s">
-								<div class="icon-box">
-									<img src="/images/icon-about-body-item-2.svg" alt="Цены и наличие топлива" />
-								</div>
-								<div class="about-us-body-item-content">
-									<h3>Цены и наличие</h3>
-									<p>Сравните стоимость топлива, статус станции и информацию об очереди.</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+	<GasPricesIntro
+		subtitle="Карта заправок Тюмени"
+		title="Бензин по наличию на АЗС"
+		description="Я отслеживаю актуальное наличие топлива и цены на заправках Тюмени. Используйте поиск и список слева, чтобы быстро найти нужную марку бензина (АИ-92, АИ-95) или дизельное топливо. Карта поможет проложить маршрут до ближайшей работающей станции."
+		image="/images/blog/azs.jpg"
+		imageAlt="Карта заправок и цены на бензин в Тюмени"
+		badgeText="Данные на карте"
+		features={[
+			{ icon: '/images/icon-about-body-item-1.svg', iconAlt: 'Поиск АЗС', title: 'Быстрый поиск', text: 'Выберите нужное топливо и найдите ближайшую работающую АЗС.' },
+			{ icon: '/images/icon-about-body-item-2.svg', iconAlt: 'Цены и наличие топлива', title: 'Цены и наличие', text: 'Сравните стоимость топлива, статус станции и информацию об очереди.' },
+		]}
+	/>
 
 	<Alert />
 
-	<div class="gas-map-section bg-section my-5">
-		<div class="container-fluid px-0">
-			<div class="gas-map-card">
-				<GasMap client:only="react" stations={stations} />
-			</div>
-		</div>
-	</div>
-	<script src="https://maps.api.2gis.ru/2.0/loader.js?pkg=full" is:inline></script>
+	<GasPricesMapSection stations={stations} />
 	<!-- Gasoline Map Section End -->
 
-	<!-- Queue Drivers Section Start -->
-	<section class="queue-drivers-section">
-		<div class="container">
-			<div class="section-title queue-drivers-section__title">
-				<span class="section-sub-title wow fadeInUp">Очередь без ожидания</span>
-				<h2 class="text-anime-style-3" data-cursor="-opaque">Водители, которые займут очередь на АЗС</h2>
-				<p class="wow fadeInUp" data-wow-delay="0.2s">
-					Я собрал свободных водителей, готовых заранее приехать на заправку и занять место в очереди.
-					Связаться и договориться о времени можно напрямую.
-				</p>
-			</div>
-
-			<div class="queue-stations wow fadeInUp" data-wow-delay="0.3s" aria-label="Доступные сети АЗС">
-				<span class="queue-stations__label">Любая из заправок:</span>
-				<ul>
-					{queueGasStations.map((station) => <li>{station}</li>)}
-				</ul>
-			</div>
-
-			<div class="queue-drivers-grid">
-				{availableQueueDrivers.map((driver) => <QueueDriverCard driver={driver} />)}
-			</div>
-
-			<div class="queue-drivers-section__action">
-				<a href="/queue" class="btn-default">Посмотреть всех водителей</a>
-			</div>
-		</div>
-	</section>
-	<!-- Queue Drivers Section End -->
+	<QueueDriversPreview drivers={availableQueueDrivers} stations={queueGasStations} />
 
 	<!-- How It Work Section Start -->
 	<HomeHowItWork 
@@ -304,36 +194,6 @@ const queueGasStations = Object.values(gasStationLabels);
 
 	<style is:global>
 		@media (max-width: 767px) {
-			.page-header {
-				padding-top: 110px !important;
-				padding-bottom: 50px !important;
-			}
-			.page-header-box h1 {
-				font-size: clamp(32px, 10vw, 46px) !important;
-				line-height: 1.12;
-			}
-			.gas-intro {
-				margin-top: 30px !important;
-				margin-bottom: 24px !important;
-				padding-top: 40px !important;
-				padding-bottom: 40px !important;
-			}
-			.gas-map-section {
-				margin-top: 24px !important;
-				margin-bottom: 50px !important;
-			}
-			.gas-map-section > .container-fluid {
-				padding-right: 0 !important;
-				padding-left: 0 !important;
-			}
-			.gas-map-card {
-				width: 100%;
-				border-right: 0;
-				border-left: 0;
-				border-radius: 0;
-				overflow: hidden;
-				box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
-			}
 			.section-title h2 {
 				font-size: 26px !important;
 			}
@@ -384,59 +244,6 @@ const queueGasStations = Object.values(gasStationLabels);
 </Layout>
 
 <style>
-    .gas-map-card {
-        width: 100%;
-        overflow: hidden;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-    }
-	.queue-drivers-section {
-		padding: 70px 0 120px;
-	}
-	.queue-drivers-section__title {
-		max-width: 820px;
-		margin: 0 auto 32px;
-		text-align: center;
-	}
-	.queue-drivers-section__title p {
-		margin-bottom: 0;
-	}
-	.queue-stations {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 14px;
-		margin-bottom: 40px;
-	}
-	.queue-stations__label {
-		color: var(--primary-color);
-		font-weight: 700;
-	}
-	.queue-stations ul {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		gap: 8px;
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-	.queue-stations li {
-		padding: 8px 14px;
-		border-radius: 999px;
-		background: var(--secondary-color);
-		color: var(--primary-color);
-		font-size: 14px;
-		font-weight: 600;
-	}
-	.queue-drivers-grid {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 18px;
-	}
-	.queue-drivers-section__action {
-		margin-top: 40px;
-		text-align: center;
-	}
     .gas-cta-section {
         margin-top: 90px;
         margin-bottom: 90px;
@@ -449,40 +256,4 @@ const queueGasStations = Object.values(gasStationLabels);
         box-shadow: none;
         border-color: rgba(0,0,0,.125);
     }
-	@media (max-width: 991px) {
-		.queue-drivers-section {
-			padding: 50px 0 80px;
-		}
-		.queue-drivers-grid {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-	}
-	@media (max-width: 767px) {
-		.queue-drivers-section {
-			padding: 35px 0 60px;
-		}
-		.queue-drivers-section__title {
-			margin-bottom: 24px;
-			text-align: left;
-		}
-		.queue-stations {
-			align-items: flex-start;
-			flex-direction: column;
-			margin-bottom: 28px;
-		}
-		.queue-stations ul {
-			justify-content: flex-start;
-		}
-		.queue-drivers-grid {
-			grid-template-columns: 1fr;
-		}
-		.queue-drivers-section__action {
-			margin-top: 30px;
-		}
-		.queue-drivers-section__action .btn-default {
-			display: block;
-			width: 100%;
-			text-align: center;
-		}
-	}
 </style>

@@ -1,0 +1,48 @@
+---
+import GasMap from '../maps/GasMap.tsx';
+
+interface Props {
+	stations: unknown[];
+}
+
+const { stations } = Astro.props;
+---
+
+<div class="container">
+	<div class="gas-map-section bg-section">
+		<div class="gas-map-card">
+			<GasMap client:only="react" stations={stations} />
+		</div>
+	</div>
+</div>
+
+<style>
+	.gas-map-section {
+		width: 100%;
+		max-width: none;
+		margin: 3rem auto;
+		border-radius: 0;
+	}
+
+	.gas-map-card {
+		width: 100%;
+		margin-right: auto;
+		margin-left: auto;
+		overflow: hidden;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+	}
+
+	@media (max-width: 767px) {
+		.gas-map-section {
+			margin-top: 24px;
+			margin-bottom: 50px;
+		}
+
+		.gas-map-card {
+			border-right: 0;
+			border-left: 0;
+			border-radius: 0;
+			box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+		}
+	}
+</style>
