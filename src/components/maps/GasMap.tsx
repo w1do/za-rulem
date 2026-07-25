@@ -82,11 +82,15 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
     switch (level) {
       case 'NONE':
         return { status: "Свободно", color: "#059669", icon: "fa-check-circle" };
+      case 'UP_TO_25':
       case 'FROM_10_TO_25':
-        return { status: "Мало машин", color: "#2563eb", icon: "fa-info-circle" };
+        // Маленькая очередь — предупреждающий цвет
+        return { status: "Маленькая очередь", color: "#f59e0b", icon: "fa-exclamation-circle" };
       case 'FROM_25_TO_50':
-        return { status: "Средняя очередь", color: "#d97706", icon: "fa-exclamation-circle" };
+        // Средняя очередь — усиленное предупреждение
+        return { status: "Средняя очередь", color: "#ea580c", icon: "fa-exclamation-triangle" };
       case 'OVER_50':
+        // Большая очередь — красный
         return { status: "Большая очередь", color: "#dc2626", icon: "fa-exclamation-triangle" };
       default:
         return { status: "Нет данных", color: "#999", icon: "fa-question-circle" };
@@ -137,7 +141,7 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
 
       // Queue filter
       if (filterQueue === 'SMALL') {
-        if (!['NONE', 'FROM_10_TO_25'].includes(s.queue_level)) return false;
+        if (!['NONE', 'UP_TO_25', 'FROM_10_TO_25'].includes(s.queue_level)) return false;
       } else if (filterQueue === 'LARGE') {
         if (!['FROM_25_TO_50', 'OVER_50'].includes(s.queue_level)) return false;
       }
@@ -677,14 +681,36 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
           color: #666;
         }
 
-        .leaflet-popup-content-wrapper, .dg-popup-content-wrapper { 
+        .leaflet-popup-content-wrapper,
+        .dg-popup-content-wrapper,
+        .dg-popup__content,
+        .dg-popup__contentWrapper,
+        [class*="dg-popup"] [class*="content"] { 
           border-radius: 8px;
           padding: 0;
           overflow: hidden;
+          background: #ffffff !important;
+          color: #111827 !important;
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
         }
-        .leaflet-popup-content, .dg-popup-content { 
+        /* Force white background for the whole 2GIS popup shell */
+        .leaflet-popup,
+        .dg-popup,
+        [class*="dg-popup"] {
+          background: transparent !important;
+        }
+        .dg-popup__tip,
+        [class*="dg-popup"] [class*="tip"] {
+          background: #ffffff !important;
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+        }
+        .leaflet-popup-tip {
+          background: #ffffff !important;
+        }
+        .leaflet-popup-content, .dg-popup-content, .dg-popup__content { 
           margin: 0 !important;
           width: auto !important;
+          background: #ffffff !important;
         }
         .custom-gas-popup {
           font-family: "Montserrat", sans-serif;
