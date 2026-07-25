@@ -1,0 +1,244 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/shared/header/Header.astro';
+import Footer from '../components/shared/footer/Footer.astro';
+import ContactForm from '../components/forms/ContactForm.tsx';
+import GasMap from '../components/maps/GasMap.tsx';
+import HomeHowItWork from '../components/home/HomeHowItWork.astro';
+import HomeWhyChoose from '../components/home/HomeWhyChoose.astro';
+import HubFaqs from '../components/hub/HubFaqs.astro';
+import HubCta from '../components/hub/HubCta.astro';
+
+import { webPageNode, breadcrumbNode } from '../lib/seo';
+
+// Fetch gasoline data for Tyumen
+let stations = [];
+let pageData = {
+  title: "Цены на бензин в Тюмени сегодня",
+  h1: "Цены на бензин в Тюмени сегодня: где заправиться дешевле?",
+  description: "Актуальные цены на бензин АИ-92, АИ-95 и ДТ в Тюмени на сегодня. Смотрите карту заправок с ценами и экономьте на топливе.",
+  text: ""
+};
+
+try {
+  const response = await fetch('https://benzin.api.2gis.ru/api/v1/stations?minLat=57.0&maxLat=57.3&minLon=65.2&maxLon=65.9');
+  if (response.ok) {
+    stations = await response.json();
+  }
+} catch (error) {
+  console.error('Error fetching gas prices from 2GIS:', error);
+}
+
+const url = '/benzin-tyumen';
+const jsonLd = [
+	webPageNode({
+		name: pageData.title,
+		description: pageData.description,
+		url: url,
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Цены на бензин', url: url },
+	]),
+];
+
+const faqs = [
+  {
+    question: "Где самый дешевый бензин в Тюмени сегодня?",
+    answer: "Цены на топливо постоянно меняются. На нашей интерактивной карте вы можете в реальном времени сравнить стоимость АИ-92, АИ-95 и дизеля на всех популярных АЗС Тюмени, включая Газпромнефть, Лукойл, Роснефть и другие."
+  },
+  {
+    question: "Как часто обновляются данные о ценах?",
+    answer: "Информация на карте обновляется ежедневно на основе данных от поставщиков и отзывов пользователей. Мы стараемся предоставлять самые свежие сведения, чтобы вы могли сэкономить на каждой заправке."
+  },
+  {
+    question: "Что делать, если закончился бензин посреди дороги?",
+    answer: "Если вы не рассчитали запас топлива и заглохли, я готов прийти на помощь. Я осуществляю подвоз бензина или дизельного топлива в любую точку Тюмени и области. Просто оставьте заявку на сайте, и я приеду к вам в течение 15-30 минут."
+  },
+  {
+    question: "Какое топливо лучше заправлять в Тюмени?",
+    answer: "Я рекомендую придерживаться рекомендаций производителя вашего автомобиля. В Тюмени представлены все крупные федеральные сети (Газпромнефть, Лукойл, Роснефть), и качество топлива на них, как правило, высокое. Моя карта поможет вам найти АИ-95, АИ-92 или дизель с актуальным ценником."
+  },
+  {
+    question: "Как сэкономить на бензине в Тюмени?",
+    answer: "Помимо мониторинга цен на моей карте, используйте бонусные программы сетей АЗС. Также следите за давлением в шинах и исправностью двигателя — это снижает расход. А планирование заправок через мой сервис позволит вам избежать переплат на 'дорогих' станциях города."
+  }
+];
+---
+
+<Layout
+	title={pageData.title}
+	description={pageData.description}
+	jsonLd={jsonLd}
+>
+	<Header />
+
+	<!-- Page Header Section Start -->
+	<div class="page-header parallaxie">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<!-- Page Header Box Start -->
+					<div class="page-header-box">
+						<h1 class="text-anime-style-3" data-cursor="-opaque">{pageData.h1}</h1>
+						<nav class="wow fadeInUp">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href="/">главная</a></li>
+								<li class="breadcrumb-item active" aria-current="page">цены на бензин</li>
+							</ol>
+						</nav>
+					</div>
+					<!-- Page Header Box End -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Page Header Section End -->
+
+	<!-- Gasoline Map Section Start -->
+	<div class="page-contact-us pt-5 pb-4">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="section-title">
+						<span class="section-sub-title wow fadeInUp">Карта заправок Тюмени</span>
+						<h2 class="text-anime-style-3" data-cursor="-opaque">Бензин по наличию на АЗС</h2>
+						<p class="wow fadeInUp" data-wow-delay="0.2s">
+							Я отслеживаю актуальное наличие топлива и цены на заправках Тюмени. 
+							Используйте поиск и список слева, чтобы быстро найти нужную марку бензина (АИ-92, АИ-95) или дизельное топливо. 
+							Карта поможет проложить маршрут до ближайшей работающей станции.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="bg-section dark-section py-5">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-xl-9 col-lg-8">
+					<div class="section-title mb-lg-0">
+						<span class="section-sub-title wow fadeInUp" style="color: var(--accent-color);">Сообщество водителей</span>
+						<h2 class="text-anime-style-3 mb-2" data-cursor="-opaque" style="color: white; font-size: 28px;">Хотите быть в курсе всех заправок, очередей и наличия бензина?</h2>
+						<p class="wow fadeInUp mb-0" data-wow-delay="0.2s" style="color: white; opacity: 0.9;">Вступайте в Telegram и VK группу, давайте развивать сообщество и помогать друг другу в такие непростые времена!</p>
+					</div>
+				</div>
+				<div class="col-xl-3 col-lg-4 text-lg-end mt-4 mt-lg-0">
+					<div class="wow fadeInUp" data-wow-delay="0.4s">
+						<a href="https://t.me/zarulem72" class="btn-default btn-highlighted me-2 mb-2"><i class="fa-brands fa-telegram me-2"></i> Telegram</a>
+						<a href="https://vk.ru/za_rulem72" class="btn-default btn-white mb-2"><i class="fa-brands fa-vk me-2"></i> VK группа</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid p-0">
+		<GasMap client:only="react" stations={stations} />
+	</div>
+	<script src="https://maps.api.2gis.ru/2.0/loader.js?pkg=full" is:inline></script>
+	<!-- Gasoline Map Section End -->
+
+	<!-- How It Work Section Start -->
+	<HomeHowItWork 
+		subtitle="Как пользоваться"
+		title="Три простых шага к экономии"
+		steps={[
+			{
+				icon: '/images/icon-how-it-work-1-gold.svg',
+				number: '01',
+				title: 'Выберите район',
+				text: 'Найдите ближайшие к вам АЗС на интерактивной карте Тюмени.',
+			},
+			{
+				icon: '/images/icon-how-it-work-2-gold.svg',
+				number: '02',
+				title: 'Сравните цены',
+				text: 'Посмотрите актуальную стоимость вашего типа топлива в списке слева.',
+			},
+			{
+				icon: '/images/icon-how-it-work-3-gold.svg',
+				number: '03',
+				title: 'Заправляйтесь выгодно',
+				text: 'Выберите лучшую цену, проверьте отсутствие очередей и отправляйтесь в путь.',
+			},
+		]}
+		footerList={[
+			'Актуальные цены АИ-92 и АИ-95',
+			'Наличие дизельного топлива',
+			'Информация об очередях',
+			'Подвоз бензина при пустом баке',
+		]}
+		footerText="Нужна помощь с топливом?"
+		footerLinkText="Оставить заявку"
+		footerLinkHref="/contacts"
+	/>
+	<!-- How It Work Section End -->
+
+	<!-- Why Choose Section Start -->
+	<HomeWhyChoose 
+		subtitle="Мой мониторинг"
+		title="Почему удобно смотреть цены здесь"
+		description="Я объединил данные всех крупных сетей АЗС Тюмени, чтобы вы могли экономить время и деньги, не отвлекаясь от дороги. Больше не нужно объезжать город в поисках выгодного предложения."
+		items={[
+			{
+				icon: '/images/icon-why-choose-body-1-gold.svg',
+				title: 'Актуальность 24/7',
+				text: 'Прямая интеграция с API гарантирует точность цен и статусов работы станций в реальном времени.',
+			},
+			{
+				icon: '/images/icon-why-choose-body-2-gold.svg',
+				title: 'Все марки топлива',
+				text: 'Сравните стоимость АИ-92, АИ-95, 100-го бензина, ДТ и газа на одной удобной карте.',
+			},
+		]}
+		ctaText="Вызвать подвоз топлива"
+		ctaHref="/contacts"
+		authorName="Ваш помощник «За рулём»"
+		authorText="Всегда на связи в Тюмени"
+	/>
+	<!-- Why Choose Section End -->
+
+    <!-- FAQ Section Start -->
+	<HubFaqs 
+		subtitle="Частые вопросы"
+		title="Все о заправке в Тюмени"
+		description="Я собрал ответы на самые частые вопросы водителей о ценах на бензин, наличии топлива и экстренной помощи на дорогах города."
+		faqs={faqs}
+	/>
+    <!-- FAQ Section End -->
+
+	<div style="margin-bottom: 90px;">
+		<HubCta 
+			subtitle="Маркетплейс водителей"
+			title="Водители займут место на АЗС для вас"
+			description="Не тратьте время в бесконечных очередях. Наши помощники приедут заранее, займут место у колонки и подождут вас. Вы просто подъезжаете к назначенному времени и заправляетесь без ожидания."
+			btnText="Занять очередь"
+			btnHref="/queue"
+			contactTitle="Услуги водителей"
+			contactText="Заказать очередь"
+			contactLinkText="Перейти к выбору"
+			contactLinkHref="/queue"
+			features={[
+				"Экономия от 1 до 3 часов времени",
+				"Работаем на всех популярных АЗС",
+				"Связь напрямую с водителем",
+				"Доступно с 4 утра круглосуточно"
+			]}
+		/>
+	</div>
+
+	<Footer />
+</Layout>
+
+<style>
+    .accordion-button:not(.collapsed) {
+        background-color: var(--primary-color, #ffb703);
+        color: #000;
+    }
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(0,0,0,.125);
+    }
+</style>

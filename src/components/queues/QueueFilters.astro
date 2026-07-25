@@ -1,0 +1,115 @@
+<aside class="page-single-sidebar queue-sidebar" aria-label="Параметры очереди на АЗС">
+	<div class="fleet-category-item wow fadeInUp">
+		<div class="fleets-search-box">
+			<div class="form-group">
+				<label for="city">Город</label>
+				<select class="form-control" id="city">
+					<option>Тюмень</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="location">Тракт / Район</label>
+				<select class="form-control" id="location">
+					<option value="all">Все локации</option>
+					<option value="Тобольский тракт">Тобольский тракт</option>
+					<option value="Московский тракт">Московский тракт</option>
+					<option value="Червишевский тракт">Червишевский тракт</option>
+					<option value="Велижанский тракт">Велижанский тракт</option>
+					<option value="Ялуторовский тракт">Ялуторовский тракт</option>
+					<option value="Старый Тобольский тракт">Старый Тобольский тракт</option>
+					<option value="Салаирский тракт">Салаирский тракт</option>
+					<option value="Центр">Центр</option>
+					<option value="Окружная дорога">Окружная дорога</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="fleet-category-options">
+			<h2 class="fleet-category-options-title">Выберите АЗС</h2>
+			<ul>
+				{[
+					['lukoil', 'Лукойл'],
+					['gazpromneft', 'Газпромнефть'],
+					['rosneft', 'Роснефть'],
+					['ntp', 'НТП'],
+					['tpk', 'ТПК'],
+				].map(([value, label]) => (
+					<li>
+						<input class="form-check-input station-filter" type="checkbox" id={value} value={value} checked />
+						<label for={value}>{label}</label>
+					</li>
+				))}
+			</ul>
+		</div>
+
+		<div class="fleet-category-options">
+			<h2 class="fleet-category-options-title">Время</h2>
+			<ul>
+				{[
+					['all', 'Любое время'],
+					['4am', 'С 4:00 утра'],
+					['5am', 'С 5:00 утра'],
+					['6am', 'С 6:00 утра'],
+					['7am', 'С 7:00 утра'],
+					['24h', 'Круглосуточно'],
+					['evening', 'Вечер'],
+				].map(([value, label], index) => (
+					<li>
+						<input class="form-check-input time-filter" type="radio" name="time" id={`time-${value}`} value={value} checked={index === 0} />
+						<label for={`time-${value}`}>{label}</label>
+					</li>
+				))}
+			</ul>
+		</div>
+
+		<div class="fleet-category-btn">
+			<a href="#queue-options" class="btn-default" id="filter-submit">Показать водителей</a>
+		</div>
+	</div>
+</aside>
+
+<style>
+	.queue-sidebar {
+		position: sticky;
+		top: 110px;
+	}
+
+	.fleets-search-box {
+		display: grid;
+		gap: 18px;
+	}
+
+	.form-group label {
+		display: block;
+		margin-bottom: 8px;
+		font-family: var(--accent-font);
+		font-weight: 600;
+		color: var(--primary-color);
+	}
+
+	.fleet-category-options label {
+		flex: 1;
+		cursor: pointer;
+	}
+
+	.fleet-category-btn .btn-default {
+		width: 100%;
+		text-align: center;
+	}
+
+	@media (max-width: 991px) {
+		.queue-sidebar {
+			position: static;
+		}
+
+		.fleets-search-box {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 575px) {
+		.fleets-search-box {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

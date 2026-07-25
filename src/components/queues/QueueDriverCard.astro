@@ -1,0 +1,87 @@
+---
+import type { QueueDriver } from '../../data/queueDrivers';
+import { statusLabels } from '../../data/queueDrivers';
+
+interface Props {
+	driver: QueueDriver;
+}
+
+const { driver } = Astro.props;
+---
+
+<article
+	class="queue-driver-card wow fadeInUp"
+	data-driver-card
+	data-gas-station={driver.gasStation}
+	data-location={driver.location}
+	data-time={driver.time}
+>
+	<header class="queue-driver-card__header">
+		<div class="queue-driver-card__avatar" aria-hidden="true">{driver.name.slice(0, 1)}</div>
+		<div>
+			<h3>{driver.name}</h3>
+			<p>{driver.location}</p>
+		</div>
+	</header>
+	
+	<div class={`queue-driver-card__status queue-driver-card__status--${driver.status}`}>
+		<span></span>{statusLabels[driver.status]}
+	</div>
+
+	<p class="queue-driver-card__service">{driver.service}</p>
+
+	<dl class="queue-driver-card__details">
+		<div><dt>Время</dt><dd>{driver.time.replace('4am', 'С 4:00').replace('5am', 'С 5:00').replace('6am', 'С 6:00').replace('7am', 'С 7:00').replace('24h', 'Круглосуточно').replace('evening', 'Вечер')}</dd></div>
+		<div><dt>Цена</dt><dd>от {driver.price} ₽</dd></div>
+	</dl>
+
+	<div class="queue-driver-card__actions">
+		<a href={`tel:${driver.phone.replace(/[^0-9+]/g, '')}`} class="btn-default queue-driver-card__btn-call" data-skip-service-request>
+			Связаться
+		</a>
+	</div>
+</article>
+
+<style>
+	.queue-driver-card {
+		display: flex;
+		min-width: 0;
+		flex-direction: column;
+		gap: 16px;
+		padding: 22px;
+		border: 1px solid var(--divider-color);
+		border-radius: 20px;
+		background: var(--white-color);
+		box-shadow: 0 12px 35px rgb(0 0 0 / 5%);
+		transition: transform .3s ease, box-shadow .3s ease;
+	}
+
+	.queue-driver-card:hover { transform: translateY(-5px); box-shadow: 0 18px 45px rgb(0 0 0 / 9%); }
+	.queue-driver-card__header { display: flex; align-items: center; gap: 12px; }
+	.queue-driver-card__avatar { display: grid; width: 48px; height: 48px; flex: 0 0 48px; place-items: center; border-radius: 50%; background: var(--accent-color); color: var(--primary-color); font: 700 20px/1 var(--accent-font); }
+	.queue-driver-card__header h3 { margin: 0 0 3px; font-size: 20px; color: var(--primary-color); }
+	.queue-driver-card__header p { margin: 0; font-size: 14px; color: var(--text-color); }
+	
+	.queue-driver-card__status { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+	.queue-driver-card__status span { width: 8px; height: 8px; border-radius: 50%; background: #f2a900; }
+	.queue-driver-card__status--free span { background: #25a55f; }
+	.queue-driver-card__status--busy span { background: #d95050; }
+
+	.queue-driver-card__service { min-height: 48px; margin: 0; font-size: 15px; font-weight: 500; line-height: 1.4; color: var(--primary-color); }
+
+	.queue-driver-card__details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0; }
+	.queue-driver-card__details div { padding: 10px; border-radius: 10px; background: var(--secondary-color); }
+	.queue-driver-card__details dt { margin-bottom: 3px; color: var(--text-color); font-size: 12px; }
+	.queue-driver-card__details dd { margin: 0; color: var(--primary-color); font-size: 14px; font-weight: 700; }
+
+	.queue-driver-card__actions { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--divider-color); }
+	
+	.queue-driver-card__actions .btn-default {
+		display: block;
+		width: 100%;
+		padding: 12px 5px;
+		font-size: 16px;
+		text-align: center;
+	}
+
+</style>

@@ -1,6 +1,6 @@
 ---
 import { SITE, baseGraph } from '../lib/seo';
-import ServiceRequestModal from '../components/forms/ServiceRequestModal.tsx';
+import VoiceRequestModal from '../components/forms/VoiceRequestModal.tsx';
 
 export interface Props {
 	title: string;
@@ -121,7 +121,7 @@ const structuredData = {
 		</div>
 
 		<!-- Глобальная универсальная форма заявки -->
-		<ServiceRequestModal client:load />
+		<VoiceRequestModal client:load />
 
 		<!--
 			Ранний перехват tel / WhatsApp / CTA «Вызвать помощь» и др.

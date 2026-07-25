@@ -8,6 +8,7 @@ import ServiceSidebar from '../components/services/single/ServiceSidebar.astro';
 import ServiceSingleImage from '../components/services/single/ServiceSingleImage.astro';
 import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 import FuelDeliveryCalculator from '../components/calculators/FuelDeliveryCalculator.tsx';
+import FuelPricesTable from '../components/FuelPricesTable.tsx';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
 
 const { frontmatter } = Astro.props;
@@ -33,6 +34,7 @@ const faqs = frontmatter.faqs ?? [];
 const image = frontmatter.image ?? '/images/service-single-image.jpg';
 const imageAlt = frontmatter.imageAlt ?? frontmatter.title;
 const showFuelCalculator = cluster === 'toplivo' && /бензин/i.test(frontmatter.title);
+const showFuelPricesTable = cluster === 'toplivo' && /очередь/i.test(frontmatter.title);
 
 const jsonLd = [
 	serviceNode({
@@ -75,6 +77,13 @@ const jsonLd = [
 						<!-- Service Entry End -->
 
 						{showFuelCalculator && <FuelDeliveryCalculator client:visible />}
+						
+						{showFuelPricesTable && (
+							<div className="fuel-prices-section mt-4 mb-4">
+								<h3 class="mb-4">Справочные цены на топливо в сетях РФ (июль 2026)</h3>
+								<FuelPricesTable client:visible />
+							</div>
+						)}
 
 						<ServiceFaqs faqs={faqs} />
 					</div>

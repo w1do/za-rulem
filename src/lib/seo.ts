@@ -2,13 +2,29 @@
 // Используется базовым Layout (базовый граф WebSite + LocalBusiness) и страницами/лейаутами
 // для добавления страничных узлов (BreadcrumbList, Service, Article, FAQPage, WebPage).
 
+const rawPhone = import.meta.env.PUBLIC_PHONE_NUMBER || import.meta.env.PHONE_NUMBER || '+79220000000';
+
+/** Форматирует номер телефона из формата +79998887766 в +7 (999) 888-77-66. */
+export function formatPhoneNumber(phone: string): string {
+	const cleaned = ('' + phone).replace(/\D/g, '');
+	if (cleaned.length === 11) {
+		return `+${cleaned[0]} (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7, 9)}-${cleaned.slice(9, 11)}`;
+	}
+	return phone;
+}
+
+const phone = rawPhone;
+const phoneFormatted = formatPhoneNumber(rawPhone);
+
 export const SITE = {
 	name: 'За рулём',
 	brand: 'За рулём — техпомощь на дороге в Тюмени',
 	description:
 		'Круглосуточная автопомощь и техпомощь на дороге в Тюмени с выездом: прикурю авто, заменю аккумулятор, отогрею машину, привезу топливо, вскрою автомобиль, вызову эвакуатор.',
- url: 'https://za-rulem.org',
+	url: 'https://za-rulem.org',
 	email: 'info@za-rulem.org',
+	phone,
+	phoneFormatted,
 	logo: 'https://za-rulem.org/images/logo.svg',
 	image: 'https://za-rulem.org/images/logo.svg',
 	addressLocality: 'Тюмень',
@@ -24,6 +40,8 @@ export const SITE = {
 // Идентификаторы узлов графа (для перекрёстных ссылок @id).
 export const BUSINESS_ID = `${SITE.url}/#business`;
 export const WEBSITE_ID = `${SITE.url}/#website`;
+export const PHONE_NUMBER = SITE.phone;
+export const PHONE_NUMBER_FORMATTED = SITE.phoneFormatted;
 
 /** Приводит относительный путь к абсолютному URL сайта. */
 export function abs(path: string): string {
@@ -58,6 +76,7 @@ export function businessNode() {
 		image: SITE.image,
 		logo: SITE.logo,
 		email: SITE.email,
+		telephone: SITE.phone,
 		priceRange: SITE.priceRange,
 		currenciesAccepted: 'RUB',
 		paymentAccepted: 'Наличные, банковская карта, перевод',

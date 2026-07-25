@@ -3692,34 +3692,47 @@ header.main-header .header-sticky.active{
 	font-weight: 600;
 }
 
-.post-entry ol{
+.post-entry ol,
+.post-body ol{
     margin: 0 0 30px;
+    padding-left: 20px;
+    list-style-type: disc;
 }
 
-.post-entry ul{
+.post-entry ul,
+.post-body ul{
 	padding: 0;
 	margin: 20px 0 20px;
 	padding-left: 20px;
 }
 
 .post-entry ol li,
-.post-entry ul li{
+.post-entry ul li,
+.post-body ol li,
+.post-body ul li{
     position: relative;
 	font-size: 18px;
     font-weight: 400;
     line-height: 1.5em;
     color: var(--text-color);
-    margin-bottom: 15px;
+    margin-bottom: 5px;
 }
 
-.post-entry ul li:last-child{
+.post-entry ul li:last-child,
+.post-entry ol li:last-child,
+.post-body ul li:last-child,
+.post-body ol li:last-child{
 	margin-bottom: 0;
 }
 
 .post-entry ul ul,
 .post-entry ul ol,
 .post-entry ol ol,
-.post-entry ol ul{
+.post-entry ol ul,
+.post-body ul ul,
+.post-body ul ol,
+.post-body ol ol,
+.post-body ol ul{
     margin-top: 20px;
     margin-bottom: 0;
 }
@@ -3727,7 +3740,11 @@ header.main-header .header-sticky.active{
 .post-entry ul ul li:last-child,
 .post-entry ul ol li:last-child,
 .post-entry ol ol li:last-child,
-.post-entry ol ul li:last-child{
+.post-entry ol ul li:last-child,
+.post-body ul ul li:last-child,
+.post-body ul ol li:last-child,
+.post-body ol ol li:last-child,
+.post-body ol ul li:last-child{
     margin-bottom: 0;
 }
 
@@ -5962,9 +5979,11 @@ header.main-header .header-sticky.active{
     }
     
     .post-entry ol li,
-    .post-entry ul li{
+    .post-entry ul li,
+    .post-body ol li,
+    .post-body ul li{
 		font-size: 16px;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
     }
     
     .post-entry blockquote{

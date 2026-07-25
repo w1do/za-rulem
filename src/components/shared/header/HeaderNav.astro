@@ -10,12 +10,13 @@ const menu = [
 			{ label: 'Замена аккумулятора', href: '/services/tehpomosch/zamena-akkumulyatora' },
 			{ label: 'Отогрев автомобиля', href: '/services/tehpomosch/otogrev-avto' },
 			{ label: 'Подвоз топлива', href: '/services/toplivo' },
+			{ label: 'Цены на бензин', href: '/benzin-tyumen' },
+			{ label: 'Очередь на АЗС', href: '/queue' },
 		],
 	},
 	{ label: 'Водители', href: '/drivers' },
-	{ label: 'Партнёрам', href: '/partners' },
-	{ label: 'Блог', href: '/blog' },
-	{ label: 'О сервисе', href: '/about' },
+	{ label: 'Очередь', href: '/queue' },
+	{ label: 'Бензин', href: '/benzin-tyumen' },
 	{ label: 'Контакты', href: '/contacts' },
 ];
 ---
@@ -53,15 +54,24 @@ const menu = [
 	</div>
 
 	<!-- Header Btn Start -->
-	<div class="header-btn">
+	<div class="header-btn d-flex align-items-center">
 		<a
-			href="/contacts"
+			href="#"
 			class="btn-default btn-highlighted"
-			data-service-request
-			data-service-title="Вызвать помощь"
+			onclick="event.preventDefault(); window.openVoiceRequest && window.openVoiceRequest()"
 		>
-			Вызвать помощь
+			Позвонить
 		</a>
 	</div>
 	<!-- Header Btn End -->
 </div>
+
+<style>
+	@media (max-width: 991px) {
+		.header-btn {
+			flex-direction: column;
+			align-items: flex-start !important;
+			padding: 20px 0;
+		}
+	}
+</style>
