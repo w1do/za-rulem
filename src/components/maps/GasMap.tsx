@@ -167,12 +167,25 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
         });
         mapRef.current = map;
 
-        const svg = '<svg width="40" height="50" viewBox="0 0 40 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 0C8.95431 0 0 8.95431 0 20C0 35 20 50 20 50C20 50 40 35 40 20C40 8.95431 31.0457 0 20 0Z" fill="#F5B754"/><circle cx="20" cy="20" r="16" fill="white"/><path d="M26 14V17H25V14H24V23H25V20H26V23C26 23.55 25.55 24 25 24S24 23.55 24 23V19H23.5V25H28.5V20.5H29.25V23C29.25 24.1 30.15 25 31.25 25S33.25 24.1 33.25 23V17.75C33.25 16.92 32.74 16.24 32.04 16.01L30.46 14.43L29.39 15.5L30.97 17.08C30.27 17.35 29.75 18.03 29.75 18.86C29.75 19.9 30.6 20.75 31.64 20.75C31.91 20.75 32.16 20.69 32.39 20.59V23.75C32.39 24.16 32.06 24.5 31.64 24.5C31.23 24.5 30.9 24.16 30.9 23.75V19.5C30.9 18.67 30.23 18 29.4 18H28.65V12.75C28.65 11.92 27.98 11.25 27.15 11.25H22.65C21.82 11.25 21.15 11.92 21.15 12.75V25H28.65V19.38L29.4 19.38V12.75H22.65V24.25H27.15V12.75H28.65" fill="#F5B754"/></svg>';
+        // On-brand fuel-pump pin marker (site colors: gold #F5B754 + dark #111827)
+        const svg = [
+          '<svg width="46" height="58" viewBox="0 0 46 58" fill="none" xmlns="http://www.w3.org/2000/svg">',
+          '<path d="M23 2C12.5 2 4 10.4 4 20.8 4 34.8 23 55 23 55s19-20.2 19-34.2C42 10.4 33.5 2 23 2Z" fill="#F5B754" stroke="#111827" stroke-width="2"/>',
+          '<circle cx="23" cy="21" r="13.5" fill="#ffffff"/>',
+          '<rect x="16.5" y="12.5" width="9.5" height="17.5" rx="1.8" fill="#111827"/>',
+          '<rect x="18.3" y="14.6" width="5.9" height="4.4" rx="0.8" fill="#F5B754"/>',
+          '<rect x="18.3" y="20.6" width="5.9" height="1.5" rx="0.7" fill="#F5B754" opacity="0.55"/>',
+          '<rect x="14.8" y="29.3" width="12.9" height="2.6" rx="1.3" fill="#111827"/>',
+          '<rect x="24.4" y="16" width="3" height="2.1" rx="1" fill="#111827"/>',
+          '<rect x="26" y="17.5" width="2.2" height="8.5" rx="1.1" fill="#111827"/>',
+          '<rect x="26" y="24.5" width="4.2" height="2.1" rx="1" fill="#111827"/>',
+          '</svg>'
+        ].join('');
         const gasIcon = DG.icon({
           iconUrl: 'data:image/svg+xml;base64,' + btoa(svg),
-          iconSize: [36, 45],
-          iconAnchor: [18, 45],
-          popupAnchor: [0, -45]
+          iconSize: [40, 50],
+          iconAnchor: [20, 50],
+          popupAnchor: [0, -48]
         });
 
         if (Array.isArray(stations)) {
@@ -192,10 +205,10 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
 
               // Services
               const services = [];
-              if (station.has_shop) services.push('<i class="fas fa-shopping-basket" title="Магазин"></i>');
-              if (station.has_cafe) services.push('<i class="fas fa-coffee" title="Кафе"></i>');
-              if (station.has_toilet) services.push('<i class="fas fa-restroom" title="Туалет"></i>');
-              if (station.has_car_wash) services.push('<i class="fas fa-car-wash" title="Мойка"></i>');
+              if (station.has_shop) services.push('<span class="svc-ico" data-tip="Магазин"><i class="fas fa-shopping-basket"></i></span>');
+              if (station.has_cafe) services.push('<span class="svc-ico" data-tip="Кафе"><i class="fas fa-coffee"></i></span>');
+              if (station.has_toilet) services.push('<span class="svc-ico" data-tip="Туалет"><i class="fas fa-restroom"></i></span>');
+              if (station.has_car_wash) services.push('<span class="svc-ico" data-tip="Мойка"><i class="fas fa-car-wash"></i></span>');
 
               // Payments
               const payments = [];
@@ -333,14 +346,14 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
               <button 
                 onClick={() => setFilterQueue(filterQueue === 'SMALL' ? 'ALL' : 'SMALL')}
                 className={`filter-btn btn-sm ${filterQueue === 'SMALL' ? 'active' : ''}`}
-                title="Маленькая очередь"
+                data-tip="Маленькая очередь"
               >
                 <i className="fas fa-bolt me-1"></i> Быстро
               </button>
               <button 
                 onClick={() => setFilterQueue(filterQueue === 'LARGE' ? 'ALL' : 'LARGE')}
                 className={`filter-btn btn-sm ${filterQueue === 'LARGE' ? 'active' : ''}`}
-                title="Большая очередь"
+                data-tip="Большая очередь"
               >
                 <i className="fas fa-users me-1"></i> Очередь
               </button>
@@ -413,10 +426,10 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
                   </div>
 
                   <div className="station-services mt-2">
-                    {station.has_shop && <i className="fas fa-shopping-basket me-2 text-muted" title="Магазин"></i>}
-                    {station.has_cafe && <i className="fas fa-coffee me-2 text-muted" title="Кафе"></i>}
-                    {station.has_toilet && <i className="fas fa-restroom me-2 text-muted" title="Туалет"></i>}
-                    {station.has_car_wash && <i className="fas fa-car-wash me-2 text-muted" title="Мойка"></i>}
+                    {station.has_shop && <span className="svc-ico" data-tip="Магазин"><i className="fas fa-shopping-basket"></i></span>}
+                    {station.has_cafe && <span className="svc-ico" data-tip="Кафе"><i className="fas fa-coffee"></i></span>}
+                    {station.has_toilet && <span className="svc-ico" data-tip="Туалет"><i className="fas fa-restroom"></i></span>}
+                    {station.has_car_wash && <span className="svc-ico" data-tip="Мойка"><i className="fas fa-car-wash"></i></span>}
                   </div>
                 </div>
               </div>
@@ -439,6 +452,63 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
           background: #fff;
           position: relative;
           z-index: 1;
+          font-family: "Montserrat", sans-serif;
+        }
+
+        /* Site-styled hover tooltip (replaces native black title popup) */
+        .svc-ico {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 26px;
+          height: 26px;
+          border-radius: 7px;
+          background: #f3f4f6;
+          color: #6b7280;
+          font-size: 12px;
+          margin-right: 6px;
+          cursor: default;
+          transition: all 0.2s ease;
+        }
+        .svc-ico:hover {
+          background: #F5B754;
+          color: #111827;
+        }
+        [data-tip] {
+          position: relative;
+        }
+        [data-tip]:hover::after {
+          content: attr(data-tip);
+          position: absolute;
+          bottom: calc(100% + 9px);
+          left: 50%;
+          transform: translateX(-50%);
+          background: #111827;
+          color: #fff;
+          font-family: "Montserrat", sans-serif;
+          font-size: 11px;
+          font-weight: 600;
+          line-height: 1;
+          letter-spacing: 0.2px;
+          padding: 7px 11px;
+          border-radius: 8px;
+          white-space: nowrap;
+          z-index: 2000;
+          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+          border-bottom: 2px solid #F5B754;
+          pointer-events: none;
+        }
+        [data-tip]:hover::before {
+          content: "";
+          position: absolute;
+          bottom: calc(100% + 3px);
+          left: 50%;
+          transform: translateX(-50%);
+          border: 6px solid transparent;
+          border-top-color: #111827;
+          z-index: 2000;
+          pointer-events: none;
         }
         .gas-sidebar {
           width: 350px;
@@ -617,8 +687,8 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
           width: auto !important;
         }
         .custom-gas-popup {
-          font-family: sans-serif;
-          min-width: 200px;
+          font-family: "Montserrat", sans-serif;
+          min-width: 220px;
         }
         .popup-header {
           padding: 10px 15px;
@@ -649,10 +719,13 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
         }
         .popup-services-row {
           display: flex;
-          gap: 8px;
-          margin-bottom: 10px;
-          font-size: 14px;
+          gap: 6px;
+          margin-bottom: 12px;
+          font-size: 12px;
           color: #666;
+        }
+        .popup-services-row .svc-ico {
+          margin-right: 0;
         }
         .popup-prices {
           display: flex;
