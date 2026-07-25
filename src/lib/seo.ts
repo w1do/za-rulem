@@ -2,7 +2,7 @@
 // Используется базовым Layout (базовый граф WebSite + LocalBusiness) и страницами/лейаутами
 // для добавления страничных узлов (BreadcrumbList, Service, Article, FAQPage, WebPage).
 
-const rawPhone = import.meta.env.PUBLIC_PHONE_NUMBER || import.meta.env.PHONE_NUMBER || '+79220000000';
+const rawPhone = import.meta.env.PUBLIC_PHONE_NUMBER || import.meta.env.PHONE_NUMBER || '+79088712026';
 
 /** Форматирует номер телефона из формата +79998887766 в +7 (999) 888-77-66. */
 export function formatPhoneNumber(phone: string): string {

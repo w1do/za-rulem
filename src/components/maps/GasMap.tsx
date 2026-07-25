@@ -391,6 +391,7 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
             const { station, prices, fuel_statuses, queue_level, closed } = item;
             const queue = getQueueInfo(queue_level);
             const statusTitle = closed ? 'Закрыто' : (queue.status || 'Открыто');
+            const badgeColor = closed ? '#dc2626' : queue.color;
 
             return (
               <div 
@@ -402,7 +403,10 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
                 <div className="station-info">
                   <div className="station-header">
                     <h5 className="station-name">{station.name}</h5>
-                    <div className="availability-badge">
+                    <div
+                      className="availability-badge"
+                      style={{ background: `${badgeColor}1a`, color: badgeColor }}
+                    >
                       {statusTitle}
                     </div>
                   </div>
