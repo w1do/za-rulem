@@ -1,0 +1,44 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/shared/header/Header.astro';
+import Footer from '../components/shared/footer/Footer.astro';
+import TestimonialsPageHeader from '../components/testimonials/TestimonialsPageHeader.astro';
+import TestimonialsGrid from '../components/testimonials/TestimonialsGrid.astro';
+import TestimonialsCoreFeatures from '../components/testimonials/TestimonialsCoreFeatures.astro';
+import TestimonialsWhyChoose from '../components/testimonials/TestimonialsWhyChoose.astro';
+import TestimonialsFaqs from '../components/testimonials/TestimonialsFaqs.astro';
+import TestimonialsExpertise from '../components/testimonials/TestimonialsExpertise.astro';
+import { breadcrumbNode, webPageNode } from '../lib/seo';
+
+const jsonLd = [
+	webPageNode({
+		name: 'Отзывы о доставке бензина в Тюмени',
+		description: 'Отзывы водителей о срочной доставке бензина и подвозе топлива к автомобилю в Тюмени, за городом и на трассе.',
+		url: '/testimonials',
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Отзывы', url: '/testimonials' },
+	]),
+];
+---
+
+<Layout
+	title="Отзывы о доставке бензина в Тюмени | За рулём"
+	description="Отзывы водителей о доставке бензина в Тюмени и области: срочный подвоз топлива к автомобилю в городе, за городом и на трассе."
+	ogTitle="Отзывы о доставке бензина в Тюмени"
+	ogDescription="Истории водителей, которым я привёз бензин к остановившемуся автомобилю в городе, за городом или на трассе."
+	keywords="доставка бензина отзывы, подвоз бензина тюмень отзывы, доставка топлива тюмень, привезти бензин на дорогу, бензин на трассу"
+	jsonLd={jsonLd}
+>
+	<Header />
+	<main>
+		<TestimonialsPageHeader />
+		<TestimonialsGrid />
+		<TestimonialsCoreFeatures />
+		<TestimonialsWhyChoose />
+		<TestimonialsFaqs />
+		<TestimonialsExpertise />
+	</main>
+	<Footer />
+</Layout>

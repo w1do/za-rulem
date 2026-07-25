@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/shared/header/Header.astro';
 import Footer from '../components/shared/footer/Footer.astro';
+import PageHeaderHelpButton from '../components/shared/PageHeaderHelpButton.astro';
 import ContactForm from '../components/forms/ContactForm.tsx';
 
 import { webPageNode, breadcrumbNode } from '../lib/seo';
@@ -43,6 +44,7 @@ const jsonLd = [
 								<li class="breadcrumb-item active" aria-current="page">Контакты</li>
 							</ol>
 						</nav>
+						<PageHeaderHelpButton />
 					</div>
 					<!-- Page Header Box End -->
 				</div>

@@ -1,0 +1,73 @@
+---
+interface Review {
+	text: string;
+	author: string;
+	service: string;
+}
+
+const reviews: Review[] = [
+	{
+		text: 'У меня закончился бензин на объездной дороге, до заправки я бы не доехал. Я отправил геолокацию и назвал марку топлива. Бензин привезли прямо к машине, после заправки двигатель сразу запустился.',
+		author: 'Алексей',
+		service: 'доставка бензина на дорогу в Тюмени',
+	},
+	{
+		text: 'Лампочка топлива загорелась слишком поздно, и машина остановилась ночью. Я указала точку на карте, мне заранее сообщили стоимость и привезли бензин нужной марки. Не пришлось оставлять автомобиль и искать канистру.',
+		author: 'Марина',
+		service: 'срочная доставка топлива ночью',
+	},
+	{
+		text: 'На трассе закончился бензин, а ближайшая АЗС была далеко. Я сообщил, что нужен АИ-95, и отправил координаты. Топливо доставили к автомобилю и помогли безопасно продолжить поездку.',
+		author: 'Дмитрий',
+		service: 'подвоз бензина АИ-95 на трассу',
+	},
+	{
+		text: 'Я перепутала запас хода и заглохла во дворе перед важной поездкой. После заявки мне быстро привезли бензин, аккуратно залили его из канистры и убедились, что автомобиль заводится.',
+		author: 'Ольга',
+		service: 'доставка бензина к автомобилю',
+	},
+	{
+		text: 'Бензин закончился за городом в мороз, и ждать эвакуатор я не хотел. Я назвал модель машины и нужное топливо, после чего мне привезли бензин на указанную точку. Цена была согласована до выезда.',
+		author: 'Сергей',
+		service: 'доставка бензина за город',
+	},
+	{
+		text: 'После долгой дороги я не рассчитал расход бензина и остановился перед Тюменью. Отправил геолокацию, подтвердил марку топлива и получил доставку прямо на обочину. Машину заправили на месте без эвакуации.',
+		author: 'Игорь',
+		service: 'экстренный подвоз топлива',
+	},
+];
+---
+
+<!-- Page Testimonials Start -->
+<section class="page-testimonials" aria-labelledby="testimonials-heading">
+	<div class="container">
+		<div class="row section-row">
+			<div class="col-lg-12">
+				<div class="section-title section-title-center">
+					<span class="section-sub-title wow fadeInUp">Отзывы водителей</span>
+					<h2 id="testimonials-heading" class="text-anime-style-3" data-cursor="-opaque">Отзывы о доставке бензина в Тюмени и области</h2>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			{reviews.map((review, index) => (
+				<div class="col-xl-4 col-md-6">
+					<article class="testimonial-item wow fadeInUp" data-wow-delay={index ? `${index * 0.2}s` : undefined}>
+						<div class="testimonial-item-image">
+							<figure><img src="/images/testimonial-image.jpg" alt={`Отзыв: ${review.service}`} /></figure>
+						</div>
+						<div class="testimonial-item-body">
+							<div class="testimonial-item-rating" aria-label="Оценка 5 из 5">
+								{Array.from({ length: 5 }).map(() => <i class="fa-solid fa-star" aria-hidden="true"></i>)}
+							</div>
+							<div class="testimonial-item-content"><p>«{review.text}»</p></div>
+							<div class="testimonial-author-content"><h3>{review.author}</h3></div>
+						</div>
+					</article>
+				</div>
+			))}
+		</div>
+	</div>
+</section>
+<!-- Page Testimonials End -->

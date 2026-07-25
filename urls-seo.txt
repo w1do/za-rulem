@@ -6,6 +6,7 @@ https://za-rulem.org
 
 # Информационные страницы
 https://za-rulem.org/about
+https://za-rulem.org/testimonials
 https://za-rulem.org/contacts
 https://za-rulem.org/drivers
 https://za-rulem.org/queue

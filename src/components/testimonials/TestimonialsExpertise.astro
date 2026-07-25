@@ -1,0 +1,30 @@
+---
+const skills = [
+	{ title: 'Аккуратность', value: 95 },
+	{ title: 'Диагностика', value: 92 },
+	{ title: 'Готовность к выезду', value: 98 },
+	{ title: 'Понятные условия', value: 100 },
+];
+---
+
+<!-- Our Expertise Section Start -->
+<section class="our-expertise" aria-labelledby="expertise-heading">
+	<div class="container"><div class="row">
+		<div class="col-xl-6"><div class="expertise-image-box wow fadeInUp">
+			<div class="expertise-image"><figure class="image-anime"><img src="/images/expertise-image.jpg" alt="Оборудование мастера техпомощи" /></figure></div>
+			<div class="expertise-contact-info"><div class="expertise-contact-title"><h2>Опишите проблему — я подскажу следующий шаг</h2></div><div class="expertise-contact-btn"><a href="/contacts" data-service-request data-service-title="Вызвать помощь">Вызвать помощь</a></div></div>
+		</div></div>
+		<div class="col-xl-6"><div class="expertise-content-box">
+			<div class="section-title">
+				<span class="section-sub-title wow fadeInUp">Мой подход</span>
+				<h2 id="expertise-heading" class="text-anime-style-3" data-cursor="-opaque">Результат, о котором рассказывают водители</h2>
+				<p class="wow fadeInUp" data-wow-delay="0.2s">Я приезжаю подготовленным, объясняю причину неисправности и выполняю только согласованные работы, чтобы водитель понимал каждый этап помощи.</p>
+			</div>
+			<div class="expertise-skill-item-list">
+				{skills.map((skill) => <div class="skills-progress-bar"><div class="skillbar" data-percent={`${skill.value}%`}><div class="skill-data"><div class="skill-title">{skill.title}</div><div class="skill-no">{skill.value}%</div></div><div class="skill-progress"><div class="count-bar"></div></div></div></div>)}
+			</div>
+			<div class="expertise-btn wow fadeInUp" data-wow-delay="0.4s"><a href="/contacts" class="btn-default" data-service-request data-service-title="Вызвать помощь">Оставить заявку</a></div>
+		</div></div>
+	</div></div>
+</section>
+<!-- Our Expertise Section End -->

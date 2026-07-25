@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/shared/header/Header.astro';
 import Footer from '../components/shared/footer/Footer.astro';
+import PageHeaderHelpButton from '../components/shared/PageHeaderHelpButton.astro';
 import { webPageNode, breadcrumbNode } from '../lib/seo';
 
 const jsonLd = [
@@ -44,6 +45,7 @@ const jsonLd = [
 								</ol>
 							</div>
 						</nav>
+						<PageHeaderHelpButton />
 					</div>
 					<!-- Page Header Box End -->
 				</div>

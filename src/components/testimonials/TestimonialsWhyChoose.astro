@@ -1,0 +1,52 @@
+---
+const benefits = [
+	{ icon: '/images/icon-why-choose-item-1.svg', title: 'Стоимость до выезда', text: 'Я уточняю задачу и заранее называю цену без скрытых работ.' },
+	{ icon: '/images/icon-why-choose-item-2.svg', title: 'Подготовка к вызову', text: 'Беру оборудование под конкретную неисправность и модель автомобиля.' },
+	{ icon: '/images/icon-why-choose-item-3.svg', title: 'Помощь 24/7', text: 'Принимаю заявки ночью, в выходные и праздничные дни.' },
+	{ icon: '/images/icon-why-choose-item-4.svg', title: 'Тюмень и область', text: 'Выезжаю по городу, на трассу и в ближайшие населённые пункты.' },
+];
+---
+
+<!-- Why Choose Us Section Start -->
+<section class="why-choose-us" aria-labelledby="why-choose-heading">
+	<div class="container"><div class="row align-items-center">
+		<div class="col-xl-6">
+			<div class="why-choose-content">
+				<div class="section-title">
+					<span class="section-sub-title wow fadeInUp">Почему мне доверяют</span>
+					<h2 id="why-choose-heading" class="text-anime-style-3" data-cursor="-opaque">Понятная техпомощь без лишних услуг</h2>
+				</div>
+				<div class="why-choose-body">
+					{[benefits.slice(0, 2), benefits.slice(2)].map((group, groupIndex) => (
+						<div class="why-choose-items-list wow fadeInUp" data-wow-delay={`${(groupIndex + 1) * 0.2}s`}>
+							{group.map((benefit) => (
+								<div class="why-choose-item">
+									<div class="icon-box"><img src={benefit.icon} alt="" /></div>
+									<div class="why-choose-item-content"><h3>{benefit.title}</h3><p>{benefit.text}</p></div>
+								</div>
+							))}
+						</div>
+					))}
+				</div>
+			</div>
+		</div>
+		<div class="col-xl-6">
+			<div class="why-choose-image-box wow fadeInUp" data-wow-delay="0.2s">
+				<div class="why-choose-image-box-1"><div class="why-choose-image"><figure class="image-anime"><img src="/images/why-choose-image-1.jpg" alt="Выездная помощь автомобилю в Тюмени" /></figure></div></div>
+				<div class="why-choose-image-box-2">
+					<div class="why-choose-counter-box">
+						<div class="why-choose-counter-no"><h2><span class="counter">24</span>/7</h2></div>
+						<div class="why-choose-counter-content">
+							<div class="satisfy-client-images">
+								{[1, 2, 3].map((number) => <div class="satisfy-client-image"><figure class="image-anime"><img src={`/images/author-${number}.jpg`} alt="Водитель, получивший помощь" /></figure></div>)}
+							</div>
+							<div class="why-choose-client-content"><p>Принимаю заявки круглосуточно</p></div>
+						</div>
+					</div>
+					<div class="why-choose-image"><figure class="image-anime"><img src="/images/why-choose-image-2.jpg" alt="Техпомощь автомобилю на дороге" /></figure></div>
+				</div>
+			</div>
+		</div>
+	</div></div>
+</section>
+<!-- Why Choose Us Section End -->

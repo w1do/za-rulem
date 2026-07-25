@@ -1,0 +1,34 @@
+---
+const features = [
+	{ icon: '/images/icon-core-features-item-1.svg', title: 'Заявка без долгих объяснений', text: 'Я уточняю местоположение, модель автомобиля и симптомы, чтобы сразу взять нужное оборудование.' },
+	{ icon: '/images/icon-core-features-item-2.svg', title: 'Помощь прямо на месте', text: 'Прикуриваю, меняю аккумулятор, отогреваю автомобиль, подвожу топливо и провожу диагностику.' },
+	{ icon: '/images/icon-core-features-item-3.svg', title: 'Выезд круглосуточно', text: 'Я принимаю заявки 24/7 по Тюмени и заранее сообщаю ориентир по времени прибытия.' },
+];
+---
+
+<!-- Core Features section Start -->
+<section class="our-core-features bg-section" aria-labelledby="features-heading">
+	<div class="container-fluid">
+		<div class="row"><div class="col-xl-12">
+			<div class="core-features-box">
+				<div class="core-features-image"><figure class="image-anime"><img src="/images/core-features-image.jpg" alt="Мастер выездной техпомощи рядом с автомобилем" /></figure></div>
+				<div class="core-features-content">
+					<div class="section-title section-title-center">
+						<span class="section-sub-title wow fadeInUp">Как проходит помощь</span>
+						<h2 id="features-heading" class="text-anime-style-3" data-cursor="-opaque">От заявки до исправного автомобиля</h2>
+						<p class="wow fadeInUp" data-wow-delay="0.2s">Я выясняю проблему до выезда, приезжаю с подходящим оборудованием и стараюсь вернуть автомобиль в движение на месте.</p>
+					</div>
+					<div class="core-features-item-list">
+						{features.map((feature, index) => (
+							<div class="core-features-item wow fadeInUp" data-wow-delay={index ? `${index * 0.2}s` : undefined}>
+								<div class="icon-box"><img src={feature.icon} alt="" /></div>
+								<div class="core-features-item-content"><h3>{feature.title}</h3><p>{feature.text}</p></div>
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+		</div></div>
+	</div>
+</section>
+<!-- Core Features section End -->

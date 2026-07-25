@@ -1,4 +1,6 @@
 ---
+import PageHeaderHelpButton from '../../shared/PageHeaderHelpButton.astro';
+
 const { title } = Astro.props;
 ---
 
@@ -17,6 +19,7 @@ const { title } = Astro.props;
 							<li class="breadcrumb-item active" aria-current="page">{title}</li>
 						</ol>
 					</nav>
+					<PageHeaderHelpButton />
 				</div>
 				<!-- Page Header Box End -->
 			</div>

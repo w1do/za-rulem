@@ -1,4 +1,6 @@
 ---
+import PageHeaderHelpButton from '../shared/PageHeaderHelpButton.astro';
+
 // Шапка страницы статьи (перенос блока "Page Header Section" из source/blog-single.html).
 const { title, author, dateLabel } = Astro.props;
 ---
@@ -19,6 +21,7 @@ const { title, author, dateLabel } = Astro.props;
 							</ol>
 						</div>
 					</nav>
+					<PageHeaderHelpButton />
 				</div>
 				<!-- Page Header Box End -->
 			</div>

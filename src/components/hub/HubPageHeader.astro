@@ -1,4 +1,6 @@
 ---
+import PageHeaderHelpButton from '../shared/PageHeaderHelpButton.astro';
+
 // Шапка хаба услуги. Разметка перенесена из шаблона (page-header parallaxie),
 // как на странице «О сервисе», с хлебными крошками до раздела услуг.
 const { title = 'Техпомощь на дороге в Тюмени', breadcrumb = 'Техпомощь' } = Astro.props;
@@ -19,6 +21,7 @@ const { title = 'Техпомощь на дороге в Тюмени', breadcru
 							<li class="breadcrumb-item active" aria-current="page">{breadcrumb}</li>
 						</ol>
 					</nav>
+					<PageHeaderHelpButton />
 				</div>
 				<!-- Page Header Box End -->
 			</div>

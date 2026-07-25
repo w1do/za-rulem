@@ -1,4 +1,6 @@
 ---
+import PageHeaderHelpButton from '../shared/PageHeaderHelpButton.astro';
+
 // Шапка страницы блога (перенос блока "Page Header Section" из source/blog.html).
 const { title = 'Блог', breadcrumb = 'Блог' } = Astro.props;
 ---
@@ -17,6 +19,7 @@ const { title = 'Блог', breadcrumb = 'Блог' } = Astro.props;
 							<li class="breadcrumb-item active" aria-current="page">{breadcrumb}</li>
 						</ol>
 					</nav>
+					<PageHeaderHelpButton />
 				</div>
 				<!-- Page Header Box End -->
 			</div>

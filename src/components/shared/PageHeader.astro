@@ -1,4 +1,6 @@
 ---
+import PageHeaderHelpButton from './PageHeaderHelpButton.astro';
+
 interface BreadcrumbItem {
 	label: string;
 	href?: string;
@@ -30,6 +32,7 @@ const { title, items } = Astro.props;
 							))}
 						</ol>
 					</nav>
+					<PageHeaderHelpButton />
 				</div>
 			</div>
 		</div>

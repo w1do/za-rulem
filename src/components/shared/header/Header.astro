@@ -17,6 +17,16 @@ import HeaderNav from './HeaderNav.astro';
 				<HeaderNav />
 				<!-- Main Menu End -->
 
+				<a
+					href="#"
+					class="mobile-call-button"
+					aria-label="Позвонить"
+					title="Позвонить"
+					onclick="event.preventDefault(); window.openVoiceRequest && window.openVoiceRequest()"
+				>
+					<div class="icon-box"><img src="/images/icon-phone-white.svg" alt="Заявка" /></div>
+				</a>
+
 				<div class="navbar-toggle"></div>
 			</div>
 		</nav>
@@ -24,3 +34,42 @@ import HeaderNav from './HeaderNav.astro';
 	</div>
 </header>
 <!-- Header End -->
+
+<style>
+	.mobile-call-button {
+		display: none;
+	}
+
+	@media (max-width: 991px) {
+		.mobile-call-button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 42px;
+			height: 42px;
+			margin-left: auto;
+			margin-right: 14px;
+			border-radius: 50%;
+			background: var(--accent-color);
+			color: var(--white-color);
+			font-size: 16px;
+			text-decoration: none;
+			transition: background-color 0.3s ease;
+		}
+
+		.mobile-call-button:hover,
+		.mobile-call-button:focus-visible {
+			background: var(--accent-color);
+			color: var(--white-color);
+		}
+	}
+
+	@media (max-width: 374px) {
+		.mobile-call-button {
+			width: 38px;
+			height: 38px;
+			margin-right: 8px;
+			font-size: 14px;
+		}
+	}
+</style>
