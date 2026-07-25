@@ -9,6 +9,8 @@ import HomeHowItWork from '../components/home/HomeHowItWork.astro';
 import HomeWhyChoose from '../components/home/HomeWhyChoose.astro';
 import HubFaqs from '../components/hub/HubFaqs.astro';
 import HubCta from '../components/hub/HubCta.astro';
+import QueueDriverCard from '../components/queues/QueueDriverCard.astro';
+import { gasStationLabels, queueDrivers } from '../data/queueDrivers';
 
 import { webPageNode, breadcrumbNode } from '../lib/seo';
 
@@ -65,6 +67,9 @@ const faqs = [
     answer: "Помимо мониторинга цен на моей карте, используйте бонусные программы сетей АЗС. Также следите за давлением в шинах и исправностью двигателя — это снижает расход. А планирование заправок через мой сервис позволит вам избежать переплат на 'дорогих' станциях города."
   }
 ];
+
+const availableQueueDrivers = queueDrivers.filter((driver) => driver.status === 'free').slice(0, 6);
+const queueGasStations = Object.values(gasStationLabels);
 ---
 
 <Layout
@@ -177,6 +182,36 @@ const faqs = [
 	</div>
 	<script src="https://maps.api.2gis.ru/2.0/loader.js?pkg=full" is:inline></script>
 	<!-- Gasoline Map Section End -->
+
+	<!-- Queue Drivers Section Start -->
+	<section class="queue-drivers-section">
+		<div class="container">
+			<div class="section-title queue-drivers-section__title">
+				<span class="section-sub-title wow fadeInUp">Очередь без ожидания</span>
+				<h2 class="text-anime-style-3" data-cursor="-opaque">Водители, которые займут очередь на АЗС</h2>
+				<p class="wow fadeInUp" data-wow-delay="0.2s">
+					Я собрал свободных водителей, готовых заранее приехать на заправку и занять место в очереди.
+					Связаться и договориться о времени можно напрямую.
+				</p>
+			</div>
+
+			<div class="queue-stations wow fadeInUp" data-wow-delay="0.3s" aria-label="Доступные сети АЗС">
+				<span class="queue-stations__label">Любая из заправок:</span>
+				<ul>
+					{queueGasStations.map((station) => <li>{station}</li>)}
+				</ul>
+			</div>
+
+			<div class="queue-drivers-grid">
+				{availableQueueDrivers.map((driver) => <QueueDriverCard driver={driver} />)}
+			</div>
+
+			<div class="queue-drivers-section__action">
+				<a href="/queue" class="btn-default">Посмотреть всех водителей</a>
+			</div>
+		</div>
+	</section>
+	<!-- Queue Drivers Section End -->
 
 	<!-- How It Work Section Start -->
 	<HomeHowItWork 
@@ -354,6 +389,54 @@ const faqs = [
         overflow: hidden;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
     }
+	.queue-drivers-section {
+		padding: 70px 0 120px;
+	}
+	.queue-drivers-section__title {
+		max-width: 820px;
+		margin: 0 auto 32px;
+		text-align: center;
+	}
+	.queue-drivers-section__title p {
+		margin-bottom: 0;
+	}
+	.queue-stations {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 14px;
+		margin-bottom: 40px;
+	}
+	.queue-stations__label {
+		color: var(--primary-color);
+		font-weight: 700;
+	}
+	.queue-stations ul {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 8px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.queue-stations li {
+		padding: 8px 14px;
+		border-radius: 999px;
+		background: var(--secondary-color);
+		color: var(--primary-color);
+		font-size: 14px;
+		font-weight: 600;
+	}
+	.queue-drivers-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 18px;
+	}
+	.queue-drivers-section__action {
+		margin-top: 40px;
+		text-align: center;
+	}
     .gas-cta-section {
         margin-top: 90px;
         margin-bottom: 90px;
@@ -366,4 +449,40 @@ const faqs = [
         box-shadow: none;
         border-color: rgba(0,0,0,.125);
     }
+	@media (max-width: 991px) {
+		.queue-drivers-section {
+			padding: 50px 0 80px;
+		}
+		.queue-drivers-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+	@media (max-width: 767px) {
+		.queue-drivers-section {
+			padding: 35px 0 60px;
+		}
+		.queue-drivers-section__title {
+			margin-bottom: 24px;
+			text-align: left;
+		}
+		.queue-stations {
+			align-items: flex-start;
+			flex-direction: column;
+			margin-bottom: 28px;
+		}
+		.queue-stations ul {
+			justify-content: flex-start;
+		}
+		.queue-drivers-grid {
+			grid-template-columns: 1fr;
+		}
+		.queue-drivers-section__action {
+			margin-top: 30px;
+		}
+		.queue-drivers-section__action .btn-default {
+			display: block;
+			width: 100%;
+			text-align: center;
+		}
+	}
 </style>
