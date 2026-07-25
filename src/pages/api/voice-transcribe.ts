@@ -3,9 +3,9 @@ import type { APIRoute } from 'astro';
 /**
  * Транскрибация аудио через Polza AI.
  */
-const POLZA_AI_API_KEY = import.meta.env.POLZA_AI_API_KEY;
-const POLZA_AI_BASE_URL = (import.meta.env.POLZA_AI_BASE_URL || 'https://polza.ai/api/v1').replace(/\/$/, '');
-const POLZA_AI_TRANSCRIPTION_MODEL = import.meta.env.POLZA_AI_TRANSCRIPTION_MODEL || 'openai/whisper-1';
+const POLZA_AI_API_KEY = process.env.POLZA_AI_API_KEY;
+const POLZA_AI_BASE_URL = (process.env.POLZA_AI_BASE_URL || 'https://polza.ai/api/v1').replace(/\/$/, '');
+const POLZA_AI_TRANSCRIPTION_MODEL = process.env.POLZA_AI_TRANSCRIPTION_MODEL || 'openai/whisper-1';
 
 export const prerender = false;
 
