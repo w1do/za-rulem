@@ -5,9 +5,11 @@ import Footer from '../components/shared/footer/Footer.astro';
 import BlogSingleHeader from '../components/blog/BlogSingleHeader.astro';
 import BlogSingleImage from '../components/blog/BlogSingleImage.astro';
 import BlogPostTagLinks from '../components/blog/BlogPostTagLinks.astro';
+import FuelPricesTable from '../components/FuelPricesTable.tsx';
 import { articleNode, breadcrumbNode } from '../lib/seo';
 
 const { frontmatter } = Astro.props;
+const showFuelPricesTable = frontmatter.showFuelPricesTable === true;
 const seoTitle = frontmatter.seo?.title ?? `${frontmatter.title} — блог «За рулём»`;
 const seoDescription = frontmatter.seo?.description ?? frontmatter.description;
 const dateLabel = frontmatter.date
@@ -63,10 +65,18 @@ const jsonLd = [
 					}
 
 					<!-- Post Single Content Start -->
-					<div class="post-content">
+					<div class="w-100">
 						<!-- Post Entry Start -->
 						<div class="post-entry">
 							<slot />
+							{
+								showFuelPricesTable && (
+									<div class="fuel-prices-section mt-5 mb-5">
+										<h3 class="mb-4">Справочные цены на топливо в сетях РФ (июль 2026)</h3>
+										<FuelPricesTable client:load />
+									</div>
+								)
+							}
 						</div>
 						<!-- Post Entry End -->
 

@@ -162,6 +162,7 @@ const blog = defineCollection({
 		imageAlt: z.string().optional(),
 		category: z.string().default('Полезное'),
 		tags: z.array(z.string()).default([]),
+		showFuelPricesTable: z.boolean().optional(),
 	}),
 });
 
