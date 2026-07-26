@@ -1,22 +1,35 @@
 import { useMemo, useState } from 'react';
 
 type FuelType = 'ai92' | 'ai95';
+type DeliveryType = 'fast' | 'scheduled';
 
 interface FuelOption {
+	label: string;
+	shortLabel: string;
+}
+
+interface DeliveryOption {
 	label: string;
 	shortLabel: string;
 	price: number;
 }
 
 const FUEL_OPTIONS: Record<FuelType, FuelOption> = {
-	ai92: { label: 'АИ-92', shortLabel: '92', price: 125 },
-	ai95: { label: 'АИ-95', shortLabel: '95', price: 135 },
+	ai92: { label: 'АИ-92', shortLabel: '92' },
+	ai95: { label: 'АИ-95', shortLabel: '95' },
+};
+
+const DELIVERY_OPTIONS: Record<DeliveryType, DeliveryOption> = {
+	fast: { label: 'Быстрая доставка', shortLabel: 'быстрая', price: 110 },
+	scheduled: { label: 'Плановая доставка', shortLabel: 'плановая', price: 80 },
 };
 
 const MIN_LITERS = 1;
-const MAX_LITERS = 15;
-const DEPARTURE_PRICE = 2800;
-const LITER_PRESETS = [5, 10, 15];
+const MAX_LITERS = 40;
+const MIN_DISTANCE = 1;
+const MAX_DISTANCE = 50;
+const DEPARTURE_PRICE_PER_KM = 220;
+const LITER_PRESETS = [5, 10, 20, 40];
 
 const formatPrice = (value: number) =>
 	new Intl.NumberFormat('ru-RU', {
@@ -33,17 +46,22 @@ declare global {
 
 export default function FuelDeliveryCalculator() {
 	const [fuelType, setFuelType] = useState<FuelType>('ai92');
-	const [liters, setLiters] = useState(15);
+	const [deliveryType, setDeliveryType] = useState<DeliveryType>('fast');
+	const [liters, setLiters] = useState(20);
+	const [distance, setDistance] = useState(5);
 
 	const result = useMemo(() => {
 		const normalizedLiters = Number.isFinite(liters) ? liters : MAX_LITERS;
 		const safeLiters = Math.min(MAX_LITERS, Math.max(MIN_LITERS, normalizedLiters));
-		const option = FUEL_OPTIONS[fuelType];
-		const fuelPrice = safeLiters * option.price;
-		const total = fuelPrice + DEPARTURE_PRICE;
+		const fuelOption = FUEL_OPTIONS[fuelType];
+		const deliveryOption = DELIVERY_OPTIONS[deliveryType];
+		const deliveryPrice = safeLiters * deliveryOption.price;
+		const safeDistance = Math.min(MAX_DISTANCE, Math.max(MIN_DISTANCE, distance));
+		const departurePrice = safeDistance * DEPARTURE_PRICE_PER_KM;
+		const total = deliveryPrice + departurePrice;
 
-		return { option, safeLiters, fuelPrice, total };
-	}, [fuelType, liters]);
+		return { fuelOption, deliveryOption, safeLiters, safeDistance, deliveryPrice, departurePrice, total };
+	}, [deliveryType, distance, fuelType, liters]);
 
 	const handleLitersChange = (value: string) => {
 		const nextValue = Number(value);
@@ -54,8 +72,17 @@ export default function FuelDeliveryCalculator() {
 		);
 	};
 
+	const handleDistanceChange = (value: string) => {
+		const nextValue = Number(value);
+		setDistance(
+			Number.isFinite(nextValue)
+				? Math.min(MAX_DISTANCE, Math.max(MIN_DISTANCE, nextValue))
+				: 5,
+		);
+	};
+
 	const openRequest = () => {
-		const subject = `Доставка бензина ${result.option.label}, ${result.safeLiters} л — расчет ${formatPrice(result.total)}`;
+		const subject = `${result.deliveryOption.label}, бензин ${result.fuelOption.label}, ${result.safeLiters} л, выезд ${result.safeDistance} км — расчет ${formatPrice(result.total)}`;
 
 		window.openServiceRequest?.({
 			service: 'toplivo',
@@ -71,10 +98,13 @@ export default function FuelDeliveryCalculator() {
 					<span className="section-sub-title">Калькулятор доставки</span>
 					<h2 id="fuel-calculator-title">Расчет стоимости доставки бензина</h2>
 					<p>
-						Марка и объём сразу покажут итог с топливом, доставкой и выездом.
+						Тариф и объём сразу покажут предварительный итог с выездом, марку укажу в заявке.
 					</p>
 				</div>
 
+				<div className="fuel-calculator__field-heading">
+					<span>Какое топливо привезти</span>
+				</div>
 				<div className="fuel-calculator__controls" role="group" aria-label="Тип бензина">
 					{Object.entries(FUEL_OPTIONS).map(([value, option]) => (
 						<button
@@ -85,9 +115,29 @@ export default function FuelDeliveryCalculator() {
 							aria-pressed={fuelType === value}
 						>
 							<span>{option.label}</span>
-							<strong>{formatPrice(option.price)}/л</strong>
+							<strong>без отдельной доплаты</strong>
 						</button>
 					))}
+				</div>
+
+				<div className="fuel-calculator__field">
+					<div className="fuel-calculator__field-heading">
+						<span>Когда нужна доставка</span>
+					</div>
+					<div className="fuel-calculator__controls" role="group" aria-label="Скорость доставки">
+						{Object.entries(DELIVERY_OPTIONS).map(([value, option]) => (
+							<button
+								key={value}
+								type="button"
+								className={`fuel-calculator__fuel ${deliveryType === value ? 'active' : ''}`}
+								onClick={() => setDeliveryType(value as DeliveryType)}
+								aria-pressed={deliveryType === value}
+							>
+								<span>{option.label}</span>
+								<strong>от {formatPrice(option.price)}/л</strong>
+							</button>
+						))}
+					</div>
 				</div>
 
 				<div className="fuel-calculator__field">
@@ -135,23 +185,43 @@ export default function FuelDeliveryCalculator() {
 					</div>
 					<small id="fuel-liters-help">Можно выбрать от {MIN_LITERS} до {MAX_LITERS} литров.</small>
 				</div>
+
+				<div className="fuel-calculator__field fuel-calculator__field--distance">
+					<div className="fuel-calculator__field-heading">
+						<label htmlFor="fuel-distance">Расстояние выезда</label>
+						<output htmlFor="fuel-distance">{result.safeDistance} км</output>
+					</div>
+					<div className="fuel-calculator__range">
+						<input
+							id="fuel-distance"
+							type="range"
+							min={MIN_DISTANCE}
+							max={MAX_DISTANCE}
+							step="1"
+							value={result.safeDistance}
+							onChange={(event) => handleDistanceChange(event.target.value)}
+							aria-describedby="fuel-distance-help"
+						/>
+					</div>
+					<small id="fuel-distance-help">Каждый километр — {formatPrice(DEPARTURE_PRICE_PER_KM)}.</small>
+				</div>
 			</div>
 
 			<div className="fuel-calculator__summary" aria-live="polite">
 				<div className="fuel-calculator__total">
 					<span>Предварительная стоимость</span>
 					<strong>{formatPrice(result.total)}</strong>
-					<small>{result.option.label} · {result.safeLiters} л</small>
+					<small>{result.fuelOption.label} · {result.deliveryOption.shortLabel} · {result.safeLiters} л · {result.safeDistance} км</small>
 				</div>
 
 				<ul className="fuel-calculator__breakdown">
 					<li>
-						<span>Бензин {result.option.label}</span>
-						<b>{formatPrice(result.fuelPrice)}</b>
+						<span>{result.deliveryOption.label} по {formatPrice(result.deliveryOption.price)}/л</span>
+						<b>{formatPrice(result.deliveryPrice)}</b>
 					</li>
 					<li>
-						<span>Доставка и выезд</span>
-						<b>от {formatPrice(DEPARTURE_PRICE)}</b>
+						<span>Выезд: {result.safeDistance} км × {formatPrice(DEPARTURE_PRICE_PER_KM)}</span>
+						<b>{formatPrice(result.departurePrice)}</b>
 					</li>
 				</ul>
 
@@ -160,7 +230,7 @@ export default function FuelDeliveryCalculator() {
 				</p>
 
 				<button type="button" className="btn-default btn-highlighted" onClick={openRequest}>
-					Заказать {result.option.shortLabel} на {result.safeLiters} л
+					Заказать {result.fuelOption.shortLabel} на {result.safeLiters} л
 				</button>
 			</div>
 		</section>

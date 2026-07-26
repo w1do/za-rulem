@@ -58,10 +58,10 @@ const {
 			image: '/images/fleets-image-4.jpg',
 			cursor: 'Подвоз топлива',
 			label: 'Подвоз топлива',
-			price: 'от 125 ₽',
+			price: 'от 80 ₽',
 			priceUnit: '/л',
-			priceNote: 'выезд от 2 800 руб',
-			amenities: ['92/95/ДТ до дома и на дорогу', 'До 15 л'],
+			priceNote: 'выезд 220 руб/км',
+			amenities: ['Плановая доставка — от 80 ₽/л', 'Быстрая доставка — от 110 ₽/л'],
 			href: '/services/toplivo',
 		},
 		{
@@ -136,7 +136,7 @@ const {
                                                 <h2>
                                                     {slide.price} {slide.priceUnit && <sub>{slide.priceUnit}</sub>}
                                                     {(slide.priceNote || /₽\/л|\/л|\/литр/i.test(`${slide.price}${slide.priceUnit ?? ''}`)) && (
-                                                        <span class="price-min-note">{slide.priceNote ?? 'выезд от 2 800 руб'}</span>
+                                                        <span class="price-min-note">{slide.priceNote ?? 'выезд 220 руб/км'}</span>
                                                     )}
                                                 </h2>
                                             </div>
@@ -146,7 +146,7 @@ const {
                                             <div class="fleets-amenity-item-list">
                                                 <ul>
                                                     {slide.amenities.map((amenity, index) => (
-                                                    <li class={/(от|до)\s*15\s*л/i.test(amenity) ? 'price-volume-highlight' : undefined}>
+                                                    <li class={/(от|до)\s*20\s*л/i.test(amenity) ? 'price-volume-highlight' : undefined}>
                                                         <img src={amenityIcons[index] ?? amenityIcons[0]} alt="" />
                                                         {amenity}
                                                     </li>

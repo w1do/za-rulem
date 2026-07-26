@@ -32,10 +32,10 @@ const {
 	subtitle = 'Цены на доставку топлива',
 	title = 'Понятная стоимость за литр',
 	items = [],
-	benefits = ['Цена до выезда', 'До 15 л', 'Выезд от 2 800 руб'],
+	benefits = ['Цена до выезда', 'До 40 л', 'Выезд 220 руб/км'],
 } = Astro.props;
 
-const defaultPriceNote = 'выезд от 2 800 руб';
+const defaultPriceNote = 'выезд 220 руб/км';
 ---
 
 {
@@ -104,7 +104,7 @@ const defaultPriceNote = 'выезд от 2 800 руб';
 						<div class="pricing-benefit-list-gold wow fadeInUp" data-wow-delay="0.6s">
 							<ul>
         {benefits.map((benefit, index) => (
-         <li class={/(от|до)\s*15\s*л|выезд\s+от\s*2\s*800/i.test(benefit) ? 'price-volume-highlight' : undefined}>
+         <li class={/(от|до)\s*20\s*л|выезд\s+от\s*2\s*800/i.test(benefit) ? 'price-volume-highlight' : undefined}>
 										<img src={benefitIcons[index] ?? benefitIcons[0]} alt="" />
 										{benefit}
 									</li>

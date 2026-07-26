@@ -95,7 +95,7 @@ const isPerLiter = (price: string, unit: string) =>
                      							<h2>
                      								{plan.price}<sub>{plan.priceUnit}</sub>
                      								{isPerLiter(plan.price, plan.priceUnit) && (
-                     									<span class="price-min-note">выезд от 2 800 руб</span>
+                                            <span class="price-min-note">выезд 220 руб/км</span>
                      								)}
                      							</h2>
                         </div>
@@ -125,7 +125,7 @@ const isPerLiter = (price: string, unit: string) =>
                 <div class="pricing-benefit-list-gold wow fadeInUp" data-wow-delay="0.6s">
                     <ul>
                         {benefits.map((benefit, index) => (
-                  						<li class={/выезд\s+от\s*(5\s*500|2\s*800)|(от|до)\s*15\s*л/i.test(benefit) ? 'price-volume-highlight' : undefined}>
+                        <li class={/выезд\s+от\s*(5\s*500|2\s*800)|(от|до)\s*40\s*л/i.test(benefit) ? 'price-volume-highlight' : undefined}>
                             <img src={benefitIcons[index] ?? benefitIcons[0]} alt="" />{benefit}
                         </li>
                         ))}
