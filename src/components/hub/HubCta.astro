@@ -11,6 +11,7 @@ interface Props {
 	contactLinkText?: string;
 	contactLinkHref?: string;
 	features?: string[];
+	class?: string;
 }
 
 const {
@@ -23,12 +24,13 @@ const {
 	contactText = "Выезд по заявке",
 	contactLinkText = "Выезд по заявке",
 	contactLinkHref = "/contacts",
-	features = ["Выезжаю на место поломки", "Работаю круглосуточно, 24/7"]
+	features = ["Выезжаю на место поломки", "Работаю круглосуточно, 24/7"],
+	class: className = ""
 } = Astro.props;
 ---
 
 <!-- CTA Section Start -->
-<div class="cta-box bg-section dark-section parallaxie">
+<div class:list={["cta-box bg-section dark-section parallaxie", className]}>
 	<div class="container">
 		<div class="row">
 			<div class="col-xl-6">

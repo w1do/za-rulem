@@ -1,6 +1,11 @@
 ---
+interface Props {
+	class?: string;
+}
+
+const { class: className = '' } = Astro.props;
 ---
-<div class="dark-section bg-section community-alert">
+<div class:list={["dark-section bg-section community-alert", className]}>
 	<div class="container-fluid py-4 px-4 px-md-5">
 		<div class="row align-items-center">
 			<div class="col-xl-9 col-lg-8">

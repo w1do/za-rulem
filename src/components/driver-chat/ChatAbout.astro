@@ -1,0 +1,126 @@
+---
+// Блок «О чате водителей» для посадочной страницы.
+// Рассказывает от первого лица, зачем нужен чат и как он устроен.
+const features = [
+	{
+		icon: 'fa-bolt',
+		title: 'Актуальная обстановка',
+		text: 'Пишу и читаю в реальном времени: где сейчас есть АИ-92, АИ-95 и дизель и какие очереди на АЗС.',
+	},
+	{
+		icon: 'fa-right-to-bracket',
+		title: 'Вход за один шаг',
+		text: 'Не нужны регистрация, пароль и код из SMS. Указываю номер — и сразу пишу в общий чат.',
+	},
+	{
+		icon: 'fa-location-dot',
+		title: 'По Тюмени и районам',
+		text: 'Каналы по маркам топлива и очередям помогают быстро найти обстановку рядом со мной.',
+	},
+];
+---
+
+<!-- Chat About Section Start -->
+<div class="chat-about">
+	<div class="container">
+		<div class="row align-items-center">
+			<div class="col-xl-6">
+				<!-- Chat About Image Start -->
+				<div class="chat-about-image wow fadeInUp">
+					<figure class="image-anime">
+						<img src="/images/about-us-image.jpg" alt="Водители Тюмени в чате о наличии топлива" />
+					</figure>
+					<div class="chat-about-badge">
+						<span class="chat-about-badge__num">24/7</span>
+						<span class="chat-about-badge__label">на связи</span>
+					</div>
+				</div>
+				<!-- Chat About Image End -->
+			</div>
+
+			<div class="col-xl-6">
+				<!-- Chat About Content Start -->
+				<div class="chat-about-content">
+					<div class="section-title">
+						<span class="section-sub-title wow fadeInUp">О чате</span>
+						<h2 class="text-anime-style-3" data-cursor="-opaque">Я собрал живой чат, где видно, где сейчас есть топливо</h2>
+						<p class="wow fadeInUp" data-wow-delay="0.2s">Когда бензин и дизель пропадают с АЗС, важнее всего актуальная подсказка от тех, кто уже проехал рядом. Поэтому я сделал простой чат: захожу по номеру, выбираю канал по марке топлива или очередям — и сразу вижу обстановку по Тюмени.</p>
+					</div>
+
+					<div class="chat-about-list">
+						{features.map((item) => (
+							<div class="chat-about-item wow fadeInUp">
+								<div class="chat-about-item__icon"><i class={`fa-solid ${item.icon}`}></i></div>
+								<div class="chat-about-item__body">
+									<h3>{item.title}</h3>
+									<p>{item.text}</p>
+								</div>
+							</div>
+						))}
+					</div>
+
+					<div class="chat-about-footer wow fadeInUp" data-wow-delay="0.4s">
+						<a href="#chat" class="btn-default">Войти в чат</a>
+						<a href="/chat" class="btn-default btn-highlighted">Открыть как приложение</a>
+					</div>
+				</div>
+				<!-- Chat About Content End -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Chat About Section End -->
+
+<style>
+	.chat-about { padding: 120px 0; }
+
+	.chat-about-image { position: relative; }
+	.chat-about-image figure {
+		margin: 0;
+		border-radius: 24px;
+		overflow: hidden;
+	}
+	.chat-about-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+	.chat-about-badge {
+		position: absolute;
+		right: 24px;
+		bottom: 24px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 16px 22px;
+		border-radius: 18px;
+		background: var(--accent-color);
+		color: var(--primary-color);
+		box-shadow: 0 18px 40px rgba(18, 18, 18, .18);
+	}
+	.chat-about-badge__num { font-size: 26px; font-weight: 700; line-height: 1; }
+	.chat-about-badge__label { font-size: 13px; margin-top: 4px; }
+
+	.chat-about-content { padding-left: 20px; }
+	.chat-about-list { margin: 28px 0 32px; display: flex; flex-direction: column; gap: 18px; }
+	.chat-about-item { display: flex; gap: 16px; }
+	.chat-about-item__icon {
+		flex: 0 0 auto;
+		width: 52px;
+		height: 52px;
+		display: grid;
+		place-items: center;
+		border-radius: 14px;
+		background: var(--accent-color);
+		color: var(--primary-color);
+		font-size: 20px;
+	}
+	.chat-about-item__body h3 { font-size: 19px; margin-bottom: 6px; }
+	.chat-about-item__body p { margin: 0; color: #5f6672; }
+
+	.chat-about-footer { display: flex; flex-wrap: wrap; gap: 14px; }
+
+	@media (max-width: 1199px) {
+		.chat-about-content { padding-left: 0; margin-top: 40px; }
+	}
+	@media (max-width: 767px) {
+		.chat-about { padding: 60px 0; }
+	}
+</style>

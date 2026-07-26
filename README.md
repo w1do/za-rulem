@@ -13,6 +13,9 @@
 - **Вёрстка и стили**: HTML/CSS/JS исходного шаблона из `public/css` и `public/js` (Bootstrap grid, Swiper, WOW, GSAP, jQuery). Tailwind/Shadcn **не подключены** — приоритет точного переноса шаблона.
 - **Контент**: Markdown через Astro Content Collections.
 - **Формы**: отправка заявок POST-запросом на n8n (`https://n8n.w1do.ru/webhook/requests`, `project=za-rulem`).
+- **Чат водителей**: страница `/chat-voditeley` отправляет запросы через серверный `/api/driver-chat` на `N8N_DRIVER_CHAT_WEBHOOK_URL`.
+
+Чат использует единый POST-контракт n8n: `action` (`join`, `send`, `sync`), `phone`, `sessionId`, `message` и `clientMessageId`. В ответе ожидается массив `messages` (также поддерживается `data.messages`) или строка `reply`; у сообщения поддерживаются поля `id`, `text`/`message`, `author`, `phone`, `createdAt`/`timestamp`.
 
 Требуется **Node.js >= 22.12.0**.
 

@@ -43,6 +43,7 @@ const structuredData = {
 		<meta charset="utf-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+		<meta name="theme-color" content="#F5B754" />
 		<meta name="description" content={description} />
 		{keywords && <meta name="keywords" content={keywords} />}
 		<meta name="author" content="За рулём — техпомощь Тюмень" />
@@ -99,6 +100,9 @@ const structuredData = {
 		<link href="/css/custom.css" rel="stylesheet" media="screen" />
 
 		<meta name="generator" content={Astro.generator} />
+
+		<!-- Дополнительные теги <head> для конкретной страницы (напр. PWA-манифест). -->
+		<slot name="head" />
 	</head>
 	<body>
 		<!-- Preloader Start -->

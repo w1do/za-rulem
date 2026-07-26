@@ -1,0 +1,53 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/shared/header/Header.astro';
+import Footer from '../components/shared/footer/Footer.astro';
+import PageHeader from '../components/shared/PageHeader.astro';
+import DriverChatLanding from '../components/driver-chat/DriverChatLanding.astro';
+import ChatAbout from '../components/driver-chat/ChatAbout.astro';
+import Alert from '../components/shared/Alert.astro';
+import HubFaqs from '../components/hub/HubFaqs.astro';
+import HubProcess from '../components/hub/HubProcess.astro';
+import HubCta from '../components/hub/HubCta.astro';
+import { breadcrumbNode, faqNode, webPageNode } from '../lib/seo';
+
+const title = 'Чат водителей Тюмени: где сейчас есть топливо';
+const description = 'Живой чат водителей Тюмени: где сейчас есть бензин и дизель и какие очереди на АЗС. Заходи по номеру без пароля, спрашивай обстановку и подсказывай другим.';
+const url = '/chat-voditeley';
+const faqs = [
+	{ question: 'Для кого этот чат?', answer: 'Для водителей Тюмени, которые ищут, где сейчас можно заправиться. Здесь подсказывают друг другу, на каких АЗС есть АИ-92, АИ-95 и дизель и где меньше очередь.' },
+	{ question: 'Нужна ли регистрация?', answer: 'Нет. Для входа нужен только номер телефона. Пароль, код из SMS и отдельный профиль не требуются, а номер хранится на твоём устройстве.' },
+	{ question: 'Как быстрее получить ответ?', answer: 'Пиши конкретно: район, название АЗС и нужную марку топлива. Выбери подходящий канал — АИ-92, АИ-95, дизель или очереди — так тебя быстрее увидят те, кто рядом.' },
+	{ question: 'Насколько актуальны сообщения?', answer: 'Рядом с сообщением видно время. Обстановку лучше уточнять повторно: наличие топлива и очереди на АЗС меняются быстро.' },
+	{ question: 'Можно ли открыть чат как приложение?', answer: 'Да. Открой страницу чата и добавь её на главный экран телефона — она работает как отдельное приложение и открывается сразу в чате.' },
+	{ question: 'Что делать, если топливо закончилось в дороге?', answer: 'Если машина уже остановилась, перейди на страницу подвоза топлива и оставь заявку — привезу бензин или дизель к месту остановки.' },
+];
+const jsonLd = [
+	webPageNode({ name: title, description, url }),
+	breadcrumbNode([{ name: 'Главная', url: '/' }, { name: 'Чат водителей', url }]),
+	faqNode(faqs, url),
+];
+---
+
+<Layout title={title} description={description} keywords="чат водителей, доставка тюмень, ищу клиентов на доставку, развоз бензина, подвоз топлива, чат водителей тюмень" jsonLd={jsonLd}>
+	<Header />
+	<main>
+		<PageHeader title="Чат водителей: где сейчас есть топливо" items={[{ label: 'Главная', href: '/' }, { label: 'Чат водителей' }]} />
+
+		<Alert class="mt-5 mb-5"/>
+		<DriverChatLanding />
+		<ChatAbout />
+		<HubProcess
+			subtitle="Как это работает"
+			title="Узнай, где есть топливо, за три шага"
+			steps={[
+				{ title: 'Укажи номер', description: 'Вхожу без пароля и кода из SMS — сразу попадаю в общий чат.' },
+				{ title: 'Выбери канал', description: 'Открываю нужный канал: АИ-92, АИ-95, дизель или очереди на АЗС.' },
+				{ title: 'Спроси и подскажи', description: 'Пишу район и марку топлива — и вижу, где сейчас можно заправиться.' },
+			]}
+		/>
+		<HubFaqs subtitle="Коротко о чате" title="Частые вопросы о чате водителей" description="Я собрал ответы о входе, каналах топлива и о том, как быстрее узнать, где сейчас есть бензин или дизель." faqs={faqs} benefits={['Вход только по номеру телефона', 'Каналы по маркам топлива и очередям', 'Можно установить как приложение']} buttonLabel="Открыть чат-приложение" buttonHref="/chat" />
+		<HubCta subtitle="Хочешь всегда быть на связи?" title="Установи чат как приложение на свой телефон" description="Чат будет доступен в один клик с главного экрана — без поиска в браузере и лишних ссылок." btnText="Открыть приложение" btnHref="/chat" contactTitle="Помощь на дороге" contactText="Подвоз топлива" contactLinkText="Заказать подвоз" contactLinkHref="/services/toplivo/podvoz-benzina" features={['Работает как PWA', 'Мгновенный доступ к чату']} class="mb-5" />
+	</main>
+	<Footer />
+</Layout>
