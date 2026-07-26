@@ -16,6 +16,7 @@ const FUEL_OPTIONS: Record<FuelType, FuelOption> = {
 const MIN_LITERS = 1;
 const MAX_LITERS = 15;
 const DEPARTURE_PRICE = 2800;
+const LITER_PRESETS = [5, 10, 15];
 
 const formatPrice = (value: number) =>
 	new Intl.NumberFormat('ru-RU', {
@@ -46,7 +47,11 @@ export default function FuelDeliveryCalculator() {
 
 	const handleLitersChange = (value: string) => {
 		const nextValue = Number(value);
-		setLiters(Number.isFinite(nextValue) ? Math.min(MAX_LITERS, nextValue) : MAX_LITERS);
+		setLiters(
+			Number.isFinite(nextValue)
+				? Math.min(MAX_LITERS, Math.max(MIN_LITERS, nextValue))
+				: MAX_LITERS,
+		);
 	};
 
 	const openRequest = () => {
@@ -66,7 +71,7 @@ export default function FuelDeliveryCalculator() {
 					<span className="section-sub-title">Калькулятор доставки</span>
 					<h2 id="fuel-calculator-title">Расчет стоимости доставки бензина</h2>
 					<p>
-						Выберите марку и литры — я покажу итог с топливом, доставкой и выездом.
+						Марка и объём сразу покажут итог с топливом, доставкой и выездом.
 					</p>
 				</div>
 
@@ -85,27 +90,58 @@ export default function FuelDeliveryCalculator() {
 					))}
 				</div>
 
-				<label className="fuel-calculator__field">
-					<span>Сколько литров привезти</span>
-					<input
-						type="number"
-						className="form-control"
-						min={MIN_LITERS}
-						max={MAX_LITERS}
-						step="1"
-						value={liters}
-						onChange={(event) => handleLitersChange(event.target.value)}
-						onBlur={() => setLiters(result.safeLiters)}
-						inputMode="numeric"
-					/>
-					<small>Максимальный объём — {MAX_LITERS} литров.</small>
-				</label>
+				<div className="fuel-calculator__field">
+					<div className="fuel-calculator__field-heading">
+						<label htmlFor="fuel-liters">Сколько литров привезти</label>
+						<output htmlFor="fuel-liters fuel-liters-range">{result.safeLiters} л</output>
+					</div>
+					<div className="fuel-calculator__volume">
+						<input
+							id="fuel-liters"
+							type="number"
+							className="form-control"
+							min={MIN_LITERS}
+							max={MAX_LITERS}
+							step="1"
+							value={liters}
+							onChange={(event) => handleLitersChange(event.target.value)}
+							onBlur={() => setLiters(result.safeLiters)}
+							inputMode="numeric"
+							aria-describedby="fuel-liters-help"
+						/>
+						<input
+							id="fuel-liters-range"
+							type="range"
+							min={MIN_LITERS}
+							max={MAX_LITERS}
+							step="1"
+							value={result.safeLiters}
+							onChange={(event) => handleLitersChange(event.target.value)}
+							aria-label="Объём топлива в литрах"
+						/>
+					</div>
+					<div className="fuel-calculator__presets" aria-label="Быстрый выбор объёма">
+						{LITER_PRESETS.map((value) => (
+							<button
+								key={value}
+								type="button"
+								className={result.safeLiters === value ? 'active' : ''}
+								onClick={() => setLiters(value)}
+								aria-pressed={result.safeLiters === value}
+							>
+								{value} л
+							</button>
+						))}
+					</div>
+					<small id="fuel-liters-help">Можно выбрать от {MIN_LITERS} до {MAX_LITERS} литров.</small>
+				</div>
 			</div>
 
 			<div className="fuel-calculator__summary" aria-live="polite">
 				<div className="fuel-calculator__total">
-					<span>Итого к оплате</span>
+					<span>Предварительная стоимость</span>
 					<strong>{formatPrice(result.total)}</strong>
+					<small>{result.option.label} · {result.safeLiters} л</small>
 				</div>
 
 				<ul className="fuel-calculator__breakdown">
@@ -119,7 +155,7 @@ export default function FuelDeliveryCalculator() {
 					</li>
 				</ul>
 
-				<p>
+				<p className="fuel-calculator__notice">
 					Расчёт предварительный. Точную сумму фиксирую до выезда по адресу и объёму.
 				</p>
 

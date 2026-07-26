@@ -4848,11 +4848,12 @@ header.main-header .header-sticky.active{
 .fuel-calculator{
 	display: grid;
 	grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
-	gap: 30px;
+	gap: 34px;
 	margin: 40px 0;
-	padding: 34px;
+	padding: 40px;
 	background: var(--secondary-color);
 	border-radius: 20px;
+	box-shadow: 0 24px 70px rgba(0, 0, 0, 0.08);
 }
 
 .fuel-calculator-section{
@@ -4880,7 +4881,9 @@ header.main-header .header-sticky.active{
 }
 
 .fuel-calculator__fuel{
-	padding: 18px;
+	position: relative;
+	min-height: 92px;
+	padding: 18px 18px 18px 22px;
 	border: 1px solid transparent;
 	border-radius: 14px;
 	background: var(--white-color);
@@ -4910,11 +4913,43 @@ header.main-header .header-sticky.active{
 	box-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
 }
 
-.fuel-calculator__field span{
-	display: block;
+.fuel-calculator__fuel.active::after{
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	width: 12px;
+	height: 12px;
+	background: var(--accent-color);
+	border: 3px solid var(--white-color);
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px var(--accent-color);
+	content: '';
+}
+
+.fuel-calculator__field-heading{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
 	margin-bottom: 8px;
+}
+
+.fuel-calculator__field-heading label{
 	font-weight: 700;
 	color: var(--primary-color);
+}
+
+.fuel-calculator__field-heading output{
+	color: var(--accent-color);
+	font-size: 18px;
+	font-weight: 700;
+}
+
+.fuel-calculator__volume{
+	display: grid;
+	grid-template-columns: 110px minmax(0, 1fr);
+	align-items: center;
+	gap: 20px;
 }
 
 .fuel-calculator__field .form-control{
@@ -4936,6 +4971,36 @@ header.main-header .header-sticky.active{
 	box-shadow: 0 0 0 4px rgba(255, 183, 0, 0.2), 0 12px 34px rgba(0, 0, 0, 0.08);
 }
 
+.fuel-calculator__volume input[type='range']{
+	width: 100%;
+	height: 8px;
+	accent-color: var(--accent-color);
+	cursor: pointer;
+}
+
+.fuel-calculator__presets{
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 8px;
+	margin-top: 14px;
+}
+
+.fuel-calculator__presets button{
+	min-height: 44px;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 10px;
+	background: var(--white-color);
+	color: var(--primary-color);
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.fuel-calculator__presets button.active,
+.fuel-calculator__presets button:hover{
+	border-color: var(--accent-color);
+	background: var(--accent-color);
+}
+
 .fuel-calculator__field small{
 	display: block;
 	margin-top: 8px;
@@ -4955,7 +5020,8 @@ header.main-header .header-sticky.active{
 }
 
 .fuel-calculator__total span,
-.fuel-calculator__total strong{
+.fuel-calculator__total strong,
+.fuel-calculator__total small{
 	display: block;
 }
 
@@ -4968,6 +5034,11 @@ header.main-header .header-sticky.active{
 	color: var(--accent-color);
 	font-size: 42px;
 	line-height: 1.1em;
+}
+
+.fuel-calculator__total small{
+	margin-top: 8px;
+	color: rgba(255, 255, 255, 0.7);
 }
 
 .fuel-calculator__breakdown{
@@ -4992,6 +5063,12 @@ header.main-header .header-sticky.active{
 .fuel-calculator__summary p{
 	margin-bottom: 20px;
 	color: rgba(255, 255, 255, 0.78);
+}
+
+.fuel-calculator__summary .btn-default{
+	width: 100%;
+	justify-content: center;
+	text-align: center;
 }
 
 .google-map{
@@ -6631,7 +6708,7 @@ header.main-header .header-sticky.active{
 	}
 
 	.fuel-calculator__controls{
-		grid-template-columns: 1fr;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
 	.fuel-calculator__total strong{
