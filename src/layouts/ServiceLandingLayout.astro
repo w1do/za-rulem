@@ -55,7 +55,7 @@ const jsonLd = [
 <Layout title={seoTitle} description={seoDescription} jsonLd={jsonLd}>
 	<Header />
 
-	<ServicePageHeader title={frontmatter.title} />
+	<ServicePageHeader title={frontmatter.title} showChatButton={cluster === 'toplivo'} />
 
 	<!-- Page Service Single Start -->
 	<div class="page-service-single">

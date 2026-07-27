@@ -71,7 +71,7 @@ const showFuelCalculator = cluster === 'toplivo';
 <Layout title={seoTitle} description={seoDescription} keywords={keywords} jsonLd={jsonLd}>
 	<Header />
 
-	<HubPageHeader title={frontmatter.title} />
+	<HubPageHeader title={frontmatter.title} showChatButton={cluster === 'toplivo'} />
 
 	<HubIntro title={frontmatter.title} description={frontmatter.description}>
 		<slot />

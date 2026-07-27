@@ -72,7 +72,7 @@ breadcrumbItems.push({ label: fuel.name });
 <Layout title={title} description={description} jsonLd={jsonLd}>
 	<Header />
 	<main>
-		<PageHeader title={h1} items={breadcrumbItems} />
+		<PageHeader title={h1} items={breadcrumbItems} showChatButton={true} chatLink={chatAppUrl(city.slug, fuel.slug)} />
 
 		<GasPricesIntro
 			subtitle={`Мониторинг ${fuel.name} ${city.name}`}
@@ -80,7 +80,6 @@ breadcrumbItems.push({ label: fuel.name });
 			description={`Я помогаю водителям ${city.ofCity} не тратить время на пустые поездки по заправкам. В моем чате всегда можно спросить, где сейчас в наличии ${fuel.name} и насколько большая очередь на АЗС. Все сообщения — от реальных людей, которые прямо сейчас находятся на дороге.`}
 			image="/images/blog/azs.jpg"
 			imageAlt={`Наличие ${fuel.name} ${city.inCity}`}
-			badgeText="Обновлено сейчас"
 			features={[
 				{
 					icon: '/images/icon-about-body-item-1.svg',

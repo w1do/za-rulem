@@ -12,7 +12,7 @@ interface Props {
 	description: string;
 	image: string;
 	imageAlt: string;
-	badgeText: string;
+	badgeText?: string;
 	features: Feature[];
 }
 
@@ -31,12 +31,12 @@ const { subtitle, title, description, image, imageAlt, badgeText, features } = A
 						<div class="about-us-video">
 							<figure class="image-anime"><img src={image} alt="Наличие топлива на АЗС Тюмени" /></figure>
 						</div>
-						<div class="about-us-video-box-content">
-							<div class="satisfy-client-images">
-								<div class="satisfy-client-image add-more"><h2><span class="counter">24</span>/7</h2></div>
-							</div>
-							<div class="about-satisfy-client-title"><p>{badgeText}</p></div>
+					<div class="about-us-video-box-content">
+						<div class="satisfy-client-images">
+							<a href="/chat-voditeley" class="satisfy-client-image add-more"><i class="fa-solid fa-comments"></i></a>
 						</div>
+						<div class="about-satisfy-client-title"><p><a href="/chat-voditeley">Чат водителей</a></p></div>
+					</div>
 					</div>
 				</div>
 			</div>

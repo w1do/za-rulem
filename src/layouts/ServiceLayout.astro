@@ -48,7 +48,7 @@ const steps = process
 <Layout title={seoTitle} description={seoDescription} jsonLd={jsonLd}>
 	<Header />
 
-	<ServicePageHeader title={frontmatter.title} />
+	<ServicePageHeader title={frontmatter.title} showChatButton={frontmatter.cluster === 'toplivo'} />
 
 	<!-- Page Service Single Start -->
 	<div class="page-service-single">

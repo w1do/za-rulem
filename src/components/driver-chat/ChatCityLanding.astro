@@ -124,7 +124,7 @@ const breadcrumbItems = [
 <Layout title={title} description={description} jsonLd={jsonLd}>
 	<Header />
 	<main>
-		<PageHeader title={h1} items={breadcrumbItems} />
+		<PageHeader title={h1} items={breadcrumbItems} showChatButton={true} chatLink={chatAppUrl(city.slug)} />
 
 		<GasPricesIntro
 			subtitle={`Чат водителей ${city.name}`}
@@ -132,7 +132,6 @@ const breadcrumbItems = [
 			description={`Я объединил водителей ${city.ofCity} в один чат, чтобы каждый мог вовремя узнать, где есть нужная марка бензина или дизеля. Больше не нужно гадать — просто спросите у тех, кто уже на заправке. Взаимовыручка помогает нам всем экономить время.`}
 			image="/images/blog/azs.jpg"
 			imageAlt={`Чат водителей ${city.name}`}
-			badgeText="На связи 24/7"
 			features={[
 				{
 					icon: '/images/icon-about-body-item-1.svg',

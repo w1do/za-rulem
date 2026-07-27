@@ -87,7 +87,7 @@ const queueGasStations = Object.values(gasStationLabels);
 >
 	<Header />
 
-	<PageHeader title={pageData.h1} items={[{ label: 'главная', href: '/' }, { label: 'цены на бензин' }]} />
+	<PageHeader title={pageData.h1} items={[{ label: 'главная', href: '/' }, { label: 'цены на бензин' }]} showChatButton={true} />
 
 	<!-- Gasoline Map Section Start -->
 	<GasPricesIntro
@@ -96,7 +96,6 @@ const queueGasStations = Object.values(gasStationLabels);
 		description="Я отслеживаю актуальное наличие топлива и цены на заправках Тюмени. Используйте поиск и список слева, чтобы быстро найти нужную марку бензина (АИ-92, АИ-95) или дизельное топливо. Карта поможет проложить маршрут до ближайшей работающей станции."
 		image="/images/blog/azs.jpg"
 		imageAlt="Карта заправок и цены на бензин в Тюмени"
-		badgeText="Данные на карте"
 		features={[
 			{ icon: '/images/icon-about-body-item-1.svg', iconAlt: 'Поиск АЗС', title: 'Быстрый поиск', text: 'Выберите нужное топливо и найдите ближайшую работающую АЗС.' },
 			{ icon: '/images/icon-about-body-item-2.svg', iconAlt: 'Цены и наличие топлива', title: 'Цены и наличие', text: 'Сравните стоимость топлива, статус станции и информацию об очереди.' },

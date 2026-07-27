@@ -1,9 +1,10 @@
 ---
 import PageHeaderHelpButton from '../shared/PageHeaderHelpButton.astro';
+import PageHeaderChatButton from '../shared/PageHeaderChatButton.astro';
 
 // Шапка хаба услуги. Разметка перенесена из шаблона (page-header parallaxie),
 // как на странице «О сервисе», с хлебными крошками до раздела услуг.
-const { title = 'Техпомощь на дороге в Тюмени', breadcrumb = 'Техпомощь' } = Astro.props;
+const { title = 'Техпомощь на дороге в Тюмени', breadcrumb = 'Техпомощь', showChatButton = false, chatLink } = Astro.props;
 ---
 
 <!-- Page Header Section Start -->
@@ -22,6 +23,7 @@ const { title = 'Техпомощь на дороге в Тюмени', breadcru
 						</ol>
 					</nav>
 					<PageHeaderHelpButton />
+					{showChatButton && <PageHeaderChatButton href={chatLink} />}
 				</div>
 				<!-- Page Header Box End -->
 			</div>

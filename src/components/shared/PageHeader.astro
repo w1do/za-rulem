@@ -1,5 +1,6 @@
 ---
 import PageHeaderHelpButton from './PageHeaderHelpButton.astro';
+import PageHeaderChatButton from './PageHeaderChatButton.astro';
 
 interface BreadcrumbItem {
 	label: string;
@@ -9,9 +10,11 @@ interface BreadcrumbItem {
 interface Props {
 	title: string;
 	items: BreadcrumbItem[];
+	showChatButton?: boolean;
+	chatLink?: string;
 }
 
-const { title, items } = Astro.props;
+const { title, items, showChatButton, chatLink } = Astro.props;
 ---
 
 <div class="page-header parallaxie">
@@ -33,6 +36,7 @@ const { title, items } = Astro.props;
 						</ol>
 					</nav>
 					<PageHeaderHelpButton />
+					{showChatButton && <PageHeaderChatButton href={chatLink} />}
 				</div>
 			</div>
 		</div>
