@@ -6,7 +6,7 @@ interface Props {
 const { class: className = '' } = Astro.props;
 ---
 <div class:list={["dark-section bg-section community-alert", className]}>
-	<div class="container-fluid py-4 px-4 px-md-5">
+	<div class="container-fluid py-4">
 		<div class="row align-items-center">
 			<div class="col-xl-9 col-lg-8">
 				<div class="section-title mb-lg-0">
@@ -29,12 +29,28 @@ const { class: className = '' } = Astro.props;
 	.community-alert {
 		position: relative;
 		z-index: 1;
+		margin-top: 0 !important;
+		margin-bottom: 30px;
+	}
+	.community-alert .container-fluid {
+		padding-top: 60px !important;
+		padding-bottom: 80px !important;
+		padding-left: 15px !important;
+		padding-right: 15px !important;
+	}
+	@media (min-width: 992px) {
+		.community-alert .container-fluid {
+			padding-left: 30px !important;
+			padding-right: 30px !important;
+		}
+	}
+	@media (min-width: 1200px) {
+		.community-alert .container-fluid {
+			padding-left: 50px !important;
+			padding-right: 50px !important;
+		}
 	}
 	@media (max-width: 767px) {
-		.container-fluid.px-4 {
-			padding-left: 15px !important;
-			padding-right: 15px !important;
-		}
 		.section-title h2 {
 			font-size: 22px !important;
 		}

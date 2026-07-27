@@ -5,12 +5,13 @@ const {
 	subtitle = 'Как проходит вызов',
 	title = 'Я приезжаю на помощь за несколько простых шагов',
 	steps = [],
+	class: className = '',
 } = Astro.props;
 ---
 
 {
 	steps.length > 0 && (
-		<div class="how-it-work-gold dark-section bg-section">
+		<div class:list={["how-it-work-gold dark-section bg-section", className]}>
 			<div class="container">
 				<div class="row section-row">
 					<div class="col-xl-12">
@@ -45,3 +46,7 @@ const {
 		</div>
 	)
 }
+
+<style>
+	.how-it-work-gold { margin-bottom: 30px; }
+</style>

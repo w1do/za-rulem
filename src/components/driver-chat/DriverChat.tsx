@@ -2,6 +2,8 @@ import type { FormEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDriverChat, type ChatTopic } from './useDriverChat';
 
+// ==== UI Components Data ====
+
 interface Channel {
 	id: ChatTopic;
 	title: string;
@@ -37,30 +39,23 @@ const formatTime = (value: string) =>
 	new Date(value).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
 
 export interface DriverChatProps {
-	/** `app` — полноэкранное приложение (PWA), `section` — карточка внутри страницы. */
 	variant?: 'app' | 'section';
 }
 
+// ==== Main Component ====
+
 export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 	const { phone, topic, setTopic, isJoined, messages, error, join, send } = useDriverChat();
+	
 	const [phoneInput, setPhoneInput] = useState('');
 	const [message, setMessage] = useState('');
 	const [asideOpen, setAsideOpen] = useState(false);
+	
 	const endRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		endRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 	}, [messages]);
-
-	const activeChannel = useMemo(
-		() => channels.find((item) => item.id === topic) ?? channels[0],
-		[topic],
-	);
-
-	const initials = useMemo(() => {
-		const digits = phone.replace(/\D/g, '');
-		return digits ? digits.slice(-2) : 'Я';
-	}, [phone]);
 
 	const handleJoin = (event: FormEvent) => {
 		event.preventDefault();
@@ -76,6 +71,16 @@ export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 		setTopic(id);
 		setAsideOpen(false);
 	};
+
+	const activeChannel = useMemo(
+		() => channels.find((item) => item.id === topic) ?? channels[0],
+		[topic],
+	);
+
+	const initials = useMemo(() => {
+		const digits = phone.replace(/\D/g, '');
+		return digits ? digits.slice(-2) : 'Я';
+	}, [phone]);
 
 	if (!isJoined) {
 		return (

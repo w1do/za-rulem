@@ -9,12 +9,13 @@ const {
 	benefits = ['Круглосуточная помощь на дороге, 24/7', 'Понятные условия и работа без навязанных услуг'],
 	buttonLabel = 'Задать вопрос',
 	buttonHref = '/contacts',
+	class: className = '',
 } = Astro.props;
 ---
 
 {
 	faqs.length > 0 && (
-		<div class="our-faqs bg-section">
+		<div class:list={["our-faqs bg-section", className]}>
 			<div class="container">
 				<div class="row">
 					<div class="col-xl-5">
@@ -75,3 +76,7 @@ const {
 		</div>
 	)
 }
+
+<style>
+	.our-faqs { margin-bottom: 30px; }
+</style>

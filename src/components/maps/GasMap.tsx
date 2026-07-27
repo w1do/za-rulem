@@ -626,7 +626,7 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
         .gas-map-container {
           display: flex;
           height: 750px;
-          background: #fff;
+          background: transparent;
           position: relative;
           z-index: 1;
           font-family: "Montserrat", sans-serif;

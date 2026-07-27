@@ -1,9 +1,15 @@
 ---
 import DriverChatBox from './DriverChatBox.astro';
+
+interface Props {
+	class?: string;
+}
+
+const { class: className = '' } = Astro.props;
 ---
 
-<div class="driver-chat-section bg-section" id="chat">
-	<div class="container-fluid px-3 px-md-4 px-lg-5">
+<div class:list={["driver-chat-section bg-section", className]} id="chat">
+	<div class="container-fluid">
 		<div class="row section-row">
 			<div class="col-lg-12">
 				<div class="section-title section-title-center">
@@ -25,12 +31,35 @@ import DriverChatBox from './DriverChatBox.astro';
 </div>
 
 <style>
-	.driver-chat-section { padding: 120px 0; }
+	.driver-chat-section {
+		padding: 120px 0;
+		margin-top: 120px !important;
+		margin-bottom: 30px;
+	}
+	.driver-chat-section .container-fluid {
+		padding-left: 15px !important;
+		padding-right: 15px !important;
+	}
+	@media (min-width: 992px) {
+		.driver-chat-section .container-fluid {
+			padding-left: 30px !important;
+			padding-right: 30px !important;
+		}
+	}
+	@media (min-width: 1200px) {
+		.driver-chat-section .container-fluid {
+			padding-left: 50px !important;
+			padding-right: 50px !important;
+		}
+	}
 	.driver-chat-section .section-title { max-width: 860px; margin: 0 auto; }
 
 	.driver-chat-wrap { width: 100%; margin: 0 auto; }
 
 	@media (max-width: 767px) {
-		.driver-chat-section { padding: 60px 0; }
+		.driver-chat-section {
+			padding: 60px 0;
+			margin-top: 60px !important;
+		}
 	}
 </style>

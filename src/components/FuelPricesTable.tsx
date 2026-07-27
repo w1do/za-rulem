@@ -7,7 +7,7 @@ interface PriceRow {
 	diesel: string;
 }
 
-const FUEL_PRICES: PriceRow[] = [
+const DEFAULT_FUEL_PRICES: PriceRow[] = [
 	{ brand: 'Газпромнефть', ai92: '70.80 ₽', ai95: '78.20 ₽', diesel: '80.90 ₽' },
 	{ brand: 'Лукойл', ai92: '72.50 ₽', ai95: '79.90 ₽', diesel: '82.10 ₽' },
 	{ brand: 'Роснефть', ai92: '70.50 ₽', ai95: '77.50 ₽', diesel: '80.60 ₽' },
@@ -16,7 +16,11 @@ const FUEL_PRICES: PriceRow[] = [
 	{ brand: 'Сургутнефтегаз', ai92: '70.20 ₽', ai95: '77.90 ₽', diesel: '80.40 ₽' },
 ];
 
-export default function FuelPricesTable() {
+interface FuelPricesTableProps {
+	prices?: PriceRow[];
+}
+
+export default function FuelPricesTable({ prices = DEFAULT_FUEL_PRICES }: FuelPricesTableProps) {
 	return (
 		<div className="fuel-prices-table-wrapper wow fadeInUp">
 			<div className="table-responsive">
@@ -30,7 +34,7 @@ export default function FuelPricesTable() {
 						</tr>
 					</thead>
 					<tbody>
-						{FUEL_PRICES.map((row, index) => (
+						{prices.map((row, index) => (
 							<tr key={index}>
 								<td><strong>{row.brand}</strong></td>
 								<td>{row.ai92}</td>

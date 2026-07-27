@@ -12,10 +12,15 @@ interface Props {
 const { variant = 'section' } = Astro.props;
 ---
 
-<DriverChat client:load variant={variant} />
+<div class:list={["dc-container", { 'dc-container--section': variant === 'section', 'dc-container--app': variant === 'app' }]}>
+	<DriverChat client:load variant={variant} />
+</div>
 
 <style is:global>
 	/* ==== Чат водителей: общий блок для встраивания и PWA ==== */
+	.dc-container--section { min-height: 560px; }
+	.dc-container--app { height: 100%; min-height: 0; }
+
 	.dc {
 		display: grid;
 		grid-template-columns: 300px 1fr;

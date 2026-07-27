@@ -12,6 +12,9 @@ export default defineConfig({
   site: 'https://za-rulem.org',
   trailingSlash: 'never',
   vite: {
+    resolve: {
+      dedupe: ['react', 'react-dom'],
+    },
     server: {
       watch: {
         usePolling: true,

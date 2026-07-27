@@ -3,51 +3,183 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/shared/header/Header.astro';
 import Footer from '../components/shared/footer/Footer.astro';
 import PageHeader from '../components/shared/PageHeader.astro';
+import Alert from '../components/shared/Alert.astro';
+import GasPricesIntro from '../components/gas-prices/GasPricesIntro.astro';
+import GasPricesMapSection from '../components/gas-prices/GasPricesMapSection.astro';
+import FuelPricesTable from '../components/FuelPricesTable';
 import DriverChatLanding from '../components/driver-chat/DriverChatLanding.astro';
 import ChatAbout from '../components/driver-chat/ChatAbout.astro';
-import Alert from '../components/shared/Alert.astro';
+import QueueDriversPreview from '../components/queues/QueueDriversPreview.astro';
 import HubFaqs from '../components/hub/HubFaqs.astro';
 import HubProcess from '../components/hub/HubProcess.astro';
 import HubCta from '../components/hub/HubCta.astro';
-import { breadcrumbNode, faqNode, webPageNode } from '../lib/seo';
+import { gasStationLabels, queueDrivers } from '../data/queueDrivers';
+import { webPageNode, breadcrumbNode, faqNode } from '../lib/seo';
 
-const title = 'Чат водителей Тюмени: где сейчас есть топливо';
-const description = 'Живой чат водителей Тюмени: где сейчас есть бензин и дизель и какие очереди на АЗС. Заходи по номеру без пароля, спрашивай обстановку и подсказывай другим.';
+// SEO Data
+const title = 'Чат водителей Тюмени: цены на бензин сегодня, очереди и наличие топлива на АЗС';
+const h1 = 'Чат водителей Тюмени: АЗС, цены на бензин и очереди';
+const description = 'Актуальные цены на бензин АИ-95, АИ-92 и дизель в Тюмени сегодня. Живой чат водителей: где сейчас есть топливо и какие очереди на АЗС. Смотрите карту заправок в реальном времени.';
 const url = '/chat-voditeley';
+const keywords = 'чат азс тюмень, цены на бензин тюмень сегодня, где бензин тюмень, очереди на заправках тюмень, заправки тюмень наличие топлива, чат водителей тюмень';
+
+// Load Gas Data
+let stations = [];
+let fuelPrices = [];
+
+try {
+  const response = await fetch('https://benzin.api.2gis.ru/api/v1/stations?minLat=57.0&maxLat=57.3&minLon=65.2&maxLon=65.9');
+  if (response.ok) {
+    stations = await response.json();
+  }
+
+  // Group by brand and calculate average prices for the table
+  const brandPrices = {};
+  stations.forEach(item => {
+    const station = item.station;
+    if (!station) return;
+    const brand = station.brand || station.name.split(' ')[0];
+    if (!brandPrices[brand]) {
+      brandPrices[brand] = { ai92: [], ai95: [], dt: [] };
+    }
+    item.prices?.forEach(p => {
+        if (p.fuel_type === 'AI_92') brandPrices[brand].ai92.push(p.price);
+        if (p.fuel_type === 'AI_95') brandPrices[brand].ai95.push(p.price);
+        if (p.fuel_type === 'DT') brandPrices[brand].dt.push(p.price);
+    });
+  });
+
+  fuelPrices = Object.keys(brandPrices).map(brand => {
+    const avg = (arr) => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2) + ' ₽' : '-';
+    return {
+      brand,
+      ai92: avg(brandPrices[brand].ai92),
+      ai95: avg(brandPrices[brand].ai95),
+      diesel: avg(brandPrices[brand].dt)
+    };
+  }).filter(p => p.ai92 !== '-' || p.ai95 !== '-' || p.diesel !== '-').slice(0, 8);
+
+} catch (error) {
+  console.error('Error loading live gas data:', error);
+  // Fallback prices if fetch fails
+  fuelPrices = [
+    { brand: 'Газпромнефть', ai92: '63.60 ₽', ai95: '69.05 ₽', diesel: '80.80 ₽' },
+    { brand: 'Лукойл', ai92: '65.20 ₽', ai95: '71.40 ₽', diesel: '81.90 ₽' },
+    { brand: 'Роснефть', ai92: '63.50 ₽', ai95: '68.90 ₽', diesel: '80.50 ₽' },
+  ];
+}
+
 const faqs = [
-	{ question: 'Для кого этот чат?', answer: 'Для водителей Тюмени, которые ищут, где сейчас можно заправиться. Здесь подсказывают друг другу, на каких АЗС есть АИ-92, АИ-95 и дизель и где меньше очередь.' },
-	{ question: 'Нужна ли регистрация?', answer: 'Нет. Для входа нужен только номер телефона. Пароль, код из SMS и отдельный профиль не требуются, а номер хранится на твоём устройстве.' },
-	{ question: 'Как быстрее получить ответ?', answer: 'Пиши конкретно: район, название АЗС и нужную марку топлива. Выбери подходящий канал — АИ-92, АИ-95, дизель или очереди — так тебя быстрее увидят те, кто рядом.' },
-	{ question: 'Насколько актуальны сообщения?', answer: 'Рядом с сообщением видно время. Обстановку лучше уточнять повторно: наличие топлива и очереди на АЗС меняются быстро.' },
-	{ question: 'Можно ли открыть чат как приложение?', answer: 'Да. Открой страницу чата и добавь её на главный экран телефона — она работает как отдельное приложение и открывается сразу в чате.' },
-	{ question: 'Что делать, если топливо закончилось в дороге?', answer: 'Если машина уже остановилась, перейди на страницу подвоза топлива и оставь заявку — привезу бензин или дизель к месту остановки.' },
+  { 
+    question: 'Где в Тюмени сейчас есть бензин АИ-95?', 
+    answer: 'Наличие топлива АИ-95 меняется динамически. Самую актуальную информацию можно узнать в нашем чате водителей, где участники в реальном времени пишут о наличии бензина на конкретных станциях Газпромнефть, Лукойл и Роснефть.' 
+  },
+  { 
+    question: 'Как узнать цены на бензин в Тюмени сегодня?', 
+    answer: 'Мы ежедневно обновляем таблицу цен на этой странице. Также вы можете посмотреть интерактивную карту АЗС выше, где указана стоимость АИ-92, АИ-95 и ДТ для каждой заправки.' 
+  },
+  { 
+    question: 'На каких АЗС в Тюмени сейчас самые большие очереди?', 
+    answer: 'Обычно очереди скапливаются на популярных станциях в часы пик или при сообщениях о перебоях с топливом. В канале "Очереди" нашего чата водители делятся сообщениями с места событий.' 
+  },
+  { 
+    question: 'Нужно ли платить за доступ к чату?', 
+    answer: 'Нет, чат полностью бесплатный и открыт для всех водителей Тюмени. Для входа достаточно указать номер телефона для идентификации.' 
+  }
 ];
+
 const jsonLd = [
 	webPageNode({ name: title, description, url }),
 	breadcrumbNode([{ name: 'Главная', url: '/' }, { name: 'Чат водителей', url }]),
 	faqNode(faqs, url),
 ];
+
+const availableQueueDrivers = queueDrivers.filter((driver) => driver.status === 'free').slice(0, 6);
+const queueGasStations = Object.values(gasStationLabels);
 ---
 
-<Layout title={title} description={description} keywords="чат водителей, доставка тюмень, ищу клиентов на доставку, развоз бензина, подвоз топлива, чат водителей тюмень" jsonLd={jsonLd}>
+<Layout title={title} description={description} keywords={keywords} jsonLd={jsonLd}>
 	<Header />
 	<main>
-		<PageHeader title="Чат водителей: где сейчас есть топливо" items={[{ label: 'Главная', href: '/' }, { label: 'Чат водителей' }]} />
-
-		<Alert class="mt-5 mb-5"/>
-		<DriverChatLanding />
-		<ChatAbout />
-		<HubProcess
-			subtitle="Как это работает"
-			title="Узнай, где есть топливо, за три шага"
-			steps={[
-				{ title: 'Укажи номер', description: 'Вхожу без пароля и кода из SMS — сразу попадаю в общий чат.' },
-				{ title: 'Выбери канал', description: 'Открываю нужный канал: АИ-92, АИ-95, дизель или очереди на АЗС.' },
-				{ title: 'Спроси и подскажи', description: 'Пишу район и марку топлива — и вижу, где сейчас можно заправиться.' },
+		<PageHeader title={h1} items={[{ label: 'Главная', href: '/' }, { label: 'Чат водителей' }]} />
+		
+		<GasPricesIntro
+			subtitle="Мониторинг АЗС Тюмень"
+			title="Узнайте, где есть бензин и нет очередей"
+			description="Я помогаю водителям Тюмени экономить время и деньги. Здесь собраны актуальные цены на всех заправках города, живой чат для обмена информацией о наличии топлива и сервис заказа очереди. Больше не нужно гадать — смотрите ситуацию на АЗС онлайн."
+			image="/images/blog/azs.jpg"
+			imageAlt="Цены на бензин и чат АЗС Тюмень"
+			badgeText="Обновлено сегодня"
+			features={[
+				{ icon: '/images/icon-about-body-item-1.svg', iconAlt: 'Цены на бензин', title: 'Актуальные цены', text: 'Сравнивайте стоимость АИ-92, АИ-95 и дизеля на всех сетях АЗС города.' },
+				{ icon: '/images/icon-about-body-item-2.svg', iconAlt: 'Чат водителей', title: 'Живой чат АЗС', text: 'Узнавайте от других водителей, где сейчас есть бензин и какие очереди.' },
 			]}
 		/>
-		<HubFaqs subtitle="Коротко о чате" title="Частые вопросы о чате водителей" description="Я собрал ответы о входе, каналах топлива и о том, как быстрее узнать, где сейчас есть бензин или дизель." faqs={faqs} benefits={['Вход только по номеру телефона', 'Каналы по маркам топлива и очередям', 'Можно установить как приложение']} buttonLabel="Открыть чат-приложение" buttonHref="/chat" />
-		<HubCta subtitle="Хочешь всегда быть на связи?" title="Установи чат как приложение на свой телефон" description="Чат будет доступен в один клик с главного экрана — без поиска в браузере и лишних ссылок." btnText="Открыть приложение" btnHref="/chat" contactTitle="Помощь на дороге" contactText="Подвоз топлива" contactLinkText="Заказать подвоз" contactLinkHref="/services/toplivo/podvoz-benzina" features={['Работает как PWA', 'Мгновенный доступ к чату']} class="mb-5" />
+
+		<Alert />
+
+		<DriverChatLanding />
+
+		<section class="fuel-prices-section py-5">
+			<div class="container">
+				<div class="section-title text-center mb-5">
+					<span class="section-sub-title">Сводка по городу</span>
+					<h2>Цены на бензин в Тюмени сегодня</h2>
+					<p>Средние цены на популярных сетях АЗС. Точные данные смотрите на карте ниже или уточняйте в чате.</p>
+				</div>
+				<FuelPricesTable prices={fuelPrices} client:load />
+			</div>
+		</section>
+
+		<GasPricesMapSection stations={stations} />
+
+		<ChatAbout />
+
+		<QueueDriversPreview drivers={availableQueueDrivers} stations={queueGasStations} />
+
+		<HubProcess
+			subtitle="Как пользоваться"
+			title="Три шага к быстрой заправке"
+			steps={[
+				{ title: 'Посмотрите цены', description: 'Сравните стоимость топлива на карте и выберите выгодный вариант.' },
+				{ title: 'Зайдите в чат', description: 'Спросите в чате, есть ли нужная марка топлива и нет ли очереди.' },
+				{ title: 'Заправьтесь без проблем', description: 'Езжайте на выбранную станцию или попросите водителя занять вам очередь.' },
+			]}
+		/>
+
+		<HubFaqs 
+      subtitle="Вопросы и ответы" 
+      title="Популярные вопросы про чат и АЗС Тюмени" 
+      description="Собрал ответы на главные вопросы водителей о поиске бензина, ценах и работе нашего сообщества." 
+      faqs={faqs} 
+      benefits={['Только свежие данные', 'Бесплатный вход в чат', 'Карта всех заправок']} 
+      buttonLabel="Открыть чат АЗС" 
+      buttonHref="/chat" 
+    />
+
+		<HubCta 
+      subtitle="Нужна помощь?" 
+      title="Закончился бензин в дороге?" 
+      description="Если вы не дотянули до заправки, я привезу топливо прямо к вашей машине. Выезжаю круглосуточно по Тюмени и району." 
+      btnText="Заказать подвоз топлива" 
+      btnHref="/services/toplivo/podvoz-benzina" 
+      contactTitle="Срочный выезд" 
+      contactText="Подвезу АИ-95, АИ-92 или ДТ за 20 минут." 
+      contactLinkText="+7 (900) 000-00-00" 
+      contactLinkHref="tel:+79000000000" 
+      features={['Круглосуточно 24/7', 'Любой район Тюмени']} 
+    />
 	</main>
 	<Footer />
 </Layout>
+
+<style>
+	.fuel-prices-section {
+		background-color: var(--white-color);
+	}
+	@media (max-width: 767px) {
+		.fuel-prices-section {
+			padding: 40px 0 !important;
+		}
+	}
+</style>

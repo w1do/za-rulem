@@ -8,9 +8,9 @@ interface Props {
 const { stations } = Astro.props;
 ---
 
-<div class="container">
-	<div class="gas-map-section bg-section">
-		<div class="gas-map-card">
+<div class="gas-map-section">
+	<div class="container">
+		<div class="gas-map-card wow fadeInUp">
 			<GasMap client:only="react" stations={stations} />
 		</div>
 	</div>
@@ -19,9 +19,7 @@ const { stations } = Astro.props;
 <style>
 	.gas-map-section {
 		width: 100%;
-		max-width: none;
-		margin: 3rem auto;
-		border-radius: 0;
+		padding: 80px 0 120px;
 	}
 
 	.gas-map-card {
@@ -30,18 +28,18 @@ const { stations } = Astro.props;
 		margin-left: auto;
 		overflow: hidden;
 		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+		border-radius: 20px;
 	}
 
 	@media (max-width: 767px) {
 		.gas-map-section {
-			margin-top: 24px;
-			margin-bottom: 50px;
+			padding: 40px 0 60px;
 		}
 
 		.gas-map-card {
 			border-right: 0;
 			border-left: 0;
-			border-radius: 0;
+			border-radius: 12px;
 			box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
 		}
 	}
