@@ -1,0 +1,221 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../shared/header/Header.astro';
+import Footer from '../shared/footer/Footer.astro';
+import PageHeader from '../shared/PageHeader.astro';
+import GasPricesIntro from '../gas-prices/GasPricesIntro.astro';
+import HubProcess from '../hub/HubProcess.astro';
+import HubFaqs from '../hub/HubFaqs.astro';
+import HubCta from '../hub/HubCta.astro';
+import ChatOtherLocations from './ChatOtherLocations.astro';
+import { webPageNode, breadcrumbNode, faqNode } from '../../lib/seo';
+import type { ChatCity } from '../../data/chatCluster';
+import { chatAppUrl, fuelLandingUrl, cityLandingUrl, chatCities, chatFuels } from '../../data/chatCluster';
+
+interface Props {
+	city: ChatCity;
+}
+
+const { city } = Astro.props;
+
+// SEO
+const title = `Чат водителей ${city.name}: где есть топливо и очереди на АЗС`;
+const h1 = `Чат водителей ${city.name}: обстановка на АЗС, цены и очереди`;
+const description = `Живой чат водителей ${city.ofCity}: узнайте, на каких АЗС сейчас есть бензин и дизель. Актуальные цены, очереди на заправках и взаимопомощь на дорогах ${city.ofCity}.`;
+const url = cityLandingUrl(city.slug);
+
+const faqs = [
+	{
+		question: `Как узнать, на каких АЗС ${city.inCity} есть бензин?`,
+		answer: `Я рекомендую наш чат водителей ${city.ofCity}. В нем участники оперативно делятся информацией о наличии АИ-92, АИ-95 и ДТ на конкретных заправках города и трасс.`,
+	},
+	{
+		question: `Где посмотреть цены на топливо ${city.inCity} сегодня?`,
+		answer: `Самые свежие данные — в чате. Водители выкладывают фото ценников с АЗС Газпромнефть, Лукойл и других сетей ${city.ofCity}, чтобы вы могли выбрать выгодную заправку.`,
+	},
+	{
+		question: `Есть ли сейчас очереди на заправках ${city.inCity}?`,
+		answer: `Ситуация меняется быстро. В чате водители пишут о скоплениях машин в реальном времени, помогая друг другу избегать пробок на АЗС ${city.ofCity}.`,
+	},
+	{
+		question: `Для кого создан этот чат ${city.inCity}?`,
+		answer: `Я создал этот чат для всех водителей ${city.ofCity}, кому важно знать реальную обстановку на дорогах и АЗС. Это бесплатное сообщество для взаимовыручки и обмена информацией.`,
+	},
+];
+
+const jsonLd = [
+	webPageNode({ name: title, description, url }),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Чат водителей', url: '/chat-voditeley' },
+		{ name: city.name, url },
+	]),
+	faqNode(faqs),
+];
+
+const otherCities = chatCities.filter((c) => c.slug !== city.slug);
+
+const breadcrumbItems = [
+	{ label: 'Главная', href: '/' },
+	{ label: 'Чат водителей', href: '/chat-voditeley' },
+	{ label: city.name },
+];
+---
+
+<Layout title={title} description={description} jsonLd={jsonLd}>
+	<Header />
+	<main>
+		<PageHeader title={h1} items={breadcrumbItems} />
+
+		<GasPricesIntro
+			subtitle={`Чат водителей ${city.name}`}
+			title={`Узнайте обстановку на АЗС ${city.ofCity}`}
+			description={`Я объединил водителей ${city.ofCity} в один чат, чтобы каждый мог вовремя узнать, где есть нужная марка бензина или дизеля. Больше не нужно гадать — просто спросите у тех, кто уже на заправке. Взаимовыручка помогает нам всем экономить время.`}
+			image="/images/blog/azs.jpg"
+			imageAlt={`Чат водителей ${city.name}`}
+			badgeText="На связи 24/7"
+			features={[
+				{
+					icon: '/images/icon-about-body-item-1.svg',
+					iconAlt: 'Наличие топлива',
+					title: 'Где есть топливо',
+					text: `Оперативные сводки о наличии АИ-92, АИ-95 и ДТ на всех АЗС ${city.ofCity}.`,
+				},
+				{
+					icon: '/images/icon-about-body-item-2.svg',
+					iconAlt: 'Цены и очереди',
+					title: 'Цены и очереди',
+					text: `Узнавайте актуальную стоимость и длину очереди до того, как приедете на заправку.`,
+				},
+			]}
+		/>
+
+		<section class="fuel-cards-section py-5 bg-section">
+			<div class="container">
+				<div class="section-title text-center mb-5">
+					<span class="section-sub-title">Каналы по топливу</span>
+					<h2>Выбирайте нужный вид топлива</h2>
+					<p>В чате {city.ofCity} информация разделена по маркам, чтобы вам было удобнее искать.</p>
+				</div>
+				<div class="row">
+					{
+						chatFuels.map((fuel, index) => (
+							<div class="col-lg-3 col-md-6 mb-4">
+                                <div class="service-item wow fadeInUp" data-wow-delay={`${index * 0.1}s`}>
+                                    <div class="icon-box">
+                                        <i class={`fa-solid ${fuel.icon}`} />
+                                    </div>
+                                    <div class="service-item-body">
+                                        <div class="service-item-content">
+                                            <h3><a href={fuelLandingUrl(city.slug, fuel.slug)}>{fuel.name}</a></h3>
+                                            <p>Наличие и цены {city.inCity}</p>
+                                        </div>
+                                        <div class="service-item-btn mt-3">
+                                            <a href={fuelLandingUrl(city.slug, fuel.slug)} class="readmore-btn">Смотреть</a>
+                                        </div>
+                                    </div>
+                                </div>
+							</div>
+						))
+					}
+				</div>
+			</div>
+		</section>
+
+		<HubCta
+			subtitle="Присоединяйтесь"
+			title={`Войти в чат ${city.ofCity}`}
+			description={`Я приглашаю вас в сообщество водителей ${city.ofCity}. Делитесь информацией с дорог, спрашивайте совета и узнавайте про бензин первыми.`}
+			btnText="Открыть чат"
+			btnHref={chatAppUrl(city.slug)}
+			showContact={false}
+			features={[`Все районы ${city.ofCity}`, 'Живое общение', 'Бесплатно']}
+		/>
+
+		<HubProcess
+			subtitle="Ваши действия"
+			title="Четыре шага к быстрой заправке"
+			steps={[
+				{
+					title: 'Войдите в систему',
+					description: `Достаточно подтвердить номер телефона для доступа к чату ${city.ofCity}.`,
+				},
+				{
+					title: 'Выберите канал',
+					description: `Зайдите в канал нужного вам топлива (АИ-95, АИ-92 или ДТ).`,
+				},
+				{
+					title: 'Уточните ситуацию',
+					description: `Читайте ленту или спросите про очереди у других водителей.`,
+				},
+				{
+					title: 'Заправляйтесь',
+					description: `Езжайте на выбранную АЗС, будучи уверенным в наличии топлива.`,
+				},
+			]}
+		/>
+
+		<HubFaqs
+			subtitle="FAQ"
+			title={`Вопросы о чате ${city.inCity}`}
+			description={`Я ответил на основные вопросы, чтобы вам было проще начать пользоваться нашим сервисом взаимопомощи ${city.inCity}.`}
+			faqs={faqs}
+			benefits={['Только реальные люди', 'Без рекламы и спама', 'Круглосуточный доступ']}
+			buttonLabel="Зайти в чат"
+			buttonHref={chatAppUrl(city.slug)}
+		/>
+
+		<ChatOtherLocations currentCitySlug={city.slug} />
+
+		<section class="py-5">
+			<div class="container">
+				<div class="row">
+					<div class="col-12 text-center">
+						<a href="/chat-voditeley" class="btn-default btn-highlighted">Все города и чаты</a>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>
+
+<style>
+    .service-item-content h3 {
+        font-size: 22px;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    .service-item-content h3 a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    .service-item-content h3 a:hover {
+        color: var(--accent-color);
+    }
+    .readmore-btn {
+        display: inline-flex;
+        align-items: center;
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .readmore-btn::after {
+        content: "\f178";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-left: 8px;
+        transition: all 0.3s;
+    }
+    .readmore-btn:hover::after {
+        margin-left: 12px;
+    }
+    .service-item .icon-box i {
+        font-size: 24px;
+        color: var(--primary-color);
+    }
+</style>

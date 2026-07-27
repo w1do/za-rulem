@@ -1,0 +1,227 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../shared/header/Header.astro';
+import Footer from '../shared/footer/Footer.astro';
+import PageHeader from '../shared/PageHeader.astro';
+import GasPricesIntro from '../gas-prices/GasPricesIntro.astro';
+import HubProcess from '../hub/HubProcess.astro';
+import HubFaqs from '../hub/HubFaqs.astro';
+import HubCta from '../hub/HubCta.astro';
+import ChatOtherLocations from './ChatOtherLocations.astro';
+import { webPageNode, breadcrumbNode, faqNode } from '../../lib/seo';
+import type { ChatCity, ChatFuel } from '../../data/chatCluster';
+import { chatAppUrl, fuelLandingUrl, cityLandingUrl, chatCities, chatFuels, DEFAULT_CITY_SLUG } from '../../data/chatCluster';
+
+interface Props {
+	city: ChatCity;
+	fuel: ChatFuel;
+}
+
+const { city, fuel } = Astro.props;
+
+// SEO
+const isDefaultCity = city.slug === DEFAULT_CITY_SLUG;
+const title = `Чат водителей: где есть ${fuel.name} ${city.inCity} сейчас`;
+const h1 = `Чат водителей ${city.ofCity}: наличие ${fuel.name} на АЗС и очереди`;
+const description = `Узнайте, на каких АЗС ${city.inCity} сейчас есть ${fuel.name}. Живой чат водителей: актуальные цены, очереди на заправках и наличие топлива в реальном времени.`;
+const url = fuelLandingUrl(city.slug, fuel.slug);
+
+const faqs = [
+	{
+		question: `Где ${city.inCity} сейчас точно есть ${fuel.name}?`,
+		answer: `Я советую заглянуть в наш чат водителей. Участники в реальном времени пишут, на каких именно АЗС ${city.inCity} появился ${fuel.name} и где он закончился. Это быстрее, чем объезжать все заправки самому.`,
+	},
+	{
+		question: `Какая цена на ${fuel.name} ${city.inCity} сегодня?`,
+		answer: `Цены меняются каждый день. В чате я и другие водители делимся фото стел АЗС и чеков, чтобы вы знали актуальную стоимость ${fuel.name} до того, как вставите пистолет в бак.`,
+	},
+	{
+		question: `Как узнать про очереди за ${fuel.name} на заправках?`,
+		answer: `В чате есть отдельный канал для сообщений об очередях. Если кто-то из водителей ${city.ofCity} уже стоит на АЗС, он обязательно напишет, сколько машин перед ним и как быстро движется поток.`,
+	},
+	{
+		question: `Нужна ли регистрация, чтобы спросить про ${fuel.name}?`,
+		answer: `Нет, я сделал вход максимально простым. Вам нужно только подтвердить свой номер телефона, и вы сразу сможете спросить у водителей ${city.ofCity} про наличие ${fuel.name} на любой заправке.`,
+	},
+];
+
+const jsonLd = [
+	webPageNode({ name: title, description, url }),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Чат водителей', url: '/chat-voditeley' },
+		...(isDefaultCity ? [] : [{ name: city.name, url: cityLandingUrl(city.slug) }]),
+		{ name: fuel.name, url },
+	]),
+	faqNode(faqs),
+];
+
+const otherFuels = chatFuels.filter((f) => f.slug !== fuel.slug);
+const otherCities = chatCities.filter((c) => c.slug !== city.slug);
+
+const breadcrumbItems = [
+	{ label: 'Главная', href: '/' },
+	{ label: 'Чат водителей', href: '/chat-voditeley' },
+];
+if (!isDefaultCity) {
+	breadcrumbItems.push({ label: city.name, href: cityLandingUrl(city.slug) });
+}
+breadcrumbItems.push({ label: fuel.name });
+---
+
+<Layout title={title} description={description} jsonLd={jsonLd}>
+	<Header />
+	<main>
+		<PageHeader title={h1} items={breadcrumbItems} />
+
+		<GasPricesIntro
+			subtitle={`Мониторинг ${fuel.name} ${city.name}`}
+			title={`Узнайте, где есть ${fuel.name} и нет очередей`}
+			description={`Я помогаю водителям ${city.ofCity} не тратить время на пустые поездки по заправкам. В моем чате всегда можно спросить, где сейчас в наличии ${fuel.name} и насколько большая очередь на АЗС. Все сообщения — от реальных людей, которые прямо сейчас находятся на дороге.`}
+			image="/images/blog/azs.jpg"
+			imageAlt={`Наличие ${fuel.name} ${city.inCity}`}
+			badgeText="Обновлено сейчас"
+			features={[
+				{
+					icon: '/images/icon-about-body-item-1.svg',
+					iconAlt: fuel.name,
+					title: `Наличие ${fuel.name}`,
+					text: `Пишу сам и читаю других: где ${city.inCity} сейчас точно можно заправиться.`,
+				},
+				{
+					icon: '/images/icon-about-body-item-2.svg',
+					iconAlt: 'Очереди на АЗС',
+					title: 'Очереди на заправках',
+					text: `Узнаю заранее, сколько времени придется провести в очереди за ${fuel.name}.`,
+				},
+			]}
+		/>
+
+		<HubCta
+			subtitle="Живое общение"
+			title={`Зайти в чат водителей ${city.ofCity}`}
+			description={`Присоединяйтесь к сообществу, чтобы всегда знать обстановку на АЗС. Спрашивайте про ${fuel.name}, делитесь ценами и помогайте другим водителям.`}
+			btnText="Открыть чат"
+			btnHref={chatAppUrl(city.slug, fuel.slug)}
+			showContact={false}
+			features={[`Актуально ${city.inCity}`, 'Бесплатный вход', 'Только реальные водители']}
+		/>
+
+		<HubProcess
+			subtitle="Как это работает"
+			title="Четыре шага к быстрой заправке"
+			steps={[
+				{
+					title: 'Зайдите в чат',
+					description: `Выберите канал ${fuel.name} в списке чатов ${city.ofCity}.`,
+				},
+				{
+					title: 'Спросите или читайте',
+					description: `Посмотрите последние сообщения от водителей или задайте свой вопрос.`,
+				},
+				{
+					title: 'Езжайте на АЗС',
+					description: `Получив подтверждение наличия ${fuel.name}, отправляйтесь на заправку.`,
+				},
+				{
+					title: 'Включите пуши',
+					description: 'Разрешите уведомления, чтобы мгновенно узнавать о новом топливе.',
+				},
+			]}
+		/>
+
+		<HubFaqs
+			subtitle="Вопросы и ответы"
+			title={`Часто спрашивают про ${fuel.name} ${city.inCity}`}
+			description={`Я собрал ответы на самые частые вопросы водителей ${city.ofCity} о том, как наш чат помогает находить топливо и экономить время.`}
+			faqs={faqs}
+			benefits={['Данные в реальном времени', 'Все сети АЗС города', 'Бесплатно и без паролей']}
+			buttonLabel="Перейти в чат"
+			buttonHref={chatAppUrl(city.slug, fuel.slug)}
+		/>
+
+		<section class="other-fuels-section py-5 bg-section">
+			<div class="container">
+				<div class="section-title text-center mb-5">
+					<span class="section-sub-title">Топливо {city.inCity}</span>
+					<h2>Другие виды топлива</h2>
+				</div>
+				<div class="row">
+					{
+						otherFuels.map((f, index) => (
+							<div class="col-lg-4 col-md-6 mb-4">
+                                <div class="service-item wow fadeInUp" data-wow-delay={`${index * 0.1}s`}>
+                                    <div class="icon-box">
+                                        <i class={`fa-solid ${f.icon}`} />
+                                    </div>
+                                    <div class="service-item-body">
+                                        <div class="service-item-content">
+                                            <h3><a href={fuelLandingUrl(city.slug, f.slug)}>{f.name}</a></h3>
+                                            <p>{f.title} {city.inCity}</p>
+                                        </div>
+                                        <div class="service-item-btn mt-3">
+                                            <a href={fuelLandingUrl(city.slug, f.slug)} class="readmore-btn">Смотреть</a>
+                                        </div>
+                                    </div>
+                                </div>
+							</div>
+						))
+					}
+				</div>
+			</div>
+		</section>
+
+		<ChatOtherLocations currentCitySlug={city.slug} currentFuelSlug={fuel.slug} />
+
+		<section class="py-5">
+			<div class="container">
+				<div class="row">
+					<div class="col-12 text-center">
+						<a href="/chat-voditeley" class="btn-default btn-highlighted">Все города и чаты</a>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>
+
+<style>
+    .service-item-content h3 {
+        font-size: 22px;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    .service-item-content h3 a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    .service-item-content h3 a:hover {
+        color: var(--accent-color);
+    }
+    .readmore-btn {
+        display: inline-flex;
+        align-items: center;
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .readmore-btn::after {
+        content: "\f178";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-left: 8px;
+        transition: all 0.3s;
+    }
+    .readmore-btn:hover::after {
+        margin-left: 12px;
+    }
+    .service-item .icon-box i {
+        font-size: 24px;
+        color: var(--primary-color);
+    }
+</style>

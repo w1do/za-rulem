@@ -2,9 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { directus } from '../../lib/directus';
 import { createItem, readItems } from '@directus/sdk';
 
+import { chatCities, DEFAULT_CITY_SLUG } from '../../data/chatCluster';
+
 // ==== Types & Logic ====
 
-export type ChatTopic = 'general' | 'ai95' | 'ai92' | 'dt' | 'queue';
+export type ChatTopic = 'general' | 'ai95' | 'ai92' | 'dt' | 'queue' | 'ai100';
 
 export interface ChatMessage {
 	id: string;
@@ -19,6 +21,7 @@ interface DirectusMessage {
 	text: string;
 	phone: string;
 	topic: string;
+	city: string;
 	sessionId: string;
 	author_type: 'me' | 'driver' | 'system';
 	date_created: string;
@@ -34,7 +37,7 @@ const welcomeMessage: ChatMessage = {
 };
 
 const isTopic = (value: unknown): value is ChatTopic =>
-	value === 'general' || value === 'ai95' || value === 'ai92' || value === 'dt' || value === 'queue';
+	value === 'general' || value === 'ai95' || value === 'ai92' || value === 'dt' || value === 'queue' || value === 'ai100';
 
 const createId = () => {
 	try {
@@ -74,6 +77,7 @@ export function useDriverChat() {
 	const [phone, setPhone] = useState('');
 	const [sessionId] = useState(() => createId());
 	const [topic, setTopic] = useState<ChatTopic>('general');
+	const [city, setCity] = useState<string>(DEFAULT_CITY_SLUG);
 	const [isJoined, setIsJoined] = useState(false);
 	const [messages, setMessages] = useState<ChatMessage[]>([welcomeMessage]);
 	const [error, setError] = useState('');
@@ -82,21 +86,26 @@ export function useDriverChat() {
 	phoneRef.current = phone;
 	const topicRef = useRef(topic);
 	topicRef.current = topic;
+	const cityRef = useRef(city);
+	cityRef.current = city;
 
 	// Загрузка истории через REST
-	const fetchHistory = useCallback(async (currentTopic: ChatTopic) => {
+	const fetchHistory = useCallback(async (currentTopic: ChatTopic, currentCity: string) => {
 		try {
 			const items = (await directus.request(
 				readItems('driver_chat_messages', {
-					filter: { topic: { _eq: currentTopic } },
+					filter: {
+						topic: { _eq: currentTopic },
+						city: { _eq: currentCity },
+					},
 					sort: ['date_created'],
 					limit: 50,
 				})
 			)) as unknown as DirectusMessage[];
 
-			// Пока запрос выполнялся, пользователь мог переключить канал —
+			// Пока запрос выполнялся, пользователь мог переключить канал или город —
 			// в этом случае ответ уже неактуален.
-			if (topicRef.current !== currentTopic) return;
+			if (topicRef.current !== currentTopic || cityRef.current !== currentCity) return;
 
 			const history = Array.isArray(items)
 				? items.map(
@@ -158,11 +167,14 @@ export function useDriverChat() {
 				
 				if (!isActive) return;
 
-				console.log(`[Chat] Subscribing to: driver_chat_messages (topic: ${topic})`);
+				console.log(`[Chat] Subscribing to: driver_chat_messages (topic: ${topic}, city: ${city})`);
 				const { subscription, unsubscribe } = await directus.subscribe('driver_chat_messages', {
 					event: 'create',
 					query: {
-						filter: { topic: { _eq: topic } },
+						filter: {
+							topic: { _eq: topic },
+							city: { _eq: city },
+						},
 						fields: ['*'],
 					},
 				});
@@ -172,7 +184,7 @@ export function useDriverChat() {
 				stopSubscription = unsubscribe;
 				isRealtimeLive = true;
 				// Добираем сообщения, пропущенные до/во время установки соединения.
-				fetchHistory(topicRef.current);
+				fetchHistory(topicRef.current, cityRef.current);
 				
 				for await (const message of subscription) {
 					if (!isActive) break;
@@ -191,9 +203,11 @@ export function useDriverChat() {
 								continue;
 							}
 							
-							// Дополнительная проверка топика
-							if (msg.topic !== topic) {
-								console.log('[Chat] Wrong topic skipped:', msg.topic);
+							// Дополнительная проверка топика и города
+							// ( city может отсутствовать у старых сообщений — считаем их 'tyumen' )
+							const msgCity = msg.city || DEFAULT_CITY_SLUG;
+							if (msg.topic !== topic || msgCity !== city) {
+								console.log('[Chat] Wrong topic or city skipped:', msg.topic, msgCity);
 								continue;
 							}
 
@@ -233,13 +247,13 @@ export function useDriverChat() {
 		};
 
 		startRealtime();
-		fetchHistory(topic);
+		fetchHistory(topic, city);
 
 		// Резервный режим: пока realtime не работает (сокеты выключены на сервере,
 		// сеть, прокси), периодически подтягиваем историю, чтобы сообщения из других
 		// вкладок появлялись без перезагрузки страницы.
 		const pollTimer = setInterval(() => {
-			if (!isRealtimeLive) fetchHistory(topicRef.current);
+			if (!isRealtimeLive) fetchHistory(topicRef.current, cityRef.current);
 		}, 7000);
 
 		return () => {
@@ -254,27 +268,69 @@ export function useDriverChat() {
 				}
 			}
 		};
-	}, [isJoined, sessionId, fetchHistory, topic]);
+	}, [isJoined, sessionId, fetchHistory, topic, city]);
 
 	useEffect(() => {
+		let initialPhone = '';
+		let initialTopic: ChatTopic = 'general';
+		let initialCity: string = DEFAULT_CITY_SLUG;
+		let hasUrlParams = false;
+
+		// 1. Читаем localStorage
 		const saved = window.localStorage.getItem(STORAGE_KEY);
-		if (!saved) return;
-		try {
-			const data = JSON.parse(saved);
-			if (data.phone) {
-				setPhone(data.phone);
-				if (isTopic(data.topic)) setTopic(data.topic);
-				setIsJoined(true);
+		if (saved) {
+			try {
+				const data = JSON.parse(saved);
+				if (data.phone) initialPhone = data.phone;
+				if (isTopic(data.topic)) initialTopic = data.topic;
+				if (data.city && chatCities.some(c => c.slug === data.city)) {
+					initialCity = data.city;
+				}
+			} catch {
+				window.localStorage.removeItem(STORAGE_KEY);
 			}
-		} catch {
-			window.localStorage.removeItem(STORAGE_KEY);
+		}
+
+		// 2. Читаем URL (имеет приоритет)
+		if (typeof window !== 'undefined') {
+			const params = new URLSearchParams(window.location.search);
+			const urlTopic = params.get('topic');
+			const urlCity = params.get('city');
+
+			if (isTopic(urlTopic)) {
+				initialTopic = urlTopic;
+				hasUrlParams = true;
+			}
+			if (urlCity && chatCities.some(c => c.slug === urlCity)) {
+				initialCity = urlCity;
+				hasUrlParams = true;
+			}
+		}
+
+		// Применяем
+		if (initialPhone) {
+			setPhone(initialPhone);
+			phoneRef.current = initialPhone;
+			setIsJoined(true);
+		}
+		setTopic(initialTopic);
+		topicRef.current = initialTopic;
+		setCity(initialCity);
+		cityRef.current = initialCity;
+
+		// 3. Запоминаем в localStorage, если был переход по ссылке с параметрами
+		if (hasUrlParams) {
+			window.localStorage.setItem(
+				STORAGE_KEY,
+				JSON.stringify({ phone: initialPhone, topic: initialTopic, city: initialCity }),
+			);
 		}
 	}, []);
 
-	const persist = (nextPhone: string, nextTopic: ChatTopic) => {
+	const persist = (nextPhone: string, nextTopic: ChatTopic, nextCity: string) => {
 		window.localStorage.setItem(
 			STORAGE_KEY,
-			JSON.stringify({ phone: nextPhone, topic: nextTopic }),
+			JSON.stringify({ phone: nextPhone, topic: nextTopic, city: nextCity }),
 		);
 	};
 
@@ -288,7 +344,7 @@ export function useDriverChat() {
 		setPhone(nextPhone);
 		setIsJoined(true);
 		setError('');
-		persist(nextPhone, topicRef.current);
+		persist(nextPhone, topicRef.current, cityRef.current);
 	};
 
 	const send = async (text: string) => {
@@ -312,6 +368,7 @@ export function useDriverChat() {
 					phone: phoneRef.current,
 					text: value,
 					topic: topicRef.current,
+					city: cityRef.current,
 					sessionId,
 					author_type: 'driver',
 				}),
@@ -342,13 +399,28 @@ export function useDriverChat() {
 		// Сбрасываем сообщения при смене канала, чтобы не видеть старые сообщения
 		setMessages([welcomeMessage]);
 		
-		if (isJoined && sessionId) persist(phoneRef.current, id);
+		if (isJoined && sessionId) persist(phoneRef.current, id, cityRef.current);
+	};
+
+	const pickCity = (id: string) => {
+		const validCity = chatCities.find(c => c.slug === id) ? id : DEFAULT_CITY_SLUG;
+		if (validCity === cityRef.current) return;
+
+		console.log(`[Chat] Switching city to: ${validCity}`);
+		cityRef.current = validCity;
+		setCity(validCity);
+		// Сбрасываем сообщения при смене города
+		setMessages([welcomeMessage]);
+
+		if (isJoined && sessionId) persist(phoneRef.current, topicRef.current, validCity);
 	};
 
 	return {
 		phone,
 		topic,
 		setTopic: pickChannel,
+		city,
+		setCity: pickCity,
 		isJoined,
 		messages,
 		error,

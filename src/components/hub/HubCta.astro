@@ -12,6 +12,7 @@ interface Props {
 	contactLinkHref?: string;
 	features?: string[];
 	class?: string;
+	showContact?: boolean;
 }
 
 const {
@@ -25,7 +26,8 @@ const {
 	contactLinkText = "Выезд по заявке",
 	contactLinkHref = "/contacts",
 	features = ["Выезжаю на место поломки", "Работаю круглосуточно, 24/7"],
-	class: className = ""
+	class: className = "",
+	showContact = true,
 } = Astro.props;
 ---
 
@@ -62,15 +64,28 @@ const {
 						<!-- CTA Button End -->
 
 						<!-- About Contact Box Start -->
-						<div class="about-contact-box">
-							<div class="icon-box">
-								<img src="/images/icon-phone-primary.svg" alt="Заявка" />
-							</div>
-							<div class="about-contact-box-content">
-								<p>{contactTitle}</p>
-								<h3><a href={contactLinkHref} class="btn-default" data-service-request data-service-title={contactLinkText}>{contactLinkText}</a></h3>
-							</div>
-						</div>
+						{
+							showContact && (
+								<div class="about-contact-box">
+									<div class="icon-box">
+										<img src="/images/icon-phone-primary.svg" alt="Заявка" />
+									</div>
+									<div class="about-contact-box-content">
+										<p>{contactTitle}</p>
+										<h3>
+											<a
+												href={contactLinkHref}
+												class="btn-default"
+												data-service-request
+												data-service-title={contactLinkText}
+											>
+												{contactLinkText}
+											</a>
+										</h3>
+									</div>
+								</div>
+							)
+						}
 						<!-- About Contact Box End -->
 					</div>
 					<!-- CTA Content Footer End -->

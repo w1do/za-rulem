@@ -1,0 +1,23 @@
+---
+import ChatFuelLanding from '../../../components/driver-chat/ChatFuelLanding.astro';
+import { chatCities, chatFuels, DEFAULT_CITY_SLUG } from '../../../data/chatCluster';
+
+export function getStaticPaths() {
+	const paths = [];
+	chatCities
+		.filter((city) => city.slug !== DEFAULT_CITY_SLUG)
+		.forEach((city) => {
+			chatFuels.forEach((fuel) => {
+				paths.push({
+					params: { city: city.slug, fuel: fuel.slug },
+					props: { city, fuel },
+				});
+			});
+		});
+	return paths;
+}
+
+const { city, fuel } = Astro.props;
+---
+
+<ChatFuelLanding city={city} fuel={fuel} />

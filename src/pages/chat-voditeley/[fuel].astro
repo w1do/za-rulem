@@ -1,0 +1,16 @@
+---
+import ChatFuelLanding from '../../components/driver-chat/ChatFuelLanding.astro';
+import { chatFuels, getCity, DEFAULT_CITY_SLUG } from '../../data/chatCluster';
+
+export function getStaticPaths() {
+	return chatFuels.map((fuel) => ({
+		params: { fuel: fuel.slug },
+		props: { fuel },
+	}));
+}
+
+const { fuel } = Astro.props;
+const city = getCity(DEFAULT_CITY_SLUG);
+---
+
+{city && <ChatFuelLanding city={city} fuel={fuel} />}

@@ -1,0 +1,17 @@
+---
+import ChatCityLanding from '../../../components/driver-chat/ChatCityLanding.astro';
+import { chatCities, DEFAULT_CITY_SLUG } from '../../../data/chatCluster';
+
+export function getStaticPaths() {
+	return chatCities
+		.filter((city) => city.slug !== DEFAULT_CITY_SLUG)
+		.map((city) => ({
+			params: { city: city.slug },
+			props: { city },
+		}));
+}
+
+const { city } = Astro.props;
+---
+
+<ChatCityLanding city={city} />

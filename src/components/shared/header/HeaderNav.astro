@@ -1,4 +1,6 @@
 ---
+import { chatCities, cityLandingUrl } from '../../../data/chatCluster';
+
 // Главное меню сайта. Пункты вынесены в массив для переиспользования и лёгкого расширения.
 const menu = [
 	{ label: 'Главная', href: '/' },
@@ -16,7 +18,14 @@ const menu = [
 	{ label: 'Водители', href: '/drivers' },
 	{ label: 'Отзывы', href: '/testimonials' },
 	{ label: 'Бензин', href: '/ceny-na-benzin' },
-	{ label: 'Чат', href: '/chat-voditeley' },
+	{
+		label: 'Чат',
+		href: '/chat-voditeley',
+		children: chatCities.map((city) => ({
+			label: city.name,
+			href: cityLandingUrl(city.slug),
+		})),
+	},
 	{ label: 'Контакты', href: '/contacts' },
 ];
 ---

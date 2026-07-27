@@ -1,0 +1,121 @@
+---
+import { chatCities, chatFuels, DEFAULT_CITY_SLUG, cityLandingUrl, fuelLandingUrl } from '../../data/chatCluster';
+
+const tyumenFuels = chatFuels.map(f => ({
+    name: f.name,
+    href: fuelLandingUrl(DEFAULT_CITY_SLUG, f.slug)
+}));
+---
+
+<section class="chat-cities-section py-5 bg-section">
+	<div class="container">
+		<div class="row section-row">
+			<div class="col-lg-12">
+				<div class="section-title section-title-center">
+					<span class="section-sub-title">Города чата</span>
+					<h2>Выберите свой город</h2>
+					<p>Я запустил локальные чаты в крупнейших городах региона. Выбирайте свой, чтобы видеть самую актуальную информацию о наличии топлива и очередях на АЗС рядом с вами.</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			{
+				chatCities.map((city, index) => (
+					<div class="col-xl-4 col-md-6 mb-4">
+						<div class="service-item wow fadeInUp" data-wow-delay={`${index * 0.1}s`}>
+							<div class="icon-box">
+								<img src="/images/icon-location-primary.svg" alt={city.name} />
+							</div>
+							<div class="service-item-body">
+								<div class="service-item-content">
+									<h3><a href={city.slug === DEFAULT_CITY_SLUG ? "#chat" : cityLandingUrl(city.slug)}>{city.name}</a></h3>
+									<p>{city.hint}</p>
+								</div>
+								
+								<div class="service-item-btn mt-3">
+									{city.slug === DEFAULT_CITY_SLUG ? (
+										<div class="tyumen-links">
+											<div class="mb-2">
+                                                <a href="#chat" class="readmore-btn">
+                                                    Открыть общий чат
+                                                </a>
+                                            </div>
+											<div class="fuel-links-grid">
+												{tyumenFuels.map(f => (
+													<a href={f.href} class="fuel-link-item">{f.name}</a>
+												))}
+											</div>
+										</div>
+									) : (
+										<a href={cityLandingUrl(city.slug)} class="readmore-btn">
+											Перейти в чат {city.ofCity}
+										</a>
+									)}
+								</div>
+							</div>
+						</div>
+					</div>
+				))
+			}
+		</div>
+	</div>
+</section>
+
+<style>
+    .service-item-content h3 {
+        font-size: 22px;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    .service-item-content h3 a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    .service-item-content h3 a:hover {
+        color: var(--accent-color);
+    }
+    .fuel-links-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .fuel-link-item {
+        display: block;
+        text-align: center;
+        padding: 6px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        font-size: 13px;
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: all 0.2s;
+        border: 1px solid #eee;
+    }
+    .fuel-link-item:hover {
+        background: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+    .readmore-btn {
+        display: inline-flex;
+        align-items: center;
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    /* В шаблоне readmore-btn обычно имеет стрелочку, добавлю её если её нет в CSS */
+    .readmore-btn::after {
+        content: "\f178";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-left: 8px;
+        transition: all 0.3s;
+    }
+    .readmore-btn:hover::after {
+        margin-left: 12px;
+    }
+</style>

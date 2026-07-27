@@ -8,6 +8,7 @@ import GasPricesIntro from '../components/gas-prices/GasPricesIntro.astro';
 import GasPricesMapSection from '../components/gas-prices/GasPricesMapSection.astro';
 import FuelPricesTable from '../components/FuelPricesTable';
 import DriverChatLanding from '../components/driver-chat/DriverChatLanding.astro';
+import ChatCityCards from '../components/driver-chat/ChatCityCards.astro';
 import ChatAbout from '../components/driver-chat/ChatAbout.astro';
 import QueueDriversPreview from '../components/queues/QueueDriversPreview.astro';
 import HubFaqs from '../components/hub/HubFaqs.astro';
@@ -118,6 +119,8 @@ const queueGasStations = Object.values(gasStationLabels);
 
 		<Alert />
 
+		<ChatCityCards />
+
 		<DriverChatLanding />
 
 		<section class="fuel-prices-section py-5">
@@ -139,11 +142,12 @@ const queueGasStations = Object.values(gasStationLabels);
 
 		<HubProcess
 			subtitle="Как пользоваться"
-			title="Три шага к быстрой заправке"
+			title="Четыре шага к быстрой заправке"
 			steps={[
 				{ title: 'Посмотрите цены', description: 'Сравните стоимость топлива на карте и выберите выгодный вариант.' },
-				{ title: 'Зайдите в чат', description: 'Спросите в чате, есть ли нужная марка топлива и нет ли очереди.' },
-				{ title: 'Заправьтесь без проблем', description: 'Езжайте на выбранную станцию или попросите водителя занять вам очередь.' },
+				{ title: 'Зайдите в чат', description: 'Выберите нужный канал по вашему городу и марке бензина.' },
+				{ title: 'Уточните наличие', description: 'Спросите у других водителей, есть ли топливо и нет ли очереди.' },
+				{ title: 'Заправьтесь быстро', description: 'Езжайте на выбранную станцию или попросите занять вам очередь.' },
 			]}
 		/>
 
@@ -157,18 +161,15 @@ const queueGasStations = Object.values(gasStationLabels);
       buttonHref="/chat" 
     />
 
-		<HubCta 
-      subtitle="Нужна помощь?" 
-      title="Закончился бензин в дороге?" 
-      description="Если вы не дотянули до заправки, я привезу топливо прямо к вашей машине. Выезжаю круглосуточно по Тюмени и району." 
-      btnText="Заказать подвоз топлива" 
-      btnHref="/services/toplivo/podvoz-benzina" 
-      contactTitle="Срочный выезд" 
-      contactText="Подвезу АИ-95, АИ-92 или ДТ за 20 минут." 
-      contactLinkText="+7 (900) 000-00-00" 
-      contactLinkHref="tel:+79000000000" 
-      features={['Круглосуточно 24/7', 'Любой район Тюмени']} 
-    />
+		<HubCta
+			subtitle="Живое общение"
+			title="Зайти в чат водителей Тюмени"
+			description="Присоединяйтесь к крупнейшему сообществу водителей города. Узнавайте про наличие бензина, очереди на АЗС и цены первыми. Взаимовыручка на дорогах Тюмени 24/7."
+			btnText="Открыть чат"
+			btnHref="/chat?city=tyumen"
+			showContact={false}
+			features={['Актуальные данные', 'Бесплатный вход', 'Только водители Тюмени']}
+		/>
 	</main>
 	<Footer />
 </Layout>

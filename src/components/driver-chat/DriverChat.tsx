@@ -1,3 +1,4 @@
+import { chatCities } from '../../data/chatCluster';
 import type { FormEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDriverChat, type ChatTopic } from './useDriverChat';
@@ -15,7 +16,8 @@ const channels: Channel[] = [
 	{ id: 'general', title: 'Общий чат', hint: 'Где сейчас есть топливо', icon: 'fa-comments' },
 	{ id: 'ai95', title: 'АИ-95', hint: 'Наличие и очереди', icon: 'fa-gas-pump' },
 	{ id: 'ai92', title: 'АИ-92', hint: 'Наличие и очереди', icon: 'fa-gas-pump' },
-	{ id: 'dt', title: 'Дизель · ДТ', hint: 'Где заправиться', icon: 'fa-truck-moving' },
+	{ id: 'ai100', title: 'АИ-100', hint: 'Наличие и очереди', icon: 'fa-gauge-high' },
+	{ id: 'dt', title: 'Дизель · ДТ', hint: 'Где заправить дизель по трассе', icon: 'fa-truck-moving' },
 	{ id: 'queue', title: 'Очереди на АЗС', hint: 'Сколько сейчас ждать', icon: 'fa-clock' },
 ];
 
@@ -24,6 +26,7 @@ const placeholderByTopic: Record<ChatTopic, string> = {
 	general: 'Например: где сейчас есть топливо в центре?',
 	ai95: 'Например: есть ли АИ-95 на Мельникайте?',
 	ai92: 'Например: где найти АИ-92 в Заречном?',
+	ai100: 'Например: где в наличии АИ-100?',
 	dt: 'Например: где заправить дизель по трассе?',
 	queue: 'Например: какая сейчас очередь на АЗС?',
 };
@@ -38,7 +41,7 @@ export interface DriverChatProps {
 // ==== Main Component ====
 
 export default function DriverChat({ variant = 'section' }: DriverChatProps) {
-	const { phone, topic, setTopic, isJoined, messages, error, join, send } = useDriverChat();
+	const { phone, topic, setTopic, city, setCity, isJoined, messages, error, join, send } = useDriverChat();
 	
 	const [phoneInput, setPhoneInput] = useState('');
 	const [message, setMessage] = useState('');
@@ -80,7 +83,7 @@ export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 			<div className={`dc dc--${variant} dc--login`}>
 				<form className="dc-login" onSubmit={handleJoin} noValidate>
 					<div className="dc-login__badge"><i className="fa-solid fa-gas-pump"></i></div>
-					<span className="section-sub-title">Чат водителей · Тюмень</span>
+					<span className="section-sub-title">Чат водителей</span>
 					<h3>Укажи номер — и сразу в чат</h3>
 					<p>Живой чат, где водители подсказывают друг другу, где сейчас есть топливо и какие очереди на АЗС. Пароль и код из SMS не нужны — номер хранится только на этом устройстве.</p>
 
@@ -116,6 +119,19 @@ export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 						<span className="dc-status"><i></i> на связи</span>
 					</div>
 				</div>
+
+				<span className="dc-aside__label">Город</span>
+				<select
+					className="form-control dc-city"
+					value={city}
+					onChange={(e) => setCity(e.target.value)}
+				>
+					{chatCities.map((c) => (
+						<option key={c.slug} value={c.slug}>
+							{c.name}
+						</option>
+					))}
+				</select>
 
 				<span className="dc-aside__label">Каналы топлива</span>
 				<div className="dc-channels" role="tablist" aria-label="Каналы чата">
@@ -155,7 +171,7 @@ export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 					<span className="dc-avatar"><i className={`fa-solid ${activeChannel.icon}`}></i></span>
 					<div className="dc-main__title">
 						<strong>{activeChannel.title}</strong>
-						<span className="dc-status dc-status--muted"><i></i> Тюмень · сообщения обновляются автоматически</span>
+						<span className="dc-status dc-status--muted"><i></i> {chatCities.find(c => c.slug === city)?.name || 'Тюмень'} · сообщения обновляются автоматически</span>
 					</div>
 					{variant === 'app' && (
 						<button
