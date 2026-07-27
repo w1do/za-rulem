@@ -34,34 +34,7 @@ showFuelPricesTable: true
 
 ## Сколько стоит бензин в июле 2026 года?
 
-Цены, конечно, кусаются. По состоянию на конец июля 2026 года средние показатели по России выглядят примерно так (хотя в отдаленных регионах вроде Тывы цена за литр 95-го может достигать и 117 рублей):
-
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-  <thead>
-    <tr style="background-color: #f8f9fa;">
-      <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Марка топлива</th>
-      <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Средняя цена за литр</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="border: 1px solid #dee2e6; padding: 12px;">АИ-92</td>
-      <td style="border: 1px solid #dee2e6; padding: 12px;">70,5 – 75,5 ₽</td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid #dee2e6; padding: 12px;">АИ-95</td>
-      <td style="border: 1px solid #dee2e6; padding: 12px;">77,5 – 81,4 ₽</td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid #dee2e6; padding: 12px;">АИ-98 / 100</td>
-      <td style="border: 1px solid #dee2e6; padding: 12px;">97,2 – 99,9 ₽</td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid #dee2e6; padding: 12px;">Дизельное топливо</td>
-      <td style="border: 1px solid #dee2e6; padding: 12px;">80,6 – 82,5 ₽</td>
-    </tr>
-  </tbody>
-</table>
+Цены, конечно, кусаются. По состоянию на конец июля 2026 года средние показатели по России выглядят примерно так (хотя в отдаленных регионах вроде Тывы цена за литр 95-го может достигать и 117 рублей).
 
 Важно понимать, что на частных АЗС цены могут быть выше на 5–10 рублей, так как они закупают топливо на бирже по уже взлетевшим котировкам. Ниже я также привел справочную таблицу с актуальными данными по конкретным крупным сетям АЗС.
 
