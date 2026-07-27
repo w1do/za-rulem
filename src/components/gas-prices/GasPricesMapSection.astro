@@ -3,15 +3,21 @@ import GasMap from '../maps/GasMap.tsx';
 
 interface Props {
 	stations: unknown[];
+	bounds?: {
+		minLat: number;
+		maxLat: number;
+		minLon: number;
+		maxLon: number;
+	};
 }
 
-const { stations } = Astro.props;
+const { stations, bounds } = Astro.props;
 ---
 
 <div class="gas-map-section">
 	<div class="container">
 		<div class="gas-map-card wow fadeInUp">
-			<GasMap client:only="react" stations={stations} />
+			<GasMap client:only="react" stations={stations} bounds={bounds} />
 		</div>
 	</div>
 </div>

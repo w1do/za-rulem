@@ -24,23 +24,24 @@ import { chatCities, chatFuels, DEFAULT_CITY_SLUG, cityLandingUrl, fuelLandingUr
 							</div>
 							<div class="service-item-body">
 								<div class="service-item-content">
-									<h3><a href={cityLandingUrl(city.slug)}>{city.name}</a></h3>
+									<h2><a href={cityLandingUrl(city.slug)}>{city.name}</a></h2>
 									<p>{city.hint}</p>
 								</div>
 								
 								<div class="service-item-btn mt-3">
-									<div class="mb-3">
-										<a href={cityLandingUrl(city.slug)} class="readmore-btn">
-											Перейти в чат {city.ofCity}
-										</a>
-									</div>
 									<div class="fuel-links-grid">
 										{chatFuels.map(fuel => (
-											<a href={chatAppUrl(city.slug, fuel.slug)} class="fuel-link-item">
-												{fuel.name}
+											<a href={fuelLandingUrl(city.slug, fuel.slug)} class="fuel-link-item">
+												<i class={`fa-solid ${fuel.icon}`}></i>
+                                                <span>{fuel.name}</span>
 											</a>
 										))}
 									</div>
+                                    <div class="mt-3">
+                                        <a href={cityLandingUrl(city.slug)} class="readmore-btn">
+                                            Перейти в чат
+                                        </a>
+                                    </div>
 								</div>
 							</div>
 						</div>
@@ -52,39 +53,50 @@ import { chatCities, chatFuels, DEFAULT_CITY_SLUG, cityLandingUrl, fuelLandingUr
 </section>
 
 <style>
-    .service-item-content h3 {
+    .service-item-content h2 {
         font-size: 22px;
         margin-bottom: 10px;
         font-weight: 700;
     }
-    .service-item-content h3 a {
+    .service-item-content h2 a {
         color: var(--primary-color);
         text-decoration: none;
         transition: all 0.3s;
     }
-    .service-item-content h3 a:hover {
+    .service-item-content h2 a:hover {
         color: var(--accent-color);
     }
     .fuel-links-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 8px;
+        gap: 10px;
     }
     .fuel-link-item {
-        display: block;
-        text-align: center;
-        padding: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px;
         background: #f8f9fa;
         border-radius: 8px;
-        font-size: 13px;
+        font-size: 14px;
+        font-weight: 600;
         color: var(--primary-color);
         text-decoration: none;
         transition: all 0.2s;
         border: 1px solid #eee;
     }
+    .fuel-link-item i {
+        font-size: 14px;
+        color: var(--accent-color);
+    }
     .fuel-link-item:hover {
-        background: var(--accent-color);
-        border-color: var(--accent-color);
+        background: var(--primary-color);
+        color: var(--white-color);
+        border-color: var(--primary-color);
+    }
+    .fuel-link-item:hover i {
+        color: var(--accent-color);
     }
     .readmore-btn {
         display: inline-flex;

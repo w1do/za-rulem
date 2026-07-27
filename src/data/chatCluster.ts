@@ -13,6 +13,13 @@ export interface ChatCity {
 	ofCity: string;
 	/** Короткая подпись для карточки города. */
 	hint: string;
+	/** Координаты для карты АЗС. */
+	bounds?: {
+		minLat: number;
+		maxLat: number;
+		minLon: number;
+		maxLon: number;
+	};
 }
 
 export interface ChatFuel {
@@ -30,12 +37,12 @@ export interface ChatFuel {
 export const DEFAULT_CITY_SLUG = 'tyumen';
 
 export const chatCities: ChatCity[] = [
-	{ slug: 'tyumen', name: 'Тюмень', inCity: 'в Тюмени', ofCity: 'Тюмени', hint: 'Базовый город чата' },
-	{ slug: 'ekaterinburg', name: 'Екатеринбург', inCity: 'в Екатеринбурге', ofCity: 'Екатеринбурга', hint: 'АЗС и трассы Свердловской области' },
-	{ slug: 'chelyabinsk', name: 'Челябинск', inCity: 'в Челябинске', ofCity: 'Челябинска', hint: 'Город и трасса М-5' },
-	{ slug: 'surgut', name: 'Сургут', inCity: 'в Сургуте', ofCity: 'Сургута', hint: 'ХМАО: город и зимники' },
-	{ slug: 'nizhnevartovsk', name: 'Нижневартовск', inCity: 'в Нижневартовске', ofCity: 'Нижневартовска', hint: 'Восток ХМАО' },
-	{ slug: 'tobolsk', name: 'Тобольск', inCity: 'в Тобольске', ofCity: 'Тобольска', hint: 'Север Тюменской области' },
+	{ slug: 'tyumen', name: 'Тюмень', inCity: 'в Тюмени', ofCity: 'Тюмени', hint: 'Базовый город чата', bounds: { minLat: 57.0, maxLat: 57.3, minLon: 65.2, maxLon: 65.9 } },
+	{ slug: 'ekaterinburg', name: 'Екатеринбург', inCity: 'в Екатеринбурге', ofCity: 'Екатеринбурга', hint: 'АЗС и трассы Свердловской области', bounds: { minLat: 56.68, maxLat: 56.98, minLon: 60.25, maxLon: 60.95 } },
+	{ slug: 'chelyabinsk', name: 'Челябинск', inCity: 'в Челябинске', ofCity: 'Челябинска', hint: 'Город и трасса М-5', bounds: { minLat: 55.01, maxLat: 55.31, minLon: 61.09, maxLon: 61.79 } },
+	{ slug: 'surgut', name: 'Сургут', inCity: 'в Сургуте', ofCity: 'Сургута', hint: 'ХМАО: город и зимники', bounds: { minLat: 61.10, maxLat: 61.40, minLon: 73.05, maxLon: 73.75 } },
+	{ slug: 'nizhnevartovsk', name: 'Нижневартовск', inCity: 'в Нижневартовске', ofCity: 'Нижневартовска', hint: 'Восток ХМАО', bounds: { minLat: 60.80, maxLat: 61.10, minLon: 76.25, maxLon: 76.95 } },
+	{ slug: 'tobolsk', name: 'Тобольск', inCity: 'в Тобольске', ofCity: 'Тобольска', hint: 'Север Тюменской области', bounds: { minLat: 58.05, maxLat: 58.35, minLon: 67.90, maxLon: 68.60 } },
 ];
 
 export const chatFuels: ChatFuel[] = [
@@ -50,11 +57,11 @@ export const getFuel = (slug: string) => chatFuels.find((f) => f.slug === slug);
 
 /** Ссылка на посадочную топлива: теперь все города имеют одинаковую структуру URL. */
 export const fuelLandingUrl = (citySlug: string, fuelSlug: string) =>
-	`/chat-voditeley/${citySlug}/${fuelSlug}`;
+	`/${citySlug}/chat-voditeley/${fuelSlug}`;
 
 /** Ссылка на страницу города. */
 export const cityLandingUrl = (citySlug: string) =>
-	`/chat-voditeley/${citySlug}`;
+	`/${citySlug}/chat-voditeley`;
 
 /** Ссылка на приложение-чат с предвыбранным городом и каналом. */
 export const chatAppUrl = (citySlug: string, fuelSlug?: string) => {

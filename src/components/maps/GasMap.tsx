@@ -46,6 +46,12 @@ interface StationData {
 
 interface GasMapProps {
   stations: StationData[];
+  bounds?: {
+    minLat: number;
+    maxLat: number;
+    minLon: number;
+    maxLon: number;
+  };
 }
 
 const MAX_STATION_AGE_MS = 24 * 60 * 60 * 1000;
@@ -56,7 +62,7 @@ const isStationDataFresh = (station: StationData, now = Date.now()) => {
   return Number.isFinite(updatedAt) && now - updatedAt <= MAX_STATION_AGE_MS;
 };
 
-const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
+const GasMap: React.FC<GasMapProps> = ({ stations: initialStations, bounds }) => {
   const [stations, setStations] = useState(initialStations);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
@@ -76,10 +82,13 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
   );
 
   useEffect(() => {
+    if (!bounds) return;
+
     const refreshInterval = setInterval(async () => {
       try {
+        const { minLat, maxLat, minLon, maxLon } = bounds;
         const response = await fetch(
-          "https://benzin.api.2gis.ru/api/v1/stations?minLat=57.0&maxLat=57.3&minLon=65.2&maxLon=65.9",
+          `https://benzin.api.2gis.ru/api/v1/stations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`,
         );
         if (response.ok) {
           const newData = await response.json();
@@ -91,7 +100,7 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
     }, 30000); // 30 seconds
 
     return () => clearInterval(refreshInterval);
-  }, []);
+  }, [bounds]);
 
   const getQueueInfo = (level: string) => {
     switch (level) {
@@ -229,9 +238,12 @@ const GasMap: React.FC<GasMapProps> = ({ stations: initialStations }) => {
       }
 
       try {
+        const centerLat = bounds ? (bounds.minLat + bounds.maxLat) / 2 : 57.1522;
+        const centerLng = bounds ? (bounds.minLon + bounds.maxLon) / 2 : 65.5272;
+
         const map = DG.map(mapContainerRef.current, {
-          center: [57.1522, 65.5272],
-          zoom: 12,
+          center: [centerLat, centerLng],
+          zoom: bounds ? 11 : 12,
           zoomControl: true,
           fullscreenControl: false,
         });

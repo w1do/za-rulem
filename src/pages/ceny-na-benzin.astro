@@ -12,10 +12,14 @@ import HubFaqs from '../components/hub/HubFaqs.astro';
 import HubCta from '../components/hub/HubCta.astro';
 import QueueDriversPreview from '../components/queues/QueueDriversPreview.astro';
 import { gasStationLabels, queueDrivers } from '../data/queueDrivers';
+import { chatCities, DEFAULT_CITY_SLUG } from '../data/chatCluster';
 
 import { webPageNode, breadcrumbNode } from '../lib/seo';
 
 // Fetch gasoline data for Tyumen
+const tyumen = chatCities.find(c => c.slug === DEFAULT_CITY_SLUG);
+const bounds = tyumen?.bounds;
+
 let stations = [];
 let pageData = {
   title: "Цены на бензин в Тюмени сегодня | Где бензин",
@@ -24,13 +28,16 @@ let pageData = {
   text: ""
 };
 
-try {
-  const response = await fetch('https://benzin.api.2gis.ru/api/v1/stations?minLat=57.0&maxLat=57.3&minLon=65.2&maxLon=65.9');
-  if (response.ok) {
-    stations = await response.json();
+if (bounds) {
+  try {
+    const { minLat, maxLat, minLon, maxLon } = bounds;
+    const response = await fetch(`https://benzin.api.2gis.ru/api/v1/stations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`);
+    if (response.ok) {
+      stations = await response.json();
+    }
+  } catch (error) {
+    console.error('Error fetching gas prices from 2GIS:', error);
   }
-} catch (error) {
-  console.error('Error fetching gas prices from 2GIS:', error);
 }
 
 const url = '/benzin-tyumen';
@@ -98,7 +105,7 @@ const queueGasStations = Object.values(gasStationLabels);
 
 	<Alert />
 
-	<GasPricesMapSection stations={stations} />
+	<GasPricesMapSection stations={stations} bounds={bounds} />
 	<!-- Gasoline Map Section End -->
 
 	<QueueDriversPreview drivers={availableQueueDrivers} stations={queueGasStations} />
