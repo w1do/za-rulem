@@ -54,7 +54,7 @@ export const normalizePhone = (value: string) => {
 
 export function useDriverChat() {
 	const [phone, setPhone] = useState('');
-	const [sessionId, setSessionId] = useState('');
+	const [sessionId] = useState(() => createId());
 	const [topic, setTopic] = useState<ChatTopic>('general');
 	const [isJoined, setIsJoined] = useState(false);
 	const [messages, setMessages] = useState<ChatMessage[]>([welcomeMessage]);
@@ -75,6 +75,10 @@ export function useDriverChat() {
 					limit: 50,
 				})
 			)) as unknown as DirectusMessage[];
+
+			// Пока запрос выполнялся, пользователь мог переключить канал —
+			// в этом случае ответ уже неактуален.
+			if (topicRef.current !== currentTopic) return;
 
 			const history = Array.isArray(items)
 				? items.map(
@@ -103,79 +107,71 @@ export function useDriverChat() {
 		}
 	}, []);
 
-	// Real-time подписка через WebSockets
+	// Real-time подписка через WebSockets + резервный опрос истории
 	useEffect(() => {
 		if (!isJoined) return;
 
 		let isActive = true;
+		let isRealtimeLive = false;
 		let stopSubscription: (() => void) | undefined;
+		let retryTimer: ReturnType<typeof setTimeout> | undefined;
+
+		const scheduleRetry = () => {
+			if (!isActive) return;
+			if (retryTimer) clearTimeout(retryTimer);
+			retryTimer = setTimeout(() => {
+				if (isActive) startRealtime();
+			}, 5000);
+		};
 
 		const startRealtime = async () => {
 			try {
-				console.log('[Chat] Initiating WebSocket connection...');
+				console.log('[Chat] Connecting to WebSocket...');
+				await directus.connect();
 				
-				// Принудительно подключаемся, если не подключены
-				try {
-					await directus.connect();
-					console.log('[Chat] WebSocket connection established');
-				} catch (connErr) {
-					console.error('[Chat] WebSocket connection error:', connErr);
-				}
-
 				if (!isActive) return;
 
 				console.log(`[Chat] Subscribing to: driver_chat_messages (topic: ${topic})`);
-				const sub = await directus.subscribe('driver_chat_messages', {
+				const { subscription, unsubscribe } = await directus.subscribe('driver_chat_messages', {
 					event: 'create',
 					query: {
 						filter: { topic: { _eq: topic } },
 						fields: ['*'],
 					},
 				});
-
-				const subscription = sub.subscription || (sub as any);
-				stopSubscription = sub.unsubscribe || (sub as any).stop;
 				
-				console.log('[Chat] Subscription successfully created. Keys:', Object.keys(sub));
+				console.log('[Chat] Subscription created');
 
+				stopSubscription = unsubscribe;
+				isRealtimeLive = true;
+				// Добираем сообщения, пропущенные до/во время установки соединения.
+				fetchHistory(topicRef.current);
+				
 				for await (const message of subscription) {
 					if (!isActive) break;
 					
-					console.log('[Chat] Raw WebSocket event received:', message);
+					console.log('[Chat] Socket event:', message.event, message.data ? 'with data' : 'no data');
 					
-					// Обработка события 'create'
-					// В SDK v23 итератор может возвращать как массив сообщений, так и одно сообщение в зависимости от типа события
-					let eventData: any[] = [];
-					if (Array.isArray(message.data)) {
-						eventData = message.data;
-					} else if (message.data) {
-						eventData = [message.data];
-					} else if (message.item) {
-						eventData = [message.item];
-					}
-
-					if (eventData.length > 0) {
-						for (const rawMsg of eventData) {
+					if (message.event === 'create' && message.data) {
+						const data = Array.isArray(message.data) ? message.data : [message.data];
+						
+						for (const rawMsg of data) {
 							const msg = rawMsg as DirectusMessage;
 							
-							// Если это сообщение из другого топика (хотя фильтр должен работать на сервере), пропускаем
-							if (msg.topic !== topicRef.current) {
-								console.log('[Chat] Message topic mismatch, expected:', topicRef.current, 'got:', msg.topic);
+							// Игнорируем свои сообщения по sessionId
+							if (msg.sessionId === sessionId) {
+								console.log('[Chat] Skipping own message:', msg.id);
 								continue;
 							}
 							
-							// Пропускаем свои сообщения (они уже добавлены оптимистично)
-							if (msg.sessionId === sessionId) {
-								console.log('[Chat] Ignoring own message (sessionId match):', msg.id);
+							// Дополнительная проверка топика
+							if (msg.topic !== topic) {
+								console.log('[Chat] Wrong topic skipped:', msg.topic);
 								continue;
 							}
 
-							console.log('[Chat] Processing new message from socket:', msg.id);
 							setMessages((current) => {
-								if (current.some((m) => m.id === msg.id)) {
-									console.log('[Chat] Duplicate message ID skipped:', msg.id);
-									return current;
-								}
+								if (current.some((m) => m.id === msg.id)) return current;
 								
 								const newMsg: ChatMessage = {
 									id: msg.id,
@@ -187,17 +183,21 @@ export function useDriverChat() {
 								return [...current, newMsg];
 							});
 						}
-					} else {
-						console.log('[Chat] No data in event message:', message);
 					}
 				}
+
+				// Итератор завершился без ошибки — соединение закрылось (сеть, сервер).
+				isRealtimeLive = false;
+				if (isActive) {
+					console.warn('[Chat] WebSocket subscription ended, reconnecting...');
+					scheduleRetry();
+				}
 			} catch (e) {
+				isRealtimeLive = false;
 				if (isActive) {
 					console.error('[Chat] WebSocket runtime error:', e);
-					// Реконнект через 5 секунд при фатальной ошибке
-					setTimeout(() => {
-						if (isActive) startRealtime();
-					}, 5000);
+					// Реконнект через 5 секунд при ошибке
+					scheduleRetry();
 				}
 			}
 		};
@@ -205,8 +205,17 @@ export function useDriverChat() {
 		startRealtime();
 		fetchHistory(topic);
 
+		// Резервный режим: пока realtime не работает (сокеты выключены на сервере,
+		// сеть, прокси), периодически подтягиваем историю, чтобы сообщения из других
+		// вкладок появлялись без перезагрузки страницы.
+		const pollTimer = setInterval(() => {
+			if (!isRealtimeLive) fetchHistory(topicRef.current);
+		}, 7000);
+
 		return () => {
 			isActive = false;
+			clearInterval(pollTimer);
+			if (retryTimer) clearTimeout(retryTimer);
 			if (stopSubscription) {
 				try {
 					stopSubscription();
@@ -217,29 +226,13 @@ export function useDriverChat() {
 		};
 	}, [isJoined, sessionId, fetchHistory, topic]);
 
-	// Fallback-опрос по таймеру: обновляем сообщения каждые 3 секунды.
-	// Работает как страховка на случай, если WebSocket-подписка не доставляет события.
-	useEffect(() => {
-		if (!isJoined) return;
-
-		const intervalId = window.setInterval(() => {
-			fetchHistory(topicRef.current);
-		}, 3000);
-
-		return () => {
-			window.clearInterval(intervalId);
-		};
-	}, [isJoined, topic, fetchHistory]);
-
-	// Загрузка сессии из localStorage
 	useEffect(() => {
 		const saved = window.localStorage.getItem(STORAGE_KEY);
 		if (!saved) return;
 		try {
 			const data = JSON.parse(saved);
-			if (data.phone && data.sessionId) {
+			if (data.phone) {
 				setPhone(data.phone);
-				setSessionId(data.sessionId);
 				if (isTopic(data.topic)) setTopic(data.topic);
 				setIsJoined(true);
 			}
@@ -248,10 +241,10 @@ export function useDriverChat() {
 		}
 	}, []);
 
-	const persist = (nextPhone: string, nextSessionId: string, nextTopic: ChatTopic) => {
+	const persist = (nextPhone: string, nextTopic: ChatTopic) => {
 		window.localStorage.setItem(
 			STORAGE_KEY,
-			JSON.stringify({ phone: nextPhone, sessionId: nextSessionId, topic: nextTopic }),
+			JSON.stringify({ phone: nextPhone, topic: nextTopic }),
 		);
 	};
 
@@ -261,13 +254,11 @@ export function useDriverChat() {
 			setError('Укажи номер из 11 цифр.');
 			return;
 		}
-		const nextSessionId = createId();
 		phoneRef.current = nextPhone;
 		setPhone(nextPhone);
-		setSessionId(nextSessionId);
 		setIsJoined(true);
 		setError('');
-		persist(nextPhone, nextSessionId, topicRef.current);
+		persist(nextPhone, topicRef.current);
 	};
 
 	const send = async (text: string) => {
@@ -321,7 +312,7 @@ export function useDriverChat() {
 		// Сбрасываем сообщения при смене канала, чтобы не видеть старые сообщения
 		setMessages([welcomeMessage]);
 		
-		if (isJoined && sessionId) persist(phoneRef.current, sessionId, id);
+		if (isJoined && sessionId) persist(phoneRef.current, id);
 	};
 
 	return {
