@@ -19,19 +19,44 @@ const jsonLd = [
 	<meta slot="head" name="apple-mobile-web-app-title" content="Чат топлива" />
 
 	<div class="chat-app">
-		<header class="chat-app__bar">
-			<a class="chat-app__brand" href="/" aria-label="На главную">
-				<img src="/images/logo.svg" alt="За рулём" width="132" height="34" />
-			</a>
-			<a class="chat-app__back" href="/chat-voditeley">
-				<i class="fa-solid fa-circle-info"></i>
-				<span>О чате</span>
-			</a>
-		</header>
-
 		<main class="chat-app__body">
 			<DriverChatBox variant="app" />
 		</main>
+
+		<dialog class="chat-about" id="chat-about-modal" aria-labelledby="chat-about-title">
+			<div class="chat-about__head">
+				<span class="chat-about__badge"><i class="fa-solid fa-mobile-screen-button"></i></span>
+				<h2 id="chat-about-title">Сделай чат приложением на телефоне</h2>
+				<button type="button" class="chat-about__close" id="chat-about-close" aria-label="Закрыть окно">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+			</div>
+
+			<p class="chat-about__lead">Я собрал этот чат так, что его можно добавить на экран «Домой» — он откроется на весь экран, как обычное приложение, без адресной строки браузера.</p>
+
+			<div class="chat-about__steps">
+				<section>
+					<h3><i class="fa-brands fa-apple"></i> iPhone · Safari</h3>
+					<ol>
+						<li>Открой эту страницу в Safari.</li>
+						<li>Нажми кнопку «Поделиться» <i class="fa-solid fa-arrow-up-from-bracket"></i> внизу экрана.</li>
+						<li>Выбери «На экран “Домой”» и подтверди «Добавить».</li>
+					</ol>
+				</section>
+				<section>
+					<h3><i class="fa-brands fa-android"></i> Android · Chrome</h3>
+					<ol>
+						<li>Открой эту страницу в Chrome.</li>
+						<li>Нажми меню <i class="fa-solid fa-ellipsis-vertical"></i> в правом верхнем углу.</li>
+						<li>Выбери «Добавить на главный экран» или «Установить приложение».</li>
+					</ol>
+				</section>
+			</div>
+
+			<p class="chat-about__note"><i class="fa-solid fa-circle-check"></i> После установки иконка «Чат топлива» появится рядом с другими приложениями — чат будет открываться в один тап.</p>
+
+			<a class="chat-about__more" href="/chat-voditeley">Подробнее о чате водителей <i class="fa-solid fa-arrow-right"></i></a>
+		</dialog>
 	</div>
 </Layout>
 
@@ -43,32 +68,101 @@ const jsonLd = [
 		height: 100dvh;
 		background: var(--secondary-color);
 	}
-	.chat-app__bar {
-		flex: 0 0 auto;
+	.chat-app__body { flex: 1; min-height: 0; }
+
+	/* ---- Модальное окно «О чате» ---- */
+	.chat-about {
+		width: min(560px, calc(100% - 32px));
+		max-height: calc(100dvh - 48px);
+		padding: 28px;
+		border: none;
+		border-radius: 20px;
+		background: var(--secondary-color);
+		color: var(--primary-color);
+		box-shadow: 0 24px 70px rgba(18, 18, 18, .18);
+	}
+	.chat-about::backdrop { background: rgba(15, 15, 15, .45); }
+	.chat-about__head {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		gap: 16px;
-		padding: 12px 20px;
-		border-bottom: 1px solid #ececec;
-		background: var(--secondary-color);
+		gap: 14px;
+		margin-bottom: 14px;
 	}
-	.chat-app__brand img { display: block; height: 34px; width: auto; }
-	.chat-app__back {
+	.chat-about__badge {
+		flex: 0 0 auto;
+		width: 46px;
+		height: 46px;
+		display: grid;
+		place-items: center;
+		border-radius: 14px;
+		background: var(--accent-color);
+		color: var(--primary-color);
+		font-size: 19px;
+	}
+	.chat-about__head h2 { margin: 0; font-size: 20px; line-height: 1.3; }
+	.chat-about__close {
+		flex: 0 0 auto;
+		margin-left: auto;
+		width: 38px;
+		height: 38px;
+		display: grid;
+		place-items: center;
+		border: 1px solid #e2e5e9;
+		border-radius: 50%;
+		background: var(--secondary-color);
+		color: var(--primary-color);
+		cursor: pointer;
+	}
+	.chat-about__close:hover { border-color: var(--accent-color); }
+	.chat-about__lead { margin: 0 0 18px; color: #5f6672; }
+	.chat-about__steps { display: flex; flex-direction: column; gap: 14px; }
+	.chat-about__steps section {
+		padding: 16px 18px;
+		border: 1px solid #ececec;
+		border-radius: 14px;
+		background: #f7f8fa;
+	}
+	.chat-about__steps h3 {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin: 0 0 10px;
+		font-size: 15px;
+	}
+	.chat-about__steps ol { margin: 0; padding-left: 20px; }
+	.chat-about__steps li { margin-bottom: 6px; font-size: 14px; color: #4b5563; }
+	.chat-about__steps li:last-child { margin-bottom: 0; }
+	.chat-about__note {
+		display: flex;
+		align-items: flex-start;
+		gap: 8px;
+		margin: 18px 0 0;
+		font-size: 13px;
+		color: #3f9c5b;
+	}
+	.chat-about__note i { margin-top: 3px; }
+	.chat-about__more {
 		display: inline-flex;
 		align-items: center;
 		gap: 8px;
-		padding: 8px 16px;
-		border: 1px solid #e2e5e9;
-		border-radius: 999px;
+		margin-top: 16px;
 		font-size: 14px;
 		color: var(--primary-color);
+		text-decoration: underline;
 	}
-	.chat-app__back:hover { border-color: var(--accent-color); color: var(--primary-color); }
-	.chat-app__body { flex: 1; min-height: 0; }
 
 	@media (max-width: 575px) {
-		.chat-app__bar { padding: 10px 14px; }
-		.chat-app__back span { display: none; }
+		.chat-about { padding: 22px 18px; }
 	}
 </style>
+
+<script>
+	const modal = document.getElementById('chat-about-modal') as HTMLDialogElement | null;
+	const closeButton = document.getElementById('chat-about-close');
+
+	closeButton?.addEventListener('click', () => modal?.close());
+	// Закрытие по клику на подложку вне содержимого окна.
+	modal?.addEventListener('click', (event) => {
+		if (event.target === modal) modal.close();
+	});
+</script>

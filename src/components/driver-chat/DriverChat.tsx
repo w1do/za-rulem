@@ -19,13 +19,6 @@ const channels: Channel[] = [
 	{ id: 'queue', title: 'Очереди на АЗС', hint: 'Сколько сейчас ждать', icon: 'fa-clock' },
 ];
 
-const promptsByTopic: Record<ChatTopic, string[]> = {
-	general: ['Где сейчас есть топливо?', 'Какие АЗС работают?', 'Подскажите по центру'],
-	ai95: ['Где есть АИ-95?', 'Очередь на АИ-95?', 'АИ-95 на Мельникайте есть?'],
-	ai92: ['Где есть АИ-92?', 'Очередь на АИ-92?', 'АИ-92 в Заречном?'],
-	dt: ['Где есть дизель?', 'ДТ по трассе?', 'Очередь на ДТ?'],
-	queue: ['Какая очередь на АЗС?', 'Сколько ждать?', 'Где очередь меньше?'],
-};
 
 const placeholderByTopic: Record<ChatTopic, string> = {
 	general: 'Например: где сейчас есть топливо в центре?',
@@ -145,7 +138,7 @@ export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 				</div>
 
 				<a className="dc-aside__cta btn-default" href="/chat">
-					<i className="fa-solid fa-mobile-screen-button"></i> Открыть приложение
+					<i className="fa-solid fa-mobile-screen-button"></i> приложение
 				</a>
 			</aside>
 
@@ -164,6 +157,16 @@ export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 						<strong>{activeChannel.title}</strong>
 						<span className="dc-status dc-status--muted"><i></i> Тюмень · сообщения обновляются автоматически</span>
 					</div>
+					{variant === 'app' && (
+						<button
+							type="button"
+							className="dc-main__download"
+							onClick={() => (document.getElementById('chat-about-modal') as HTMLDialogElement | null)?.showModal()}
+						>
+							<i className="fa-solid fa-mobile-screen-button"></i>
+							<span>Скачать</span>
+						</button>
+					)}
 				</header>
 
 				<div className="dc-thread" aria-live="polite">
@@ -193,11 +196,6 @@ export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 
 				{error && <div className="dc-alert dc-alert--inline" role="alert">{error}</div>}
 
-				<div className="dc-prompts">
-					{promptsByTopic[topic].map((prompt) => (
-						<button type="button" key={prompt} onClick={() => setMessage(prompt)}>{prompt}</button>
-					))}
-				</div>
 
 				<form className="dc-compose" onSubmit={handleSend}>
 					<input
