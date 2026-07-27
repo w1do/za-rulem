@@ -48,15 +48,13 @@ export const chatFuels: ChatFuel[] = [
 export const getCity = (slug: string) => chatCities.find((c) => c.slug === slug);
 export const getFuel = (slug: string) => chatFuels.find((f) => f.slug === slug);
 
-/** Ссылка на посадочную топлива: базовый город без сегмента города. */
+/** Ссылка на посадочную топлива: теперь все города имеют одинаковую структуру URL. */
 export const fuelLandingUrl = (citySlug: string, fuelSlug: string) =>
-	citySlug === DEFAULT_CITY_SLUG
-		? `/chat-voditeley/${fuelSlug}`
-		: `/chat-voditeley/${citySlug}/${fuelSlug}`;
+	`/chat-voditeley/${citySlug}/${fuelSlug}`;
 
-/** Ссылка на страницу города (для базового города — сам пиллер). */
+/** Ссылка на страницу города. */
 export const cityLandingUrl = (citySlug: string) =>
-	citySlug === DEFAULT_CITY_SLUG ? '/chat-voditeley' : `/chat-voditeley/${citySlug}`;
+	`/chat-voditeley/${citySlug}`;
 
 /** Ссылка на приложение-чат с предвыбранным городом и каналом. */
 export const chatAppUrl = (citySlug: string, fuelSlug?: string) => {

@@ -72,10 +72,11 @@ https://za-rulem.org/blog/evakuator-tyumen-kak-vybrat
 https://za-rulem.org/blog/pochemu-vazhna-vzaimovyruchka-na-doroge-tyumen
 
 # Кластер чата водителей
-https://za-rulem.org/chat-voditeley/ai92
-https://za-rulem.org/chat-voditeley/ai95
-https://za-rulem.org/chat-voditeley/ai100
-https://za-rulem.org/chat-voditeley/dt
+https://za-rulem.org/chat-voditeley/tyumen
+https://za-rulem.org/chat-voditeley/tyumen/ai92
+https://za-rulem.org/chat-voditeley/tyumen/ai95
+https://za-rulem.org/chat-voditeley/tyumen/ai100
+https://za-rulem.org/chat-voditeley/tyumen/dt
 https://za-rulem.org/chat-voditeley/ekaterinburg
 https://za-rulem.org/chat-voditeley/ekaterinburg/ai92
 https://za-rulem.org/chat-voditeley/ekaterinburg/ai95

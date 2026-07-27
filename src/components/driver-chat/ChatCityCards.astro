@@ -1,10 +1,5 @@
 ---
-import { chatCities, chatFuels, DEFAULT_CITY_SLUG, cityLandingUrl, fuelLandingUrl } from '../../data/chatCluster';
-
-const tyumenFuels = chatFuels.map(f => ({
-    name: f.name,
-    href: fuelLandingUrl(DEFAULT_CITY_SLUG, f.slug)
-}));
+import { chatCities, chatFuels, DEFAULT_CITY_SLUG, cityLandingUrl, fuelLandingUrl, chatAppUrl } from '../../data/chatCluster';
 ---
 
 <section class="chat-cities-section py-5 bg-section">
@@ -29,29 +24,23 @@ const tyumenFuels = chatFuels.map(f => ({
 							</div>
 							<div class="service-item-body">
 								<div class="service-item-content">
-									<h3><a href={city.slug === DEFAULT_CITY_SLUG ? "#chat" : cityLandingUrl(city.slug)}>{city.name}</a></h3>
+									<h3><a href={cityLandingUrl(city.slug)}>{city.name}</a></h3>
 									<p>{city.hint}</p>
 								</div>
 								
 								<div class="service-item-btn mt-3">
-									{city.slug === DEFAULT_CITY_SLUG ? (
-										<div class="tyumen-links">
-											<div class="mb-2">
-                                                <a href="#chat" class="readmore-btn">
-                                                    Открыть общий чат
-                                                </a>
-                                            </div>
-											<div class="fuel-links-grid">
-												{tyumenFuels.map(f => (
-													<a href={f.href} class="fuel-link-item">{f.name}</a>
-												))}
-											</div>
-										</div>
-									) : (
+									<div class="mb-3">
 										<a href={cityLandingUrl(city.slug)} class="readmore-btn">
 											Перейти в чат {city.ofCity}
 										</a>
-									)}
+									</div>
+									<div class="fuel-links-grid">
+										{chatFuels.map(fuel => (
+											<a href={chatAppUrl(city.slug, fuel.slug)} class="fuel-link-item">
+												{fuel.name}
+											</a>
+										))}
+									</div>
 								</div>
 							</div>
 						</div>

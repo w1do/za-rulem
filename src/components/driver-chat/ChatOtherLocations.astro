@@ -1,5 +1,5 @@
 ---
-import { chatCities, DEFAULT_CITY_SLUG, cityLandingUrl, fuelLandingUrl } from '../../data/chatCluster';
+import { chatCities, chatFuels, DEFAULT_CITY_SLUG, cityLandingUrl, fuelLandingUrl, chatAppUrl } from '../../data/chatCluster';
 
 interface Props {
     currentCitySlug: string;
@@ -47,9 +47,18 @@ const sectionTitle = currentFuelSlug
 								</div>
 								
 								<div class="service-item-btn mt-3">
-									<a href={currentFuelSlug ? fuelLandingUrl(city.slug, currentFuelSlug) : cityLandingUrl(city.slug)} class="readmore-btn">
-										{currentFuelSlug ? `Бензин в ${city.inCity}` : `Перейти в чат ${city.ofCity}`}
-									</a>
+									<div class="mb-3">
+										<a href={currentFuelSlug ? fuelLandingUrl(city.slug, currentFuelSlug) : cityLandingUrl(city.slug)} class="readmore-btn">
+											{currentFuelSlug ? `Бензин в ${city.inCity}` : `Перейти в чат ${city.ofCity}`}
+										</a>
+									</div>
+									<div class="fuel-links-grid">
+										{chatFuels.map(fuel => (
+											<a href={chatAppUrl(city.slug, fuel.slug)} class="fuel-link-item">
+												{fuel.name}
+											</a>
+										))}
+									</div>
 								</div>
 							</div>
 						</div>
@@ -93,5 +102,26 @@ const sectionTitle = currentFuelSlug
     }
     .readmore-btn:hover::after {
         margin-left: 12px;
+    }
+    .fuel-links-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .fuel-link-item {
+        display: block;
+        text-align: center;
+        padding: 6px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        font-size: 13px;
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: all 0.2s;
+        border: 1px solid #eee;
+    }
+    .fuel-link-item:hover {
+        background: var(--accent-color);
+        border-color: var(--accent-color);
     }
 </style>

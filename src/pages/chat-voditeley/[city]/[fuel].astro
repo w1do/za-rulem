@@ -4,16 +4,14 @@ import { chatCities, chatFuels, DEFAULT_CITY_SLUG } from '../../../data/chatClus
 
 export function getStaticPaths() {
 	const paths = [];
-	chatCities
-		.filter((city) => city.slug !== DEFAULT_CITY_SLUG)
-		.forEach((city) => {
-			chatFuels.forEach((fuel) => {
-				paths.push({
-					params: { city: city.slug, fuel: fuel.slug },
-					props: { city, fuel },
-				});
+	chatCities.forEach((city) => {
+		chatFuels.forEach((fuel) => {
+			paths.push({
+				params: { city: city.slug, fuel: fuel.slug },
+				props: { city, fuel },
 			});
 		});
+	});
 	return paths;
 }
 

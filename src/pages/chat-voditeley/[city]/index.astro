@@ -3,12 +3,10 @@ import ChatCityLanding from '../../../components/driver-chat/ChatCityLanding.ast
 import { chatCities, DEFAULT_CITY_SLUG } from '../../../data/chatCluster';
 
 export function getStaticPaths() {
-	return chatCities
-		.filter((city) => city.slug !== DEFAULT_CITY_SLUG)
-		.map((city) => ({
-			params: { city: city.slug },
-			props: { city },
-		}));
+	return chatCities.map((city) => ({
+		params: { city: city.slug },
+		props: { city },
+	}));
 }
 
 const { city } = Astro.props;
