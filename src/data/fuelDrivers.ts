@@ -82,4 +82,4 @@ export const fuelDrivers: FuelDriver[] = names.map((name, index) => {
 });
 
 export const getFuelDriverPath = (driver: FuelDriver) =>
-	`/${driver.citySlug}/drivers/${driver.serviceSlug}/${driver.slug}`;
+	`/drivers/${driver.citySlug}/${driver.serviceSlug}/${driver.slug}`;
