@@ -28,9 +28,12 @@ export default function VoiceRequestModal() {
 	const [transcription, setTranscription] = useState('');
 	const [phone, setPhone] = useState('');
 	const [error, setError] = useState('');
+	const [recordingTime, setRecordingTime] = useState(0);
 
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const chunksRef = useRef<Blob[]>([]);
+	const startTimeRef = useRef<number>(0);
+	const timerRef = useRef<number | null>(null);
 
 	const openModal = useCallback((detail?: OpenVoiceRequestDetail) => {
 		setHeading(detail?.title || 'Как вам удобнее?');
@@ -102,12 +105,20 @@ export default function VoiceRequestModal() {
 			const mediaRecorder = new MediaRecorder(stream);
 			mediaRecorderRef.current = mediaRecorder;
 			chunksRef.current = [];
+			startTimeRef.current = Date.now();
 
 			mediaRecorder.ondataavailable = (e) => {
 				if (e.data.size > 0) chunksRef.current.push(e.data);
 			};
 
 			mediaRecorder.onstop = () => {
+				const duration = (Date.now() - startTimeRef.current) / 1000;
+				if (duration < 0.8) {
+					setError('Запись слишком короткая. Удерживайте кнопку дольше.');
+					setStatus('idle');
+					return;
+				}
+
 				const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
 				handleTranscription(blob);
 			};
@@ -115,6 +126,11 @@ export default function VoiceRequestModal() {
 			mediaRecorder.start();
 			setStatus('recording');
 			setError('');
+			setRecordingTime(0);
+
+			timerRef.current = window.setInterval(() => {
+				setRecordingTime(t => t + 1);
+			}, 1000);
 		} catch (err) {
 			console.error('Mic error:', err);
 			setError('Не удалось получить доступ к микрофону. Проверьте разрешения в браузере.');
@@ -122,6 +138,10 @@ export default function VoiceRequestModal() {
 	};
 
 	const stopRecording = () => {
+		if (timerRef.current) {
+			clearInterval(timerRef.current);
+			timerRef.current = null;
+		}
 		if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
 			mediaRecorderRef.current.stop();
 			mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
@@ -291,7 +311,7 @@ export default function VoiceRequestModal() {
 										<i className="fa-solid fa-stop"></i>
 									</button>
 									<p className="mt-4" style={{ fontSize: '16px', fontWeight: '600', color: '#ff4444' }}>
-										Идет запись... Нажмите, чтобы закончить
+										Идет запись... {recordingTime}с. Нажмите, чтобы закончить
 									</p>
 								</div>
 							)}

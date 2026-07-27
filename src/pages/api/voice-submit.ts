@@ -4,10 +4,10 @@ import type { APIRoute } from 'astro';
  * Отправка голосовой заявки в Telegram.
  */
 const TELEGRAM_BOT_TOKEN =
-	process.env.TELEGRAM_BOT_TOKEN || '8613339179:AAGmlfd9HjXZRmIQpN5ngmlYyYcJaEXOn2Q';
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '6420797957';
+	import.meta.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '8613339179:AAGmlfd9HjXZRmIQpN5ngmlYyYcJaEXOn2Q';
+const TELEGRAM_CHAT_ID = import.meta.env.TELEGRAM_CHAT_ID || process.env.TELEGRAM_CHAT_ID || '6420797957';
 const TELEGRAM_API_BASE_URL = (
-	process.env.TELEGRAM_API_BASE_URL || 'https://shrill-sun-ef51.wotdenike.workers.dev'
+	import.meta.env.TELEGRAM_API_BASE_URL || process.env.TELEGRAM_API_BASE_URL || 'https://shrill-sun-ef51.wotdenike.workers.dev'
 ).replace(/\/$/, '');
 
 export const prerender = false;

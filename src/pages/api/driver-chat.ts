@@ -25,7 +25,7 @@ const TOPIC_LABELS: Record<ChatTopic, string> = {
 const isTopic = (value: unknown): value is ChatTopic =>
 	value === 'general' || value === 'ai95' || value === 'ai92' || value === 'dt' || value === 'queue';
 
-const CHAT_WEBHOOK_URL = import.meta.env.N8N_DRIVER_CHAT_WEBHOOK_URL;
+const CHAT_WEBHOOK_URL = import.meta.env.N8N_DRIVER_CHAT_WEBHOOK_URL || process.env.N8N_DRIVER_CHAT_WEBHOOK_URL;
 
 function json(data: unknown, status = 200) {
 	return new Response(JSON.stringify(data), {
