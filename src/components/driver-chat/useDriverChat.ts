@@ -45,6 +45,24 @@ const createId = () => {
 	return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 };
 
+// Пуш-уведомление о новом сообщении, когда вкладка/PWA свёрнута.
+// Работает через Notification API, пока страница запущена (соединение живо).
+const notifyNewMessage = (text: string) => {
+	if (typeof document === 'undefined' || document.visibilityState !== 'hidden') return;
+	if (typeof window === 'undefined' || !('Notification' in window)) return;
+	if (Notification.permission !== 'granted') return;
+	try {
+		new Notification('Чат водителей', {
+			body: text,
+			icon: '/images/logo.svg',
+			// Новые уведомления заменяют предыдущие, чтобы не копить стопку.
+			tag: 'driver-chat',
+		});
+	} catch {
+		// iOS и часть браузеров не поддерживают конструктор Notification — молча пропускаем.
+	}
+};
+
 export const normalizePhone = (value: string) => {
 	const digits = value.replace(/\D/g, '').slice(0, 11);
 	if (!digits) return '';
@@ -106,6 +124,15 @@ export function useDriverChat() {
 			console.error('Failed to fetch chat history:', e);
 		}
 	}, []);
+
+	// Запрашиваем разрешение на уведомления после входа в чат.
+	useEffect(() => {
+		if (!isJoined) return;
+		if (typeof window === 'undefined' || !('Notification' in window)) return;
+		if (Notification.permission === 'default') {
+			Notification.requestPermission().catch(() => {});
+		}
+	}, [isJoined]);
 
 	// Real-time подписка через WebSockets + резервный опрос истории
 	useEffect(() => {
@@ -182,6 +209,9 @@ export function useDriverChat() {
 								};
 								return [...current, newMsg];
 							});
+
+							// Показываем пуш-уведомление о чужом сообщении, если чат свёрнут.
+							if (msg.phone !== phoneRef.current) notifyNewMessage(msg.text);
 						}
 					}
 				}
