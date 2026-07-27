@@ -217,6 +217,20 @@ export function useDriverChat() {
 		};
 	}, [isJoined, sessionId, fetchHistory, topic]);
 
+	// Fallback-опрос по таймеру: обновляем сообщения каждые 3 секунды.
+	// Работает как страховка на случай, если WebSocket-подписка не доставляет события.
+	useEffect(() => {
+		if (!isJoined) return;
+
+		const intervalId = window.setInterval(() => {
+			fetchHistory(topicRef.current);
+		}, 3000);
+
+		return () => {
+			window.clearInterval(intervalId);
+		};
+	}, [isJoined, topic, fetchHistory]);
+
 	// Загрузка сессии из localStorage
 	useEffect(() => {
 		const saved = window.localStorage.getItem(STORAGE_KEY);
@@ -272,7 +286,7 @@ export function useDriverChat() {
 		setError('');
 
 		try {
-			await directus.request(
+			const created = (await directus.request(
 				createItem('driver_chat_messages', {
 					phone: phoneRef.current,
 					text: value,
@@ -280,8 +294,16 @@ export function useDriverChat() {
 					sessionId,
 					author_type: 'driver',
 				}),
+			)) as unknown as Partial<DirectusMessage> | undefined;
+
+			// Синхронизируем id оптимистичного сообщения с серверным,
+			// чтобы опрос истории не создавал дубликат этой же реплики.
+			const serverId = created?.id;
+			setMessages((current) =>
+				current.map((m) =>
+					m.id === id ? { ...m, id: serverId ?? m.id, status: 'sent' } : m,
+				),
 			);
-			setMessages((current) => current.map((m) => (m.id === id ? { ...m, status: 'sent' } : m)));
 			return true;
 		} catch (sendError) {
 			setMessages((current) => current.map((m) => (m.id === id ? { ...m, status: 'error' } : m)));
