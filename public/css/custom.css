@@ -5076,6 +5076,11 @@ header.main-header .header-sticky.active{
 	white-space: nowrap;
 }
 
+.fuel-calculator__discount,
+.fuel-calculator__discount b {
+	color: var(--error-color) !important;
+}
+
 .fuel-calculator__summary p{
 	margin-bottom: 20px;
 	color: rgba(255, 255, 255, 0.78);
