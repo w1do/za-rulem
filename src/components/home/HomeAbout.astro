@@ -1,6 +1,10 @@
 ---
 import type { ChatCity } from '../../data/cities';
 import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import AppImage from '../shared/ui/AppImage.astro';
+import aboutImg1 from '../../assets/images/about-us-image-1-gold.jpg';
+import aboutImg2 from '../../assets/images/about-us-image-2-gold.jpg';
+import author1 from '../../assets/images/author-1.jpg';
 
 interface AboutCounter {
 	value: string;
@@ -75,7 +79,7 @@ const counters = propCounters ?? [
                             <div class="about-us-item-gold wow fadeInUp">
                                 <div class="about-us-item-header-gold">
                                     <div class="icon-box">
-                                        <img src="/images/icon-about-us-1-gold.svg" alt="">
+                                        <img src="/images/icon-about-us-1-gold.svg" alt="Задача" width="60" height="60">
                                     </div>
                                     <div class="about-us-item-title-gold">
                                         <h3>{taskTitle}</h3>
@@ -90,7 +94,7 @@ const counters = propCounters ?? [
                             <!-- About Us Item Image Start -->
                             <div class="about-us-image-gold">
                                 <figure class="image-anime reveal">
-                                    <img src="/images/about-us-image-1-gold.jpg" alt="">
+                                    <AppImage src={aboutImg1} alt="Техпомощь на дороге" />
                                 </figure>
                             </div>
                             <!-- About Us Item Image End -->
@@ -102,7 +106,7 @@ const counters = propCounters ?? [
                             <!-- About Us Item Image Start -->
                             <div class="about-us-image-gold">
                                 <figure class="image-anime reveal">
-                                    <img src="/images/about-us-image-2-gold.jpg" alt="">
+                                    <AppImage src={aboutImg2} alt="Автопомощь Тюмень" />
                                 </figure>
                             </div>
                             <!-- About Us Item Image End -->
@@ -126,7 +130,7 @@ const counters = propCounters ?? [
                             <div class="about-us-item-gold wow fadeInUp" data-wow-delay="0.2s">
                                 <div class="about-us-item-header-gold">
                                     <div class="icon-box">
-                                        <img src="/images/icon-about-us-2-gold.svg" alt="">
+                                        <img src="/images/icon-about-us-2-gold.svg" alt="Принцип" width="60" height="60">
                                     </div>
                                     <div class="about-us-item-title-gold">
                                         <h3>{principleTitle}</h3>
@@ -150,11 +154,11 @@ const counters = propCounters ?? [
                         <div class="satisfy-client-images">
                             <div class="satisfy-client-image">
                                 <figure class="image-anime">
-                                    <img src="/images/author-1.jpg" alt="">
+                                    <AppImage src={author1} alt="Водитель" width={60} height={60} />
                                 </figure>
                             </div>
                             <div class="satisfy-client-image add-more">
-                                <img src="/images/icon-phone-primary.svg" alt="">
+                                <img src="/images/icon-phone-primary.svg" alt="Телефон" width="24" height="24">
                             </div>
                         </div>
                         <!-- Satisfy Client Images End -->    

@@ -1,0 +1,42 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+	src: string;
+	alt: string;
+	width?: number;
+	height?: number;
+	class?: string;
+	loading?: 'lazy' | 'eager';
+}
+
+const { src, alt, width, height, class: className, loading = 'lazy' } = Astro.props;
+
+// Сопоставляем пути из контента (/images/...) с ассетами (src/assets/images/...)
+const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/**/*.{jpeg,jpg,png,gif,webp}');
+
+// Нормализуем путь: если начинается с /images/, меняем на /src/assets/images/
+let imagePath = src;
+if (src.startsWith('/images/')) {
+	imagePath = `/src/assets${src}`;
+}
+
+const resolveImage = images[imagePath];
+---
+
+{
+	resolveImage ? (
+		<Image
+			src={resolveImage()}
+			alt={alt}
+			width={width}
+			height={height}
+			class={className}
+			loading={loading}
+			decoding="async"
+		/>
+	) : (
+		<img src={src} alt={alt} width={width} height={height} class={className} loading={loading} />
+	)
+}

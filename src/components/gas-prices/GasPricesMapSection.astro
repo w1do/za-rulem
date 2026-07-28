@@ -14,7 +14,7 @@ const { stations, bounds, chatUrl } = Astro.props;
 
 <div class="gas-map-section">
 	<div class="container">
-		<div class="gas-map-card wow fadeInUp">
+		<div class="gas-map-card">
    <GasMap client:only="react" initialStations={stations} bounds={bounds} chatUrl={chatUrl} />
 		</div>
 	</div>
@@ -28,11 +28,13 @@ const { stations, bounds, chatUrl } = Astro.props;
 
 	.gas-map-card {
 		width: 100%;
+		min-height: 750px;
 		margin-right: auto;
 		margin-left: auto;
 		overflow: hidden;
 		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
 		border-radius: 20px;
+		background: #eee;
 	}
 
 	@media (max-width: 767px) {
@@ -44,6 +46,7 @@ const { stations, bounds, chatUrl } = Astro.props;
 			border-right: 0;
 			border-left: 0;
 			border-radius: 12px;
+			min-height: 520px;
 			box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
 		}
 	}

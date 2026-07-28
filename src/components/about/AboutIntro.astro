@@ -1,6 +1,13 @@
 ---
 import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
 import type { ChatCity } from '../../data/cities';
+import AppImage from '../shared/ui/AppImage.astro';
+
+import aboutImg from '../../assets/images/about-us-image.jpg';
+import aboutVideoImg from '../../assets/images/about-us-video-image.jpg';
+import author1 from '../../assets/images/author-1.jpg';
+import author2 from '../../assets/images/author-2.jpg';
+import author3 from '../../assets/images/author-3.jpg';
 
 interface Props {
 	city?: ChatCity;
@@ -20,7 +27,7 @@ const city = propCity ?? getCityBySlug();
 					<!-- About Us Image Start -->
 					<div class="about-us-image">
 						<figure class="image-anime">
-							<img src="/images/about-us-image.jpg" alt={replaceCityPlaceholders("Техпомощь на дороге {inCity}", city)} />
+							<AppImage src={aboutImg} alt={replaceCityPlaceholders("Техпомощь на дороге {inCity}", city)} />
 						</figure>
 					</div>
 					<!-- About Us Image End -->
@@ -30,7 +37,7 @@ const city = propCity ?? getCityBySlug();
 						<!-- About Us Video Start -->
 						<div class="about-us-video">
 							<figure class="image-anime">
-								<img src="/images/about-us-video-image.jpg" alt="Круглосуточная автопомощь" />
+								<AppImage src={aboutVideoImg} alt="Круглосуточная автопомощь" />
 							</figure>
 							<div class="video-play-button">
 								<a href="https://www.youtube.com/watch?v=Y-x0efG1seA" class="popup-video bg-effect" data-cursor-text="Смотреть">
@@ -46,17 +53,17 @@ const city = propCity ?? getCityBySlug();
 							<div class="satisfy-client-images">
 								<div class="satisfy-client-image">
 									<figure class="image-anime">
-										<img src="/images/author-1.jpg" alt="Отзыв о техпомощи" />
+										<AppImage src={author1} alt="Отзыв о техпомощи" width={60} height={60} />
 									</figure>
 								</div>
 								<div class="satisfy-client-image">
 									<figure class="image-anime">
-										<img src="/images/author-2.jpg" alt="Отзыв о техпомощи" />
+										<AppImage src={author2} alt="Отзыв о техпомощи" width={60} height={60} />
 									</figure>
 								</div>
 								<div class="satisfy-client-image">
 									<figure class="image-anime">
-										<img src="/images/author-3.jpg" alt="Отзыв о техпомощи" />
+										<AppImage src={author3} alt="Отзыв о техпомощи" width={60} height={60} />
 									</figure>
 								</div>
 								<div class="satisfy-client-image add-more">
@@ -94,7 +101,7 @@ const city = propCity ?? getCityBySlug();
 						<!-- About Us Body Item Start -->
 						<div class="about-us-body-item wow fadeInUp" data-wow-delay="0.4s">
 							<div class="icon-box">
-								<img src="/images/icon-about-body-item-1.svg" alt="Выезд на помощь" />
+								<img src="/images/icon-about-body-item-1.svg" alt="Выезд на помощь" width="60" height="60" />
 							</div>
 							<div class="about-us-body-item-content">
 								<h3>Помощь с выездом</h3>
@@ -106,7 +113,7 @@ const city = propCity ?? getCityBySlug();
 						<!-- About Us Body Item Start -->
 						<div class="about-us-body-item wow fadeInUp" data-wow-delay="0.6s">
 							<div class="icon-box">
-								<img src="/images/icon-about-body-item-2.svg" alt="Круглосуточная работа" />
+								<img src="/images/icon-about-body-item-2.svg" alt="Круглосуточная работа" width="60" height="60" />
 							</div>
 							<div class="about-us-body-item-content">
 								<h3>Круглосуточно, 24/7</h3>
@@ -137,7 +144,7 @@ const city = propCity ?? getCityBySlug();
 							<!-- About Author Image Start -->
 							<div class="about-us-author-image">
 								<figure class="image-anime">
-									<img src="/images/author-1.jpg" alt="Мастер За рулём" />
+									<AppImage src={author1} alt="Мастер За рулём" width={60} height={60} />
 								</figure>
 							</div>
 							<!-- About Author Image End -->

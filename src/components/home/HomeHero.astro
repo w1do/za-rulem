@@ -1,5 +1,13 @@
 ---
 import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../lib/cities/types';
+import AppImage from '../shared/ui/AppImage.astro';
+import { chatAppUrl } from '../../data/cities';
+
+import author1 from '../../assets/images/author-1.jpg';
+import author2 from '../../assets/images/author-2.jpg';
+import author3 from '../../assets/images/author-3.jpg';
+import author4 from '../../assets/images/author-4.jpg';
 
 interface HeroBenefit {
 	icon: string;
@@ -93,6 +101,9 @@ const benefits = propBenefits ?? [
 							>
 								{ctaText}
 							</a>
+							<a href={chatAppUrl(city.slug)} class="btn-default">
+								Перейти в чат
+							</a>
                         </div>
                         <!-- Hero Content Button End -->
                     </div>
@@ -114,22 +125,22 @@ const benefits = propBenefits ?? [
                             <div class="satisfy-client-images">
                                 <div class="satisfy-client-image">
                                     <figure class="image-anime">
-                                        <img src="/images/author-1.jpg" alt="">
+                                        <AppImage src={author1} alt="Водитель 1" width={60} height={60} />
                                     </figure>
                                 </div>
                                 <div class="satisfy-client-image">
                                     <figure class="image-anime">
-                                        <img src="/images/author-2.jpg" alt="">
+                                        <AppImage src={author2} alt="Водитель 2" width={60} height={60} />
                                     </figure>
                                 </div>
                                 <div class="satisfy-client-image">
                                     <figure class="image-anime">
-                                        <img src="/images/author-3.jpg" alt="">
+                                        <AppImage src={author3} alt="Водитель 3" width={60} height={60} />
                                     </figure>
                                 </div>
                                 <div class="satisfy-client-image">
                                     <figure class="image-anime">
-                                        <img src="/images/author-4.jpg" alt="">
+                                        <AppImage src={author4} alt="Водитель 4" width={60} height={60} />
                                     </figure>
                                 </div>
                             </div>
@@ -153,7 +164,7 @@ const benefits = propBenefits ?? [
                         {benefits.map((item, index) => (
                         <div class="hero-benefit-item-gold wow fadeInUp" data-wow-delay={index === 0 ? undefined : `${index * 0.2}s`}>
                             <div class="icon-box">
-                                <img src={item.icon} alt="" />
+                                <img src={item.icon} alt="" width="60" height="60" />
                             </div>
                             <div class="hero-benefit-item-content-gold">
                                 <h3>{item.title}</h3>
@@ -168,3 +179,17 @@ const benefits = propBenefits ?? [
         </div>
     </div>
     <!-- Hero Section End -->
+
+<style>
+	.hero-content-btn-gold {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 20px;
+	}
+
+	@media (max-width: 767px) {
+		.hero-content-btn-gold {
+			gap: 15px;
+		}
+	}
+</style>

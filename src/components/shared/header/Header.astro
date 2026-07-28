@@ -20,22 +20,11 @@ const chatUrl = chatAppUrl(city?.slug ?? DEFAULT_CITY_SLUG);
 	<div class="header-sticky">
 		<nav class="navbar navbar-expand-lg">
 			<div class="container">
-				<!-- Logo Start -->
-				<a class="navbar-brand" href={getCityUrl('/', city?.slug)}>
-					<img src="/images/logo.svg" alt={site.brand} />
-				</a>
-				<!-- Logo End -->
-				
 				<CitySelector currentCity={city} />
 				
 				<!-- Main Menu Start -->
 				<HeaderNav city={city} />
 				<!-- Main Menu End -->
-
-				<a href={chatUrl} class="header-chat-button" aria-label="Перейти в чат" title="Перейти в чат">
-					<i class="fa-solid fa-comments" aria-hidden="true"></i>
-				</a>
-
 				<a
 					href="#"
 					class="mobile-call-button"
@@ -43,7 +32,7 @@ const chatUrl = chatAppUrl(city?.slug ?? DEFAULT_CITY_SLUG);
 					title="Позвонить"
 					onclick="event.preventDefault(); window.openVoiceRequest && window.openVoiceRequest()"
 				>
-					<div class="icon-box"><img src="/images/icon-phone-white.svg" alt="Заявка" /></div>
+					<div class="icon-box"><img src="/images/icon-phone-white.svg" alt="Заявка" width="20" height="20" /></div>
 				</a>
 
 				<div class="navbar-toggle"></div>

@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import llms from 'astro-llms-md';
+import compress from 'astro-compress';
 
 import node from '@astrojs/node';
 
@@ -14,7 +15,19 @@ const SITE = 'https://za-rulem.org';
 export default defineConfig({
   site: SITE,
   trailingSlash: 'never',
+  image: {
+    service: { entrypoint: 'astro/assets/services/sharp' },
+  },
   vite: {
+    css: {
+      lightningcss: {
+        errorRecovery: true,
+      },
+    },
+    build: {
+      cssMinify: 'lightningcss',
+      assetsInlineLimit: 2048,
+    },
     resolve: {
       dedupe: ['react', 'react-dom'],
     },
@@ -54,6 +67,15 @@ export default defineConfig({
         'form',
         'noscript',
       ],
+    }),
+    compress({
+      CSS: false, // Уже сжимается Vite + lightningcss
+      Image: false, // Уже сжимается astro:assets + sharp
+      Action: {
+        passed: (file) => {
+          console.log(`Compressed: ${file}`);
+        },
+      },
     }),
   ],
 

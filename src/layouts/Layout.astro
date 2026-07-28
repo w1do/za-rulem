@@ -2,6 +2,11 @@
 import { SITE, baseGraph, getSiteData } from '../lib/seo';
 import VoiceRequestModal from '../components/forms/VoiceRequestModal.tsx';
 import type { ChatCity } from '../data/cities';
+import '../styles/fonts.css';
+import '../styles/main.css';
+import criticalStyles from '../styles/critical.css?inline';
+import lazyStylesUrl from '../styles/lazy.css?url';
+import heroBgUrl from '../assets/images/hero-bg-image-gold.webp?url';
 
 export interface Props {
 	title: string;
@@ -78,30 +83,25 @@ const structuredData = {
 		<!-- Favicon Icon -->
 		<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.png" />
 
-		<!-- Google Fonts Css-->
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+		<!-- Montserrat Font Preload -->
 		<link
-			href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-			rel="stylesheet"
+			rel="preload"
+			href="/fonts/montserrat-normal-cyrillic.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
 		/>
 
-		<!-- Bootstrap Css -->
-		<link href="/css/bootstrap.min.css" rel="stylesheet" media="screen" />
-		<!-- SlickNav Css -->
-		<link href="/css/slicknav.min.css" rel="stylesheet" />
-		<!-- Swiper Css -->
-		<link rel="stylesheet" href="/css/swiper-bundle.min.css" />
-		<!-- Font Awesome Icon Css-->
-		<link href="/css/all.min.css" rel="stylesheet" media="screen" />
-		<!-- Animated Css -->
-		<link href="/css/animate.css" rel="stylesheet" />
-		<!-- Magnific Popup Core Css File -->
-		<link rel="stylesheet" href="/css/magnific-popup.css" />
-		<!-- Mouse Cursor Css File -->
-		<link rel="stylesheet" href="/css/mousecursor.css" />
-		<!-- Main Custom Css -->
-		<link href="/css/custom.css" rel="stylesheet" media="screen" />
+		<!-- LCP Hero Background Preload -->
+		<link rel="preload" href={heroBgUrl} as="image" type="image/webp" />
+
+		<!-- Critical CSS Inline -->
+		<style is:inline set:html={criticalStyles} />
+
+		<!-- Lazy CSS (Non-blocking) -->
+		<link rel="preload" href={lazyStylesUrl} as="style" />
+		<link rel="stylesheet" href={lazyStylesUrl} media="print" onload="this.media='all'" />
+		<noscript><link rel="stylesheet" href={lazyStylesUrl} /></noscript>
 
 		<meta name="generator" content={Astro.generator} />
 
@@ -129,7 +129,7 @@ const structuredData = {
 		</div>
 
 		<!-- Глобальная универсальная форма заявки -->
-		<VoiceRequestModal client:load />
+		<VoiceRequestModal client:idle />
 
 		<!-- Синхронизация города с URL и localStorage -->
 		<script is:inline define:vars={{ citySlug: city?.slug || 'tyumen' }}>
@@ -146,14 +146,18 @@ const structuredData = {
 					console.error('City sync failed:', e);
 				}
 
-				// Аварийное скрытие прелоадера через 5 секунд
-				setTimeout(function() {
+				// Скрытие прелоадера по готовности DOM
+				const hidePreloader = function() {
 					const preloader = document.querySelector('.preloader');
 					if (preloader && preloader.style.display !== 'none') {
 						preloader.style.opacity = '0';
 						setTimeout(function() { preloader.style.display = 'none'; }, 600);
 					}
-				}, 5000);
+				};
+				window.addEventListener('DOMContentLoaded', hidePreloader);
+
+				// Аварийное скрытие через 5 секунд
+				setTimeout(hidePreloader, 5000);
 			})();
 		</script>
 
@@ -263,51 +267,61 @@ const structuredData = {
 
 		<!-- Yandex.Metrika counter -->
 		<script type="text/javascript">
-			(function(m,e,t,r,i,k,a){
-				m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-				m[i].l=1*new Date();
-				for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-				k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-			})(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=108393118', 'ym');
+			(function() {
+				var runYm = function() {
+					(function(m,e,t,r,i,k,a){
+						m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+						m[i].l=1*new Date();
+						for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+						k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+					})(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=108393118', 'ym');
 
-			ym(108393118, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+					ym(108393118, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+				};
+
+				if ('requestIdleCallback' in window) {
+					requestIdleCallback(runYm);
+				} else {
+					setTimeout(runYm, 3000);
+				}
+			})();
 		</script>
 		<noscript><div><img src="https://mc.yandex.ru/watch/108393118" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 		<!-- /Yandex.Metrika counter -->
 
 
 		<!-- Jquery Library File -->
-		<script is:inline src="/js/jquery-3.7.1.min.js"></script>
+		<script is:inline defer src="/js/jquery-3.7.1.min.js"></script>
 		<!-- Circle Progress Js File -->
-		<script is:inline src="/js/circle-progress.min.js"></script>
+		<script is:inline defer src="/js/circle-progress.min.js"></script>
 		<!-- Bootstrap js file -->
-		<script is:inline src="/js/bootstrap.min.js"></script>
+		<script is:inline defer src="/js/bootstrap.min.js"></script>
 		<!-- Validator js file -->
-		<script is:inline src="/js/validator.min.js"></script>
+		<script is:inline defer src="/js/validator.min.js"></script>
 		<!-- SlickNav js file -->
-		<script is:inline src="/js/jquery.slicknav.js"></script>
+		<script is:inline defer src="/js/jquery.slicknav.js"></script>
 		<!-- Swiper js file -->
-		<script is:inline src="/js/swiper-bundle.min.js"></script>
+		<script is:inline defer src="/js/swiper-bundle.min.js"></script>
 		<!-- Counter js file -->
-		<script is:inline src="/js/jquery.waypoints.min.js"></script>
-		<script is:inline src="/js/jquery.counterup.min.js"></script>
+		<script is:inline defer src="/js/jquery.waypoints.min.js"></script>
+		<script is:inline defer src="/js/jquery.counterup.min.js"></script>
 		<!-- Magnific js file -->
-		<script is:inline src="/js/jquery.magnific-popup.min.js"></script>
+		<script is:inline defer src="/js/jquery.magnific-popup.min.js"></script>
 		<!-- SmoothScroll -->
-		<script is:inline src="/js/SmoothScroll.js"></script>
+		<script is:inline defer src="/js/SmoothScroll.js"></script>
 		<!-- Parallax js -->
-		<script is:inline src="/js/parallaxie.js"></script>
+		<script is:inline defer src="/js/parallaxie.js"></script>
 		<!-- MagicCursor js file -->
-		<script is:inline src="/js/gsap.min.js"></script>
-		<script is:inline src="/js/magiccursor.js"></script>
+		<script is:inline defer src="/js/gsap.min.js"></script>
+		<script is:inline defer src="/js/magiccursor.js"></script>
 		<!-- Text Effect js file -->
-		<script is:inline src="/js/SplitText.min.js"></script>
-		<script is:inline src="/js/ScrollTrigger.min.js"></script>
+		<script is:inline defer src="/js/SplitText.min.js"></script>
+		<script is:inline defer src="/js/ScrollTrigger.min.js"></script>
 		<!-- YTPlayer js File -->
-		<script is:inline src="/js/jquery.mb.YTPlayer.min.js"></script>
+		<script is:inline defer src="/js/jquery.mb.YTPlayer.min.js"></script>
 		<!-- Wow js file -->
-		<script is:inline src="/js/wow.min.js"></script>
+		<script is:inline defer src="/js/wow.min.js"></script>
 		<!-- Main Custom js file -->
-		<script is:inline src="/js/function.js"></script>
+		<script is:inline defer src="/js/function.js"></script>
 	</body>
 </html>

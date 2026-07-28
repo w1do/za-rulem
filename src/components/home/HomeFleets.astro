@@ -1,9 +1,17 @@
 ---
 import { type ChatCity } from '../../data/cities';
 import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import AppImage from '../shared/ui/AppImage.astro';
+
+import fleet1 from '../../assets/images/fleets-image-1.jpg';
+import fleet2 from '../../assets/images/fleets-image-2.jpg';
+import fleet3 from '../../assets/images/fleets-image-3.jpg';
+import fleet4 from '../../assets/images/fleets-image-4.jpg';
+import fleet5 from '../../assets/images/fleets-image-5.jpg';
+import author1 from '../../assets/images/author-1.jpg';
 
 interface FleetSlide {
-	image: string;
+	image: any;
 	alt?: string;
 	cursor?: string;
 	label: string;
@@ -44,7 +52,7 @@ const footerLinkHref = propFooterLinkHref ?? getCityUrl('/services', city.slug);
 
 const slides = propSlides ?? [
 	{
-		image: '/images/fleets-image-1.jpg',
+		image: fleet1,
 		cursor: 'Замена аккумулятора',
 		label: 'Замена аккумулятора',
 		price: 'от 5 500 ₽',
@@ -53,7 +61,7 @@ const slides = propSlides ?? [
 		href: getCityUrl('/services/tehpomosch/zamena-akkumulyatora', city.slug),
 	},
 	{
-		image: '/images/fleets-image-2.jpg',
+		image: fleet2,
 		cursor: 'Отогрев авто',
 		label: 'Отогрев авто',
 		price: 'от 5 500 ₽',
@@ -62,7 +70,7 @@ const slides = propSlides ?? [
 		href: getCityUrl('/services/tehpomosch/otogrev-avto', city.slug),
 	},
 	{
-		image: '/images/fleets-image-3.jpg',
+		image: fleet3,
 		cursor: 'Автоэлектрик и диагностика',
 		label: 'Автоэлектрик и диагностика',
 		price: 'от 5 500 ₽',
@@ -71,7 +79,7 @@ const slides = propSlides ?? [
 		href: getCityUrl('/services/tehpomosch', city.slug),
 	},
 	{
-		image: '/images/fleets-image-4.jpg',
+		image: fleet4,
 		cursor: 'Подвоз топлива',
 		label: 'Подвоз топлива',
 		price: 'от 6 500 ₽',
@@ -81,7 +89,7 @@ const slides = propSlides ?? [
 		href: getCityUrl('/services/toplivo', city.slug),
 	},
 	{
-		image: '/images/fleets-image-5.jpg',
+		image: fleet5,
 		cursor: 'Вызвать эвакуатор',
 		label: 'Эвакуатор',
 		price: 'от 5 500 ₽',
@@ -90,7 +98,7 @@ const slides = propSlides ?? [
 		href: getCityUrl('/services/tehpomosch', city.slug),
 	},
 	{
-		image: '/images/fleets-image-1.jpg',
+		image: fleet1,
 		cursor: 'Прикурить авто',
 		label: 'Прикурить авто',
 		price: 'от 5 500 ₽',
@@ -128,7 +136,7 @@ const slides = propSlides ?? [
                                         <div class="fleets-item-image">
                                             <a href={slide.href} data-cursor-text={slide.cursor}>
                                                 <figure>
-                                                    <img src={slide.image} alt={slide.alt ?? slide.label} />
+                                                    <AppImage src={slide.image} alt={slide.alt ?? slide.label} width={600} height={400} />
                                                 </figure>
                                             </a>
                                         </div>
@@ -136,7 +144,7 @@ const slides = propSlides ?? [
 
                                         <!-- Fleets Item Button Start -->
                                         <div class="fleets-item-btn">
-                                            <a href={slide.href}><img src="/images/arrow-primary.svg" alt="" /></a>
+                                            <a href={slide.href}><img src="/images/arrow-primary.svg" alt="Подробнее" width="24" height="24" /></a>
                                         </div>
                                         <!-- Project Item Button End -->
 
@@ -159,7 +167,7 @@ const slides = propSlides ?? [
                                                 <ul>
                                                     {slide.amenities.map((amenity, index) => (
                                                     <li class={/(от|до)\s*20\s*л/i.test(amenity) ? 'price-volume-highlight' : undefined}>
-                                                        <img src={amenityIcons[index] ?? amenityIcons[0]} alt="" />
+                                                        <img src={amenityIcons[index] ?? amenityIcons[0]} alt="Опция" width="24" height="24" />
                                                         {amenity}
                                                     </li>
                                                     ))}
@@ -185,11 +193,11 @@ const slides = propSlides ?? [
                         <div class="satisfy-client-images">
                             <div class="satisfy-client-image">
                                 <figure class="image-anime">
-                                    <img src="/images/author-1.jpg" alt="">
+                                    <AppImage src={author1} alt="Водитель" width={60} height={60} />
                                 </figure>
                             </div>
                             <div class="satisfy-client-image add-more">
-                                <img src="/images/icon-phone-primary.svg" alt="">
+                                <img src="/images/icon-phone-primary.svg" alt="Телефон" width="24" height="24">
                             </div>
                         </div>
                         <!-- Satisfy Client Images End -->    

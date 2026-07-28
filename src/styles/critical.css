@@ -1,0 +1,132 @@
+/* Critical CSS: Variables, Reset, Preloader, Header and Hero minimal shell */
+:root {
+  --primary-color: #000000;
+  --secondary-color: #FFFFFF;
+  --bg-color: #F6F4F3;
+  --text-color: #29313A;
+  --accent-color: #F5B754;
+  --white-color: #FFFFFF;
+  --divider-color: #0000001A;
+  --dark-divider-color: #FFFFFF1A;
+  --default-font: "Montserrat", sans-serif;
+  --accent-font: "Montserrat", sans-serif;
+}
+
+html, body {
+  width: 100%;
+  overflow-x: clip;
+}
+
+body {
+  font-family: var(--default-font);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6em;
+  color: var(--text-color);
+  background: var(--bg-color);
+  margin: 0;
+  padding: 0;
+}
+
+/* Preloader */
+.preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-container {
+  height: 100px;
+  position: relative;
+  width: 100px;
+  border-radius: 100%;
+  margin: 40px auto;
+}
+
+.loading {
+  height: 100px;
+  width: 100px;
+  border-radius: 100%;
+  border: 1px solid transparent;
+  border-color: transparent var(--white-color) transparent var(--white-color);
+  animation: rotate-loading 1.5s linear 0s infinite normal;
+  transform-origin: 50% 50%;
+}
+
+#loading-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: 66px;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes rotate-loading {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Header Shell */
+header.main-header {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  z-index: 100;
+}
+
+.header-sticky {
+  position: relative;
+  top: 0px;
+  border-bottom: 1px solid var(--dark-divider-color);
+  z-index: 100;
+}
+
+.navbar {
+  padding: 30px 0px;
+  display: flex;
+  align-items: center;
+}
+
+/* Hero Shell */
+.hero {
+  position: relative;
+  border-radius: 20px;
+  min-height: 800px;
+  padding: 230px 0 100px;
+  margin: 15px 15px 0 15px;
+  overflow: hidden;
+  background-color: var(--primary-color);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.90) 7.07%, rgba(0, 0, 0, 0.36) 50.22%, rgba(0, 0, 0, 0.90) 91.91%);
+  opacity: 0.8;
+  z-index: 2;
+}
+
+/* Common Layout Helpers */
+.container, .container-fluid {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 1200px) {
+  .container { max-width: 1140px; }
+}

@@ -1,6 +1,8 @@
 ---
 // Карточка поста для списка блога.
 // Разметка перенесена из шаблона (source/blog.html — блок post-item).
+import ContentImage from '../shared/ui/ContentImage.astro';
+
 const { title, image, imageAlt, url, delay } = Astro.props;
 ---
 
@@ -12,7 +14,7 @@ const { title, image, imageAlt, url, delay } = Astro.props;
 				<div class="post-featured-image">
 					<a href={url} data-cursor-text="Читать">
 						<figure class="image-anime">
-							<img src={image} alt={imageAlt ?? title} />
+							<ContentImage src={image} alt={imageAlt ?? title} width={400} height={250} />
 						</figure>
 					</a>
 				</div>

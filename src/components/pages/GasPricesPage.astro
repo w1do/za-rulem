@@ -6,6 +6,7 @@ import PageHeader from '../../components/shared/PageHeader.astro';
 import Alert from '../../components/shared/Alert.astro';
 import GasPricesIntro from '../../components/gas-prices/GasPricesIntro.astro';
 import GasPricesMapSection from '../../components/gas-prices/GasPricesMapSection.astro';
+import FuelDeliveryCalculator from '../../components/calculators/FuelDeliveryCalculator';
 import HomeHowItWork from '../../components/home/HomeHowItWork.astro';
 import HomeWhyChoose from '../../components/home/HomeWhyChoose.astro';
 import HubFaqs from '../../components/hub/HubFaqs.astro';
@@ -69,6 +70,12 @@ const queueGasStations = Object.values(gasStationLabels);
 	<GasPricesMapSection stations={stations} bounds={city.bounds} chatUrl={chatAppUrl(city.slug)} />
 	<!-- Gasoline Map Section End -->
 
+	<section class="gas-prices-calculator bg-section">
+		<div class="container">
+			<FuelDeliveryCalculator client:visible />
+		</div>
+	</section>
+
 	<QueueDriversPreview drivers={availableQueueDrivers} stations={queueGasStations} />
 
 	<HomeHowItWork city={city} />
@@ -85,3 +92,25 @@ const queueGasStations = Object.values(gasStationLabels);
 
 	<Footer city={city} />
 </Layout>
+
+<style>
+	.gas-prices-calculator {
+		padding: 120px 0;
+	}
+
+	.gas-prices-calculator :global(.fuel-calculator) {
+		margin: 0;
+	}
+
+	@media (max-width: 991px) {
+		.gas-prices-calculator {
+			padding: 80px 0;
+		}
+	}
+
+	@media (max-width: 767px) {
+		.gas-prices-calculator {
+			padding: 60px 0;
+		}
+	}
+</style>

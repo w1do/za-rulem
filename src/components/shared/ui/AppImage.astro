@@ -1,0 +1,53 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+	src: ImageMetadata | Promise<{ default: ImageMetadata }>;
+	alt: string;
+	preset?: 'hero' | 'content' | 'thumb';
+	widths?: number[];
+	sizes?: string;
+	class?: string;
+	loading?: 'lazy' | 'eager';
+	decoding?: 'async' | 'sync' | 'auto';
+	fetchpriority?: 'high' | 'low' | 'auto';
+	width?: number;
+	height?: number;
+}
+
+const {
+	src,
+	alt,
+	preset = 'content',
+	widths,
+	sizes,
+	class: className,
+	loading,
+	decoding = 'async',
+	fetchpriority,
+	width,
+	height,
+} = Astro.props;
+
+// Настройки по умолчанию для пресетов
+const isHero = preset === 'hero';
+const defaultLoading = isHero ? 'eager' : 'lazy';
+const defaultFetchPriority = isHero ? 'high' : 'auto';
+
+const finalLoading = loading || defaultLoading;
+const finalFetchPriority = fetchpriority || defaultFetchPriority;
+---
+
+<Image
+	src={src}
+	alt={alt}
+	widths={widths || (isHero ? [720, 1280, 1920] : [400, 800])}
+	sizes={sizes || (isHero ? '100vw' : '(max-width: 800px) 100vw, 800px')}
+	class={className}
+	loading={finalLoading}
+	decoding={decoding}
+	fetchpriority={finalFetchPriority}
+	width={width}
+	height={height}
+/>
