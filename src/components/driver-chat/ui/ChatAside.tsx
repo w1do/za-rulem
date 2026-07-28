@@ -1,8 +1,8 @@
-import { chatCities } from '../../../data/cities';
-import type { ChatTopic } from '../model/types';
+import type { ChatCityOption, ChatTopic } from '../model/types';
 import { chatChannels } from './channels';
 
 interface ChatAsideProps {
+	cities: ChatCityOption[];
 	phone: string;
 	city: string;
 	topic: ChatTopic;
@@ -15,7 +15,7 @@ const getInitials = (phone: string): string => {
 	return digits ? digits.slice(-2) : 'Я';
 };
 
-export default function ChatAside({ phone, city, topic, onSelectCity, onSelectTopic }: ChatAsideProps) {
+export default function ChatAside({ cities, phone, city, topic, onSelectCity, onSelectTopic }: ChatAsideProps) {
 	return (
 		<aside className="dc-aside">
 			<div className="dc-aside__profile">
@@ -33,7 +33,7 @@ export default function ChatAside({ phone, city, topic, onSelectCity, onSelectTo
 				value={city}
 				onChange={(event) => onSelectCity(event.target.value)}
 			>
-				{chatCities.map((item) => (
+				{cities.map((item) => (
 					<option key={item.slug} value={item.slug}>
 						{item.name}
 					</option>

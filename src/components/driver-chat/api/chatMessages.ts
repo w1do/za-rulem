@@ -21,12 +21,23 @@ const channelFilter = ({ topic, city }: ChannelFilter) => ({
 	city: { _eq: city },
 });
 
+/**
+ * Directus отдаёт datetime без указания зоны («2026-07-28T20:45:00»), а такую
+ * строку браузер трактует как локальное время. Время всегда хранится в UTC,
+ * поэтому дописываем «Z». Пустое значение означает, что времени нет.
+ */
+export const normalizeCreatedAt = (value: string | null | undefined): string | null => {
+	if (!value) return null;
+	if (/(Z|[+-]\d{2}:?\d{2})$/.test(value)) return value;
+	return `${value}Z`;
+};
+
 /** Единственная точка преобразования сообщения Directus в модель UI. */
 export const toChatMessage = (message: DirectusChatMessage, myPhone: string): ChatMessage => ({
 	id: message.id,
 	text: message.text,
 	author: message.phone === myPhone ? 'me' : message.author_type,
-	createdAt: message.date_created,
+	createdAt: normalizeCreatedAt(message.date_created),
 	status: 'sent',
 });
 
@@ -51,7 +62,16 @@ export const createChatMessage = async ({
 	sessionId,
 }: NewChatMessage): Promise<string | undefined> => {
 	const created = (await directus.request(
-		createItem(COLLECTION, { phone, text, topic, city, sessionId, author_type: 'driver' }),
+		// date_created в коллекции не автозаполняется, поэтому проставляем время сами (UTC).
+		createItem(COLLECTION, {
+			phone,
+			text,
+			topic,
+			city,
+			sessionId,
+			author_type: 'driver',
+			date_created: new Date().toISOString(),
+		}),
 	)) as unknown as Partial<DirectusChatMessage> | undefined;
 
 	return created?.id;

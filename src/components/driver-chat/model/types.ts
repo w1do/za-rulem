@@ -6,11 +6,18 @@ export type ChatMessageStatus = 'sending' | 'sent' | 'error';
 
 export type ChatAuthor = 'me' | 'driver' | 'system';
 
+/** Минимум данных о городе, который сервер передаёт в клиентский чат. */
+export type ChatCityOption = {
+	slug: string;
+	name: string;
+};
+
 export interface ChatMessage {
 	id: string;
 	text: string;
 	author: ChatAuthor;
-	createdAt: string;
+	/** ISO-строка в UTC; null, если Directus не сохранил время. */
+	createdAt: string | null;
 	status?: ChatMessageStatus;
 }
 
@@ -23,7 +30,7 @@ export interface DirectusChatMessage {
 	city: string;
 	sessionId: string;
 	author_type: Exclude<ChatAuthor, 'me'> | 'me';
-	date_created: string;
+	date_created: string | null;
 }
 
 export const isChatTopic = (value: unknown): value is ChatTopic =>

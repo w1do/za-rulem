@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { DEFAULT_CITY_SLUG } from '../../../data/cities';
+import { DEFAULT_CITY_SLUG } from '../../../lib/cities/default';
 import {
 	persistCity,
 	persistPrefs,

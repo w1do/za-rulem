@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
-import { chatCities, DEFAULT_CITY_SLUG } from '../../data/cities';
-import type { ChatTopic } from './model/types';
+import type { ChatCityOption, ChatTopic } from './model/types';
 import { useDriverChat } from './model/useDriverChat';
 import { findChannel } from './ui/channels';
 import ChatAside from './ui/ChatAside';
@@ -12,14 +11,14 @@ import ChatThread from './ui/ChatThread';
 
 export interface DriverChatProps {
 	variant?: 'app' | 'section';
+	// Справочник городов приходит с сервера: клиент не должен знать про Directus.
+	cities: ChatCityOption[];
 }
 
-const cityName = (slug: string): string =>
-	chatCities.find((city) => city.slug === slug)?.name ??
-	chatCities.find((city) => city.slug === DEFAULT_CITY_SLUG)?.name ??
-	'';
+const cityName = (cities: ChatCityOption[], slug: string): string =>
+	cities.find((city) => city.slug === slug)?.name ?? cities[0]?.name ?? '';
 
-export default function DriverChat({ variant = 'section' }: DriverChatProps) {
+export default function DriverChat({ variant = 'section', cities }: DriverChatProps) {
 	const { phone, topic, setTopic, city, setCity, isJoined, messages, error, join, send } = useDriverChat();
 	const [isAsideOpen, setIsAsideOpen] = useState(false);
 
@@ -41,6 +40,7 @@ export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 	return (
 		<div className={`dc dc--${variant}${isAsideOpen ? ' dc--aside-open' : ''}`}>
 			<ChatAside
+				cities={cities}
 				phone={phone}
 				city={city}
 				topic={topic}
@@ -51,7 +51,7 @@ export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 			<section className="dc-main">
 				<ChatHeader
 					channel={channel}
-					cityName={cityName(city)}
+					cityName={cityName(cities, city)}
 					showDownload={variant === 'app'}
 					onToggleAside={() => setIsAsideOpen((open) => !open)}
 				/>

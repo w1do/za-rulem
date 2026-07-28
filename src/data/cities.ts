@@ -2,8 +2,7 @@ import { fetchCities, type ChatCity } from '../lib/cities';
 
 export type { ChatCity };
 
-/** Базовый город кластера: его посадочные живут на /chat-voditeley/{fuel}. */
-export const DEFAULT_CITY_SLUG = 'tyumen';
+export { DEFAULT_CITY_SLUG } from '../lib/cities/default';
 
 /**
  * Полный справочник городов чата: источник истины — коллекция `cities` Directus.

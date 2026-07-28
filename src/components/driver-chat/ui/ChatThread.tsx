@@ -6,8 +6,13 @@ interface ChatThreadProps {
 	messages: ChatMessage[];
 }
 
-const formatTime = (value: string): string =>
-	new Date(value).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+/** Пустая строка вместо «05:00», если у сообщения нет корректного времени. */
+const formatTime = (value: string | null): string => {
+	if (!value) return '';
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return '';
+	return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+};
 
 const statusLabel = (status?: ChatMessageStatus): string => {
 	if (status === 'sending') return ' · отправляется';
@@ -18,6 +23,7 @@ const statusLabel = (status?: ChatMessageStatus): string => {
 export default function ChatThread({ messages }: ChatThreadProps) {
 	const endRef = useRef<HTMLDivElement>(null);
 
+	// Лента хронологическая: новые сообщения внизу, поэтому держим в фокусе конец списка.
 	useEffect(() => {
 		endRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 	}, [messages]);

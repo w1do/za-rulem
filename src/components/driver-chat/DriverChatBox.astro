@@ -2,6 +2,7 @@
 // Переиспользуемый блок чата водителей.
 // Встраивается на любую страницу как компонент, а также используется
 // на отдельной PWA-странице /chat. Стили общие для обоих сценариев.
+import { chatCities } from '../../data/cities';
 import DriverChat from './DriverChat';
 
 interface Props {
@@ -10,10 +11,13 @@ interface Props {
 }
 
 const { variant = 'section' } = Astro.props;
+
+// В island уходит только slug и название: остальные поля городу в браузере не нужны.
+const cities = chatCities.map(({ slug, name }) => ({ slug, name }));
 ---
 
 <div class:list={["dc-container", { 'dc-container--section': variant === 'section', 'dc-container--app': variant === 'app' }]}>
-	<DriverChat client:load variant={variant} />
+	<DriverChat client:load variant={variant} cities={cities} />
 </div>
 
 <style is:global>

@@ -1,8 +1,8 @@
 // Централизованные данные о бизнесе и билдеры структурированных данных (Schema.org / JSON-LD).
 // Используется базовым Layout (базовый граф WebSite + LocalBusiness) и страницами/лейаутами
 // для добавления страничных узлов (BreadcrumbList, Service, Article, FAQPage, WebPage).
-import { type ChatCity } from '../data/cities';
-import { replaceCityPlaceholders } from './city';
+import type { ChatCity } from './cities/types';
+import { replaceCityPlaceholders } from './cityText';
 
 const rawPhone = import.meta.env.PUBLIC_PHONE_NUMBER || import.meta.env.PHONE_NUMBER || '+79088712026';
 

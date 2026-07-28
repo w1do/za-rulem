@@ -1,4 +1,4 @@
-import { chatCities, DEFAULT_CITY_SLUG } from '../../../data/cities';
+import { DEFAULT_CITY_SLUG } from '../../../lib/cities/default';
 import { isChatTopic, type ChatTopic } from '../model/types';
 import { isValidPhone, normalizePhone } from './phone';
 
@@ -11,8 +11,11 @@ export interface ChatPrefs {
 	city: string;
 }
 
+// Справочник городов живёт на сервере, поэтому в браузере проверяем только форму слага.
+const CITY_SLUG_PATTERN = /^[a-z0-9-]{2,50}$/;
+
 export const isKnownCity = (slug: unknown): slug is string =>
-	typeof slug === 'string' && chatCities.some((city) => city.slug === slug);
+	typeof slug === 'string' && CITY_SLUG_PATTERN.test(slug);
 
 export const resolveCity = (slug: unknown): string => (isKnownCity(slug) ? slug : DEFAULT_CITY_SLUG);
 
