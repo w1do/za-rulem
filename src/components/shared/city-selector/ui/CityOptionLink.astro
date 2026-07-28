@@ -1,0 +1,72 @@
+---
+import type { CityOption } from '../lib/cityOptions';
+
+interface Props {
+	option: CityOption;
+}
+
+const { option } = Astro.props;
+const { city, region, href, isActive } = option;
+---
+
+<a
+	href={href}
+	class:list={['city-option', { 'is-active': isActive }]}
+	data-city-option
+	data-city-slug={city.slug}
+	data-city-name={city.name}
+	data-city-region={region}
+	aria-current={isActive ? 'true' : undefined}
+>
+	<span class="city-option__name">{city.name}</span>
+	<span class="city-option__hint">{region || city.hint}</span>
+</a>
+
+<style>
+	.city-option {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		padding: 14px 18px;
+		background: var(--bg-color);
+		border: 1px solid transparent;
+		border-radius: 16px;
+		color: var(--primary-color);
+		text-decoration: none;
+		transition: all 0.3s ease-in-out;
+	}
+
+	.city-option[hidden] {
+		display: none;
+	}
+
+	.city-option:hover,
+	.city-option:focus-visible {
+		background: var(--white-color);
+		border-color: var(--accent-color);
+		transform: translateY(-2px);
+	}
+
+	.city-option.is-active {
+		background: var(--accent-color);
+		border-color: var(--accent-color);
+	}
+
+	.city-option__name {
+		font-size: 15px;
+		font-weight: 600;
+		line-height: 1.2em;
+	}
+
+	.city-option__hint {
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 1.4em;
+		color: var(--text-color);
+		opacity: 0.7;
+	}
+
+	.city-option.is-active .city-option__hint {
+		opacity: 0.8;
+	}
+</style>

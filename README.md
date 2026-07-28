@@ -13,9 +13,9 @@
 - **Вёрстка и стили**: HTML/CSS/JS исходного шаблона из `public/css` и `public/js` (Bootstrap grid, Swiper, WOW, GSAP, jQuery). Tailwind/Shadcn **не подключены** — приоритет точного переноса шаблона.
 - **Контент**: Markdown через Astro Content Collections.
 - **Формы**: отправка заявок POST-запросом на n8n (`https://n8n.w1do.ru/webhook/requests`, `project=za-rulem`).
-- **Чат водителей**: страница `/chat-voditeley` отправляет запросы через серверный `/api/driver-chat` на `N8N_DRIVER_CHAT_WEBHOOK_URL`.
+- **Чат водителей**: React-остров `components/driver-chat` работает напрямую с Directus (`PUBLIC_DIRECTUS_URL`, коллекция `driver_chat_messages`): история через REST, новые сообщения через WebSocket с резервным опросом.
 
-Чат использует единый POST-контракт n8n: `action` (`join`, `send`, `sync`), `phone`, `sessionId`, `message` и `clientMessageId`. В ответе ожидается массив `messages` (также поддерживается `data.messages`) или строка `reply`; у сообщения поддерживаются поля `id`, `text`/`message`, `author`, `phone`, `createdAt`/`timestamp`.
+Модули чата: `model/` — типы и хуки (`useChatSession` — номер/канал/город, `useChatMessages` — лента и отправка, `useDriverChat` — сборка для UI); `api/chatMessages.ts` — единственная точка обращения к Directus; `lib/` — телефон, настройки в localStorage/URL, уведомления; `ui/` — экран входа, панель каналов, шапка, лента, поле ввода.
 
 Требуется **Node.js >= 22.12.0**.
 
@@ -31,6 +31,25 @@
 | `npm run preview` | Локальный предпросмотр собранного сайта           |
 | `npm run astro`   | Команды Astro CLI (`astro add`, `astro check`)    |
 
+### Справочник городов (Directus)
+
+Источник истины — коллекция `cities` в Directus (`status: published`). Города редактируются в админке без деплоя.
+
+- `src/lib/cities/` — загрузка городов: `index.ts` (публичный API, `fetchCities` и тип `ChatCity`), `types.ts` (тип `ChatCity`), `api.ts` (запрос и fallback), `config.ts` (адрес Directus, таймаут, TTL), `dto.ts` (поля и валидация записей), `cache.ts` (кеш процесса), `parse.ts` (примитивы разбора).
+- `src/data/cities.ts` — ре-экспорт `ChatCity`, `chatCities` (загружается один раз на процесс), `findCity`, URL-хелперы.
+- `src/data/cities/fallback.ts` — резервные 36 городов: используются только если Directus недоступен.
+- `src/data/cityMeta.ts` — таблица «регион → федеральный округ», формат населения и шаблоны title/description (приоритет у `seo_title`/`seo_description` из Directus).
+- Поля Directus: `slug`, `name`, `case_in/of/by/for`, `hint`, `bounds_*`, `center_*`, `region`, `population`, `is_featured`, `is_indexable`, `seo_title`, `seo_description`, `sort`, `status`.
+- Регион виден в селекторе города (и участвует в поиске), в блоке «другие локации» и в мета-тегах страницы города.
+
+Адрес API: `DIRECTUS_URL` (рантайм) или `PUBLIC_DIRECTUS_URL`. После правок в Directus достаточно перезапустить сервер — пересборка не нужна.
+
+Кеш городов: список запрашивается не чаще, чем раз в `CITIES_CACHE_TTL_MS` (по умолчанию 600000 мс, `0` отключает кеш). Параллельные рендеры ждут один запрос, а при недоступности Directus отдаётся последний успешный список либо резервный.
+
+### Рендеринг городских страниц
+
+Городские маршруты `src/pages/[city]/**` отдаются по запросу (`export const prerender = false`, адаптер `@astrojs/node` в режиме `standalone`), неизвестный слаг города возвращает 404. Поэтому сборка занимает ~1 минуту и 61 страницу вместо тысяч предгенерированных. Городские URL публикуются в `/sitemap-cities.xml` (по флагу `is_indexable`), он указан в `public/robots.txt` рядом с `sitemap-index.xml`.
+
 ## 📁 Структура проекта (FSD-lite)
 
 ```text
@@ -41,7 +60,7 @@
 ├── src/
 │   ├── layouts/            # Layout, HubLayout, ServiceLayout, ServiceLandingLayout, BlogLayout
 │   ├── components/
-│   │   ├── shared/         # header/, footer/ — общие блоки
+│   │   ├── shared/         # header/, footer/, city-selector/ — общие блоки
 │   │   ├── home/           # блоки главной страницы
 │   │   ├── about/          # блоки страницы «О сервисе»
 │   │   ├── hub/            # блоки лендинга хаба услуги (pillar)

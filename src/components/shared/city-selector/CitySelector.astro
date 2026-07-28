@@ -1,0 +1,70 @@
+---
+import type { ChatCity } from '../../../data/cities';
+import { getCityOptions } from './lib/cityOptions';
+import CityModal from './ui/CityModal.astro';
+import CityTrigger from './ui/CityTrigger.astro';
+
+interface Props {
+	currentCity?: ChatCity;
+}
+
+const { currentCity } = Astro.props;
+const options = getCityOptions(currentCity?.slug);
+const cityName = currentCity?.name ?? 'Тюмень';
+const modalId = 'city-modal';
+---
+
+<div class="city-selector" data-city-selector>
+	<CityTrigger cityName={cityName} modalId={modalId} />
+	<CityModal id={modalId} options={options} />
+</div>
+
+<style>
+	.city-selector {
+		display: inline-flex;
+		align-items: center;
+	}
+</style>
+
+<script>
+	import { createCityModal } from './lib/cityModal';
+	import { saveCity, syncCityFromUrl } from './lib/cityStorage';
+
+	let destroy: (() => void) | null = null;
+
+	function initCitySelector() {
+		destroy?.();
+		destroy = null;
+
+		const root = document.querySelector<HTMLElement>('[data-city-selector]');
+		const trigger = root?.querySelector<HTMLElement>('[data-city-trigger]');
+		const modal = root?.querySelector<HTMLElement>('[data-city-modal]');
+		const dialog = modal?.querySelector<HTMLElement>('[data-city-modal-dialog]');
+		if (!root || !trigger || !modal || !dialog) return;
+
+		const options = Array.from(root.querySelectorAll<HTMLElement>('[data-city-option]'));
+
+		destroy = createCityModal({
+			trigger,
+			modal,
+			dialog,
+			closeButton: modal.querySelector<HTMLElement>('[data-city-modal-close]'),
+			backdrop: modal.querySelector<HTMLElement>('[data-city-modal-backdrop]'),
+			search: modal.querySelector<HTMLInputElement>('[data-city-search]'),
+			options,
+			empty: modal.querySelector<HTMLElement>('[data-city-empty]'),
+		});
+
+		for (const option of options) {
+			option.addEventListener('click', () => {
+				const slug = option.dataset.citySlug;
+				if (slug) saveCity(slug);
+			});
+		}
+
+		syncCityFromUrl(options.map((option) => option.dataset.citySlug ?? ''));
+	}
+
+	initCitySelector();
+	document.addEventListener('astro:page-load', initCitySelector);
+</script>

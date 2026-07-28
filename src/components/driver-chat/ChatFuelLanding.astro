@@ -10,7 +10,7 @@ import HubCta from '../hub/HubCta.astro';
 import ChatOtherLocations from './ChatOtherLocations.astro';
 import { webPageNode, breadcrumbNode, faqNode } from '../../lib/seo';
 import type { ChatCity } from '../../data/cities';
-import { chatCities, DEFAULT_CITY_SLUG, chatAppUrl, fuelLandingUrl, cityLandingUrl } from '../../data/cities';
+import { DEFAULT_CITY_SLUG, chatAppUrl, fuelLandingUrl, cityLandingUrl } from '../../data/cities';
 import { chatFuels, type ChatFuel } from '../../data/chatCluster';
 
 interface Props {
@@ -58,7 +58,6 @@ const jsonLd = [
 ];
 
 const otherFuels = chatFuels.filter((f) => f.slug !== fuel.slug);
-const otherCities = chatCities.filter((c) => c.slug !== city.slug);
 
 const breadcrumbItems = [
 	{ label: 'Главная', href: '/' },

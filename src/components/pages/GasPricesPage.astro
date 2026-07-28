@@ -12,9 +12,15 @@ import HubFaqs from '../../components/hub/HubFaqs.astro';
 import HubCta from '../../components/hub/HubCta.astro';
 import QueueDriversPreview from '../../components/queues/QueueDriversPreview.astro';
 import { gasStationLabels, queueDrivers } from '../../data/queueDrivers';
-import { chatCities, DEFAULT_CITY_SLUG } from '../../data/cities';
 import type { ChatCity } from '../../data/cities';
+import { chatAppUrl } from '../../data/cities';
 import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import { fetchGasStations } from '../../lib/gasStations';
+import {
+	buildGasPricesFaqs,
+	buildGasPricesIntro,
+	buildGasPricesMeta,
+} from '../../data/gasPricesContent';
 
 import { webPageNode, breadcrumbNode } from '../../lib/seo';
 
@@ -24,36 +30,16 @@ export interface Props {
 
 const { city } = Astro.props;
 
-// Fetch gasoline data for the current city
-const bounds = city?.bounds;
-
-let stations = [];
-let pageData = {
-	title: replaceCityPlaceholders("Цены на бензин {inCity} сегодня | Где бензин", city),
-	h1: replaceCityPlaceholders("Цены на бензин {inCity} сегодня: где заправиться дешевле?", city),
-	description: replaceCityPlaceholders("Актуальные цены на бензин АИ-92, АИ-95 и ДТ {inCity} на сегодня. Смотрите карту заправок с ценами и экономьте на топливе.", city),
-	text: "",
-};
-
-if (bounds) {
-	try {
-		const { minLat, maxLat, minLon, maxLon } = bounds;
-		const response = await fetch(
-			`https://benzin.api.2gis.ru/api/v1/stations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`
-		);
-		if (response.ok) {
-			stations = await response.json();
-		}
-	} catch (error) {
-		console.error("Error fetching gas prices from 2GIS:", error);
-	}
-}
+const meta = buildGasPricesMeta(city);
+const intro = buildGasPricesIntro(city);
+const faqs = buildGasPricesFaqs(city);
+const stations = await fetchGasStations(city.bounds);
 
 const url = getCityUrl('/ceny-na-benzin', city.slug);
 const jsonLd = [
 	webPageNode({
-		name: pageData.title,
-		description: pageData.description,
+		name: meta.title,
+		description: meta.description,
 		url: url,
 	}),
 	breadcrumbNode([
@@ -62,80 +48,25 @@ const jsonLd = [
 	]),
 ];
 
-const faqs = [
-	{
-		question: replaceCityPlaceholders("Где самый дешевый бензин {inCity} сегодня?", city),
-		answer: replaceCityPlaceholders(
-			"Цены на топливо постоянно меняются. На нашей интерактивной карте вы можете в реальном времени сравнить стоимость АИ-92, АИ-95 и дизеля на всех популярных АЗС {ofCity}, включая Газпромнефть, Лукойл, Роснефть и другие.",
-			city,
-		),
-	},
-	{
-		question: "Как часто обновляются данные о ценах?",
-		answer: "Информация на карте обновляется ежедневно на основе данных от поставщиков и отзывов пользователей. Мы стараемся предоставлять самые свежие сведения, чтобы вы могли сэкономить на каждой заправке.",
-	},
-	{
-		question: "Что делать, если закончился бензин посреди дороги?",
-		answer: replaceCityPlaceholders(
-			"Если вы не рассчитали запас топлива и заглохли, я готов прийти на помощь. Я осуществляю подвоз бензина или дизельного топлива в любую точку {ofCity} и области. Просто оставьте заявку на сайте, и я приеду к вам в течение 15-30 минут.",
-			city,
-		),
-	},
-	{
-		question: replaceCityPlaceholders("Какое топливо лучше заправлять {inCity}?", city),
-		answer: replaceCityPlaceholders(
-			"Я рекомендую придерживаться рекомендаций производителя вашего автомобиля. {inCity} представлены все крупные федеральные сети (Газпромнефть, Лукойл, Роснефть), и качество топлива на них, как правило, высокое. Моя карта поможет вам найти АИ-95, АИ-92 или дизель с актуальным ценником.",
-			city,
-		),
-	},
-	{
-		question: replaceCityPlaceholders("Как сэкономить на бензине {inCity}?", city),
-		answer: replaceCityPlaceholders(
-			"Помимо мониторинга цен на моей карте, используйте бонусные программы сетей АЗС. Также следите за давлением в шинах и исправностью двигателя — это снижает расход. А планирование заправок через мой сервис позволит вам избежать переплат на 'дорогих' станциях города.",
-			city,
-		),
-	},
-];
-
 const availableQueueDrivers = queueDrivers.filter((driver) => driver.status === "free").slice(0, 6);
 const queueGasStations = Object.values(gasStationLabels);
 ---
 
-<Layout title={pageData.title} description={pageData.description} jsonLd={jsonLd} city={city}>
+<Layout title={meta.title} description={meta.description} jsonLd={jsonLd} city={city}>
 	<Header city={city} />
 
 	<PageHeader
-		title={pageData.h1}
+		title={meta.h1}
 		items={[{ label: 'главная', href: getCityUrl('/', city.slug) }, { label: 'цены на бензин' }]}
 		showChatButton={true}
 	/>
 
 	<!-- Gasoline Map Section Start -->
-	<GasPricesIntro
-		subtitle={replaceCityPlaceholders("Карта заправок {ofCity}", city)}
-		title="Бензин по наличию на АЗС"
-		description={replaceCityPlaceholders("Я отслеживаю актуальное наличие топлива и цены на заправках {ofCity}. Используйте поиск и список слева, чтобы быстро найти нужную марку бензина (АИ-92, АИ-95) или дизельное топливо. Карта поможет проложить маршрут до ближайшей работающей станции.", city)}
-		image="/images/blog/azs.jpg"
-		imageAlt={replaceCityPlaceholders("Карта заправок и цены на бензин {inCity}", city)}
-		features={[
-			{
-				icon: '/images/icon-about-body-item-1.svg',
-				iconAlt: 'Поиск АЗС',
-				title: 'Быстрый поиск',
-				text: 'Выберите нужное топливо и найдите ближайшую работающую АЗС.',
-			},
-			{
-				icon: '/images/icon-about-body-item-2.svg',
-				iconAlt: 'Цены и наличие топлива',
-				title: 'Цены и наличие',
-				text: 'Сравните стоимость топлива, статус станции и информацию об очереди.',
-			},
-		]}
-	/>
+	<GasPricesIntro {...intro} />
 
-	<Alert />
+	<Alert chatHref={chatAppUrl(city.slug)} />
 
-	<GasPricesMapSection stations={stations} bounds={bounds} />
+	<GasPricesMapSection stations={stations} bounds={city.bounds} chatUrl={chatAppUrl(city.slug)} />
 	<!-- Gasoline Map Section End -->
 
 	<QueueDriversPreview drivers={availableQueueDrivers} stations={queueGasStations} />

@@ -102,3 +102,10 @@ https://za-rulem.org/tobolsk/chat-voditeley/ai92
 https://za-rulem.org/tobolsk/chat-voditeley/ai95
 https://za-rulem.org/tobolsk/chat-voditeley/ai100
 https://za-rulem.org/tobolsk/chat-voditeley/dt
+
+# Городские разделы генерируются для всех городов из src/data/cities.ts
+# (базовый список + src/data/cities/{south,volga,central,east}.ts, сейчас 294 города):
+# /{city}, /{city}/about, /{city}/contacts, /{city}/drivers, /{city}/queue,
+# /{city}/partners, /{city}/calculator, /{city}/testimonials, /{city}/services/*,
+# /{city}/ceny-na-benzin, /{city}/chat, /{city}/chat-voditeley[/{fuel}].
+# Полный перечень адресов — в sitemap-index.xml после сборки.

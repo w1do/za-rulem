@@ -1,22 +1,13 @@
 ---
 import ChatFuelLanding from '../../../components/driver-chat/ChatFuelLanding.astro';
-import { chatCities, DEFAULT_CITY_SLUG } from '../../../data/cities';
+import { findCity } from '../../../data/cities';
 import { chatFuels } from '../../../data/chatCluster';
 
-export function getStaticPaths() {
-	const paths = [];
-	chatCities.forEach((city) => {
-		chatFuels.forEach((fuel) => {
-			paths.push({
-				params: { city: city.slug, fuel: fuel.slug },
-				props: { city, fuel },
-			});
-		});
-	});
-	return paths;
-}
+export const prerender = false;
 
-const { city, fuel } = Astro.props;
+const city = findCity(Astro.params.city);
+const fuel = chatFuels.find((item) => item.slug === Astro.params.fuel);
+if (!city || !fuel) return new Response('Страница не найдена', { status: 404 });
 ---
 
 <ChatFuelLanding city={city} fuel={fuel} />

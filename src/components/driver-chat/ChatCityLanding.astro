@@ -12,7 +12,8 @@ import FuelPricesTable from '../FuelPricesTable';
 import GasPricesMapSection from '../gas-prices/GasPricesMapSection.astro';
 import { webPageNode, breadcrumbNode, faqNode } from '../../lib/seo';
 import type { ChatCity } from '../../data/cities';
-import { chatCities, DEFAULT_CITY_SLUG, chatAppUrl, fuelLandingUrl, cityLandingUrl } from '../../data/cities';
+import { DEFAULT_CITY_SLUG, chatAppUrl, fuelLandingUrl, cityLandingUrl } from '../../data/cities';
+import { districtOfRegion, formatPopulation, citySeoTitle, citySeoDescription } from '../../data/cityMeta';
 import { chatFuels } from '../../data/chatCluster';
 
 interface Props {
@@ -70,9 +71,13 @@ if (city.bounds) {
 }
 
 // SEO
+const region = city.region;
+const district = districtOfRegion(region);
+const population = city.population;
+
 const title = city.slug === DEFAULT_CITY_SLUG 
     ? `Чат водителей Тюмени: цены на бензин сегодня, очереди и наличие топлива на АЗС`
-    : `Чат водителей ${city.name}: где есть топливо и очереди на АЗС`;
+    : citySeoTitle(city);
 
 const h1 = city.slug === DEFAULT_CITY_SLUG
     ? `Чат водителей Тюмени: АЗС, цены на бензин и очереди`
@@ -80,7 +85,17 @@ const h1 = city.slug === DEFAULT_CITY_SLUG
 
 const description = city.slug === DEFAULT_CITY_SLUG
     ? `Актуальные цены на бензин АИ-95, АИ-92 и дизель в Тюмени сегодня. Живой чат водителей: где сейчас есть топливо и какие очереди на АЗС. Смотрите карту заправок в реальном времени.`
-    : `Живой чат водителей ${city.ofCity}: узнайте, на каких АЗС сейчас есть бензин и дизель. Актуальные цены, очереди на заправках и взаимопомощь на дорогах ${city.ofCity}.`;
+    : citySeoDescription(city);
+
+/** Подпись с административной привязкой: читателю видно, к какому региону относится город. */
+const regionLabel = region ? `Чат водителей ${city.name} · ${region}` : `Чат водителей ${city.name}`;
+
+const introDescription = [
+	`Я объединил водителей ${city.ofCity} в один чат, чтобы каждый мог вовремя узнать, где есть нужная марка бензина или дизеля. Больше не нужно гадать — просто спросите у тех, кто уже на заправке. Взаимовыручка помогает нам всем экономить время.`,
+	region ? `${city.name} — город в ${region}${district ? ` (${district})` : ''}${population ? `, ${formatPopulation(population)}` : ''}.` : '',
+]
+	.filter(Boolean)
+	.join(' ');
 
 const url = cityLandingUrl(city.slug);
 
@@ -113,7 +128,6 @@ const jsonLd = [
 	faqNode(faqs),
 ];
 
-const otherCities = chatCities.filter((c) => c.slug !== city.slug);
 
 const breadcrumbItems = [
 	{ label: 'Главная', href: '/' },
@@ -128,9 +142,9 @@ const breadcrumbItems = [
 		<PageHeader title={h1} items={breadcrumbItems} showChatButton={true} chatLink={chatAppUrl(city.slug)} />
 
 		<GasPricesIntro
-			subtitle={`Чат водителей ${city.name}`}
+			subtitle={regionLabel}
 			title={`Узнайте обстановку на АЗС ${city.ofCity}`}
-			description={`Я объединил водителей ${city.ofCity} в один чат, чтобы каждый мог вовремя узнать, где есть нужная марка бензина или дизеля. Больше не нужно гадать — просто спросите у тех, кто уже на заправке. Взаимовыручка помогает нам всем экономить время.`}
+			description={introDescription}
 			image="/images/blog/azs.jpg"
 			imageAlt={`Чат водителей ${city.name}`}
 			features={[
@@ -194,7 +208,7 @@ const breadcrumbItems = [
                     </div>
                 </section>
 
-                <GasPricesMapSection stations={stations} bounds={city.bounds} />
+                <GasPricesMapSection stations={stations} bounds={city.bounds} chatUrl={chatAppUrl(city.slug)} />
             </>
         )}
 

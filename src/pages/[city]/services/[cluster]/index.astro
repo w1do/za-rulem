@@ -1,42 +1,28 @@
 ---
 import { getCollection, render } from 'astro:content';
 import HubLayout from '../../../../layouts/HubLayout.astro';
-import { chatCities } from '../../../../data/cities';
+import { findCity } from '../../../../data/cities';
 import { removeCityPlaceholders, getCityUrl } from '../../../../lib/city';
 
-export async function getStaticPaths() {
-	const hubs = await getCollection('services', ({ data }) => data.hub === true);
-	const spokes = await getCollection('serviceLanding');
-	
-	const paths = [];
-	
-	for (const city of chatCities) {
-		for (const pillar of hubs) {
-			paths.push({
-				params: { city: city.slug, cluster: pillar.id },
-				props: {
-					city,
-					pillar,
-					spokes: spokes
-						.filter(({ data }) => data.cluster === pillar.id)
-						.sort((a, b) => a.data.order - b.data.order)
-						.map((entry) => ({
-							title: removeCityPlaceholders(entry.data.title),
-							description: removeCityPlaceholders(entry.data.description),
-							excerpt: removeCityPlaceholders(entry.data.excerpt),
-							icon: entry.data.icon,
-							tags: entry.data.tags,
-							url: getCityUrl(`/services/${pillar.id}/${entry.id.split('/').pop()}`, city.slug),
-						})),
-				},
-			});
-		}
-	}
-	
-	return paths;
-}
+export const prerender = false;
 
-const { city, pillar, spokes } = Astro.props;
+const city = findCity(Astro.params.city);
+const pillar = city
+	? (await getCollection('services', ({ data, id }) => data.hub === true && id === Astro.params.cluster))[0]
+	: undefined;
+if (!city || !pillar) return new Response('Страница не найдена', { status: 404 });
+
+const spokes = (await getCollection('serviceLanding', ({ data }) => data.cluster === pillar.id))
+	.sort((a, b) => a.data.order - b.data.order)
+	.map((entry) => ({
+		title: removeCityPlaceholders(entry.data.title),
+		description: removeCityPlaceholders(entry.data.description),
+		excerpt: removeCityPlaceholders(entry.data.excerpt),
+		icon: entry.data.icon,
+		tags: entry.data.tags,
+		url: getCityUrl(`/services/${pillar.id}/${entry.id.split('/').pop()}`, city.slug),
+	}));
+
 const { Content } = await render(pillar);
 ---
 

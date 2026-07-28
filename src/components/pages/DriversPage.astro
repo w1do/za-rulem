@@ -11,6 +11,7 @@ import FuelDriverCard from '../../components/fleets/FuelDriverCard.astro';
 import Alert from '../../components/shared/Alert.astro';
 import { fuelDrivers } from '../../data/fuelDrivers';
 import type { ChatCity } from '../../data/cities';
+import { chatAppUrl } from '../../data/cities';
 import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
 
 export interface Props {
@@ -82,7 +83,7 @@ const faqs = [
 
 	<!-- Page Fleets Section Start -->
 	<div class="page-fleets">
-		<Alert />
+		<Alert chatHref={chatAppUrl(city.slug)} />
 
 		<div class="container mt-5">
 			<div class="row fuel-delivery-layout">

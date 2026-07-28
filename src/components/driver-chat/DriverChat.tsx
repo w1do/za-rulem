@@ -1,244 +1,73 @@
-import { chatCities } from '../../data/cities';
-import type { FormEvent } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useDriverChat, type ChatTopic } from './useDriverChat';
+import { useState } from 'react';
 
-// ==== UI Components Data ====
-
-interface Channel {
-	id: ChatTopic;
-	title: string;
-	hint: string;
-	icon: string;
-}
-
-const channels: Channel[] = [
-	{ id: 'general', title: 'Общий чат', hint: 'Где сейчас есть топливо', icon: 'fa-comments' },
-	{ id: 'ai95', title: 'АИ-95', hint: 'Наличие и очереди', icon: 'fa-gas-pump' },
-	{ id: 'ai92', title: 'АИ-92', hint: 'Наличие и очереди', icon: 'fa-gas-pump' },
-	{ id: 'ai100', title: 'АИ-100', hint: 'Наличие и очереди', icon: 'fa-gauge-high' },
-	{ id: 'dt', title: 'Дизель · ДТ', hint: 'Где заправить дизель по трассе', icon: 'fa-truck-moving' },
-	{ id: 'queue', title: 'Очереди на АЗС', hint: 'Сколько сейчас ждать', icon: 'fa-clock' },
-];
-
-
-const placeholderByTopic: Record<ChatTopic, string> = {
-	general: 'Например: где сейчас есть топливо в центре?',
-	ai95: 'Например: есть ли АИ-95 на Мельникайте?',
-	ai92: 'Например: где найти АИ-92 в Заречном?',
-	ai100: 'Например: где в наличии АИ-100?',
-	dt: 'Например: где заправить дизель по трассе?',
-	queue: 'Например: какая сейчас очередь на АЗС?',
-};
-
-const formatTime = (value: string) =>
-	new Date(value).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+import { chatCities, DEFAULT_CITY_SLUG } from '../../data/cities';
+import type { ChatTopic } from './model/types';
+import { useDriverChat } from './model/useDriverChat';
+import { findChannel } from './ui/channels';
+import ChatAside from './ui/ChatAside';
+import ChatComposer from './ui/ChatComposer';
+import ChatHeader from './ui/ChatHeader';
+import ChatLogin from './ui/ChatLogin';
+import ChatThread from './ui/ChatThread';
 
 export interface DriverChatProps {
 	variant?: 'app' | 'section';
 }
 
-// ==== Main Component ====
+const cityName = (slug: string): string =>
+	chatCities.find((city) => city.slug === slug)?.name ??
+	chatCities.find((city) => city.slug === DEFAULT_CITY_SLUG)?.name ??
+	'';
 
 export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 	const { phone, topic, setTopic, city, setCity, isJoined, messages, error, join, send } = useDriverChat();
-	
-	const [phoneInput, setPhoneInput] = useState('');
-	const [message, setMessage] = useState('');
-	const [asideOpen, setAsideOpen] = useState(false);
-	
-	const endRef = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		endRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-	}, [messages]);
-
-	const handleJoin = (event: FormEvent) => {
-		event.preventDefault();
-		event.stopPropagation();
-		// @ts-ignore
-		if (event.nativeEvent) event.nativeEvent.stopImmediatePropagation();
-		join(phoneInput);
-		return false;
-	};
-
-	const handleSend = async (event: FormEvent) => {
-		event.preventDefault();
-		if (await send(message)) setMessage('');
-	};
-
-	const handlePickChannel = (id: ChatTopic) => {
-		setTopic(id);
-		setAsideOpen(false);
-	};
-
-	const activeChannel = useMemo(
-		() => channels.find((item) => item.id === topic) ?? channels[0],
-		[topic],
-	);
-
-	const initials = useMemo(() => {
-		const digits = phone.replace(/\D/g, '');
-		return digits ? digits.slice(-2) : 'Я';
-	}, [phone]);
+	const [isAsideOpen, setIsAsideOpen] = useState(false);
 
 	if (!isJoined) {
 		return (
 			<div className={`dc dc--${variant} dc--login`}>
-				<form className="dc-login" onSubmit={handleJoin} noValidate method="GET" action="/chat" data-skip-service-request>
-					<input type="hidden" name="city" value={city} />
-					<input type="hidden" name="topic" value={topic} />
-					<div className="dc-login__badge"><i className="fa-solid fa-gas-pump"></i></div>
-					<span className="section-sub-title">Чат водителей</span>
-					<h3>Укажи номер — и сразу в чат</h3>
-					<p>Живой чат, где водители подсказывают друг другу, где сейчас есть топливо и какие очереди на АЗС. Пароль и код из SMS не нужны — номер хранится только на этом устройстве.</p>
-
-					<label htmlFor="dc-phone">Номер телефона</label>
-					<div className="form-group dc-login__row">
-						<input
-							className="form-control"
-							id="dc-phone"
-							name="phone"
-							type="tel"
-							inputMode="tel"
-							autoComplete="tel"
-							placeholder="+7 999 000-00-00"
-							value={phoneInput}
-							onChange={(event) => setPhoneInput(event.target.value)}
-							required
-						/>
-						<button className="btn-default" type="submit">Войти в чат</button>
-					</div>
-					{error && <div className="dc-alert" role="alert">{error}</div>}
-					<small><i className="fa-solid fa-lock"></i> Отправляя номер, я принимаю <a href="/privacy-policy">политику конфиденциальности</a>.</small>
-				</form>
+				<ChatLogin city={city} topic={topic} error={error} onJoin={join} />
 			</div>
 		);
 	}
 
+	const channel = findChannel(topic);
+
+	const handleSelectTopic = (nextTopic: ChatTopic) => {
+		setTopic(nextTopic);
+		setIsAsideOpen(false);
+	};
+
 	return (
-		<div className={`dc dc--${variant}${asideOpen ? ' dc--aside-open' : ''}`}>
-			<aside className="dc-aside">
-				<div className="dc-aside__profile">
-					<span className="dc-avatar dc-avatar--lg">{initials}</span>
-					<div className="dc-aside__profile-body">
-						<strong>{phone || 'Гость'}</strong>
-						<span className="dc-status"><i></i> на связи</span>
-					</div>
-				</div>
-
-				<span className="dc-aside__label">Город</span>
-				<select
-					className="form-control dc-city"
-					value={city}
-					onChange={(e) => setCity(e.target.value)}
-				>
-					{chatCities.map((c) => (
-						<option key={c.slug} value={c.slug}>
-							{c.name}
-						</option>
-					))}
-				</select>
-
-				<span className="dc-aside__label">Каналы топлива</span>
-				<div className="dc-channels" role="tablist" aria-label="Каналы чата">
-					{channels.map((item) => (
-						<button
-							type="button"
-							key={item.id}
-							role="tab"
-							aria-selected={item.id === topic}
-							className={`dc-channel${item.id === topic ? ' is-active' : ''}`}
-							onClick={() => handlePickChannel(item.id)}
-						>
-							<span className="dc-channel__icon"><i className={`fa-solid ${item.icon}`}></i></span>
-							<span className="dc-channel__body">
-								<strong>{item.title}</strong>
-								<span>{item.hint}</span>
-							</span>
-						</button>
-					))}
-				</div>
-
-				<a className="dc-aside__cta btn-default" href="/chat">
-					<i className="fa-solid fa-mobile-screen-button"></i> приложение
-				</a>
-			</aside>
+		<div className={`dc dc--${variant}${isAsideOpen ? ' dc--aside-open' : ''}`}>
+			<ChatAside
+				phone={phone}
+				city={city}
+				topic={topic}
+				onSelectCity={setCity}
+				onSelectTopic={handleSelectTopic}
+			/>
 
 			<section className="dc-main">
-				<header className="dc-main__head">
-					<button
-						type="button"
-						className="dc-main__toggle"
-						aria-label="Показать каналы"
-						onClick={() => setAsideOpen((open) => !open)}
-					>
-						<i className="fa-solid fa-bars"></i>
-					</button>
-					<span className="dc-avatar"><i className={`fa-solid ${activeChannel.icon}`}></i></span>
-					<div className="dc-main__title">
-						<strong>{activeChannel.title}</strong>
-						<span className="dc-status dc-status--muted"><i></i> {chatCities.find(c => c.slug === city)?.name || 'Тюмень'} · сообщения обновляются автоматически</span>
-					</div>
-					{variant === 'app' && (
-						<button
-							type="button"
-							className="dc-main__download"
-							onClick={() => (document.getElementById('chat-about-modal') as HTMLDialogElement | null)?.showModal()}
-						>
-							<i className="fa-solid fa-mobile-screen-button"></i>
-							<span>Скачать</span>
-						</button>
-					)}
-				</header>
+				<ChatHeader
+					channel={channel}
+					cityName={cityName(city)}
+					showDownload={variant === 'app'}
+					onToggleAside={() => setIsAsideOpen((open) => !open)}
+				/>
 
-				<div className="dc-thread" aria-live="polite">
-					{messages.map((item) => (
-						<div key={item.id} className={`dc-msg dc-msg--${item.author}`}>
-							{item.author === 'system' ? (
-								<p className="dc-msg__system">{item.text}</p>
-							) : (
-								<>
-									{item.author !== 'me' && (
-										<span className="dc-avatar dc-avatar--sm"><i className="fa-solid fa-user"></i></span>
-									)}
-									<div className="dc-msg__bubble">
-										{item.author !== 'me' && <b>Участник</b>}
-										<p>{item.text}</p>
-										<small>
-											{formatTime(item.createdAt)}
-											{item.status === 'sending' ? ' · отправляется' : item.status === 'error' ? ' · ошибка' : ''}
-										</small>
-									</div>
-								</>
-							)}
-						</div>
-					))}
-					<div ref={endRef}></div>
-				</div>
+				<ChatThread messages={messages} />
 
 				{error && <div className="dc-alert dc-alert--inline" role="alert">{error}</div>}
 
-
-				<form className="dc-compose" onSubmit={handleSend}>
-					<input
-						className="form-control"
-						aria-label="Сообщение"
-						placeholder={placeholderByTopic[topic]}
-						value={message}
-						onChange={(event) => setMessage(event.target.value)}
-					/>
-					<button className="dc-send" type="submit" aria-label="Отправить сообщение">
-						<i className="fa-solid fa-paper-plane"></i>
-					</button>
-				</form>
+				<ChatComposer placeholder={channel.placeholder} onSend={send} />
 			</section>
 
 			<button
 				type="button"
 				className="dc-scrim"
 				aria-label="Закрыть панель каналов"
-				onClick={() => setAsideOpen(false)}
+				onClick={() => setIsAsideOpen(false)}
 			></button>
 		</div>
 	);

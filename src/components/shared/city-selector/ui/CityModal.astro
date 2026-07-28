@@ -1,0 +1,221 @@
+---
+import type { CityOption } from '../lib/cityOptions';
+import CityOptionLink from './CityOptionLink.astro';
+
+interface Props {
+	id: string;
+	options: CityOption[];
+}
+
+const { id, options } = Astro.props;
+const titleId = `${id}-title`;
+const searchId = `${id}-search`;
+---
+
+<div class="city-modal" id={id} role="dialog" aria-modal="true" aria-labelledby={titleId} hidden data-city-modal>
+	<div class="city-modal__backdrop" data-city-modal-backdrop></div>
+
+	<div class="city-modal__dialog" tabindex="-1" data-city-modal-dialog>
+		<div class="city-modal__header">
+			<div>
+				<span class="city-modal__subtitle">Города обслуживания</span>
+				<h3 class="city-modal__title" id={titleId}>Выберите <span>город</span></h3>
+			</div>
+			<button type="button" class="city-modal__close" aria-label="Закрыть выбор города" data-city-modal-close>
+				<i class="fa-solid fa-xmark" aria-hidden="true"></i>
+			</button>
+		</div>
+
+		<div class="city-modal__search">
+			<label class="city-modal__search-label" for={searchId}>Поиск города или региона</label>
+			<i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+			<input type="search" id={searchId} placeholder="Город или регион" autocomplete="off" data-city-search />
+		</div>
+
+		<div class="city-modal__body">
+			<div class="city-modal__grid">
+				{options.map((option) => <CityOptionLink option={option} />)}
+			</div>
+			<p class="city-modal__empty" hidden data-city-empty>Такого города пока нет. Позвоните — подскажем ближайший.</p>
+		</div>
+	</div>
+</div>
+
+<style>
+	.city-modal {
+		position: fixed;
+		inset: 0;
+		z-index: 10000;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 20px;
+	}
+
+	.city-modal[hidden] {
+		display: none;
+	}
+
+	.city-modal__backdrop {
+		position: absolute;
+		inset: 0;
+		background: rgba(41, 49, 58, 0.6);
+		backdrop-filter: blur(4px);
+		-webkit-backdrop-filter: blur(4px);
+	}
+
+	.city-modal__dialog {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		max-width: 860px;
+		max-height: 85vh;
+		padding: 30px;
+		background: var(--white-color);
+		border-radius: 20px;
+		box-shadow: 0 24px 60px rgba(41, 49, 58, 0.25);
+		font-family: var(--default-font);
+	}
+
+	.city-modal__header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 20px;
+		padding-bottom: 20px;
+		border-bottom: 1px solid var(--divider-color);
+	}
+
+	.city-modal__subtitle {
+		display: block;
+		margin-bottom: 10px;
+		font-size: 13px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--text-color);
+		opacity: 0.6;
+	}
+
+	.city-modal__title {
+		margin: 0;
+		font-size: 26px;
+		font-weight: 600;
+		line-height: 1.2em;
+		color: var(--primary-color);
+	}
+
+	.city-modal__title span {
+		color: var(--accent-color);
+	}
+
+	.city-modal__close {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+		background: var(--bg-color);
+		border: none;
+		border-radius: 50%;
+		color: var(--primary-color);
+		font-size: 16px;
+		cursor: pointer;
+		transition: all 0.3s ease-in-out;
+	}
+
+	.city-modal__close:hover,
+	.city-modal__close:focus-visible {
+		background: var(--accent-color);
+	}
+
+	.city-modal__search {
+		position: relative;
+		margin: 20px 0;
+	}
+
+	.city-modal__search-label {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	.city-modal__search i {
+		position: absolute;
+		top: 50%;
+		left: 20px;
+		transform: translateY(-50%);
+		color: var(--text-color);
+		opacity: 0.5;
+		font-size: 14px;
+	}
+
+	.city-modal__search input {
+		width: 100%;
+		padding: 14px 20px 14px 48px;
+		background: var(--bg-color);
+		border: 1px solid var(--divider-color);
+		border-radius: 100px;
+		font-family: var(--default-font);
+		font-size: 15px;
+		color: var(--primary-color);
+		outline: none;
+		transition: all 0.3s ease-in-out;
+	}
+
+	.city-modal__search input:focus {
+		border-color: var(--accent-color);
+		background: var(--white-color);
+	}
+
+	.city-modal__body {
+		overflow-y: auto;
+		padding-right: 5px;
+	}
+
+	.city-modal__grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 12px;
+	}
+
+	.city-modal__empty {
+		margin: 20px 0 0;
+		font-size: 15px;
+		line-height: 1.5em;
+		color: var(--text-color);
+	}
+
+	.city-modal__empty[hidden] {
+		display: none;
+	}
+
+	@media (max-width: 767px) {
+		.city-modal {
+			padding: 12px;
+		}
+
+		.city-modal__dialog {
+			padding: 20px;
+			max-height: 90vh;
+		}
+
+		.city-modal__title {
+			font-size: 22px;
+		}
+
+		.city-modal__grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (max-width: 479px) {
+		.city-modal__grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

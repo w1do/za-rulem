@@ -1,15 +1,11 @@
 ---
 import TermsPage from '../../components/pages/TermsPage.astro';
-import { chatCities } from '../../data/cities';
+import { findCity } from '../../data/cities';
 
-export function getStaticPaths() {
-	return chatCities.map((city) => ({
-		params: { city: city.slug },
-		props: { city },
-	}));
-}
+export const prerender = false;
 
-const { city } = Astro.props;
+const city = findCity(Astro.params.city);
+if (!city) return new Response('Город не найден', { status: 404 });
 ---
 
 <TermsPage city={city} />

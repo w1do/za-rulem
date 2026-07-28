@@ -1,9 +1,11 @@
 ---
 interface Props {
 	class?: string;
+	/** Ссылка на чат: по умолчанию общий чат без предвыбранного города. */
+	chatHref?: string;
 }
 
-const { class: className = '' } = Astro.props;
+const { class: className = '', chatHref = '/chat' } = Astro.props;
 ---
 <div class:list={["dark-section bg-section community-alert", className]}>
 	<div class="container-fluid py-4">
@@ -17,6 +19,7 @@ const { class: className = '' } = Astro.props;
 			</div>
 			<div class="col-xl-3 col-lg-4 text-lg-end mt-4 mt-lg-0">
 				<div class="wow fadeInUp" data-wow-delay="0.4s">
+					<a href={chatHref} class="btn-default btn-highlighted me-2 mb-2"><i class="fa-solid fa-comments me-2"></i> Перейти в чат</a>
 					<a href="https://t.me/zarulem72" class="btn-default btn-highlighted me-2 mb-2"><i class="fa-brands fa-telegram me-2"></i> Telegram</a>
 					<a href="https://vk.ru/za_rulem72" class="btn-default btn-white mb-2"><i class="fa-brands fa-vk me-2"></i> VK группа</a>
 				</div>

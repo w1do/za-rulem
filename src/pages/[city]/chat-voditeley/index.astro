@@ -1,15 +1,11 @@
 ---
 import ChatCityLanding from '../../../components/driver-chat/ChatCityLanding.astro';
-import { chatCities, DEFAULT_CITY_SLUG } from '../../../data/cities';
+import { findCity } from '../../../data/cities';
 
-export function getStaticPaths() {
-	return chatCities.map((city) => ({
-		params: { city: city.slug },
-		props: { city },
-	}));
-}
+export const prerender = false;
 
-const { city } = Astro.props;
+const city = findCity(Astro.params.city);
+if (!city) return new Response('Город не найден', { status: 404 });
 ---
 
 <ChatCityLanding city={city} />

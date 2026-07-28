@@ -1,0 +1,519 @@
+        .gas-map-container {
+          display: flex;
+          height: 750px;
+          background: transparent;
+          position: relative;
+          z-index: 1;
+          font-family: "Montserrat", sans-serif;
+        }
+
+        /* Site-styled hover tooltip (replaces native black title popup) */
+        .svc-ico {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 26px;
+          height: 26px;
+          border-radius: 7px;
+          background: #f3f4f6;
+          color: #6b7280;
+          font-size: 12px;
+          margin-right: 6px;
+          cursor: default;
+          transition: all 0.2s ease;
+        }
+        .svc-ico:hover {
+          background: #F5B754;
+          color: #111827;
+        }
+        [data-tip] {
+          position: relative;
+        }
+        [data-tip]:hover::after {
+          content: attr(data-tip);
+          position: absolute;
+          bottom: calc(100% + 9px);
+          left: 50%;
+          transform: translateX(-50%);
+          background: #111827;
+          color: #fff;
+          font-family: "Montserrat", sans-serif;
+          font-size: 11px;
+          font-weight: 600;
+          line-height: 1;
+          letter-spacing: 0.2px;
+          padding: 7px 11px;
+          border-radius: 8px;
+          white-space: nowrap;
+          z-index: 2000;
+          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+          border-bottom: 2px solid #F5B754;
+          pointer-events: none;
+        }
+        [data-tip]:hover::before {
+          content: "";
+          position: absolute;
+          bottom: calc(100% + 3px);
+          left: 50%;
+          transform: translateX(-50%);
+          border: 6px solid transparent;
+          border-top-color: #111827;
+          z-index: 2000;
+          pointer-events: none;
+        }
+        .gas-sidebar {
+          width: 350px;
+          display: flex;
+          flex-direction: column;
+          border-right: 1px solid #eee;
+          z-index: 10;
+          background: #fff;
+          transition: transform 0.3s ease;
+        }
+        .sidebar-backdrop {
+          display: none;
+        }
+        .sidebar-close-btn {
+          position: absolute;
+          top: 15px;
+          right: 15px;
+          background: none;
+          border: none;
+          font-size: 20px;
+          color: #666;
+          z-index: 100;
+          cursor: pointer;
+          display: none;
+        }
+        .sidebar-toggle-btn {
+          position: absolute;
+          top: 15px;
+          left: 15px;
+          z-index: 99;
+          background: #F5B754;
+          color: #111827;
+          border: none;
+          border-radius: 8px;
+          padding: 10px 16px;
+          font-weight: 700;
+          font-size: 14px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          display: none;
+          align-items: center;
+        }
+        .sidebar-search {
+          padding: 15px;
+          border-bottom: 1px solid #eee;
+        }
+        .search-input {
+          width: 100%;
+          padding: 8px 12px;
+          border-radius: 6px;
+          border: 1px solid #ddd;
+          font-size: 14px;
+        }
+        .sidebar-filters {
+          padding: 12px 15px;
+          border-bottom: 1px solid #eee;
+          background: #f9fafb;
+        }
+        .filter-group {
+          margin-bottom: 10px;
+        }
+        .filter-group:last-child {
+          margin-bottom: 0;
+        }
+        .filter-label {
+          font-size: 12px;
+          font-weight: 700;
+          margin-bottom: 5px;
+          color: #4b5563;
+        }
+        .filter-buttons {
+          display: flex;
+          width: 100%;
+          gap: 5px;
+          flex-wrap: nowrap;
+        }
+        .filter-buttons > .filter-btn {
+          min-width: 0;
+          flex: 1 1 0;
+        }
+        .filter-btn {
+          background: #fff;
+          border: 1px solid #d1d5db;
+          color: #4b5563;
+          border-radius: 6px;
+          padding: 4px 10px;
+          font-size: 12px;
+          font-weight: 600;
+          transition: all 0.2s;
+          cursor: pointer;
+        }
+        .filter-btn:hover {
+          border-color: #F5B754;
+          background: #fffcf5;
+        }
+        .filter-btn.active {
+          background: #F5B754;
+          border-color: #F5B754;
+          color: #000;
+        }
+        .sidebar-list {
+          flex: 1;
+          overflow-y: auto;
+        }
+        .station-item {
+          padding: 15px;
+          border-bottom: 1px solid #eee;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .station-item:hover {
+          background: #f9fafb;
+        }
+        .station-item.active {
+          background: #eff6ff;
+          border-left: 4px solid #F5B754;
+          padding-left: 11px;
+        }
+        .station-item.is-closed {
+          opacity: 0.7;
+          background: #fdfdfd;
+        }
+        .station-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 10px;
+          margin-bottom: 5px;
+        }
+        .station-name {
+          margin: 0;
+          font-size: 15px;
+          font-weight: 700;
+          color: #111;
+        }
+        .availability-badge {
+          background: #dcfce7;
+          color: #166534;
+          font-size: 10px;
+          font-weight: 700;
+          padding: 2px 6px;
+          border-radius: 4px;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+        .station-item.is-closed .availability-badge {
+          background: #fee2e2;
+          color: #dc2626;
+        }
+        .station-address {
+          margin: 0 0 10px 0;
+          font-size: 12px;
+          color: #666;
+          line-height: 1.4;
+        }
+        .station-meta {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 10px;
+          font-size: 11px;
+          color: #888;
+        }
+        .meta-divider {
+          color: #eee;
+        }
+        .station-prices {
+          display: flex;
+          gap: 6px;
+          flex-wrap: wrap;
+        }
+        .price-tag {
+          background: #f3f4f6;
+          border-radius: 4px;
+          padding: 3px 8px;
+          font-size: 11px;
+          display: flex;
+          flex-direction: column;
+        }
+        .fuel-type {
+          font-weight: 700;
+          color: #4b5563;
+          font-size: 9px;
+          text-transform: uppercase;
+        }
+        .price-val {
+          color: #000;
+          font-weight: 700;
+        }
+        .fuel-avail {
+          font-size: 9px;
+          color: #059669;
+        }
+        .fuel-avail.out {
+          color: #dc2626;
+        }
+        .map-view {
+          flex: 1;
+          height: 100%;
+        }
+        .no-results {
+          padding: 20px;
+          text-align: center;
+          color: #666;
+        }
+
+        .leaflet-popup-content-wrapper,
+        .dg-popup-content-wrapper,
+        .dg-popup__content,
+        .dg-popup__contentWrapper,
+        [class*="dg-popup"] [class*="content"] { 
+          border-radius: 8px;
+          padding: 0;
+          overflow: hidden;
+          background: #ffffff !important;
+          color: #111827 !important;
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+        }
+        /* Force white background for the whole 2GIS popup shell */
+        .leaflet-popup,
+        .dg-popup,
+        [class*="dg-popup"] {
+          background: transparent !important;
+        }
+        .dg-popup__tip,
+        [class*="dg-popup"] [class*="tip"] {
+          background: #ffffff !important;
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+        }
+        .leaflet-popup-tip {
+          background: #ffffff !important;
+        }
+        .leaflet-popup-content, .dg-popup-content, .dg-popup__content { 
+          margin: 0 !important;
+          width: auto !important;
+          background: #ffffff !important;
+        }
+        .custom-gas-popup {
+          font-family: "Montserrat", sans-serif;
+          min-width: 220px;
+        }
+        .popup-header {
+          padding: 10px 15px;
+          color: #fff;
+        }
+        .popup-header h4 {
+          margin: 0;
+          font-size: 14px;
+          font-weight: 700;
+        }
+        .popup-availability {
+          font-size: 10px;
+          font-weight: 700;
+          opacity: 0.9;
+          text-transform: uppercase;
+        }
+        .popup-body {
+          padding: 12px 15px;
+        }
+        .popup-address {
+          font-size: 12px;
+          color: #444;
+          margin-bottom: 10px;
+        }
+        .popup-status-row {
+          font-size: 11px;
+          margin-bottom: 8px;
+        }
+        .popup-services-row {
+          display: flex;
+          gap: 6px;
+          margin-bottom: 12px;
+          font-size: 12px;
+          color: #666;
+        }
+        .popup-services-row .svc-ico {
+          margin-right: 0;
+        }
+        .popup-prices {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+        .price-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 12px;
+          border-bottom: 1px solid #f3f4f6;
+          padding-bottom: 4px;
+        }
+        .price-item:last-child {
+          border-bottom: none;
+        }
+        .price-item .fuel {
+          font-weight: 700;
+          color: #4b5563;
+        }
+        .price-details {
+          text-align: right;
+        }
+        .price-details .value {
+          font-weight: 700;
+          display: block;
+        }
+        .price-details .avail {
+          font-size: 9px;
+        }
+        .popup-footer {
+          padding: 8px 15px;
+          background: #f9fafb;
+          border-top: 1px solid #eee;
+          font-size: 10px;
+          color: #888;
+        }
+        .popup-payments-row {
+          margin-bottom: 2px;
+          font-weight: 600;
+          color: #666;
+        }
+        .popup-chat-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          min-height: 40px;
+          padding: 10px 14px;
+          border-top: 1px solid #eee;
+          background: #F5B754;
+          color: #111827;
+          font-size: 13px;
+          font-weight: 700;
+          text-decoration: none;
+          transition: background 0.2s ease;
+        }
+        .popup-chat-btn:hover,
+        .popup-chat-btn:focus-visible {
+          background: #e5a63f;
+          color: #111827;
+        }
+
+        @media (max-width: 767px) {
+          .gas-map-container {
+            height: clamp(520px, 72vh, 680px);
+            position: relative;
+          }
+          .gas-sidebar {
+            position: fixed;
+            top: auto;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: min(82dvh, 720px);
+            transform: translateY(105%);
+            border-right: none;
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 -16px 50px rgba(0,0,0,0.22);
+            z-index: 1100;
+            overflow: hidden;
+          }
+          .gas-sidebar.is-open {
+            transform: translateY(0);
+          }
+          .gas-sidebar::before {
+            content: "";
+            width: 44px;
+            height: 4px;
+            margin: 9px auto 0;
+            flex: 0 0 auto;
+            border-radius: 999px;
+            background: #d1d5db;
+          }
+          .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            display: block;
+            visibility: hidden;
+            opacity: 0;
+            border: 0;
+            background: rgba(17, 24, 39, 0.48);
+            backdrop-filter: blur(2px);
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            pointer-events: none;
+            z-index: 1090;
+          }
+          .sidebar-backdrop.is-visible {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+          }
+          .sidebar-close-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            top: 8px;
+            right: 8px;
+            border-radius: 50%;
+            background: #f3f4f6;
+          }
+          .sidebar-toggle-btn {
+            display: flex;
+            min-height: 44px;
+            max-width: calc(100% - 30px);
+            top: auto;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            border-radius: 999px;
+            padding: 12px 22px;
+            box-shadow: 0 10px 30px rgba(17, 24, 39, 0.24);
+          }
+          .map-view {
+            width: 100%;
+            height: 100%;
+          }
+          .sidebar-search {
+            padding: 12px 64px 12px 12px;
+          }
+          .search-input {
+            min-height: 44px;
+            font-size: 16px;
+          }
+          .sidebar-filters {
+            padding: 12px;
+          }
+          .filter-buttons {
+            gap: 8px;
+          }
+          .filter-btn {
+            min-height: 40px;
+            padding: 7px 12px;
+            font-size: 13px;
+          }
+          .station-item {
+            padding: 14px 12px;
+          }
+          .station-item.active {
+            padding-left: 8px;
+          }
+          .station-prices {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+          }
+          .price-tag {
+            min-width: 0;
+            padding: 7px 9px;
+            border-radius: 7px;
+          }
+          .custom-gas-popup {
+            min-width: min(220px, calc(100vw - 64px));
+            max-width: calc(100vw - 64px);
+          }
+        }

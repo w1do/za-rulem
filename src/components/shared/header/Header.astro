@@ -1,7 +1,8 @@
 ---
 import HeaderNav from './HeaderNav.astro';
-import CitySelector from './CitySelector.astro';
+import CitySelector from '../city-selector/CitySelector.astro';
 import type { ChatCity } from '../../../data/cities';
+import { DEFAULT_CITY_SLUG, chatAppUrl } from '../../../data/cities';
 import { getCityUrl } from '../../../lib/city';
 import { getSiteData } from '../../../lib/seo';
 
@@ -11,6 +12,7 @@ export interface Props {
 
 const { city } = Astro.props;
 const site = getSiteData(city);
+const chatUrl = chatAppUrl(city?.slug ?? DEFAULT_CITY_SLUG);
 ---
 
 <!-- Header Start -->
@@ -29,6 +31,10 @@ const site = getSiteData(city);
 				<!-- Main Menu Start -->
 				<HeaderNav city={city} />
 				<!-- Main Menu End -->
+
+				<a href={chatUrl} class="header-chat-button" aria-label="Перейти в чат" title="Перейти в чат">
+					<i class="fa-solid fa-comments" aria-hidden="true"></i>
+				</a>
 
 				<a
 					href="#"
@@ -49,11 +55,37 @@ const site = getSiteData(city);
 <!-- Header End -->
 
 <style>
+	.header-chat-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 42px;
+		height: 42px;
+		margin-left: auto;
+		margin-right: 14px;
+		border-radius: 50%;
+		background: var(--accent-color);
+		color: var(--primary-color);
+		font-size: 16px;
+		text-decoration: none;
+		transition: opacity 0.3s ease;
+	}
+
+	.header-chat-button:hover,
+	.header-chat-button:focus-visible {
+		opacity: 0.85;
+		color: var(--primary-color);
+	}
+
 	.mobile-call-button {
 		display: none;
 	}
 
 	@media (max-width: 991px) {
+		.header-chat-button {
+			margin-right: 12px;
+		}
+
 		.mobile-call-button {
 			display: inline-flex;
 			align-items: center;
@@ -78,6 +110,7 @@ const site = getSiteData(city);
 	}
 
 	@media (max-width: 374px) {
+		.header-chat-button,
 		.mobile-call-button {
 			width: 38px;
 			height: 38px;

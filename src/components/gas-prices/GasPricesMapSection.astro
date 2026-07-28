@@ -1,23 +1,21 @@
 ---
 import GasMap from '../maps/GasMap.tsx';
+import type { MapBounds, StationData } from '../../lib/gasStations';
 
 interface Props {
-	stations: unknown[];
-	bounds?: {
-		minLat: number;
-		maxLat: number;
-		minLon: number;
-		maxLon: number;
-	};
+	stations: StationData[];
+	bounds: MapBounds;
+	/** Ссылка на чат города для кнопки в подсказке АЗС. */
+	chatUrl: string;
 }
 
-const { stations, bounds } = Astro.props;
+const { stations, bounds, chatUrl } = Astro.props;
 ---
 
 <div class="gas-map-section">
 	<div class="container">
 		<div class="gas-map-card wow fadeInUp">
-			<GasMap client:only="react" stations={stations} bounds={bounds} />
+   <GasMap client:only="react" initialStations={stations} bounds={bounds} chatUrl={chatUrl} />
 		</div>
 	</div>
 </div>

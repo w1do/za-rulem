@@ -1,29 +1,18 @@
 ---
 import { getCollection, render } from 'astro:content';
 import ServiceLandingLayout from '../../../../layouts/ServiceLandingLayout.astro';
-import { chatCities } from '../../../../data/cities';
+import { findCity } from '../../../../data/cities';
 
-export async function getStaticPaths() {
-	const entries = await getCollection('serviceLanding');
-	const paths = [];
-	
-	for (const city of chatCities) {
-		for (const entry of entries) {
-			paths.push({
-				params: { 
-					city: city.slug, 
-					cluster: entry.data.cluster, 
-					post: entry.id.split('/').pop() 
-				},
-				props: { city, entry },
-			});
-		}
-	}
-	
-	return paths;
-}
+export const prerender = false;
 
-const { city, entry } = Astro.props;
+const city = findCity(Astro.params.city);
+const entry = city
+	? (await getCollection('serviceLanding')).find(
+			(item) => item.data.cluster === Astro.params.cluster && item.id.split('/').pop() === Astro.params.post,
+		)
+	: undefined;
+if (!city || !entry) return new Response('Страница не найдена', { status: 404 });
+
 const { Content } = await render(entry);
 ---
 

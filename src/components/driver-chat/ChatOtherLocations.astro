@@ -9,7 +9,17 @@ interface Props {
 
 const { currentCitySlug, currentFuelSlug } = Astro.props;
 
-const otherCities = chatCities.filter(c => c.slug !== currentCitySlug);
+/** Показываем ограниченный набор локаций: полный список городов живёт на /chat-voditeley. */
+const OTHER_CITIES_LIMIT = 12;
+
+const currentRegion = chatCities.find(c => c.slug === currentCitySlug)?.region ?? '';
+
+/** Сначала города того же региона: в поездке по своей области они полезнее всего. */
+const otherCities = chatCities
+    .filter(c => c.slug !== currentCitySlug)
+    .map(c => ({ city: c, region: c.region }))
+    .sort((a, b) => Number(b.region === currentRegion) - Number(a.region === currentRegion))
+    .slice(0, OTHER_CITIES_LIMIT);
 
 // Для SEO-заголовка секции
 const sectionTitle = currentFuelSlug 
@@ -31,7 +41,7 @@ const sectionTitle = currentFuelSlug
 
 		<div class="row">
 			{
-				otherCities.map((city, index) => (
+				otherCities.map(({ city, region }, index) => (
 					<div class="col-xl-4 col-md-6 mb-4">
 						<div class="service-item wow fadeInUp" data-wow-delay={`${index * 0.1}s`}>
 							<div class="icon-box">
@@ -44,7 +54,7 @@ const sectionTitle = currentFuelSlug
                                             {city.name}
                                         </a>
                                     </h2>
-									<p>{city.hint}</p>
+									<p>{region || city.hint}</p>
 								</div>
 								
 								<div class="service-item-btn mt-3">
