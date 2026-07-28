@@ -1,6 +1,12 @@
 ---
 import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
 import type { ChatCity } from '../../data/cities';
+import { Image } from 'astro:assets';
+
+import whatWeDoImage1 from '../../assets/images/what-we-do-image-1-gold.jpg';
+import whatWeDoImage2 from '../../assets/images/what-we-do-image-2-gold.jpg';
+import author1 from '../../assets/images/author-1.jpg';
+import iconWhatWeDo1 from '../../assets/images/icon-what-we-do-1-gold.svg';
 
 interface WhatWeCounter {
 	value: string;
@@ -67,15 +73,14 @@ const ctaHref = propCtaHref ?? getCityUrl('/contacts', city.slug);
                         <!-- What We Image 1 Start -->
                         <div class="what-we-image-gold box-1">
                             <figure class="image-anime">
-                                <img src="/images/what-we-do-image-1-gold.jpg" alt="">
+                                <Image src={whatWeDoImage1} alt="" width={200} height={178} />
                             </figure>
                         </div>
                         <!-- What We Image 1 End -->
-
                         <!-- What We Image 2 Start -->
                         <div class="what-we-image-gold box-2">
                             <figure class="image-anime">
-                                <img src="/images/what-we-do-image-2-gold.jpg" alt="">
+                                <Image src={whatWeDoImage2} alt="" width={1000} height={1423} />
                             </figure>
                         </div>
                         <!-- What We Image 2 End -->
@@ -135,7 +140,7 @@ const ctaHref = propCtaHref ?? getCityUrl('/contacts', city.slug);
                             <div class="what-we-info-box-gold">
                                 <div class="what-we-info-header-gold">
                                     <div class="icon-box">
-                                        <img src="/images/icon-what-we-do-1-gold.svg" alt="">
+                                        <img src="/images/icon-what-we-do-1-gold.svg" alt="" />
                                     </div>
                                     <div class="what-we-info-header-title-gold">
                                         <h3>{infoTitle}</h3>
@@ -162,7 +167,7 @@ const ctaHref = propCtaHref ?? getCityUrl('/contacts', city.slug);
                                 <!-- Why Choose Author Image Start -->
                                 <div class="why-choose-author-image-gold">
                                     <figure class="image-anime">
-                                        <img src="/images/author-1.jpg" alt="">
+                                        <Image src={author1} alt="" width={50} height={50} />
                                     </figure>
                                 </div>
                                 <!-- Why Choose Author Image End -->

@@ -1,4 +1,9 @@
 ---
+import { Image } from 'astro:assets';
+import whyChooseImage1 from '../../assets/images/why-choose-image-1-gold.jpg';
+import whyChooseImage2 from '../../assets/images/why-choose-image-2-gold.jpg';
+import author1 from '../../assets/images/author-1.jpg';
+
 interface WhyChooseItem {
 	icon: string;
 	title: string;
@@ -87,7 +92,7 @@ const {
                                 <!-- Why Choose Author Image Start -->
                                 <div class="why-choose-author-image-gold">
                                     <figure class="image-anime">
-                                        <img src="/images/author-1.jpg" alt="">
+                                        <Image src={author1} alt="" width={50} height={50} />
                                     </figure>
                                 </div>
                                 <!-- Why Choose Author Image End -->
@@ -112,15 +117,15 @@ const {
                         <!-- Why Choose Image Start -->
                         <div class="why-choose-image-gold box-1">
                             <figure class="image-anime">
-                                <img src="/images/why-choose-image-1-gold.jpg" alt="">
+                                <Image src={whyChooseImage1} alt="" width={740} height={468} />
                             </figure>
                         </div>
                         <!-- Why Choose Image End -->
-
+                        
                         <!-- Why Choose Image Start -->
                         <div class="why-choose-image-gold box-2">
                             <figure class="image-anime">
-                                <img src="/images/why-choose-image-2-gold.jpg" alt="">
+                                <Image src={whyChooseImage2} alt="" width={740} height={510} />
                             </figure>
                         </div>
                         <!-- Why Choose Image End -->

@@ -1,6 +1,13 @@
 ---
 import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
 import type { ChatCity } from '../../data/cities';
+import { Image } from 'astro:assets';
+
+import testimonialsImage from '../../assets/images/testimonials-image-gold.jpg';
+import author1 from '../../assets/images/author-1.jpg';
+import author2 from '../../assets/images/author-2.jpg';
+import author3 from '../../assets/images/author-3.jpg';
+import author4 from '../../assets/images/author-4.jpg';
 
 interface Review {
 	title: string;
@@ -91,7 +98,7 @@ const reviews = propReviews ?? [
                     <!-- Testimonials Image Start -->
                     <div class="testimonials-image-gold">
                         <figure class="image-anime">
-                            <img src="/images/testimonials-image-gold.jpg" alt="">
+                            <Image src={testimonialsImage} alt="" width={600} height={600} />
                         </figure>
                     </div>
                     <!-- Testimonials Image End -->
@@ -102,17 +109,17 @@ const reviews = propReviews ?? [
                         <div class="satisfy-client-images">
                             <div class="satisfy-client-image">
                                 <figure class="image-anime">
-                                    <img src="/images/author-1.jpg" alt="">
+                                    <Image src={author1} alt="" width={60} height={60} />
                                 </figure>
                             </div>
                             <div class="satisfy-client-image">
                                 <figure class="image-anime">
-                                    <img src="/images/author-2.jpg" alt="">
+                                    <Image src={author2} alt="" width={60} height={60} />
                                 </figure>
                             </div>
                             <div class="satisfy-client-image">
                                 <figure class="image-anime">
-                                    <img src="/images/author-3.jpg" alt="">
+                                    <Image src={author3} alt="" width={60} height={60} />
                                 </figure>
                             </div>
                             <div class="satisfy-client-image add-more">

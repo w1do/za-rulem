@@ -1,6 +1,13 @@
 ---
 import { getCityBySlug, replaceCityPlaceholders } from '../../lib/city';
 import type { ChatCity } from '../../data/cities';
+import { Image } from 'astro:assets';
+
+import whyChooseImg1 from '../../assets/images/why-choose-image-1.jpg';
+import whyChooseImg2 from '../../assets/images/why-choose-image-2.jpg';
+import author1 from '../../assets/images/author-1.jpg';
+import author2 from '../../assets/images/author-2.jpg';
+import author3 from '../../assets/images/author-3.jpg';
 
 interface Props {
 	city?: ChatCity;
@@ -95,7 +102,7 @@ const city = propCity ?? getCityBySlug();
 						<!-- Why Choose Image Start -->
 						<div class="why-choose-image">
 							<figure class="image-anime">
-								<img src="/images/why-choose-image-1.jpg" alt="Автопомощь на дороге" />
+								<Image src={whyChooseImg1} alt="Автопомощь на дороге" width={600} />
 							</figure>
 						</div>
 						<!-- Why Choose Image End -->
@@ -118,17 +125,17 @@ const city = propCity ?? getCityBySlug();
 								<div class="satisfy-client-images">
 									<div class="satisfy-client-image">
 										<figure class="image-anime">
-											<img src="/images/author-1.jpg" alt="Отзыв о помощи" />
+											<Image src={author1} alt="Отзыв о помощи" width={60} height={60} />
 										</figure>
 									</div>
 									<div class="satisfy-client-image">
 										<figure class="image-anime">
-											<img src="/images/author-2.jpg" alt="Отзыв о помощи" />
+											<Image src={author2} alt="Отзыв о помощи" width={60} height={60} />
 										</figure>
 									</div>
 									<div class="satisfy-client-image">
 										<figure class="image-anime">
-											<img src="/images/author-3.jpg" alt="Отзыв о помощи" />
+											<Image src={author3} alt="Отзыв о помощи" width={60} height={60} />
 										</figure>
 									</div>
 								</div>
@@ -147,7 +154,7 @@ const city = propCity ?? getCityBySlug();
 						<!-- Why Choose Image Start -->
 						<div class="why-choose-image">
 							<figure class="image-anime">
-								<img src="/images/why-choose-image-2.jpg" alt="Круглосуточная техпомощь" />
+								<Image src={whyChooseImg2} alt="Круглосуточная техпомощь" width={600} />
 							</figure>
 						</div>
 						<!-- Why Choose Image End -->
