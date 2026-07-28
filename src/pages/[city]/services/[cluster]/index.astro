@@ -1,0 +1,45 @@
+---
+import { getCollection, render } from 'astro:content';
+import HubLayout from '../../../../layouts/HubLayout.astro';
+import { chatCities } from '../../../../data/cities';
+import { removeCityPlaceholders, getCityUrl } from '../../../../lib/city';
+
+export async function getStaticPaths() {
+	const hubs = await getCollection('services', ({ data }) => data.hub === true);
+	const spokes = await getCollection('serviceLanding');
+	
+	const paths = [];
+	
+	for (const city of chatCities) {
+		for (const pillar of hubs) {
+			paths.push({
+				params: { city: city.slug, cluster: pillar.id },
+				props: {
+					city,
+					pillar,
+					spokes: spokes
+						.filter(({ data }) => data.cluster === pillar.id)
+						.sort((a, b) => a.data.order - b.data.order)
+						.map((entry) => ({
+							title: removeCityPlaceholders(entry.data.title),
+							description: removeCityPlaceholders(entry.data.description),
+							excerpt: removeCityPlaceholders(entry.data.excerpt),
+							icon: entry.data.icon,
+							tags: entry.data.tags,
+							url: getCityUrl(`/services/${pillar.id}/${entry.id.split('/').pop()}`, city.slug),
+						})),
+				},
+			});
+		}
+	}
+	
+	return paths;
+}
+
+const { city, pillar, spokes } = Astro.props;
+const { Content } = await render(pillar);
+---
+
+<HubLayout frontmatter={pillar.data} spokes={spokes} cluster={pillar.id} city={city}>
+	<Content />
+</HubLayout>

@@ -1,32 +1,39 @@
 ---
-import { chatCities, cityLandingUrl } from '../../../data/chatCluster';
+import { chatCities, cityLandingUrl, type ChatCity } from '../../../data/cities';
+import { getCityUrl } from '../../../lib/city';
+
+export interface Props {
+	city?: ChatCity;
+}
+
+const { city } = Astro.props;
 
 // Главное меню сайта. Пункты вынесены в массив для переиспользования и лёгкого расширения.
 const menu = [
-	{ label: 'Главная', href: '/' },
+	{ label: 'Главная', href: getCityUrl('/', city?.slug) },
 	{
 		label: 'Услуги',
-		href: '/services',
+		href: getCityUrl('/services', city?.slug),
 		children: [
-			{ label: 'Прикурить авто', href: '/services/tehpomosch/prikurit-avto' },
-			{ label: 'Замена аккумулятора', href: '/services/tehpomosch/zamena-akkumulyatora' },
-			{ label: 'Отогрев автомобиля', href: '/services/tehpomosch/otogrev-avto' },
-			{ label: 'Подвоз топлива', href: '/services/toplivo' },
-			{ label: 'Калькулятор доставки', href: '/calculator' },
+			{ label: 'Прикурить авто', href: getCityUrl('/services/tehpomosch/prikurit-avto', city?.slug) },
+			{ label: 'Замена аккумулятора', href: getCityUrl('/services/tehpomosch/zamena-akkumulyatora', city?.slug) },
+			{ label: 'Отогрев автомобиля', href: getCityUrl('/services/tehpomosch/otogrev-avto', city?.slug) },
+			{ label: 'Подвоз топлива', href: getCityUrl('/services/toplivo', city?.slug) },
+			{ label: 'Калькулятор доставки', href: getCityUrl('/calculator', city?.slug) },
 		],
 	},
-	{ label: 'Водители', href: '/drivers' },
-	{ label: 'Отзывы', href: '/testimonials' },
-	{ label: 'Бензин', href: '/ceny-na-benzin' },
+	{ label: 'Водители', href: getCityUrl('/drivers', city?.slug) },
+	{ label: 'Отзывы', href: getCityUrl('/testimonials', city?.slug) },
+	{ label: 'Бензин', href: getCityUrl('/ceny-na-benzin', city?.slug) },
 	{
 		label: 'Чат',
-		href: '/chat-voditeley',
-		children: chatCities.map((city) => ({
-			label: city.name,
-			href: cityLandingUrl(city.slug),
+		href: getCityUrl('/chat-voditeley', city?.slug),
+		children: chatCities.slice(0, 8).map((c) => ({
+			label: c.name,
+			href: cityLandingUrl(c.slug),
 		})),
 	},
-	{ label: 'Контакты', href: '/contacts' },
+	{ label: 'Контакты', href: getCityUrl('/contacts', city?.slug) },
 ];
 ---
 

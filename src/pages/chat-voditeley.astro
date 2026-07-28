@@ -7,6 +7,9 @@ import ChatCityCards from '../components/driver-chat/ChatCityCards.astro';
 import HubProcess from '../components/hub/HubProcess.astro';
 import HubCta from '../components/hub/HubCta.astro';
 import { webPageNode, breadcrumbNode } from '../lib/seo';
+import { getCityBySlug } from '../lib/city';
+
+const city = getCityBySlug('tyumen');
 
 // SEO Data
 const title = 'Чат водителей: города, цены на бензин и наличие топлива на АЗС';
@@ -20,8 +23,8 @@ const jsonLd = [
 ];
 ---
 
-<Layout title={title} description={description} jsonLd={jsonLd}>
-	<Header />
+<Layout title={title} description={description} jsonLd={jsonLd} city={city}>
+	<Header city={city} />
 	<main>
 		<PageHeader title={h1} items={[{ label: 'Главная', href: '/' }, { label: 'Чат водителей' }]} showChatButton={true} chatLink="/chat" />
 		
@@ -49,6 +52,7 @@ const jsonLd = [
 		/>
 
 		<HubCta
+			city={city}
 			subtitle="Всегда под рукой"
 			title="Пользуйтесь чатом как приложением"
 			description="Вы можете добавить чат на главный экран своего телефона. Это позволит получать пуш-уведомления и заходить в чат в один клик, без поиска ссылки."
@@ -58,5 +62,5 @@ const jsonLd = [
 			features={['Быстрый доступ', 'Пуш-уведомления', 'Работает на iOS и Android']}
 		/>
 	</main>
-	<Footer />
+	<Footer city={city} />
 </Layout>

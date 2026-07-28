@@ -1,3 +1,15 @@
+---
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
+interface Props {
+	city?: ChatCity;
+}
+
+const { city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
+---
+
 <!-- About Us Section Start -->
 <div class="about-us">
 	<div class="container">
@@ -8,7 +20,7 @@
 					<!-- About Us Image Start -->
 					<div class="about-us-image">
 						<figure class="image-anime">
-							<img src="/images/about-us-image.jpg" alt="Техпомощь на дороге в Тюмени" />
+							<img src="/images/about-us-image.jpg" alt={replaceCityPlaceholders("Техпомощь на дороге {inCity}", city)} />
 						</figure>
 					</div>
 					<!-- About Us Image End -->
@@ -73,7 +85,7 @@
 					<div class="section-title">
 						<span class="section-sub-title wow fadeInUp">О сервисе</span>
 						<h2 class="text-anime-style-3" data-cursor="-opaque">Я помогаю решить проблему с автомобилем прямо на дороге</h2>
- 					<p class="wow fadeInUp" data-wow-delay="0.2s">Я выезжаю на помощь в Тюмени и Тюменской области: запускаю автомобиль, меняю аккумулятор, отогреваю машину, подвожу топливо, работаю как автоэлектрик и провожу диагностику.</p>
+ 					<p class="wow fadeInUp" data-wow-delay="0.2s">{replaceCityPlaceholders("Я выезжаю на помощь {inCity} и области: запускаю автомобиль, меняю аккумулятор, отогреваю машину, подвожу топливо, работаю как автоэлектрик и провожу диагностику.", city)}</p>
 					</div>
 					<!-- Section Title End -->
 
@@ -110,7 +122,7 @@
 						<!-- About Us Button Start -->
 						<div class="about-us-btn">
 							<a
-								href="/contacts"
+								href={getCityUrl("/contacts", city.slug)}
 								class="btn-default"
 								data-service-request
 								data-service-title="Вызвать помощь"

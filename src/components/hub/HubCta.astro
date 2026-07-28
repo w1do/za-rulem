@@ -1,6 +1,10 @@
 ---
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
 // Блок призыва к действию хаба. Разметка перенесена из шаблона (cta-box bg-section dark-section parallaxie).
 interface Props {
+	city?: ChatCity;
 	subtitle?: string;
 	title?: string;
 	description?: string;
@@ -15,20 +19,32 @@ interface Props {
 	showContact?: boolean;
 }
 
+const { city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
+
 const {
-	subtitle = "Связаться со мной",
-	title = "Нужна техпомощь на дороге?",
-	description = "Я принимаю заявки на выезд в Тюмени и Тюменской области круглосуточно. Оставьте заявку — уточню ситуацию и назову цену заранее.",
-	btnText = "Оставить заявку",
-	btnHref = "/contacts",
-	contactTitle = "Круглосуточно, 24/7",
-	contactText = "Выезд по заявке",
-	contactLinkText = "Выезд по заявке",
-	contactLinkHref = "/contacts",
-	features = ["Выезжаю на место поломки", "Работаю круглосуточно, 24/7"],
-	class: className = "",
+	subtitle = 'Связаться со мной',
+	title = 'Нужна техпомощь на дороге?',
+	description: propDescription,
+	btnText = 'Оставить заявку',
+	btnHref: propBtnHref,
+	contactTitle = 'Круглосуточно, 24/7',
+	contactText = 'Выезд по заявке',
+	contactLinkText = 'Выезд по заявке',
+	contactLinkHref: propContactLinkHref,
+	features = ['Выезжаю на место поломки', 'Работаю круглосуточно, 24/7'],
+	class: className = '',
 	showContact = true,
 } = Astro.props;
+
+const description =
+	propDescription ??
+	replaceCityPlaceholders(
+		'Я принимаю заявки на выезд {inCity} и области круглосуточно. Оставьте заявку — уточню ситуацию и назову цену заранее.',
+		city,
+	);
+const btnHref = propBtnHref ?? getCityUrl('/contacts', city.slug);
+const contactLinkHref = propContactLinkHref ?? getCityUrl('/contacts', city.slug);
 ---
 
 <!-- CTA Section Start -->

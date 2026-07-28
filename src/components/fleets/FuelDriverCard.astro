@@ -1,12 +1,15 @@
 ---
 import type { FuelDriver } from '../../data/fuelDrivers';
 import { fuelLabels, getFuelDriverPath, statusLabels } from '../../data/fuelDrivers';
+import type { ChatCity } from '../../data/cities';
 
 interface Props {
 	driver: FuelDriver;
+	city?: ChatCity;
 }
 
-const { driver } = Astro.props;
+const { driver, city } = Astro.props;
+const cityName = city?.name || 'Тюмень';
 ---
 
 <article
@@ -21,7 +24,7 @@ const { driver } = Astro.props;
 		<div class="fuel-driver-card__avatar" aria-hidden="true">{driver.name.slice(0, 1)}</div>
 		<div>
 			<h3><a href={getFuelDriverPath(driver)}>{driver.name}</a></h3>
-			<p>{driver.district}, Тюмень</p>
+			<p>{driver.district}, {cityName}</p>
 		</div>
 	</header>
 	<div class={`fuel-driver-card__status fuel-driver-card__status--${driver.status}`}>

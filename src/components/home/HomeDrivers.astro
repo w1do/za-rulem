@@ -1,4 +1,7 @@
 ---
+import { getCityBySlug, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
 interface DriverItem {
 	image: string;
 	title: string;
@@ -7,6 +10,7 @@ interface DriverItem {
 }
 
 interface Props {
+	city?: ChatCity;
 	subtitle?: string;
 	title?: string;
 	drivers?: DriverItem[];
@@ -16,32 +20,38 @@ interface Props {
 }
 
 const {
+	city: propCity,
 	subtitle = 'Форматы выезда',
 	title = 'Подберу выезд под вашу ситуацию',
-	drivers = [
-		{
-			image: '/images/driver/ekip-1.jpg',
-			title: 'Выезд на прикуривание',
-			text: 'Приеду и заведу авто с разряженным аккумулятором.',
-			href: '/services',
-		},
-		{
-			image: '/images/driver/ekip-2.jpg',
-			title: 'Выезд на замену аккумулятора',
-			text: 'Привезу и установлю новую батарею на месте.',
-			href: '/services',
-		},
-		{
-			image: '/images/driver/ekip-3.jpg',
-			title: 'Выезд на эвакуацию',
-			text: 'Погружу и доставлю авто по нужному адресу.',
-			href: '/services',
-		},
-	],
+	drivers: propDrivers,
 	footerText = 'Поддерживаю полный спектр техпомощи на дороге —',
 	footerLinkText = 'все услуги',
-	footerLinkHref = '/services',
+	footerLinkHref: propFooterLinkHref,
 } = Astro.props;
+
+const city = propCity ?? getCityBySlug();
+const footerLinkHref = propFooterLinkHref ?? getCityUrl('/services', city.slug);
+
+const drivers = propDrivers ?? [
+	{
+		image: '/images/driver/ekip-1.jpg',
+		title: 'Выезд на прикуривание',
+		text: 'Приеду и заведу авто с разряженным аккумулятором.',
+		href: getCityUrl('/services', city.slug),
+	},
+	{
+		image: '/images/driver/ekip-2.jpg',
+		title: 'Выезд на замену аккумулятора',
+		text: 'Привезу и установлю новую батарею на месте.',
+		href: getCityUrl('/services', city.slug),
+	},
+	{
+		image: '/images/driver/ekip-3.jpg',
+		title: 'Выезд на эвакуацию',
+		text: 'Погружу и доставлю авто по нужному адресу.',
+		href: getCityUrl('/services', city.slug),
+	},
+];
 ---
 
     <!-- Our Driver Section Start -->

@@ -1,4 +1,7 @@
 ---
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
 interface WhatWeCounter {
 	value: string;
 	title: string;
@@ -6,6 +9,7 @@ interface WhatWeCounter {
 }
 
 interface Props {
+	city?: ChatCity;
 	subtitle?: string;
 	title?: string;
 	description?: string;
@@ -20,6 +24,7 @@ interface Props {
 }
 
 const {
+	city: propCity,
 	subtitle = 'Как я работаю',
 	title = 'Решаю дорожные проблемы на месте',
 	description = 'Определяю причину поломки на месте и сразу берусь за дело: завожу двигатель, меняю аккумулятор, отогреваю авто или безопасно гружу его на эвакуатор.',
@@ -32,13 +37,24 @@ const {
 		'Работаю круглосуточно, без выходных',
 		'Помогаю на месте или подаю эвакуатор',
 	],
-	infoTitle = 'Работаю по всей Тюмени',
-	infoText = 'Выезжаю в любую точку города и области, оцениваю проблему на месте и выбираю безопасный способ вернуть авто в движение.',
+	infoTitle: propInfoTitle,
+	infoText: propInfoText,
 	ctaText = 'Связаться со мной',
-	ctaHref = '/contacts',
+	ctaHref: propCtaHref,
 	authorName = 'Я — «За рулём»',
 	authorText = 'Я помогаю на дороге',
 } = Astro.props;
+
+const city = propCity ?? getCityBySlug();
+
+const infoTitle = propInfoTitle ?? replaceCityPlaceholders('Работаю по всей {inCity}', city);
+const infoText =
+	propInfoText ??
+	replaceCityPlaceholders(
+		'Выезжаю в любую точку города и области, оцениваю проблему на месте и выбираю безопасный способ вернуть авто в движение.',
+		city,
+	);
+const ctaHref = propCtaHref ?? getCityUrl('/contacts', city.slug);
 ---
 
     <!-- What We Do Section Start -->

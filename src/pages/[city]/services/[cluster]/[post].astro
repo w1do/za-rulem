@@ -1,0 +1,32 @@
+---
+import { getCollection, render } from 'astro:content';
+import ServiceLandingLayout from '../../../../layouts/ServiceLandingLayout.astro';
+import { chatCities } from '../../../../data/cities';
+
+export async function getStaticPaths() {
+	const entries = await getCollection('serviceLanding');
+	const paths = [];
+	
+	for (const city of chatCities) {
+		for (const entry of entries) {
+			paths.push({
+				params: { 
+					city: city.slug, 
+					cluster: entry.data.cluster, 
+					post: entry.id.split('/').pop() 
+				},
+				props: { city, entry },
+			});
+		}
+	}
+	
+	return paths;
+}
+
+const { city, entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<ServiceLandingLayout frontmatter={entry.data} city={city}>
+	<Content />
+</ServiceLandingLayout>

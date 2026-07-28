@@ -1,3 +1,15 @@
+---
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
+interface Props {
+	city?: ChatCity;
+}
+
+const { city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
+---
+
 <!-- Our Expertise Section Start -->
 <div class="our-expertise">
 	<div class="container">
@@ -8,7 +20,7 @@
 					<!-- Expertise Image Start -->
 					<div class="expertise-image">
 						<figure class="image-anime">
-							<img src="/images/expertise-image.jpg" alt="Опыт техпомощи на дороге в Тюмени" />
+							<img src="/images/expertise-image.jpg" alt={replaceCityPlaceholders("Опыт техпомощи на дороге {inCity}", city)} />
 						</figure>
 					</div>
 					<!-- Expertise Image End -->
@@ -19,7 +31,7 @@
 							<h2>Оставьте заявку — приеду на помощь и заведу автомобиль</h2>
 						</div>
 						<div class="expertise-contact-btn">
-							<a href="/contacts" data-service-request data-service-title="Вызвать помощь">Вызвать помощь</a>
+							<a href={getCityUrl("/contacts", city.slug)} data-service-request data-service-title="Вызвать помощь">Вызвать помощь</a>
 						</div>
 					</div>
 					<!-- Expertise Contact Info End -->
@@ -34,7 +46,7 @@
 					<div class="section-title">
 						<span class="section-sub-title wow fadeInUp">Мой опыт</span>
 						<h2 class="text-anime-style-3" data-cursor="-opaque">Мой опыт в надёжной техпомощи на дороге</h2>
-						<p class="wow fadeInUp" data-wow-delay="0.2s">Мой опыт выездной техпомощи помогает быстро понять причину поломки и безопасно вернуть автомобиль в движение в Тюмени и области.</p>
+						<p class="wow fadeInUp" data-wow-delay="0.2s">{replaceCityPlaceholders("Мой опыт выездной техпомощи помогает быстро понять причину поломки и безопасно вернуть автомобиль в движение {inCity} и области.", city)}</p>
 					</div>
 					<!-- Section Title End -->
 
@@ -108,7 +120,7 @@
 
 					<!-- Expertise Button Start -->
 					<div class="expertise-btn wow fadeInUp" data-wow-delay="0.4s">
-						<a href="/contacts" class="btn-default">Оставить заявку</a>
+						<a href={getCityUrl("/contacts", city.slug)} class="btn-default">Оставить заявку</a>
 					</div>
 					<!-- Expertise Button End -->
 				</div>

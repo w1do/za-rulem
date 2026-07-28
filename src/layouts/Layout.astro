@@ -1,6 +1,7 @@
 ---
-import { SITE, baseGraph } from '../lib/seo';
+import { SITE, baseGraph, getSiteData } from '../lib/seo';
 import VoiceRequestModal from '../components/forms/VoiceRequestModal.tsx';
+import type { ChatCity } from '../data/cities';
 
 export interface Props {
 	title: string;
@@ -11,6 +12,7 @@ export interface Props {
 	ogType?: string;
 	keywords?: string;
 	jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
+	city?: ChatCity;
 }
 
 const {
@@ -22,8 +24,10 @@ const {
 	ogType = 'website',
 	keywords,
 	jsonLd,
+	city,
 } = Astro.props;
 
+const site = getSiteData(city);
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImageAbsolute = new URL(ogImage, Astro.site).href;
 
@@ -32,7 +36,7 @@ const ogImageAbsolute = new URL(ogImage, Astro.site).href;
 const pageNodes = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
 const structuredData = {
 	'@context': 'https://schema.org',
-	'@graph': [...baseGraph(), ...pageNodes],
+	'@graph': [...baseGraph(city), ...pageNodes],
 };
 ---
 
@@ -46,7 +50,7 @@ const structuredData = {
 		<meta name="theme-color" content="#F5B754" />
 		<meta name="description" content={description} />
 		{keywords && <meta name="keywords" content={keywords} />}
-		<meta name="author" content="За рулём — техпомощь Тюмень" />
+		<meta name="author" content={`${site.name} — техпомощь ${site.addressLocality}`} />
 
 		<!-- Page Title -->
 		<title>{title}</title>
@@ -54,7 +58,7 @@ const structuredData = {
 
 		<!-- Open Graph -->
 		<meta property="og:type" content={ogType} />
-		<meta property="og:site_name" content={SITE.brand} />
+		<meta property="og:site_name" content={site.brand} />
 		<meta property="og:title" content={ogTitle ?? title} />
 		<meta property="og:description" content={ogDescription ?? description} />
 		<meta property="og:image" content={ogImageAbsolute} />
@@ -126,6 +130,32 @@ const structuredData = {
 
 		<!-- Глобальная универсальная форма заявки -->
 		<VoiceRequestModal client:load />
+
+		<!-- Синхронизация города с URL и localStorage -->
+		<script is:inline define:vars={{ citySlug: city?.slug || 'tyumen' }}>
+			(function() {
+				try {
+					const CITY_STORAGE_KEY = 'za-rulem-city';
+					if (typeof localStorage !== 'undefined') {
+						if (localStorage.getItem(CITY_STORAGE_KEY) !== citySlug) {
+							localStorage.setItem(CITY_STORAGE_KEY, citySlug);
+							window.dispatchEvent(new CustomEvent('city-change', { detail: citySlug }));
+						}
+					}
+				} catch (e) {
+					console.error('City sync failed:', e);
+				}
+
+				// Аварийное скрытие прелоадера через 5 секунд
+				setTimeout(function() {
+					const preloader = document.querySelector('.preloader');
+					if (preloader && preloader.style.display !== 'none') {
+						preloader.style.opacity = '0';
+						setTimeout(function() { preloader.style.display = 'none'; }, 600);
+					}
+				}, 5000);
+			})();
+		</script>
 
 		<!--
 			Ранний перехват tel / WhatsApp / CTA «Вызвать помощь» и др.

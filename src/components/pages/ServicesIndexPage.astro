@@ -1,0 +1,102 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/shared/header/Header.astro';
+import Footer from '../../components/shared/footer/Footer.astro';
+import PageHeaderHelpButton from '../../components/shared/PageHeaderHelpButton.astro';
+import ServiceCard from '../../components/services/ServiceCard.astro';
+import { webPageNode, breadcrumbNode, itemListNode } from '../../lib/seo';
+import type { ChatCity } from '../../data/cities';
+import { replaceCityPlaceholders, removeCityPlaceholders, getCityUrl } from '../../lib/city';
+
+export interface Props {
+	city: ChatCity;
+}
+
+const { city } = Astro.props;
+
+// Каталог показывает отдельные услуги (spokes), а не хабы-кластеры.
+const spokes = (await getCollection('serviceLanding')).sort(
+	(a, b) => a.data.order - b.data.order,
+);
+
+const cards = spokes.map((entry, i) => ({
+	title: removeCityPlaceholders(entry.data.title),
+	description: removeCityPlaceholders(entry.data.excerpt ?? entry.data.description),
+	icon: entry.data.icon,
+	url: getCityUrl(`/services/${entry.id}`, city.slug),
+	delay: i % 3 === 0 ? undefined : `${(i % 3) * 0.2}s`,
+}));
+
+const title = replaceCityPlaceholders("Услуги техпомощи на дороге {inCity} — выезд 24/7 | За рулём", city);
+const description = replaceCityPlaceholders("Все услуги автопомощи {inCity}: прикурить авто, замена аккумулятора, отогрев, подвоз топлива, автоэлектрик и диагностика. Приеду на место круглосуточно.", city);
+
+const jsonLd = [
+	webPageNode({
+		type: 'CollectionPage',
+		name: replaceCityPlaceholders('Услуги автопомощи и техпомощи на дороге {inCity}', city),
+		description: description,
+		url: getCityUrl('/services', city.slug),
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: getCityUrl('/', city.slug) },
+		{ name: 'Услуги', url: getCityUrl('/services', city.slug) },
+	]),
+	itemListNode(cards.map((card) => ({ name: card.title, url: card.url }))),
+];
+---
+
+<Layout
+	title={title}
+	description={description}
+	keywords={replaceCityPlaceholders("услуги техпомощи {city}, прикурить авто, замена аккумулятора с выездом, отогрев автомобиля, подвоз топлива", city)}
+	jsonLd={jsonLd}
+    city={city}
+>
+	<Header city={city} />
+
+	<!-- Page Header Section Start -->
+	<div class="page-header parallaxie">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<!-- Page Header Box Start -->
+					<div class="page-header-box">
+						<h1 class="text-anime-style-3" data-cursor="-opaque">Мои услуги</h1>
+						<nav class="wow fadeInUp">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href={getCityUrl('/', city.slug)}>главная</a></li>
+								<li class="breadcrumb-item active" aria-current="page">Услуги</li>
+							</ol>
+						</nav>
+						<PageHeaderHelpButton />
+					</div>
+					<!-- Page Header Box End -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Page Header Section End -->
+
+	<!-- page Services Start -->
+	<div class="page-services">
+		<div class="container">
+			<div class="row">
+				{
+					cards.map((card) => (
+						<ServiceCard
+							title={card.title}
+							description={card.description}
+							icon={card.icon}
+							url={card.url}
+							delay={card.delay}
+						/>
+					))
+				}
+			</div>
+		</div>
+	</div>
+	<!-- page Services End -->
+
+	<Footer city={city} />
+</Layout>

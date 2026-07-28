@@ -1,0 +1,15 @@
+---
+import ServicesIndexPage from '../../../components/pages/ServicesIndexPage.astro';
+import { chatCities } from '../../../data/cities';
+
+export function getStaticPaths() {
+	return chatCities.map((city) => ({
+		params: { city: city.slug },
+		props: { city },
+	}));
+}
+
+const { city } = Astro.props;
+---
+
+<ServicesIndexPage city={city} />

@@ -1,4 +1,7 @@
 ---
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
 interface Review {
 	title: string;
 	text: string;
@@ -8,6 +11,7 @@ interface Review {
 }
 
 interface Props {
+	city?: ChatCity;
 	subtitle?: string;
 	title?: string;
 	intro?: string;
@@ -19,30 +23,43 @@ interface Props {
 }
 
 const {
+	city: propCity,
 	subtitle = 'Отзывы водителей',
 	title = 'Надёжная техпомощь в любой ситуации',
-	intro = 'Цену подтверждаю делом: приезжаю на место поломки в Тюмени и возвращаю автомобиль в движение — прикуриваю, меняю аккумулятор, отогреваю двигатель и подаю эвакуатор.',
+	intro: propIntro,
 	satisfyText = 'Мне доверяют автомобили',
-	reviews = [
-		{
-			title: 'Я быстро вернул автомобиль в движение',
-			text: 'Я обратился за помощью после разряда аккумулятора во дворе. Мне быстро прикурили автомобиль, проверили запуск двигателя и объяснили, что сделать дальше. Я остался доволен точным приездом и аккуратной работой.',
-			author: 'Алексей',
-			authorRole: "Замена аккума. советую",
-			image: '/images/author-3.jpg',
-		},
-		{
-			title: 'Я получил помощь в сильный мороз',
-			text: 'Я не смогла завести машину утром после ночной стоянки. Мне помогли отогреть двигатель, запустить автомобиль и проверить аккумулятор. Я получил понятные рекомендации и спокойно продолжила поездку.',
-			author: 'Марина',
-			authorRole: 'Отогрев авто',
-			image: '/images/author-2.jpg',
-		},
-	],
+	reviews: propReviews,
 	footerText = 'Помогаю вернуть автомобиль на дорогу —',
 	footerLinkText = 'Читать отзывы',
-	footerLinkHref = '/blog',
+	footerLinkHref: propFooterLinkHref,
 } = Astro.props;
+
+const city = propCity ?? getCityBySlug();
+
+const intro =
+	propIntro ??
+	replaceCityPlaceholders(
+		'Цену подтверждаю делом: приезжаю на место поломки {inCity} и возвращаю автомобиль в движение — прикуриваю, меняю аккумулятор, отогрею двигатель и подаю эвакуатор.',
+		city,
+	);
+const footerLinkHref = propFooterLinkHref ?? getCityUrl('/blog', city.slug);
+
+const reviews = propReviews ?? [
+	{
+		title: 'Я быстро вернул автомобиль в движение',
+		text: 'Я обратился за помощью после разряда аккумулятора во дворе. Мне быстро прикурили автомобиль, проверили запуск двигателя и объяснили, что сделать дальше. Я остался доволен точным приездом и аккуратной работой.',
+		author: 'Алексей',
+		authorRole: 'Замена аккума. советую',
+		image: '/images/author-3.jpg',
+	},
+	{
+		title: 'Я получил помощь в сильный мороз',
+		text: 'Я не смогла завести машину утром после ночной стоянки. Мне помогли отогреть двигатель, запустить автомобиль и проверить аккумулятор. Я получил понятные рекомендации и спокойно продолжила поездку.',
+		author: 'Марина',
+		authorRole: 'Отогрев авто',
+		image: '/images/author-2.jpg',
+	},
+];
 ---
 
 <!-- Our Testimonials Section Start -->

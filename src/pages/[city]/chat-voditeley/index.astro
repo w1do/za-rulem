@@ -1,6 +1,6 @@
 ---
 import ChatCityLanding from '../../../components/driver-chat/ChatCityLanding.astro';
-import { chatCities, DEFAULT_CITY_SLUG } from '../../../data/chatCluster';
+import { chatCities, DEFAULT_CITY_SLUG } from '../../../data/cities';
 
 export function getStaticPaths() {
 	return chatCities.map((city) => ({

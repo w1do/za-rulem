@@ -1,0 +1,15 @@
+---
+import QueuePage from '../../components/pages/QueuePage.astro';
+import { chatCities } from '../../data/cities';
+
+export function getStaticPaths() {
+	return chatCities.map((city) => ({
+		params: { city: city.slug },
+		props: { city },
+	}));
+}
+
+const { city } = Astro.props;
+---
+
+<QueuePage city={city} />

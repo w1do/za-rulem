@@ -1,5 +1,13 @@
 ---
-// Блок отзывов хаба. Разметка перенесена из шаблона (our-testimonials + swiper).
+import { getCityBySlug, replaceCityPlaceholders } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
+interface Props {
+	city?: ChatCity;
+}
+
+const { city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
 ---
 
 <!-- Our Testimonials Section Start -->
@@ -29,7 +37,7 @@
 									<!-- Testimonial Item Image Start -->
 									<div class="testimonial-item-image">
 										<figure>
-											<img src="/images/testimonial-image.jpg" alt="Отзыв о техпомощи в Тюмени" />
+											<img src="/images/testimonial-image.jpg" alt={replaceCityPlaceholders("Отзыв о техпомощи {inCity}", city)} />
 										</figure>
 									</div>
 									<!-- Testimonial Item Image End -->

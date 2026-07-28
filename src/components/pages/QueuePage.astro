@@ -1,0 +1,232 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/shared/header/Header.astro';
+import Footer from '../../components/shared/footer/Footer.astro';
+import PageHeaderHelpButton from '../../components/shared/PageHeaderHelpButton.astro';
+import PageHeaderChatButton from '../../components/shared/PageHeaderChatButton.astro';
+import ServiceFaqs from '../../components/services/single/ServiceFaqs.astro';
+import AboutCta from '../../components/about/AboutCta.astro';
+import QueueFilters from '../../components/queues/QueueFilters.astro';
+import QueueDriverCard from '../../components/queues/QueueDriverCard.astro';
+import Alert from '../../components/shared/Alert.astro';
+import { queueDrivers } from '../../data/queueDrivers';
+import type { ChatCity } from '../../data/cities';
+import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+
+export interface Props {
+	city: ChatCity;
+}
+
+const { city } = Astro.props;
+
+const title = replaceCityPlaceholders("Занять очередь на АЗС {inCity} — Лукойл, Газпромнефть, Роснефть", city);
+const description = replaceCityPlaceholders("Маркетплейс водителей, которые займут для вас очередь на заправке {inCity}. Экономьте свое время!", city);
+
+const faqs = [
+	{ question: 'Как это работает?', answer: 'Вы выбираете водителя в маркетплейсе. Он приезжает на АЗС и занимает очередь. Когда подходит время заправки, он звонит вам, и вы подъезжаете.' },
+	{ question: 'На каких заправках можно занять очередь?', answer: 'Наши водители работают со всеми крупными сетями: Лукойл, Газпромнефть, Роснефть, НТП и другие.' },
+	{ question: 'Сколько стоит услуга?', answer: 'Стоимость зависит от времени ожидания и удаленности АЗС, в среднем от 800 до 1500 рублей. Договариваетесь напрямую с водителем.' },
+	{ question: 'Можно ли занять очередь к определенному времени?', answer: 'Да, в фильтрах можно выбрать водителей, готовых занять очередь с 4 или 5 утра.' },
+];
+---
+
+<Layout title={title} description={description} city={city}>
+	<Header city={city} />
+
+	<!-- Page Header Section Start -->
+	<div class="page-header parallaxie">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="page-header-box">
+						<h1 class="text-anime-style-3" data-cursor="-opaque">{replaceCityPlaceholders("Очередь на АЗС {inCity}", city)}</h1>
+						<nav class="wow fadeInUp">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href={getCityUrl('/', city.slug)}>Главная</a></li>
+								<li class="breadcrumb-item active" aria-current="page">Занять очередь</li>
+							</ol>
+						</nav>
+						<PageHeaderHelpButton />
+						<PageHeaderChatButton />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Page Header Section End -->
+
+	<!-- Page Fleets Section Start -->
+	<div class="page-fleets">
+		<Alert />
+
+		<div class="container mt-5">
+
+			<div class="row fuel-delivery-layout">
+				<div class="col-lg-3">
+					<QueueFilters />
+				</div>
+
+				<div class="col-lg-9">
+					<!-- Info Box Start -->
+					<div class="fuel-delivery-intro wow fadeInUp">
+						<div class="service-content">
+							<span class="section-sub-title">Маркетплейс услуг</span>
+							<h2>Водители, готовые занять очередь</h2>
+							<p>{replaceCityPlaceholders("Выберите подходящее предложение. Наши специалисты займут очередь на любой АЗС {ofCity}. Прямая связь с водителем без посредников.", city)}</p>
+						</div>
+					</div>
+					<!-- Info Box End -->
+
+
+					<!-- Fleet Item List Start -->
+					<div class="driver-grid" id="queue-options">
+						{queueDrivers.map((driver) => <QueueDriverCard driver={driver} city={city} />)}
+					</div>
+					<p class="driver-grid__empty" id="drivers-empty" hidden>По выбранным параметрам водителей пока нет. Попробуйте изменить фильтры.</p>
+					<nav class="driver-pagination" id="driver-pagination" aria-label="Страницы водителей"></nav>
+					<!-- Fleet Item List End -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Page Fleets Section End -->
+
+	<section class="fuel-delivery-faq-section">
+		<div class="container"><ServiceFaqs faqs={faqs} title="Частые вопросы об очереди на АЗС" /></div>
+	</section>
+	<section class="fuel-delivery-cta-section">
+		<AboutCta city={city} />
+	</section>
+
+	<Footer city={city} />
+
+	<script>
+		const cards = [...document.querySelectorAll<HTMLElement>('[data-driver-card]')];
+		const pagination = document.querySelector<HTMLElement>('#driver-pagination');
+		const empty = document.querySelector<HTMLElement>('#drivers-empty');
+		let page = 1;
+		const pageSize = 12;
+
+		const filter = () => {
+			const selectedStations = [...document.querySelectorAll<HTMLInputElement>('.station-filter:checked')].map((input) => input.value);
+			const location = (document.querySelector<HTMLSelectElement>('#location')?.value ?? 'all');
+			const time = (document.querySelector<HTMLInputElement>('.time-filter:checked')?.value ?? 'all');
+			
+			const matches = cards.filter((card) => {
+				const cardStation = card.dataset.gasStation;
+				const cardLocation = card.dataset.location;
+				const cardTime = card.dataset.time;
+
+				return (location === 'all' || cardLocation === location)
+					&& (selectedStations.length === 0 || selectedStations.includes(cardStation ?? ''))
+					&& (time === 'all' || cardTime === time);
+			});
+			
+			const pages = Math.ceil(matches.length / pageSize);
+			page = Math.min(page, Math.max(pages, 1));
+			cards.forEach((card) => card.hidden = true);
+			matches.slice((page - 1) * pageSize, page * pageSize).forEach((card) => card.hidden = false);
+			
+			if (empty) empty.hidden = matches.length > 0;
+			
+			if (pagination) {
+				pagination.innerHTML = Array.from({ length: pages }, (_, index) => `<button type="button" class="${page === index + 1 ? 'is-active' : ''}" data-page="${index + 1}" aria-label="Страница ${index + 1}">${index + 1}</button>`).join('');
+			}
+		};
+
+		document.querySelectorAll('.station-filter, .time-filter, #location').forEach((input) => input.addEventListener('change', () => { page = 1; filter(); }));
+		document.querySelector('#filter-submit')?.addEventListener('click', () => { page = 1; filter(); });
+		
+		pagination?.addEventListener('click', (event) => {
+			const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-page]');
+			if (!button) return;
+			page = Number(button.dataset.page);
+			filter();
+			document.querySelector('#queue-options')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		});
+		
+		filter();
+	</script>
+
+	<style>
+		.fuel-delivery-layout {
+			row-gap: 40px;
+		}
+
+		.fuel-delivery-intro {
+			margin-bottom: 36px;
+			padding: 32px;
+			background: var(--secondary-color);
+			border-radius: 20px;
+		}
+
+		.fuel-delivery-intro .section-sub-title {
+			display: inline-block;
+			margin-bottom: 12px;
+		}
+
+		.fuel-delivery-intro h2 {
+			margin-bottom: 16px;
+		}
+
+		.fuel-delivery-intro p {
+			margin-bottom: 0;
+		}
+
+		.driver-grid {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 18px;
+		}
+
+		.driver-grid__empty { padding: 30px; border-radius: 16px; background: var(--secondary-color); text-align: center; }
+		.driver-pagination { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 36px; }
+		.driver-pagination :global(button) { width: 42px; height: 42px; border: 0; border-radius: 50%; background: var(--secondary-color); color: var(--primary-color); font-weight: 700; transition: .3s ease; }
+		.driver-pagination :global(button:hover), .driver-pagination :global(button.is-active) { background: var(--accent-color); }
+
+		.fuel-delivery-faq-section {
+			padding: 120px 0;
+		}
+
+		.fuel-delivery-cta-section {
+			padding-bottom: 120px;
+		}
+
+		.fuel-delivery-faq-section :global(.page-single-faqs) {
+			max-width: 980px;
+			margin: 0 auto;
+		}
+
+		.fuel-delivery-faq-section :global(.section-title) {
+			margin-bottom: 40px;
+			text-align: center;
+		}
+
+		@media (max-width: 991px) {
+			.driver-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+			.fuel-delivery-faq-section {
+				padding: 80px 0;
+			}
+
+			.fuel-delivery-cta-section {
+				padding-bottom: 80px;
+			}
+		}
+
+		@media (max-width: 767px) {
+			.driver-grid { grid-template-columns: 1fr; }
+			.fuel-delivery-intro {
+				margin-bottom: 24px;
+				padding: 24px 20px;
+			}
+
+			.fuel-delivery-faq-section {
+				padding: 60px 0;
+			}
+
+			.fuel-delivery-cta-section {
+				padding-bottom: 60px;
+			}
+		}
+	</style>
+</Layout>

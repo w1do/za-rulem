@@ -1,11 +1,31 @@
 ---
+import { getCityBySlug, replaceCityPlaceholders } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
 // Вводный блок хаба (стиль about-us из шаблона). Заголовок и описание берутся
 // из frontmatter услуги, а тело pillar-страницы выводится через <slot />.
+interface Props {
+	city?: ChatCity;
+	subtitle?: string;
+	title?: string;
+	description?: string;
+}
+
+const { city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
+
 const {
 	subtitle = 'О сервисе',
 	title = 'Я помогаю решить проблему с автомобилем прямо на дороге',
-	description = 'Я выезжаю на помощь в Тюмени и Тюменской области: запускаю автомобиль, меняю аккумулятор, отогреваю машину, подвожу топливо, работаю как автоэлектрик и провожу диагностику.',
+	description: propDescription,
 } = Astro.props;
+
+const description =
+	propDescription ??
+	replaceCityPlaceholders(
+		'Я выезжаю на помощь {inCity} и Тюменской области: запускаю автомобиль, меняю аккумулятор, отогреваю машину, подвожу топливо, работаю как автоэлектрик и провожу диагностику.',
+		city,
+	);
 ---
 
 <!-- About Us Section Start -->
@@ -18,7 +38,7 @@ const {
 					<!-- About Us Image Start -->
 					<div class="about-us-image">
 						<figure class="image-anime">
-							<img src="/images/about-us-image.jpg" alt="Техпомощь на дороге в Тюмени" />
+							<img src="/images/about-us-image.jpg" alt={replaceCityPlaceholders("Техпомощь на дороге {inCity}", city)} />
 						</figure>
 					</div>
 					<!-- About Us Image End -->

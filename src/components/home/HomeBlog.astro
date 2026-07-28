@@ -1,4 +1,7 @@
 ---
+import type { ChatCity } from '../../data/cities';
+import { getCityBySlug, replaceCityPlaceholders } from '../../lib/city';
+
 interface BlogPost {
 	image: string;
 	title: string;
@@ -7,6 +10,7 @@ interface BlogPost {
 }
 
 interface Props {
+	city?: ChatCity;
 	subtitle?: string;
 	title?: string;
 	description?: string;
@@ -14,30 +18,42 @@ interface Props {
 }
 
 const {
+	city: propCity,
 	subtitle = 'Блог об автомобилях',
 	title = 'Полезные советы для водителей',
-	description = 'Чтобы вы реже вызывали помощь, делюсь практикой: как запустить двигатель, ухаживать за аккумулятором и что делать при поломке на дороге в Тюмени.',
-	posts = [
-		{
-			image: '/images/post-1.jpg',
-			title: 'Как правильно прикурить автомобиль и не повредить электронику',
-			href: '/blog',
-			btnText: 'Читать статью',
-		},
-		{
-			image: '/images/post-2.jpg',
-			title: 'Почему аккумулятор разряжается и когда нужна замена',
-			href: '/blog',
-			btnText: 'Читать статью',
-		},
-		{
-			image: '/images/post-3.jpg',
-			title: 'Что делать при поломке автомобиля на дороге в Тюмени',
-			href: '/blog',
-			btnText: 'Читать статью',
-		},
-	],
+	description: propDescription,
+	posts: propPosts,
 } = Astro.props;
+
+const city = propCity ?? getCityBySlug();
+
+const description =
+	propDescription ??
+	replaceCityPlaceholders(
+		'Чтобы вы реже вызывали помощь, делюсь практикой: как запустить двигатель, ухаживать за аккумулятором и что делать при поломке на дороге {inCity}.',
+		city,
+	);
+
+const posts = propPosts ?? [
+	{
+		image: '/images/post-1.jpg',
+		title: 'Как правильно прикурить автомобиль и не повредить электронику',
+		href: '/blog',
+		btnText: 'Читать статью',
+	},
+	{
+		image: '/images/post-2.jpg',
+		title: 'Почему аккумулятор разряжается и когда нужна замена',
+		href: '/blog',
+		btnText: 'Читать статью',
+	},
+	{
+		image: '/images/post-3.jpg',
+		title: replaceCityPlaceholders('Что делать при поломке автомобиля на дороге {inCity}', city),
+		href: '/blog',
+		btnText: 'Читать статью',
+	},
+];
 ---
 
 <!-- Our Blog Section Start -->

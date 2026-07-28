@@ -1,4 +1,7 @@
 ---
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
 interface WorkStep {
 	icon: string;
 	number: string;
@@ -7,6 +10,7 @@ interface WorkStep {
 }
 
 interface Props {
+	city?: ChatCity;
 	subtitle?: string;
 	title?: string;
 	steps?: WorkStep[];
@@ -17,28 +21,10 @@ interface Props {
 }
 
 const {
+	city: propCity,
 	subtitle = 'Как вызвать помощь',
 	title = 'Три шага — и я уже в пути',
-	steps = [
-		{
-			icon: '/images/icon-how-it-work-1-gold.svg',
-			number: '01',
-			title: 'Принимаю заявку',
-			text: 'Уточняю поломку и называю цену до выезда.',
-		},
-		{
-			icon: '/images/icon-how-it-work-2-gold.svg',
-			number: '02',
-			title: 'Фиксирую адрес',
-			text: 'Отмечаю точку в Тюмени и строю быстрый маршрут.',
-		},
-		{
-			icon: '/images/icon-how-it-work-3-gold.svg',
-			number: '03',
-			title: 'Оказываю помощь',
-			text: 'Прикуриваю, ремонтирую, отогреваю или эвакуирую авто.',
-		},
-	],
+	steps: propSteps,
 	footerList = [
 		'Прикуривание автомобиля',
 		'Замена аккумулятора',
@@ -47,8 +33,32 @@ const {
 	],
 	footerText = 'Быстро организую помощь на дороге в любое время.',
 	footerLinkText = 'Вызвать помощь',
-	footerLinkHref = '/contacts',
+	footerLinkHref: propFooterLinkHref,
 } = Astro.props;
+
+const city = propCity ?? getCityBySlug();
+const footerLinkHref = propFooterLinkHref ?? getCityUrl('/contacts', city.slug);
+
+const steps = propSteps ?? [
+	{
+		icon: '/images/icon-how-it-work-1-gold.svg',
+		number: '01',
+		title: 'Принимаю заявку',
+		text: 'Уточняю поломку и называю цену до выезда.',
+	},
+	{
+		icon: '/images/icon-how-it-work-2-gold.svg',
+		number: '02',
+		title: 'Фиксирую адрес',
+		text: replaceCityPlaceholders('Отмечаю точку в {inCity} и строю быстрый маршрут.', city),
+	},
+	{
+		icon: '/images/icon-how-it-work-3-gold.svg',
+		number: '03',
+		title: 'Оказываю помощь',
+		text: 'Прикуриваю, ремонтирую, отогреваю или эвакуирую авто.',
+	},
+];
 ---
 
     <!-- How It Work Section Start -->

@@ -1,22 +1,33 @@
 ---
+import type { ChatCity } from '../../../data/cities';
+import { getCityUrl, replaceCityPlaceholders } from '../../../lib/city';
+import { getSiteData } from '../../../lib/seo';
+
+export interface Props {
+	city?: ChatCity;
+}
+
+const { city } = Astro.props;
+const site = getSiteData(city);
+
 // Общий подвал сайта. Структура перенесена из шаблона, изменены только тексты и ссылки.
 const quickLinks = [
-	{ label: 'Главная', href: '/' },
-	{ label: 'О сервисе', href: '/about' },
-	{ label: 'Услуги', href: '/services' },
-	{ label: 'Отзывы', href: '/testimonials' },
+	{ label: 'Главная', href: getCityUrl('/', city?.slug) },
+	{ label: 'О сервисе', href: getCityUrl('/about', city?.slug) },
+	{ label: 'Услуги', href: getCityUrl('/services', city?.slug) },
+	{ label: 'Отзывы', href: getCityUrl('/testimonials', city?.slug) },
 	{ label: 'Блог', href: '/blog' },
-	{ label: 'Партнёрам', href: '/partners' },
-	{ label: 'Контакты', href: '/contacts' },
+	{ label: 'Партнёрам', href: getCityUrl('/partners', city?.slug) },
+	{ label: 'Контакты', href: getCityUrl('/contacts', city?.slug) },
 ];
 
 const serviceLinks = [
-	{ label: 'Прикурить авто', href: '/services/tehpomosch/prikurit-avto' },
-	{ label: 'Замена аккумулятора', href: '/services/tehpomosch/zamena-akkumulyatora' },
-	{ label: 'Отогрев автомобиля', href: '/services/tehpomosch/otogrev-avto' },
-	{ label: 'Подвоз бензина', href: '/services/toplivo/podvoz-benzina' },
-	{ label: 'Подвоз дизеля', href: '/services/toplivo/podvoz-dizelya' },
-	{ label: 'Все услуги', href: '/services' },
+	{ label: 'Прикурить авто', href: getCityUrl('/services/tehpomosch/prikurit-avto', city?.slug) },
+	{ label: 'Замена аккумулятора', href: getCityUrl('/services/tehpomosch/zamena-akkumulyatora', city?.slug) },
+	{ label: 'Отогрев автомобиля', href: getCityUrl('/services/tehpomosch/otogrev-avto', city?.slug) },
+	{ label: 'Подвоз бензина', href: getCityUrl('/services/toplivo/podvoz-benzina', city?.slug) },
+	{ label: 'Подвоз дизеля', href: getCityUrl('/services/toplivo/podvoz-dizelya', city?.slug) },
+	{ label: 'Все услуги', href: getCityUrl('/services', city?.slug) },
 ];
 ---
 
@@ -29,14 +40,14 @@ const serviceLinks = [
 				<div class="about-footer-gold">
 					<!-- Footer Logo Start -->
 					<div class="footer-logo-gold">
-						<img src="/images/logo.svg" alt="За рулём — техпомощь Тюмень" />
+						<img src="/images/logo.svg" alt={site.brand} />
 					</div>
 					<!-- Footer Logo End -->
 
 					<!-- About Footer Content Start -->
 					<div class="about-footer-content-gold">
 						<p>
-							Я — мастер техпомощи на дороге в Тюмени. Приезжаю на вызов круглосуточно:
+							Я — мастер техпомощи на дороге {site.inCity}. Приезжаю на вызов круглосуточно:
 							прикурю автомобиль, заменю аккумулятор, отогрею машину в мороз и выручу
 							в других дорожных ситуациях.
 						</p>
@@ -85,8 +96,8 @@ const serviceLinks = [
 						<h2>Контакты</h2>
 						<div class="footer-contact-info-list-gold">
 							<ul>
-								<li><img src="/images/icon-phone-accent.svg" alt="Заявка" /><a href="/contacts" data-service-request data-service-title="Вызвать помощь">Выезд только по заявке</a></li>
-								<li><img src="/images/icon-location-accent.svg" alt="Адрес" />Тюмень и Тюменская область, выезд 24/7</li>
+								<li><img src="/images/icon-phone-accent.svg" alt="Заявка" /><a href={getCityUrl('/contacts', city?.slug)} data-service-request data-service-title="Вызвать помощь">Выезд только по заявке</a></li>
+								<li><img src="/images/icon-location-accent.svg" alt="Адрес" />{site.addressLocality} и {site.addressRegion}, выезд 24/7</li>
 							</ul>
 						</div>
 					</div>
@@ -98,7 +109,7 @@ const serviceLinks = [
 						<div class="about-footer-content-gold">
 							<p>Оставьте заявку — перезвоню в течение пары минут и выеду на место.</p>
 						</div>
-						<a href="/contacts" class="btn-default btn-highlighted">Оставить заявку</a>
+						<a href={getCityUrl('/contacts', city?.slug)} class="btn-default btn-highlighted">Оставить заявку</a>
 					</div>
 					<!-- Footer Link End -->
 				</div>
@@ -110,15 +121,15 @@ const serviceLinks = [
 				<div class="footer-copyright-gold">
 					<!-- Footer Copyright Text Start -->
 					<div class="footer-copyright-text-gold">
-						<p>© 2026 «За рулём» — техпомощь на дороге в Тюмени. Разработано <a href="https://w1do.ru" target="_blank" rel="noopener noreferrer">W1DO DIGITAL</a>.</p>
+						<p>© 2026 «За рулём» — техпомощь на дороге {site.inCity}. Разработано <a href="https://w1do.ru" target="_blank" rel="noopener noreferrer">W1DO DIGITAL</a>.</p>
 					</div>
 					<!-- Footer Copyright Text End -->
 
 					<!-- Footer Privacy Policy Start -->
 					<div class="footer-privacy-policy-gold">
 						<ul>
- 						<li><a href="/privacy-policy">Политика конфиденциальности</a></li>
- 						<li><a href="/terms">Условия обслуживания</a></li>
+ 						<li><a href={getCityUrl('/privacy-policy', city?.slug)}>Политика конфиденциальности</a></li>
+ 						<li><a href={getCityUrl('/terms', city?.slug)}>Условия обслуживания</a></li>
 						</ul>
 					</div>
 					<!-- Footer Privacy Policy End -->

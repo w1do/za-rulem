@@ -20,64 +20,95 @@ import HubFaqs from '../components/hub/HubFaqs.astro';
 import HubTestimonials from '../components/hub/HubTestimonials.astro';
 import FuelDeliveryCalculator from '../components/calculators/FuelDeliveryCalculator.tsx';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../lib/city';
+import type { ChatCity } from '../data/cities';
 
-const { frontmatter, spokes = [], cluster } = Astro.props;
+export interface Props {
+	frontmatter: any;
+	spokes?: any[];
+	cluster: string;
+	city?: ChatCity;
+}
 
-const seoTitle = frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь в Тюмени`;
-const seoDescription = frontmatter.seo?.description ?? frontmatter.description;
+const { frontmatter, spokes = [], cluster, city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
+
+const seoTitle = replaceCityPlaceholders(frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь {inCity}`, city);
+const seoDescription = replaceCityPlaceholders(frontmatter.seo?.description ?? frontmatter.description, city);
 const keywords = Array.isArray(frontmatter.tags) ? frontmatter.tags.join(', ') : undefined;
 
 const jsonLd = [
 	serviceNode({
-		name: frontmatter.title,
-		description: frontmatter.description,
+		name: replaceCityPlaceholders(frontmatter.title, city),
+		description: seoDescription,
 		url: Astro.url.pathname,
+		city,
 	}),
 	breadcrumbNode([
-		{ name: 'Главная', url: '/' },
-		{ name: 'Услуги', url: '/services' },
-		{ name: frontmatter.title, url: Astro.url.pathname },
+		{ name: 'Главная', url: getCityUrl('/', city.slug) },
+		{ name: 'Услуги', url: getCityUrl('/services', city.slug) },
+		{ name: replaceCityPlaceholders(frontmatter.title, city), url: Astro.url.pathname },
 	]),
 	faqNode(frontmatter.faqs),
 ].filter(Boolean);
 
 // Карточки услуг для перелинковки на посадочные страницы.
 const services = spokes.map((spoke) => ({
-	title: spoke.title,
-	description: spoke.excerpt ?? spoke.description,
+	title: replaceCityPlaceholders(spoke.title, city),
+	description: replaceCityPlaceholders(spoke.excerpt ?? spoke.description, city),
 	icon: spoke.icon,
-	url: spoke.url,
+	url: getCityUrl(spoke.url, city.slug),
 }));
 
 // Шаги процесса из frontmatter услуги.
 const process = frontmatter.process;
 const steps = process
 	? [
-			{ title: process.step1Title, description: process.step1Desc },
-			{ title: process.step2Title, description: process.step2Desc },
-			{ title: process.step3Title, description: process.step3Desc },
-			{ title: process.step4Title, description: process.step4Desc },
+			{
+				title: replaceCityPlaceholders(process.step1Title, city),
+				description: replaceCityPlaceholders(process.step1Desc, city),
+			},
+			{
+				title: replaceCityPlaceholders(process.step2Title, city),
+				description: replaceCityPlaceholders(process.step2Desc, city),
+			},
+			{
+				title: replaceCityPlaceholders(process.step3Title, city),
+				description: replaceCityPlaceholders(process.step3Desc, city),
+			},
+			{
+				title: replaceCityPlaceholders(process.step4Title, city),
+				description: replaceCityPlaceholders(process.step4Desc, city),
+			},
 		].filter((s) => s.title)
 	: [];
 
 const pricing = frontmatter.pricing;
-const pricingItems = pricing?.items ?? [];
+const pricingItems = (pricing?.items ?? []).map((item: any) => ({
+	...item,
+	title: replaceCityPlaceholders(item.title, city),
+	features: (item.features ?? []).map((f: any) => replaceCityPlaceholders(f, city)),
+}));
 
 const approach = frontmatter.approach;
 const whyChoose = frontmatter.whyChoose;
 const showFuelCalculator = cluster === 'toplivo';
 ---
 
-<Layout title={seoTitle} description={seoDescription} keywords={keywords} jsonLd={jsonLd}>
-	<Header />
+<Layout title={seoTitle} description={seoDescription} keywords={keywords} jsonLd={jsonLd} city={city}>
+	<Header city={city} />
 
-	<HubPageHeader title={frontmatter.title} showChatButton={cluster === 'toplivo'} />
+	<HubPageHeader
+		title={replaceCityPlaceholders(frontmatter.title, city)}
+		showChatButton={cluster === 'toplivo'}
+		city={city}
+	/>
 
-	<HubIntro title={frontmatter.title} description={frontmatter.description}>
+	<HubIntro title={replaceCityPlaceholders(frontmatter.title, city)} description={seoDescription} city={city}>
 		<slot />
 	</HubIntro>
 
-	<HubPricing title={pricing?.title} items={pricingItems} />
+	<HubPricing title={replaceCityPlaceholders(pricing?.title, city)} items={pricingItems} />
 
 	{
 		showFuelCalculator && (
@@ -91,40 +122,48 @@ const showFuelCalculator = cluster === 'toplivo';
 
 	<HubServices services={services} />
 
-	<HubProcess title={process?.title} steps={steps} />
+	<HubProcess title={replaceCityPlaceholders(process?.title, city)} steps={steps} />
 
 	<HubApproach
-		subtitle={approach?.subtitle}
-		title={approach?.title}
+		city={city}
+		subtitle={replaceCityPlaceholders(approach?.subtitle, city)}
+		title={replaceCityPlaceholders(approach?.title, city)}
 		items={approach?.items}
 		image={approach?.image}
-		imageAlt={approach?.imageAlt}
-		footerText={approach?.footerText}
-		footerLinkHref={approach?.footerLinkHref}
-		footerLinkLabel={approach?.footerLinkLabel}
-		footerBadge={approach?.footerBadge}
+		imageAlt={replaceCityPlaceholders(approach?.imageAlt, city)}
+		footerText={replaceCityPlaceholders(approach?.footerText, city)}
+		footerLinkHref={getCityUrl(approach?.footerLinkHref ?? '/services', city.slug)}
+		footerLinkLabel={replaceCityPlaceholders(approach?.footerLinkLabel, city)}
+		footerBadge={replaceCityPlaceholders(approach?.footerBadge, city)}
 	/>
 
 	<HubWhyChoose
-		subtitle={whyChoose?.subtitle}
-		title={whyChoose?.title}
+		city={city}
+		subtitle={replaceCityPlaceholders(whyChoose?.subtitle, city)}
+		title={replaceCityPlaceholders(whyChoose?.title, city)}
 		items={whyChoose?.items}
 		image1={whyChoose?.image1}
-		image1Alt={whyChoose?.image1Alt}
+		image1Alt={replaceCityPlaceholders(whyChoose?.image1Alt, city)}
 		image2={whyChoose?.image2}
-		image2Alt={whyChoose?.image2Alt}
-		counterLabel={whyChoose?.counterLabel}
+		image2Alt={replaceCityPlaceholders(whyChoose?.image2Alt, city)}
+		counterLabel={replaceCityPlaceholders(whyChoose?.counterLabel, city)}
 	/>
 
-	<HubWhatWeDo />
+	<HubWhatWeDo city={city} />
 
-	<HubExpertise />
+	<HubExpertise city={city} />
 
-	<HubCta />
+	<HubCta city={city} />
 
-	<HubFaqs faqs={frontmatter.faqs} />
+	<HubFaqs
+		faqs={frontmatter.faqs?.map((f: any) => ({
+			question: replaceCityPlaceholders(f.question, city),
+			answer: replaceCityPlaceholders(f.answer, city),
+		}))}
+		title={replaceCityPlaceholders('Частые вопросы {inCity}', city)}
+	/>
 
-	<HubTestimonials />
+	<HubTestimonials city={city} />
 
-	<Footer />
+	<Footer city={city} />
 </Layout>

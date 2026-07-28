@@ -1,23 +1,6 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Header from '../../components/shared/header/Header.astro';
-import Footer from '../../components/shared/footer/Footer.astro';
-
-import HomeHero from '../../components/home/HomeHero.astro';
-import HomeAbout from '../../components/home/HomeAbout.astro';
-import HomeServices from '../../components/home/HomeServices.astro';
-import HomeWhyChoose from '../../components/home/HomeWhyChoose.astro';
-import HomeFleets from '../../components/home/HomeFleets.astro';
-import HomeWhatWeDo from '../../components/home/HomeWhatWeDo.astro';
-import HomeCollection from '../../components/home/HomeCollection.astro';
-import HomeDrivers from '../../components/home/HomeDrivers.astro';
-import HomeHowItWork from '../../components/home/HomeHowItWork.astro';
-import HomeTestimonials from '../../components/home/HomeTestimonials.astro';
-import HomePricing from '../../components/home/HomePricing.astro';
-import HomeBlog from '../../components/home/HomeBlog.astro';
-
-import { webPageNode, itemListNode } from '../../lib/seo';
-import { chatCities } from '../../data/chatCluster';
+import HomePage from '../../components/pages/HomePage.astro';
+import { chatCities } from '../../data/cities';
 
 export function getStaticPaths() {
 	return chatCities.map((city) => ({
@@ -27,57 +10,6 @@ export function getStaticPaths() {
 }
 
 const { city } = Astro.props;
-
-// Структурированные данные главной: описание страницы и каталог ключевых услуг.
-const jsonLd = [
-	webPageNode({
-		type: 'WebPage',
-		name: `Автопомощь и техпомощь на дороге ${city.inCity} — срочный выезд 24/7`,
-		description:
-			`Срочная автопомощь и техпомощь на дороге ${city.inCity} с выездом: прикурить авто, замена аккумулятора, отогрев машины, подвоз топлива, автоэлектрик, диагностика и эвакуация круглосуточно.`,
-		url: `/${city.slug}`,
-	}),
-	itemListNode([
-		{ name: 'Прикурить авто', url: '/services/tehpomosch/prikurit-avto' },
-		{ name: 'Замена аккумулятора с выездом', url: '/services/tehpomosch/zamena-akkumulyatora' },
-		{ name: 'Отогрев автомобиля', url: '/services/tehpomosch/otogrev-avto' },
-		{ name: 'Подвоз бензина', url: '/services/toplivo/podvoz-benzina' },
-		{ name: 'Подвоз дизеля', url: '/services/toplivo/podvoz-dizelya' },
-	]),
-];
-
-const title = `Автопомощь и техпомощь на дороге ${city.inCity} — срочный выезд 24/7`;
-const description = `Срочная автопомощь и техпомощь на дороге ${city.inCity} с выездом: прикурю авто, заменю аккумулятор, отогрею машину, привезу топливо. Приеду за 20–40 минут круглосуточно.`;
 ---
 
-<Layout
-	title={title}
-	description={description}
-	ogTitle={`Автопомощь и техпомощь ${city.inCity} — срочный выезд 24/7`}
-    ogDescription={`Застряли на дороге ${city.inCity}? Оставьте заявку — срочно приеду с выездом и заведу вашу машину в любое время суток.`}
-	keywords={`автопомощь ${city.name.toLowerCase()}, техпомощь на дороге ${city.name.toLowerCase()}, срочно техпомощь ${city.name.toLowerCase()} с выездом, прикурить авто, замена аккумулятора с выездом, отогрев автомобиля`}
-	jsonLd={jsonLd}
->
-	<Header />
-
-	<HomeHero 
-        subtitle={`Техпомощь на дороге ${city.inCity} 24/7`}
-        title={`Срочная автопомощь на дороге ${city.inCity} с выездом`}
-        description={`Приеду за 20–40 минут и заведу вашу машину: прикурю авто, заменю аккумулятор с выездом, отогрею двигатель, вскрою салон, привезу топливо или подам эвакуатор. Работаю круглосуточно ${city.inCity}. Выезд только по заявке на сайте.`}
-        reviewText={`Круглосуточно на связи с водителями ${city.ofCity}`}
-    />
-	<HomeAbout 
-        title={`Выезд ${city.inCity} и по области`}
-    />
-	<HomeServices />
-	<HomeWhyChoose />
-	<HomeFleets />
-	<HomeWhatWeDo />
-	<HomeCollection />
-	<HomeDrivers />
-	<HomeHowItWork />
-	<HomeTestimonials />
-	<HomePricing />
-	<HomeBlog />
-	<Footer />
-</Layout>
+<HomePage city={city} />

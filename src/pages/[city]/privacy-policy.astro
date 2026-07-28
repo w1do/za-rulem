@@ -1,0 +1,15 @@
+---
+import PrivacyPolicyPage from '../../components/pages/PrivacyPolicyPage.astro';
+import { chatCities } from '../../data/cities';
+
+export function getStaticPaths() {
+	return chatCities.map((city) => ({
+		params: { city: city.slug },
+		props: { city },
+	}));
+}
+
+const { city } = Astro.props;
+---
+
+<PrivacyPolicyPage city={city} />

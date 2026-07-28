@@ -11,8 +11,9 @@ import ChatOtherLocations from './ChatOtherLocations.astro';
 import FuelPricesTable from '../FuelPricesTable';
 import GasPricesMapSection from '../gas-prices/GasPricesMapSection.astro';
 import { webPageNode, breadcrumbNode, faqNode } from '../../lib/seo';
-import type { ChatCity } from '../../data/chatCluster';
-import { chatAppUrl, fuelLandingUrl, cityLandingUrl, chatCities, chatFuels, DEFAULT_CITY_SLUG } from '../../data/chatCluster';
+import type { ChatCity } from '../../data/cities';
+import { chatCities, DEFAULT_CITY_SLUG, chatAppUrl, fuelLandingUrl, cityLandingUrl } from '../../data/cities';
+import { chatFuels } from '../../data/chatCluster';
 
 interface Props {
 	city: ChatCity;

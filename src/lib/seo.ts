@@ -1,6 +1,8 @@
 // Централизованные данные о бизнесе и билдеры структурированных данных (Schema.org / JSON-LD).
 // Используется базовым Layout (базовый граф WebSite + LocalBusiness) и страницами/лейаутами
 // для добавления страничных узлов (BreadcrumbList, Service, Article, FAQPage, WebPage).
+import { type ChatCity } from '../data/cities';
+import { replaceCityPlaceholders } from './city';
 
 const rawPhone = import.meta.env.PUBLIC_PHONE_NUMBER || import.meta.env.PHONE_NUMBER || '+79088712026';
 
@@ -18,24 +20,44 @@ const phoneFormatted = formatPhoneNumber(rawPhone);
 
 export const SITE = {
 	name: 'За рулём',
-	brand: 'За рулём — техпомощь на дороге в Тюмени',
+	brand: 'За рулём — техпомощь на дороге в {city}',
 	description:
-		'Круглосуточная автопомощь и техпомощь на дороге в Тюмени с выездом: прикурю авто, заменю аккумулятор, отогрею машину, привезу топливо, вскрою автомобиль, вызову эвакуатор.',
+		'Круглосуточная автопомощь и техпомощь на дороге в {inCity} с выездом: прикурю авто, заменю аккумулятор, отогрею машину, привезу топливо, вскрою автомобиль, вызову эвакуатор.',
 	url: 'https://za-rulem.org',
 	email: 'info@za-rulem.org',
 	phone,
 	phoneFormatted,
 	logo: 'https://za-rulem.org/images/logo.svg',
 	image: 'https://za-rulem.org/images/logo.svg',
-	addressLocality: 'Тюмень',
-	addressRegion: 'Тюменская область',
+	addressLocality: '{city}',
+	addressRegion: 'Тюменская область', // Default region, might need adjustment per city
 	addressCountry: 'RU',
-	geo: { latitude: 57.153033, longitude: 65.534328 },
-	areaServed: ['Тюмень', 'Тюменская область'],
+	geo: { latitude: 57.153033, longitude: 65.534328 }, // Default geo, might need adjustment
+	areaServed: ['{city}'],
 	priceRange: '₽₽',
 	openingHours: 'Mo-Su 00:00-24:00',
 	sameAs: [] as string[],
 } as const;
+
+/** Получает данные сайта с учетом города. */
+export function getSiteData(city?: ChatCity) {
+	const effectiveCity = city || {
+		slug: 'tyumen',
+		name: 'Тюмень',
+		inCity: 'в Тюмени',
+		ofCity: 'Тюмени',
+		byCity: 'по Тюмени',
+		forCity: 'для Тюмени',
+	} as ChatCity;
+
+	return {
+		...SITE,
+		brand: replaceCityPlaceholders(SITE.brand, effectiveCity),
+		description: replaceCityPlaceholders(SITE.description, effectiveCity),
+		addressLocality: replaceCityPlaceholders(SITE.addressLocality, effectiveCity),
+		areaServed: SITE.areaServed.map((s) => replaceCityPlaceholders(s, effectiveCity)),
+	};
+}
 
 // Идентификаторы узлов графа (для перекрёстных ссылок @id).
 export const BUSINESS_ID = `${SITE.url}/#business`;
@@ -53,45 +75,47 @@ type FaqItem = { question: string; answer: string };
 type BreadcrumbItem = { name: string; url: string };
 
 /** Узел WebSite для базового графа. */
-export function websiteNode() {
+export function websiteNode(city?: ChatCity) {
+	const site = getSiteData(city);
 	return {
 		'@type': 'WebSite',
 		'@id': WEBSITE_ID,
 		url: `${SITE.url}/`,
-		name: SITE.brand,
-		description: SITE.description,
+		name: site.brand,
+		description: site.description,
 		inLanguage: 'ru-RU',
 		publisher: { '@id': BUSINESS_ID },
 	};
 }
 
 /** Узел LocalBusiness (автопомощь на дороге) для базового графа. */
-export function businessNode() {
+export function businessNode(city?: ChatCity) {
+	const site = getSiteData(city);
 	return {
 		'@type': ['LocalBusiness', 'AutomotiveBusiness'],
 		'@id': BUSINESS_ID,
-		name: SITE.brand,
-		description: SITE.description,
-        url: `${SITE.url}/`,
-		image: SITE.image,
-		logo: SITE.logo,
-		email: SITE.email,
-		telephone: SITE.phone,
-		priceRange: SITE.priceRange,
+		name: site.brand,
+		description: site.description,
+		url: `${SITE.url}/`,
+		image: site.image,
+		logo: site.logo,
+		email: site.email,
+		telephone: site.phone,
+		priceRange: site.priceRange,
 		currenciesAccepted: 'RUB',
 		paymentAccepted: 'Наличные, банковская карта, перевод',
 		address: {
 			'@type': 'PostalAddress',
-			addressLocality: SITE.addressLocality,
-			addressRegion: SITE.addressRegion,
-			addressCountry: SITE.addressCountry,
+			addressLocality: site.addressLocality,
+			addressRegion: site.addressRegion,
+			addressCountry: site.addressCountry,
 		},
 		geo: {
 			'@type': 'GeoCoordinates',
-			latitude: SITE.geo.latitude,
-			longitude: SITE.geo.longitude,
+			latitude: site.geo.latitude,
+			longitude: site.geo.longitude,
 		},
-		areaServed: SITE.areaServed.map((name) => ({
+		areaServed: site.areaServed.map((name) => ({
 			'@type': 'AdministrativeArea',
 			name,
 		})),
@@ -113,8 +137,8 @@ export function businessNode() {
 }
 
 /** Базовый граф: WebSite + LocalBusiness, присутствует на всех страницах. */
-export function baseGraph() {
-	return [websiteNode(), businessNode()];
+export function baseGraph(city?: ChatCity) {
+	return [websiteNode(city), businessNode(city)];
 }
 
 /** Хлебные крошки. Элементы принимают абсолютные или относительные URL. */
@@ -154,7 +178,9 @@ export function serviceNode(opts: {
 	description: string;
 	url: string;
 	serviceType?: string;
+	city?: ChatCity;
 }) {
+	const site = getSiteData(opts.city);
 	return {
 		'@type': 'Service',
 		name: opts.name,
@@ -162,8 +188,8 @@ export function serviceNode(opts: {
 		url: abs(opts.url),
 		serviceType: opts.serviceType ?? 'Техпомощь на дороге',
 		provider: { '@id': BUSINESS_ID },
-		areaServed: SITE.areaServed.map((name) => ({ '@type': 'AdministrativeArea', name })),
-  availableChannel: {
+		areaServed: site.areaServed.map((name) => ({ '@type': 'AdministrativeArea', name })),
+		availableChannel: {
 			'@type': 'ServiceChannel',
 			serviceUrl: `${SITE.url}/contacts`,
 		},

@@ -1,4 +1,7 @@
 ---
+import { type ChatCity } from '../../data/cities';
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+
 interface FleetSlide {
 	image: string;
 	alt?: string;
@@ -13,6 +16,7 @@ interface FleetSlide {
 }
 
 interface Props {
+	city?: ChatCity;
 	subtitle?: string;
 	title?: string;
 	slides?: FleetSlide[];
@@ -24,69 +28,77 @@ interface Props {
 const amenityIcons = ['/images/icon-amenity-item-1.svg', '/images/icon-amenity-item-2.svg'];
 
 const {
+	city: propCity,
 	subtitle = 'Направления выезда',
-	title = 'Чем помогу на дороге в Тюмени',
-	slides = [
-		{
-			image: '/images/fleets-image-1.jpg',
-			cursor: 'Замена аккумулятора',
-			label: 'Замена аккумулятора',
-   price: 'от 5 500 ₽',
-			priceUnit: '/выезд',
-			amenities: ['Привезу батарею', 'Установлю на месте'],
-			href: '/services/tehpomosch/zamena-akkumulyatora',
-		},
-		{
-			image: '/images/fleets-image-2.jpg',
-			cursor: 'Отогрев авто',
-			label: 'Отогрев авто',
-			price: 'от 5 500 ₽',
-			priceUnit: '/выезд',
-			amenities: ['Отогрею двигатель', 'Заведу на месте'],
-			href: '/services/tehpomosch/otogrev-avto',
-		},
-		{
-			image: '/images/fleets-image-3.jpg',
-			cursor: 'Автоэлектрик и диагностика',
-			label: 'Автоэлектрик и диагностика',
-			price: 'от 5 500 ₽',
-			priceUnit: '/выезд',
-			amenities: ['Найду причину поломки', 'Проверю электрику авто'],
-			href: '/services/tehpomosch',
-		},
-		{
-			image: '/images/fleets-image-4.jpg',
-			cursor: 'Подвоз топлива',
-			label: 'Подвоз топлива',
-			price: 'от 6 500 ₽',
-			priceUnit: '/выезд',
-			priceNote: 'включено 20 л',
-			amenities: ['20 л бензина включено', 'АИ-92, АИ-95 и дизель'],
-			href: '/services/toplivo',
-		},
-		{
-			image: '/images/fleets-image-5.jpg',
-			cursor: 'Вызвать эвакуатор',
-			label: 'Эвакуатор',
-			price: 'от 5 500 ₽',
-			priceUnit: '/выезд',
-			amenities: ['Погружу автомобиль', 'Доставлю по адресу'],
-			href: '/services/tehpomosch',
-		},
-		{
-			image: '/images/fleets-image-1.jpg',
-			cursor: 'Прикурить авто',
-			label: 'Прикурить авто',
-			price: 'от 5 500 ₽',
-			priceUnit: '/выезд',
-			amenities: ['Подам питание', 'Запущу двигатель'],
-			href: '/services/tehpomosch/prikurit-avto',
-		},
-	],
+	title: propTitle,
+	slides: propSlides,
 	footerText = 'Собрал все услуги техпомощи на дороге —',
 	footerLinkText = 'посмотреть все услуги',
-	footerLinkHref = '/services',
+	footerLinkHref: propFooterLinkHref,
 } = Astro.props;
+
+const city = propCity ?? getCityBySlug();
+
+const title = propTitle ?? replaceCityPlaceholders('Чем помогу на дороге {inCity}', city);
+const footerLinkHref = propFooterLinkHref ?? getCityUrl('/services', city.slug);
+
+const slides = propSlides ?? [
+	{
+		image: '/images/fleets-image-1.jpg',
+		cursor: 'Замена аккумулятора',
+		label: 'Замена аккумулятора',
+		price: 'от 5 500 ₽',
+		priceUnit: '/выезд',
+		amenities: ['Привезу батарею', 'Установлю на месте'],
+		href: getCityUrl('/services/tehpomosch/zamena-akkumulyatora', city.slug),
+	},
+	{
+		image: '/images/fleets-image-2.jpg',
+		cursor: 'Отогрев авто',
+		label: 'Отогрев авто',
+		price: 'от 5 500 ₽',
+		priceUnit: '/выезд',
+		amenities: ['Отогрею двигатель', 'Заведу на месте'],
+		href: getCityUrl('/services/tehpomosch/otogrev-avto', city.slug),
+	},
+	{
+		image: '/images/fleets-image-3.jpg',
+		cursor: 'Автоэлектрик и диагностика',
+		label: 'Автоэлектрик и диагностика',
+		price: 'от 5 500 ₽',
+		priceUnit: '/выезд',
+		amenities: ['Найду причину поломки', 'Проверю электрику авто'],
+		href: getCityUrl('/services/tehpomosch', city.slug),
+	},
+	{
+		image: '/images/fleets-image-4.jpg',
+		cursor: 'Подвоз топлива',
+		label: 'Подвоз топлива',
+		price: 'от 6 500 ₽',
+		priceUnit: '/выезд',
+		priceNote: 'включено 20 л',
+		amenities: ['20 л бензина включено', 'АИ-92, АИ-95 и дизель'],
+		href: getCityUrl('/services/toplivo', city.slug),
+	},
+	{
+		image: '/images/fleets-image-5.jpg',
+		cursor: 'Вызвать эвакуатор',
+		label: 'Эвакуатор',
+		price: 'от 5 500 ₽',
+		priceUnit: '/выезд',
+		amenities: ['Погружу автомобиль', 'Доставлю по адресу'],
+		href: getCityUrl('/services/tehpomosch', city.slug),
+	},
+	{
+		image: '/images/fleets-image-1.jpg',
+		cursor: 'Прикурить авто',
+		label: 'Прикурить авто',
+		price: 'от 5 500 ₽',
+		priceUnit: '/выезд',
+		amenities: ['Подам питание', 'Запущу двигатель'],
+		href: getCityUrl('/services/tehpomosch/prikurit-avto', city.slug),
+	},
+];
 ---
 
     <!-- Our Fleets Section Start -->

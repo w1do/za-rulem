@@ -1,4 +1,14 @@
 ---
+import { getCityBySlug, replaceCityPlaceholders } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
+interface Props {
+	city?: ChatCity;
+}
+
+const { city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
+
 interface Review {
 	text: string;
 	author: string;
@@ -9,7 +19,7 @@ const reviews: Review[] = [
 	{
 		text: 'У меня закончился бензин на объездной дороге, до заправки я бы не доехал. Я отправил геолокацию и назвал марку топлива. Бензин привезли прямо к машине, после заправки двигатель сразу запустился.',
 		author: 'Алексей',
-		service: 'доставка бензина на дорогу в Тюмени',
+		service: replaceCityPlaceholders('доставка бензина на дорогу {inCity}', city),
 	},
 	{
 		text: 'Лампочка топлива загорелась слишком поздно, и машина остановилась ночью. Я указала точку на карте, мне заранее сообщили стоимость и привезли бензин нужной марки. Не пришлось оставлять автомобиль и искать канистру.',
@@ -32,7 +42,10 @@ const reviews: Review[] = [
 		service: 'доставка бензина за город',
 	},
 	{
-		text: 'После долгой дороги я не рассчитал расход бензина и остановился перед Тюменью. Отправил геолокацию, подтвердил марку топлива и получил доставку прямо на обочину. Машину заправили на месте без эвакуации.',
+		text: replaceCityPlaceholders(
+			'После долгой дороги я не рассчитал расход бензина и остановился перед {ofCity}. Отправил геолокацию, подтвердил марку топлива и получил доставку прямо на обочину. Машину заправили на месте без эвакуации.',
+			city,
+		),
 		author: 'Игорь',
 		service: 'экстренный подвоз топлива',
 	},
@@ -46,7 +59,7 @@ const reviews: Review[] = [
 			<div class="col-lg-12">
 				<div class="section-title section-title-center">
 					<span class="section-sub-title wow fadeInUp">Отзывы водителей</span>
-					<h2 id="testimonials-heading" class="text-anime-style-3" data-cursor="-opaque">Отзывы о доставке бензина в Тюмени и области</h2>
+					<h2 id="testimonials-heading" class="text-anime-style-3" data-cursor="-opaque">{replaceCityPlaceholders("Отзывы о доставке бензина {inCity} и области", city)}</h2>
 				</div>
 			</div>
 		</div>

@@ -1,4 +1,7 @@
 ---
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
 interface PricingPlan {
 	icon: string;
 	title: string;
@@ -11,6 +14,7 @@ interface PricingPlan {
 }
 
 interface Props {
+	city?: ChatCity;
 	subtitle?: string;
 	title?: string;
 	plans?: PricingPlan[];
@@ -24,42 +28,47 @@ const benefitIcons = [
 ];
 
 const {
+	city: propCity,
 	subtitle = 'Цены на техпомощь',
 	title = 'Понятная стоимость выезда',
- plans = [
-		{
-			icon: '/images/icon-pricing-1-gold.svg',
-			title: 'Прикурить авто',
-			text: 'Запущу автомобиль от внешнего источника питания прямо на месте поломки.',
-			price: 'от 5 500 ₽',
-			priceUnit: '/выезд',
-			features: ['Выезд по Тюмени', 'Запуск двигателя', 'Проверка заряда аккумулятора'],
-			ctaText: 'Заказать помощь',
-			ctaHref: '/contacts',
-		},
-		{
-			icon: '/images/icon-pricing-2-gold.svg',
-			title: 'Замена аккумулятора',
-			text: 'Заменю аккумулятор с выездом, а новую батарею подберу по вашему авто.',
-			price: 'от 5 500 ₽',
-			priceUnit: '+ запчасть',
-			features: ['Выезд по Тюмени', 'Снятие старого аккумулятора', 'Установка новой запчасти'],
-			ctaText: 'Заказать помощь',
-			ctaHref: '/contacts',
-		},
-		{
-			icon: '/images/icon-pricing-3-gold.svg',
-			title: 'Отогрев и эвакуатор',
-			text: 'Отогрею автомобиль или подам эвакуатор при серьёзной неисправности.',
-			price: 'от 5 500 ₽',
-			priceUnit: '/выезд',
-			features: ['Выезд к автомобилю', 'Отогрев двигателя и замков', 'Эвакуация по согласованному маршруту'],
-			ctaText: 'Заказать помощь',
-			ctaHref: '/contacts',
-		},
-	],
+	plans: propPlans,
 	benefits = ['Выезд от 5 500 руб', 'Цена до начала работ', 'Помощь круглосуточно'],
 } = Astro.props;
+
+const city = propCity ?? getCityBySlug();
+
+const plans = propPlans ?? [
+	{
+		icon: '/images/icon-pricing-1-gold.svg',
+		title: 'Прикурить авто',
+		text: 'Запущу автомобиль от внешнего источника питания прямо на месте поломки.',
+		price: 'от 5 500 ₽',
+		priceUnit: '/выезд',
+		features: [replaceCityPlaceholders('Выезд {byCity}', city), 'Запуск двигателя', 'Проверка заряда аккумулятора'],
+		ctaText: 'Заказать помощь',
+		ctaHref: getCityUrl('/contacts', city.slug),
+	},
+	{
+		icon: '/images/icon-pricing-2-gold.svg',
+		title: 'Замена аккумулятора',
+		text: 'Заменю аккумулятор с выездом, а новую батарею подберу по вашему авто.',
+		price: 'от 5 500 ₽',
+		priceUnit: '+ запчасть',
+		features: [replaceCityPlaceholders('Выезд {byCity}', city), 'Снятие старого аккумулятора', 'Установка новой запчасти'],
+		ctaText: 'Заказать помощь',
+		ctaHref: getCityUrl('/contacts', city.slug),
+	},
+	{
+		icon: '/images/icon-pricing-3-gold.svg',
+		title: 'Отогрев и эвакуатор',
+		text: 'Отогрею автомобиль или подам эвакуатор при серьёзной неисправности.',
+		price: 'от 5 500 ₽',
+		priceUnit: '/выезд',
+		features: ['Выезд к автомобилю', 'Отогрев двигателя и замков', 'Эвакуация по согласованному маршруту'],
+		ctaText: 'Заказать помощь',
+		ctaHref: getCityUrl('/contacts', city.slug),
+	},
+];
 
 const isPerLiter = (price: string, unit: string) =>
 	/₽\/л|\/л|\/литр/i.test(`${price}${unit}`);

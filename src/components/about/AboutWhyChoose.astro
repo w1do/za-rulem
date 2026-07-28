@@ -1,3 +1,15 @@
+---
+import { getCityBySlug, replaceCityPlaceholders } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
+interface Props {
+	city?: ChatCity;
+}
+
+const { city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
+---
+
 <!-- Why Choose Us Section Start -->
 <div class="why-choose-us">
 	<div class="container">
@@ -8,7 +20,7 @@
 					<!-- Section Title Start -->
 					<div class="section-title">
 						<span class="section-sub-title wow fadeInUp">Почему я</span>
-						<h2 class="text-anime-style-3" data-cursor="-opaque">Почему мне доверяют техпомощь на дороге</h2>
+						<h2 class="text-anime-style-3" data-cursor="-opaque">{replaceCityPlaceholders("Почему мне доверяют техпомощь {inCity}", city)}</h2>
 					</div>
 					<!-- Section Title End -->
 
@@ -63,7 +75,7 @@
 								</div>
 								<div class="why-choose-item-content">
 									<h3>Выезд 24/7</h3>
-									<p>Я работаю круглосуточно в Тюмени и Тюменской области.</p>
+									<p>{replaceCityPlaceholders("Я работаю круглосуточно {inCity} и области.", city)}</p>
 								</div>
 							</div>
 							<!-- Why Choose Item End -->

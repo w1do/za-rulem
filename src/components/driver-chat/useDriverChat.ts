@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { directus } from '../../lib/directus';
 import { createItem, readItems } from '@directus/sdk';
 
-import { chatCities, DEFAULT_CITY_SLUG } from '../../data/chatCluster';
+import { chatCities, DEFAULT_CITY_SLUG } from '../../data/cities';
 
 // ==== Types & Logic ====
 
@@ -28,6 +28,7 @@ interface DirectusMessage {
 }
 
 const STORAGE_KEY = 'za-rulem-driver-chat';
+const CITY_STORAGE_KEY = 'za-rulem-city';
 
 const welcomeMessage: ChatMessage = {
 	id: 'welcome',
@@ -67,7 +68,12 @@ const notifyNewMessage = (text: string) => {
 };
 
 export const normalizePhone = (value: string) => {
-	const digits = value.replace(/\D/g, '').slice(0, 11);
+	let digits = value.replace(/\D/g, '');
+	// Для РФ: если 10 цифр и начинается с 9, добавляем 7
+	if (digits.length === 10 && digits[0] === '9') {
+		digits = '7' + digits;
+	}
+	digits = digits.slice(0, 11);
 	if (!digits) return '';
 	const normalized = digits[0] === '8' ? `7${digits.slice(1)}` : digits;
 	return `+${normalized}`;
@@ -160,10 +166,26 @@ export function useDriverChat() {
 			}, 5000);
 		};
 
+		// Соединение общее для всего клиента: при смене города/топика эффект
+		// перезапускается, а сокет остаётся открытым. Повторный connect() в этом
+		// случае бросает 'Cannot connect when state is "open"' — просто игнорируем.
+		const ensureConnected = async () => {
+			try {
+				await directus.connect();
+			} catch (e) {
+				const message = e instanceof Error ? e.message : String(e);
+				if (/Cannot connect when state is/i.test(message)) {
+					console.log('[Chat] WebSocket already connected/connecting');
+					return;
+				}
+				throw e;
+			}
+		};
+
 		const startRealtime = async () => {
 			try {
 				console.log('[Chat] Connecting to WebSocket...');
-				await directus.connect();
+				await ensureConnected();
 				
 				if (!isActive) return;
 
@@ -274,16 +296,23 @@ export function useDriverChat() {
 		let initialPhone = '';
 		let initialTopic: ChatTopic = 'general';
 		let initialCity: string = DEFAULT_CITY_SLUG;
-		let hasUrlParams = false;
 
-		// 1. Читаем localStorage
+		// 1. Читаем зарезервированный город
+		const globalCity = window.localStorage.getItem(CITY_STORAGE_KEY);
+		if (globalCity && chatCities.some(c => c.slug === globalCity)) {
+			initialCity = globalCity;
+		}
+
+		// 2. Читаем основной конфиг чата (телефон, топик)
 		const saved = window.localStorage.getItem(STORAGE_KEY);
 		if (saved) {
 			try {
 				const data = JSON.parse(saved);
 				if (data.phone) initialPhone = data.phone;
 				if (isTopic(data.topic)) initialTopic = data.topic;
-				if (data.city && chatCities.some(c => c.slug === data.city)) {
+				// Если в общем конфиге чата город другой, но в глобальном нет — берем из чата.
+				// Но глобальный CITY_STORAGE_KEY имеет приоритет.
+				if (!globalCity && data.city && chatCities.some(c => c.slug === data.city)) {
 					initialCity = data.city;
 				}
 			} catch {
@@ -291,19 +320,24 @@ export function useDriverChat() {
 			}
 		}
 
-		// 2. Читаем URL (имеет приоритет)
+		// 3. Читаем URL (имеет высший приоритет)
 		if (typeof window !== 'undefined') {
 			const params = new URLSearchParams(window.location.search);
 			const urlTopic = params.get('topic');
 			const urlCity = params.get('city');
+			const urlPhone = params.get('phone');
 
 			if (isTopic(urlTopic)) {
 				initialTopic = urlTopic;
-				hasUrlParams = true;
 			}
 			if (urlCity && chatCities.some(c => c.slug === urlCity)) {
 				initialCity = urlCity;
-				hasUrlParams = true;
+			}
+			if (urlPhone) {
+				const norm = normalizePhone(urlPhone);
+				if (norm.replace(/\D/g, '').length === 11) {
+					initialPhone = norm;
+				}
 			}
 		}
 
@@ -318,24 +352,65 @@ export function useDriverChat() {
 		setCity(initialCity);
 		cityRef.current = initialCity;
 
-		// 3. Запоминаем в localStorage, если был переход по ссылке с параметрами
-		if (hasUrlParams) {
-			window.localStorage.setItem(
-				STORAGE_KEY,
-				JSON.stringify({ phone: initialPhone, topic: initialTopic, city: initialCity }),
-			);
-		}
+		// Синхронизируем localStorage
+		try {
+			window.localStorage.setItem(CITY_STORAGE_KEY, initialCity);
+			if (initialPhone) {
+				persist(initialPhone, initialTopic, initialCity);
+			}
+		} catch (e) {}
+
+		// 4. Слушаем внешние изменения города
+		const handleCityChange = (e: Event) => {
+			const detail = (e as CustomEvent).detail;
+			if (detail && detail !== cityRef.current) {
+				pickCity(detail);
+			}
+		};
+		const handleStorage = (e: StorageEvent) => {
+			if (e.key === CITY_STORAGE_KEY && e.newValue && e.newValue !== cityRef.current) {
+				pickCity(e.newValue);
+			}
+		};
+		window.addEventListener('city-change', handleCityChange);
+		window.addEventListener('storage', handleStorage);
+		
+		return () => {
+			window.removeEventListener('city-change', handleCityChange);
+			window.removeEventListener('storage', handleStorage);
+		};
 	}, []);
 
+	// Держим query-параметры страницы в актуальном состоянии: иначе после
+	// перезагрузки старый ?city= из URL перекроет выбранный город.
+	const syncUrl = (nextTopic: ChatTopic, nextCity: string) => {
+		if (typeof window === 'undefined' || !window.history?.replaceState) return;
+		try {
+			const url = new URL(window.location.href);
+			if (!url.searchParams.has('city') && !url.searchParams.has('topic')) return;
+			if (url.searchParams.has('city')) url.searchParams.set('city', nextCity);
+			if (url.searchParams.has('topic')) url.searchParams.set('topic', nextTopic);
+			window.history.replaceState(window.history.state, '', url.toString());
+		} catch (e) {
+			console.warn('Chat URL sync failed:', e);
+		}
+	};
+
 	const persist = (nextPhone: string, nextTopic: ChatTopic, nextCity: string) => {
-		window.localStorage.setItem(
-			STORAGE_KEY,
-			JSON.stringify({ phone: nextPhone, topic: nextTopic, city: nextCity }),
-		);
+		try {
+			window.localStorage.setItem(
+				STORAGE_KEY,
+				JSON.stringify({ phone: nextPhone, topic: nextTopic, city: nextCity }),
+			);
+			window.localStorage.setItem(CITY_STORAGE_KEY, nextCity);
+		} catch (e) {
+			console.warn('Chat persistence failed:', e);
+		}
 	};
 
 	const join = (phoneInput: string) => {
 		const nextPhone = normalizePhone(phoneInput);
+		console.log('[Chat] Joining with phone:', nextPhone);
 		if (nextPhone.replace(/\D/g, '').length !== 11) {
 			setError('Укажи номер из 11 цифр.');
 			return;
@@ -399,7 +474,8 @@ export function useDriverChat() {
 		// Сбрасываем сообщения при смене канала, чтобы не видеть старые сообщения
 		setMessages([welcomeMessage]);
 		
-		if (isJoined && sessionId) persist(phoneRef.current, id, cityRef.current);
+		persist(phoneRef.current, id, cityRef.current);
+		syncUrl(id, cityRef.current);
 	};
 
 	const pickCity = (id: string) => {
@@ -412,7 +488,8 @@ export function useDriverChat() {
 		// Сбрасываем сообщения при смене города
 		setMessages([welcomeMessage]);
 
-		if (isJoined && sessionId) persist(phoneRef.current, topicRef.current, validCity);
+		persist(phoneRef.current, topicRef.current, validCity);
+		syncUrl(topicRef.current, validCity);
 	};
 
 	return {

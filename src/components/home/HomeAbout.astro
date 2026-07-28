@@ -1,4 +1,7 @@
 ---
+import type { ChatCity } from '../../data/cities';
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+
 interface AboutCounter {
 	value: string;
 	suffix?: string;
@@ -6,6 +9,7 @@ interface AboutCounter {
 }
 
 interface Props {
+	city?: ChatCity;
 	subtitle?: string;
 	title?: string;
 	taskTitle?: string;
@@ -19,22 +23,32 @@ interface Props {
 }
 
 const {
+	city: propCity,
 	subtitle = 'Кто приедет на помощь',
-	title = 'Верну вашу машину в движение на дороге в Тюмени',
+	title: propTitle,
 	taskTitle = 'Моя задача',
 	taskText = 'Прикурю авто, заменю аккумулятор, отогрею двигатель, вскрою салон или подам эвакуатор — решаю проблему прямо на месте поломки.',
 	principleTitle = 'Мой принцип',
 	principleText = 'Называю точную цену до начала работ, без скрытых доплат, и работаю аккуратно, не повреждая автомобиль.',
-	counters = [
-		{ value: '6', suffix: '+', label: 'Мои услуги на дороге' },
-		{ value: '24', suffix: '/7', label: 'Я на связи' },
-		{ value: '1', label: 'Мой город — Тюмень' },
-		{ value: '1', label: 'Мой номер для вызова' },
-	],
-	footerText = 'Подберу решение для любой поломки на дороге в Тюмени —',
+	counters: propCounters,
+	footerText: propFooterText,
 	footerLinkText = 'Оставить заявку',
-	footerLinkHref = '/contacts',
+	footerLinkHref: propFooterLinkHref,
 } = Astro.props;
+
+const city = propCity ?? getCityBySlug();
+
+const title = propTitle ?? replaceCityPlaceholders('Верну вашу машину в движение на дороге {inCity}', city);
+const footerText =
+	propFooterText ?? replaceCityPlaceholders('Подберу решение для любой поломки на дороге {inCity} —', city);
+const footerLinkHref = propFooterLinkHref ?? getCityUrl('/contacts', city.slug);
+
+const counters = propCounters ?? [
+	{ value: '6', suffix: '+', label: 'Мои услуги на дороге' },
+	{ value: '24', suffix: '/7', label: 'Я на связи' },
+	{ value: '1', label: replaceCityPlaceholders('Мой город — {city}', city) },
+	{ value: '1', label: 'Мой номер для вызова' },
+];
 ---
 
     <!-- About Us Section Start -->

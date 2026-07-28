@@ -9,8 +9,9 @@ import HubFaqs from '../hub/HubFaqs.astro';
 import HubCta from '../hub/HubCta.astro';
 import ChatOtherLocations from './ChatOtherLocations.astro';
 import { webPageNode, breadcrumbNode, faqNode } from '../../lib/seo';
-import type { ChatCity, ChatFuel } from '../../data/chatCluster';
-import { chatAppUrl, fuelLandingUrl, cityLandingUrl, chatCities, chatFuels, DEFAULT_CITY_SLUG } from '../../data/chatCluster';
+import type { ChatCity } from '../../data/cities';
+import { chatCities, DEFAULT_CITY_SLUG, chatAppUrl, fuelLandingUrl, cityLandingUrl } from '../../data/cities';
+import { chatFuels, type ChatFuel } from '../../data/chatCluster';
 
 interface Props {
 	city: ChatCity;

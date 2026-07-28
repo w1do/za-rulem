@@ -10,52 +10,70 @@ import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 import FuelDeliveryCalculator from '../components/calculators/FuelDeliveryCalculator.tsx';
 import FuelPricesTable from '../components/FuelPricesTable.tsx';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
+import type { ChatCity } from '../data/cities';
+import { getCityBySlug, replaceCityPlaceholders, removeCityPlaceholders, getCityUrl } from '../lib/city';
 
-const { frontmatter } = Astro.props;
+export interface Props {
+	frontmatter: any;
+	city?: ChatCity;
+}
+
+const { frontmatter, city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
+
 const cluster = frontmatter.cluster;
 const pillar = await getEntry('services', cluster);
-const hubUrl = `/services/${cluster}`;
-const hubTitle = pillar?.data.title ?? 'Услуги';
+const hubUrl = getCityUrl(`/services/${cluster}`, city.slug);
+const hubTitle = removeCityPlaceholders(pillar?.data.title ?? 'Услуги');
 
-const siblings = (
-	await getCollection('serviceLanding', ({ data }) => data.cluster === cluster)
-)
+const siblings = (await getCollection('serviceLanding', ({ data }) => data.cluster === cluster))
 	.sort((a, b) => a.data.order - b.data.order)
 	.map((entry) => ({
-		title: entry.data.title,
-		url: `/services/${entry.id}`,
+		title: removeCityPlaceholders(entry.data.title),
+		url: getCityUrl(`/services/${entry.id}`, city.slug),
 	}));
 
 const sidebarLinks = [{ title: `Все услуги: ${hubTitle}`, url: hubUrl }, ...siblings];
 
-const seoTitle = frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь в Тюмени`;
-const seoDescription = frontmatter.seo?.description ?? frontmatter.description;
-const faqs = frontmatter.faqs ?? [];
+const seoTitle = replaceCityPlaceholders(frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь {inCity}`, city);
+const seoDescription = replaceCityPlaceholders(frontmatter.seo?.description ?? frontmatter.description, city);
+const faqs = (frontmatter.faqs ?? []).map((faq: any) => ({
+	question: replaceCityPlaceholders(faq.question, city),
+	answer: replaceCityPlaceholders(faq.answer, city),
+}));
 const image = frontmatter.image ?? '/images/service-single-image.jpg';
-const imageAlt = frontmatter.imageAlt ?? frontmatter.title;
+const imageAlt = replaceCityPlaceholders(frontmatter.imageAlt ?? frontmatter.title, city);
 const showFuelCalculator = cluster === 'toplivo' && /бензин/i.test(frontmatter.title);
 const showFuelPricesTable = cluster === 'toplivo' && /очередь/i.test(frontmatter.title);
 
 const jsonLd = [
 	serviceNode({
-		name: frontmatter.title,
-		description: frontmatter.description,
+		name: replaceCityPlaceholders(frontmatter.title, city),
+		description: seoDescription,
 		url: Astro.url.pathname,
+		city,
 	}),
 	breadcrumbNode([
-		{ name: 'Главная', url: '/' },
-		{ name: 'Услуги', url: '/services' },
+		{ name: 'Главная', url: getCityUrl('/', city.slug) },
+		{ name: 'Услуги', url: getCityUrl('/services', city.slug) },
 		{ name: hubTitle, url: hubUrl },
-		{ name: frontmatter.title, url: Astro.url.pathname },
+		{ name: replaceCityPlaceholders(frontmatter.title, city), url: Astro.url.pathname },
 	]),
 	faqNode(faqs),
 ].filter(Boolean);
+
+// Рендерим контент слота и заменяем плейсхолдеры города в HTML
+const contentHtml = await Astro.slots.render('default');
+const replacedContentHtml = replaceCityPlaceholders(contentHtml, city);
 ---
 
-<Layout title={seoTitle} description={seoDescription} jsonLd={jsonLd}>
-	<Header />
+<Layout title={seoTitle} description={seoDescription} jsonLd={jsonLd} city={city}>
+	<Header city={city} />
 
-	<ServicePageHeader title={frontmatter.title} showChatButton={cluster === 'toplivo'} />
+	<ServicePageHeader
+		title={replaceCityPlaceholders(frontmatter.title, city)}
+		showChatButton={cluster === 'toplivo'}
+	/>
 
 	<!-- Page Service Single Start -->
 	<div class="page-service-single">
@@ -71,19 +89,19 @@ const jsonLd = [
 						<ServiceSingleImage image={image} alt={imageAlt} />
 
 						<!-- Service Entry Start -->
-						<div class="service-entry post-body">
-							<slot />
-						</div>
+						<div class="service-entry post-body" set:html={replacedContentHtml} />
 						<!-- Service Entry End -->
 
 						{showFuelCalculator && <FuelDeliveryCalculator client:visible />}
-						
-						{showFuelPricesTable && (
-							<div className="fuel-prices-section mt-4 mb-4">
-								<h3 class="mb-4">Справочные цены на топливо в сетях РФ (июль 2026)</h3>
-								<FuelPricesTable client:visible />
-							</div>
-						)}
+
+						{
+							showFuelPricesTable && (
+								<div className="fuel-prices-section mt-4 mb-4">
+									<h3 class="mb-4">Справочные цены на топливо в сетях РФ (июль 2026)</h3>
+									<FuelPricesTable client:visible />
+								</div>
+							)
+						}
 
 						<ServiceFaqs faqs={faqs} />
 					</div>
@@ -94,5 +112,5 @@ const jsonLd = [
 	</div>
 	<!-- Page Service Single End -->
 
-	<Footer />
+	<Footer city={city} />
 </Layout>

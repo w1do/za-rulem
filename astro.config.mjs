@@ -15,6 +15,9 @@ export default defineConfig({
     resolve: {
       dedupe: ['react', 'react-dom'],
     },
+    optimizeDeps: {
+      include: ['@directus/sdk', 'react', 'react-dom'],
+    },
     server: {
       watch: {
         usePolling: true,

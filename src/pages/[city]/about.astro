@@ -1,0 +1,15 @@
+---
+import AboutPage from '../../components/pages/AboutPage.astro';
+import { chatCities } from '../../data/cities';
+
+export function getStaticPaths() {
+	return chatCities.map((city) => ({
+		params: { city: city.slug },
+		props: { city },
+	}));
+}
+
+const { city } = Astro.props;
+---
+
+<AboutPage city={city} />

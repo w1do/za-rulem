@@ -1,4 +1,6 @@
 ---
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+
 interface HeroBenefit {
 	icon: string;
 	title: string;
@@ -6,6 +8,7 @@ interface HeroBenefit {
 }
 
 interface Props {
+	city?: ChatCity;
 	subtitle?: string;
 	title?: string;
 	description?: string;
@@ -18,32 +21,51 @@ interface Props {
 }
 
 const {
-	subtitle = 'Техпомощь на дороге в Тюмени 24/7',
-	title = 'Срочная автопомощь на дороге в Тюмени с выездом',
- description = 'Приеду за 20–40 минут и заведу вашу машину: прикурю авто, заменю аккумулятор с выездом, отогрею двигатель, вскрою салон, привезу топливо или подам эвакуатор. Работаю круглосуточно по Тюмени. Выезд только по заявке на сайте.',
+	city: propCity,
+	subtitle: propSubtitle,
+	title: propTitle,
+	description: propDescription,
 	ctaText = 'Вызвать помощь',
-	ctaHref = '/contacts',
-	reviewText = 'Круглосуточно на связи с водителями Тюмени',
+	ctaHref: propCtaHref,
+	reviewText: propReviewText,
 	counterValue = '6',
-	counterText = 'Шесть видов техпомощи на дороге — приеду с готовым оборудованием и решу проблему на месте.',
-	benefits = [
-  {
-			icon: '/images/icon-hero-info-list-1-gold.svg',
-			title: '01. Оставьте заявку',
-			text: 'Опишите поломку в форме — подскажу решение и назову цену до выезда.',
-		},
-		{
-			icon: '/images/icon-hero-info-list-2-gold.svg',
-			title: '02. Я выезжаю',
-			text: 'Уточню адрес в Тюмени и сразу выезжаю к вам с нужным оборудованием.',
-		},
-		{
-			icon: '/images/icon-hero-info-list-3-gold.svg',
-			title: '03. Завожу на месте',
-			text: 'Прикурю авто, заменю аккумулятор или подам эвакуатор, если ремонт на месте невозможен.',
-		},
-	],
+	counterText: propCounterText,
+	benefits: propBenefits,
 } = Astro.props;
+
+const city = propCity ?? getCityBySlug();
+
+const subtitle = propSubtitle ?? replaceCityPlaceholders('Техпомощь на дороге в {city} 24/7', city);
+const title = propTitle ?? replaceCityPlaceholders('Срочная автопомощь на дороге в {city} с выездом', city);
+const description =
+	propDescription ??
+	replaceCityPlaceholders(
+		'Приеду за 20–40 минут и заведу вашу машину: прикурю авто, заменю аккумулятор с выездом, отогрею двигатель, вскрою салон, привезу топливо или подам эвакуатор. Работаю круглосуточно по {inCity}. Выезд только по заявке на сайте.',
+		city,
+	);
+const ctaHref = propCtaHref ?? getCityUrl('/contacts', city.slug);
+const reviewText = propReviewText ?? replaceCityPlaceholders('Круглосуточно на связи с водителями {ofCity}', city);
+const counterText =
+	propCounterText ??
+	'Шесть видов техпомощи на дороге — приеду с готовым оборудованием и решу проблему на месте.';
+
+const benefits = propBenefits ?? [
+	{
+		icon: '/images/icon-hero-info-list-1-gold.svg',
+		title: '01. Оставьте заявку',
+		text: 'Опишите поломку в форме — подскажу решение и назову цену до выезда.',
+	},
+	{
+		icon: '/images/icon-hero-info-list-2-gold.svg',
+		title: '02. Я выезжаю',
+		text: replaceCityPlaceholders('Уточню адрес в {inCity} и сразу выезжаю к вам с нужным оборудованием.', city),
+	},
+	{
+		icon: '/images/icon-hero-info-list-3-gold.svg',
+		title: '03. Завожу на месте',
+		text: 'Прикурю авто, заменю аккумулятор или подам эвакуатор, если ремонт на месте невозможен.',
+	},
+];
 ---
 
     <!-- Hero Section Start -->

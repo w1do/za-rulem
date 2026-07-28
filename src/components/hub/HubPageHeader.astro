@@ -2,9 +2,30 @@
 import PageHeaderHelpButton from '../shared/PageHeaderHelpButton.astro';
 import PageHeaderChatButton from '../shared/PageHeaderChatButton.astro';
 
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
 // Шапка хаба услуги. Разметка перенесена из шаблона (page-header parallaxie),
 // как на странице «О сервисе», с хлебными крошками до раздела услуг.
-const { title = 'Техпомощь на дороге в Тюмени', breadcrumb = 'Техпомощь', showChatButton = false, chatLink } = Astro.props;
+interface Props {
+	city?: ChatCity;
+	title?: string;
+	breadcrumb?: string;
+	showChatButton?: boolean;
+	chatLink?: string;
+}
+
+const { city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
+
+const {
+	title: propTitle,
+	breadcrumb = 'Техпомощь',
+	showChatButton = false,
+	chatLink,
+} = Astro.props;
+
+const title = propTitle ?? replaceCityPlaceholders('Техпомощь на дороге {inCity}', city);
 ---
 
 <!-- Page Header Section Start -->
@@ -17,8 +38,8 @@ const { title = 'Техпомощь на дороге в Тюмени', breadcru
 					<h1 class="text-anime-style-3" data-cursor="-opaque">{title}</h1>
 					<nav class="wow fadeInUp">
 						<ol class="breadcrumb">
-							<li class="breadcrumb-item"><a href="/">главная</a></li>
-							<li class="breadcrumb-item"><a href="/services">услуги</a></li>
+							<li class="breadcrumb-item"><a href={getCityUrl('/', city.slug)}>главная</a></li>
+							<li class="breadcrumb-item"><a href={getCityUrl('/services', city.slug)}>услуги</a></li>
 							<li class="breadcrumb-item active" aria-current="page">{breadcrumb}</li>
 						</ol>
 					</nav>

@@ -1,8 +1,33 @@
 ---
+import { getCityBySlug, replaceCityPlaceholders } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
+interface Props {
+	city?: ChatCity;
+}
+
+const { city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
+
 const features = [
-	{ icon: '/images/icon-core-features-item-1.svg', title: 'Заявка без долгих объяснений', text: 'Я уточняю местоположение, модель автомобиля и симптомы, чтобы сразу взять нужное оборудование.' },
-	{ icon: '/images/icon-core-features-item-2.svg', title: 'Помощь прямо на месте', text: 'Прикуриваю, меняю аккумулятор, отогреваю автомобиль, подвожу топливо и провожу диагностику.' },
-	{ icon: '/images/icon-core-features-item-3.svg', title: 'Выезд круглосуточно', text: 'Я принимаю заявки 24/7 по Тюмени и заранее сообщаю ориентир по времени прибытия.' },
+	{
+		icon: '/images/icon-core-features-item-1.svg',
+		title: 'Заявка без долгих объяснений',
+		text: 'Я уточняю местоположение, модель автомобиля и симптомы, чтобы сразу взять нужное оборудование.',
+	},
+	{
+		icon: '/images/icon-core-features-item-2.svg',
+		title: 'Помощь прямо на месте',
+		text: 'Прикуриваю, меняю аккумулятор, отогреваю автомобиль, подвожу топливо и провожу диагностику.',
+	},
+	{
+		icon: '/images/icon-core-features-item-3.svg',
+		title: 'Выезд круглосуточно',
+		text: replaceCityPlaceholders(
+			'Я принимаю заявки 24/7 {byCity} и заранее сообщаю ориентир по времени прибытия.',
+			city,
+		),
+	},
 ];
 ---
 

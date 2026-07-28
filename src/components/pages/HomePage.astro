@@ -1,0 +1,73 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/shared/header/Header.astro';
+import Footer from '../../components/shared/footer/Footer.astro';
+
+import HomeHero from '../../components/home/HomeHero.astro';
+import HomeAbout from '../../components/home/HomeAbout.astro';
+import HomeServices from '../../components/home/HomeServices.astro';
+import HomeWhyChoose from '../../components/home/HomeWhyChoose.astro';
+import HomeFleets from '../../components/home/HomeFleets.astro';
+import HomeWhatWeDo from '../../components/home/HomeWhatWeDo.astro';
+import HomeCollection from '../../components/home/HomeCollection.astro';
+import HomeDrivers from '../../components/home/HomeDrivers.astro';
+import HomeHowItWork from '../../components/home/HomeHowItWork.astro';
+import HomeTestimonials from '../../components/home/HomeTestimonials.astro';
+import HomePricing from '../../components/home/HomePricing.astro';
+import HomeBlog from '../../components/home/HomeBlog.astro';
+
+import { webPageNode, itemListNode } from '../../lib/seo';
+import type { ChatCity } from '../../data/cities';
+import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+
+export interface Props {
+	city: ChatCity;
+}
+
+const { city } = Astro.props;
+
+const title = replaceCityPlaceholders("Автопомощь и техпомощь на дороге {inCity} — срочный выезд 24/7", city);
+const description = replaceCityPlaceholders("Срочная автопомощь и техпомощь на дороге {inCity} с выездом: прикурю авто, заменю аккумулятор, отогрею машину, привезу топливо. Приеду за 20–40 минут круглосуточно.", city);
+
+const jsonLd = [
+	webPageNode({
+		type: 'WebPage',
+		name: title,
+		description: description,
+		url: getCityUrl('/', city.slug),
+	}),
+	itemListNode([
+		{ name: 'Прикурить авто', url: getCityUrl('/services/tehpomosch/prikurit-avto', city.slug) },
+		{ name: 'Замена аккумулятора с выездом', url: getCityUrl('/services/tehpomosch/zamena-akkumulyatora', city.slug) },
+		{ name: 'Отогрев автомобиля', url: getCityUrl('/services/tehpomosch/otogrev-avto', city.slug) },
+		{ name: 'Подвоз бензина', url: getCityUrl('/services/toplivo/podvoz-benzina', city.slug) },
+		{ name: 'Подвоз дизеля', url: getCityUrl('/services/toplivo/podvoz-dizelya', city.slug) },
+	]),
+];
+---
+
+<Layout
+	title={title}
+	description={description}
+	ogTitle={replaceCityPlaceholders("Автопомощь и техпомощь {inCity} — срочный выезд 24/7", city)}
+    ogDescription={replaceCityPlaceholders("Застряли на дороге {inCity}? Оставьте заявку — срочно приеду с выездом и заведу вашу машину в любое время суток.", city)}
+	keywords={replaceCityPlaceholders("автопомощь {city}, техпомощь на дороге {city}, срочно техпомощь {city} с выездом, прикурить авто, замена аккумулятора с выездом, отогрев автомобиля", city)}
+	jsonLd={jsonLd}
+    city={city}
+>
+	<Header city={city} />
+
+	<HomeHero city={city} />
+	<HomeAbout city={city} />
+	<HomeServices city={city} />
+	<HomeWhyChoose />
+	<HomeFleets city={city} />
+	<HomeWhatWeDo city={city} />
+	<HomeCollection />
+	<HomeDrivers />
+	<HomeHowItWork city={city} />
+	<HomeTestimonials city={city} />
+	<HomePricing city={city} />
+	<HomeBlog city={city} />
+	<Footer city={city} />
+</Layout>

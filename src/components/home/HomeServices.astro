@@ -1,4 +1,7 @@
 ---
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
 interface ServiceItem {
 	icon: string;
 	title: string;
@@ -8,6 +11,7 @@ interface ServiceItem {
 }
 
 interface Props {
+	city?: ChatCity;
 	subtitle?: string;
 	title?: string;
 	services?: ServiceItem[];
@@ -19,34 +23,41 @@ interface Props {
 }
 
 const {
+	city: propCity,
 	subtitle = 'Услуги техпомощи на дороге',
-	title = 'Помогу при любой поломке авто в Тюмени',
-	services = [
-		{
-			icon: '/images/icon-service-1.svg',
-			title: 'Прикурить авто',
-			text: 'Сел аккумулятор — подам питание и запущу двигатель на месте за несколько минут.',
-			href: '/services',
-		},
-		{
-			icon: '/images/icon-service-2.svg',
-			title: 'Замена аккумулятора с выездом',
-			text: 'Проверю АКБ, подберу и установлю новую батарею прямо у вашего авто.',
-			href: '/services',
-		},
-		{
-			icon: '/images/icon-service-3.svg',
-			title: 'Отогрев автомобиля',
-			text: 'Отогрею замёрзший двигатель и салон и заведу машину без риска для узлов.',
-			href: '/services',
-		},
-	],
+	title: propTitle,
+	services: propServices,
 	footerText = 'Ещё вскрою авто, привезу топливо или подам эвакуатор —',
 	footerLinkText = 'посмотреть все услуги',
-	footerLinkHref = '/services',
+	footerLinkHref: propFooterLinkHref,
 	rating = '4.9',
 	ratingText = 'Отзывы о моей работе',
 } = Astro.props;
+
+const city = propCity ?? getCityBySlug();
+const title = propTitle ?? replaceCityPlaceholders('Помогу при любой поломке авто {inCity}', city);
+const footerLinkHref = propFooterLinkHref ?? getCityUrl('/services', city.slug);
+
+const services = propServices ?? [
+	{
+		icon: '/images/icon-service-1.svg',
+		title: 'Прикурить авто',
+		text: 'Сел аккумулятор — подам питание и запущу двигатель на месте за несколько минут.',
+		href: getCityUrl('/services/tehpomosch/prikurit-avto', city.slug),
+	},
+	{
+		icon: '/images/icon-service-2.svg',
+		title: 'Замена аккумулятора с выездом',
+		text: 'Проверю АКБ, подберу и установлю новую батарею прямо у вашего авто.',
+		href: getCityUrl('/services/tehpomosch/zamena-akkumulyatora', city.slug),
+	},
+	{
+		icon: '/images/icon-service-3.svg',
+		title: 'Отогрев автомобиля',
+		text: 'Отогрею замёрзший двигатель и салон и заведу машину без риска для узлов.',
+		href: getCityUrl('/services/tehpomosch/otogrev-avto', city.slug),
+	},
+];
 ---
 
     <!-- Our Service Section Start -->

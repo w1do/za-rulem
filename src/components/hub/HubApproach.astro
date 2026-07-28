@@ -1,4 +1,7 @@
 ---
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
 // Блок «Мой подход» хаба. Разметка our-apporach из source. Контент — через props.
 interface ApproachItem {
 	title: string;
@@ -8,6 +11,7 @@ interface ApproachItem {
 }
 
 interface Props {
+	city?: ChatCity;
 	subtitle?: string;
 	title?: string;
 	items?: ApproachItem[];
@@ -19,12 +23,18 @@ interface Props {
 	footerBadge?: string;
 }
 
+const { city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
+
 const defaultItems: ApproachItem[] = [
 	{
 		title: 'Быстрый выезд',
 		description: 'Я беру трубку сам и выезжаю к машине с нужным оборудованием.',
 		icon: '/images/icon-approach-item-1.svg',
-		points: ['Подача по Тюмени за 20–40 минут', 'Работаю круглосуточно, включая мороз'],
+		points: [
+			replaceCityPlaceholders('Подача {byCity} за 20–40 минут', city),
+			'Работаю круглосуточно, включая мороз',
+		],
 	},
 	{
 		title: 'Честный расчёт',
@@ -39,12 +49,14 @@ const {
 	title = 'Я решаю проблему на месте, без лишнего ожидания',
 	items = defaultItems,
 	image = '/images/approach-image.jpg',
-	imageAlt = 'Выездная автопомощь в Тюмени',
+	imageAlt = replaceCityPlaceholders('Выездная автопомощь {inCity}', city),
 	footerText = 'Полный список дорожной помощи —',
-	footerLinkHref = '/services',
+	footerLinkHref: propFooterLinkHref,
 	footerLinkLabel = 'смотреть услуги',
 	footerBadge = 'На связи круглосуточно',
 } = Astro.props;
+
+const footerLinkHref = propFooterLinkHref ?? getCityUrl('/services', city.slug);
 
 const approachIcons = [
 	'/images/icon-approach-item-1.svg',

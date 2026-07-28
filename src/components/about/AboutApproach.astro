@@ -1,3 +1,15 @@
+---
+import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../data/cities';
+
+interface Props {
+	city?: ChatCity;
+}
+
+const { city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
+---
+
 <!-- Our Approach Section Start -->
 <div class="our-apporach bg-section">
 	<div class="container">
@@ -29,7 +41,7 @@
 						</div>
 						<div class="approach-item-body-list">
 							<ul>
-								<li>Выезжаю в Тюмени и области</li>
+								<li>{replaceCityPlaceholders("Выезжаю {inCity} и области", city)}</li>
 								<li>Работаю с распространёнными дорожными ситуациями</li>
 							</ul>
 						</div>
@@ -63,7 +75,7 @@
 				<!-- Approach Image Start -->
 				<div class="approach-image">
 					<figure class="image-anime reveal">
-						<img src="/images/approach-image.jpg" alt="Выездная автопомощь в Тюмени" />
+						<img src="/images/approach-image.jpg" alt={replaceCityPlaceholders("Выездная автопомощь {inCity}", city)} />
 					</figure>
 				</div>
 				<!-- Approach Image End -->
@@ -84,7 +96,7 @@
 						</div>
 					</div>
 					<!-- Satisfy Client Images End -->
-					<p>Полный список дорожной помощи — <a href="/services">смотреть услуги</a></p>
+					<p>Полный список дорожной помощи — <a href={getCityUrl("/services", city.slug)}>смотреть услуги</a></p>
 					<ul>
 						<li><span class="counter">24</span>/7</li>
 						<li>

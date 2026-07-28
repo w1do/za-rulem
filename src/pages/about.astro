@@ -1,57 +1,8 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Header from '../components/shared/header/Header.astro';
-import Footer from '../components/shared/footer/Footer.astro';
+import AboutPage from '../components/pages/AboutPage.astro';
+import { getCityBySlug } from '../lib/city';
 
-import AboutPageHeader from '../components/about/AboutPageHeader.astro';
-import AboutIntro from '../components/about/AboutIntro.astro';
-import AboutApproach from '../components/about/AboutApproach.astro';
-import AboutWhyChoose from '../components/about/AboutWhyChoose.astro';
-import AboutWhatWeDo from '../components/about/AboutWhatWeDo.astro';
-import AboutDrivers from '../components/about/AboutDrivers.astro';
-import AboutCta from '../components/about/AboutCta.astro';
-import AboutExpertise from '../components/about/AboutExpertise.astro';
-import AboutFaqs from '../components/about/AboutFaqs.astro';
-import AboutTestimonials from '../components/about/AboutTestimonials.astro';
-
-import { webPageNode, breadcrumbNode } from '../lib/seo';
-import HomeDrivers from "../components/home/HomeDrivers.astro";
-
-const jsonLd = [
-	webPageNode({
-		type: 'AboutPage',
-		name: 'О сервисе — автопомощь и техпомощь на дороге в Тюмени 24/7',
-		description:
-			'Как я оказываю круглосуточную автопомощь и техпомощь на дороге в Тюмени и области с выездом: прикуриваю авто, меняю аккумуляторы, отогреваю машины, подвожу топливо, выезжаю как автоэлектрик и провожу диагностику автомобилей.',
-		url: '/about',
-	}),
-	breadcrumbNode([
-		{ name: 'Главная', url: '/' },
-		{ name: 'О сервисе', url: '/about' },
-	]),
-];
+const city = getCityBySlug('tyumen');
 ---
 
-<Layout
-	title="О сервисе — техпомощь на дороге в Тюмени 24/7 | За рулём"
-	description="Я оказываю круглосуточную техпомощь на дороге в Тюмени и области: прикуриваю авто, меняю аккумуляторы, отогреваю машины, подвожу топливо, работаю как автоэлектрик и провожу диагностику."
-	ogTitle="За рулём — о сервисе техпомощи на дороге в Тюмени"
-	ogDescription="Круглосуточная автопомощь в Тюмени и области: прикурю, заведу автомобиль и проведу диагностику. Узнайте, как я работаю."
-	keywords="о сервисе техпомощи тюмень, автопомощь на дороге тюмень, прикурить авто, замена аккумулятора, отогрев автомобиля, подвоз топлива, автоэлектрик, диагностика авто"
-	jsonLd={jsonLd}
->
-	<Header />
-
-	<AboutPageHeader />
-	<AboutIntro />
-	<AboutApproach />
-	<AboutWhyChoose />
-	<AboutWhatWeDo />
-	<HomeDrivers/>
-	<AboutCta />
-	<AboutExpertise />
-	<AboutFaqs />
-	<AboutTestimonials />
-
-	<Footer />
-</Layout>
+<AboutPage city={city} />

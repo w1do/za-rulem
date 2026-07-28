@@ -1,4 +1,4 @@
-import { chatCities } from '../../data/chatCluster';
+import { chatCities } from '../../data/cities';
 import type { FormEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDriverChat, type ChatTopic } from './useDriverChat';
@@ -55,7 +55,11 @@ export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 
 	const handleJoin = (event: FormEvent) => {
 		event.preventDefault();
+		event.stopPropagation();
+		// @ts-ignore
+		if (event.nativeEvent) event.nativeEvent.stopImmediatePropagation();
 		join(phoneInput);
+		return false;
 	};
 
 	const handleSend = async (event: FormEvent) => {
@@ -81,7 +85,9 @@ export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 	if (!isJoined) {
 		return (
 			<div className={`dc dc--${variant} dc--login`}>
-				<form className="dc-login" onSubmit={handleJoin} noValidate>
+				<form className="dc-login" onSubmit={handleJoin} noValidate method="GET" action="/chat" data-skip-service-request>
+					<input type="hidden" name="city" value={city} />
+					<input type="hidden" name="topic" value={topic} />
 					<div className="dc-login__badge"><i className="fa-solid fa-gas-pump"></i></div>
 					<span className="section-sub-title">Чат водителей</span>
 					<h3>Укажи номер — и сразу в чат</h3>
@@ -92,6 +98,7 @@ export default function DriverChat({ variant = 'section' }: DriverChatProps) {
 						<input
 							className="form-control"
 							id="dc-phone"
+							name="phone"
 							type="tel"
 							inputMode="tel"
 							autoComplete="tel"

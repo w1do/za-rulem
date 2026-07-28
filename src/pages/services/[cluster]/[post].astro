@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import ServiceLandingLayout from '../../../layouts/ServiceLandingLayout.astro';
+import { getCityBySlug } from '../../../lib/city';
 
 export async function getStaticPaths() {
 	const entries = await getCollection('serviceLanding');
@@ -11,9 +12,10 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
+const city = getCityBySlug('tyumen');
 const { Content } = await render(entry);
 ---
 
-<ServiceLandingLayout frontmatter={entry.data}>
+<ServiceLandingLayout frontmatter={entry.data} city={city}>
 	<Content />
 </ServiceLandingLayout>

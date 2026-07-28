@@ -1,0 +1,15 @@
+---
+import GasPricesPage from '../../components/pages/GasPricesPage.astro';
+import { chatCities } from '../../data/cities';
+
+export function getStaticPaths() {
+	return chatCities.map((city) => ({
+		params: { city: city.slug },
+		props: { city },
+	}));
+}
+
+const { city } = Astro.props;
+---
+
+<GasPricesPage city={city} />

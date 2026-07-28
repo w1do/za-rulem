@@ -1,12 +1,15 @@
 ---
 import type { QueueDriver } from '../../data/queueDrivers';
 import { statusLabels } from '../../data/queueDrivers';
+import type { ChatCity } from '../../data/cities';
 
 interface Props {
 	driver: QueueDriver;
+	city?: ChatCity;
 }
 
-const { driver } = Astro.props;
+const { driver, city } = Astro.props;
+const cityName = city?.name || 'Тюмень';
 ---
 
 <article
@@ -20,7 +23,7 @@ const { driver } = Astro.props;
 		<div class="queue-driver-card__avatar" aria-hidden="true">{driver.name.slice(0, 1)}</div>
 		<div>
 			<h3>{driver.name}</h3>
-			<p>{driver.location}</p>
+			<p>{driver.location}, {cityName}</p>
 		</div>
 	</header>
 	

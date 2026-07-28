@@ -1,0 +1,67 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/shared/header/Header.astro';
+import Footer from '../../components/shared/footer/Footer.astro';
+
+import AboutPageHeader from '../../components/about/AboutPageHeader.astro';
+import AboutIntro from '../../components/about/AboutIntro.astro';
+import AboutApproach from '../../components/about/AboutApproach.astro';
+import AboutWhyChoose from '../../components/about/AboutWhyChoose.astro';
+import AboutWhatWeDo from '../../components/about/AboutWhatWeDo.astro';
+import AboutCta from '../../components/about/AboutCta.astro';
+import AboutExpertise from '../../components/about/AboutExpertise.astro';
+import AboutFaqs from '../../components/about/AboutFaqs.astro';
+import AboutTestimonials from '../../components/about/AboutTestimonials.astro';
+import HomeDrivers from "../../components/home/HomeDrivers.astro";
+
+import { webPageNode, breadcrumbNode } from '../../lib/seo';
+import type { ChatCity } from '../../data/cities';
+import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+
+export interface Props {
+	city: ChatCity;
+}
+
+const { city } = Astro.props;
+
+const title = replaceCityPlaceholders("О сервисе — техпомощь на дороге {inCity} 24/7 | За рулём", city);
+const description = replaceCityPlaceholders("Я оказываю круглосуточную техпомощь на дороге {inCity} и области: прикуриваю авто, меняю аккумуляторы, отогреваю машины, подвожу топливо, работаю как автоэлектрик и провожу диагностику.", city);
+
+const jsonLd = [
+	webPageNode({
+		type: 'AboutPage',
+		name: replaceCityPlaceholders('О сервисе — автопомощь и техпомощь на дороге {inCity} 24/7', city),
+		description: description,
+		url: getCityUrl('/about', city.slug),
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: getCityUrl('/', city.slug) },
+		{ name: 'О сервисе', url: getCityUrl('/about', city.slug) },
+	]),
+];
+---
+
+<Layout
+	title={title}
+	description={description}
+	ogTitle={replaceCityPlaceholders("За рулём — о сервисе техпомощи на дороге {inCity}", city)}
+	ogDescription={replaceCityPlaceholders("Круглосуточная автопомощь {inCity} и области: прикурю, заведу автомобиль и проведу диагностику. Узнайте, как я работаю.", city)}
+	keywords={replaceCityPlaceholders("о сервисе техпомощи {city}, автопомощь на дороге {city}, прикурить авто, замена аккумулятора, отогрев автомобиля, подвоз топлива, автоэлектрик, диагностика авто", city)}
+	jsonLd={jsonLd}
+    city={city}
+>
+	<Header city={city} />
+
+	<AboutPageHeader city={city} />
+	<AboutIntro city={city} />
+	<AboutApproach city={city} />
+	<AboutWhyChoose city={city} />
+	<AboutWhatWeDo city={city} />
+	<HomeDrivers />
+	<AboutCta city={city} />
+	<AboutExpertise city={city} />
+	<AboutFaqs />
+	<AboutTestimonials city={city} />
+
+	<Footer city={city} />
+</Layout>
