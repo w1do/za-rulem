@@ -48,7 +48,7 @@
 
 ### Рендеринг городских страниц
 
-Городские маршруты `src/pages/[city]/**` отдаются по запросу (`export const prerender = false`, адаптер `@astrojs/node` в режиме `standalone`), неизвестный слаг города возвращает 404. Поэтому сборка занимает ~1 минуту и 61 страницу вместо тысяч предгенерированных. Городские URL публикуются в `/sitemap-cities.xml` (по флагу `is_indexable`), он указан в `public/robots.txt` рядом с `sitemap-index.xml`.
+Городские маршруты `src/pages/[city]/**` отдаются по запросу (`export const prerender = false`, адаптер `@astrojs/node` в режиме `standalone`), неизвестный слаг города возвращает 404. Поэтому сборка занимает ~1 минуту и 61 страницу вместо тысяч предгенерированных. Городские URL публикуются той же интеграцией `@astrojs/sitemap`: список собирается в `src/lib/sitemap/cityUrls.ts` (по флагу `is_indexable`) и передаётся как `customPages`, а опция `chunks` раскладывает карту на два файла — `sitemap-cities-0.xml` и `sitemap-pages-0.xml`. В `public/robots.txt` указан только общий `sitemap-index.xml`, который ссылается на оба файла.
 
 ## 📁 Структура проекта (FSD-lite)
 

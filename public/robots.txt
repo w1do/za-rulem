@@ -120,4 +120,3 @@ Disallow: /package.json
 Disallow: /package-lock.json
 
 Sitemap: https://za-rulem.org/sitemap-index.xml
-Sitemap: https://za-rulem.org/sitemap-cities.xml

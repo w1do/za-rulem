@@ -6,10 +6,13 @@ import llms from 'astro-llms-md';
 
 import node from '@astrojs/node';
 
+import { getCitySitemapUrls, isCitySitemapUrl } from './src/lib/sitemap/cityUrls';
+
+const SITE = 'https://za-rulem.org';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://za-rulem.org',
+  site: SITE,
   trailingSlash: 'never',
   vite: {
     resolve: {
@@ -29,8 +32,14 @@ export default defineConfig({
     react(),
     sitemap({
       changefreq: 'weekly',
-      priority: 0.8,
+      priority: 1.0,
       lastmod: new Date(),
+      // Городские маршруты работают через SSR, поэтому в pages их нет.
+      customPages: getCitySitemapUrls(SITE),
+      // Две карты в одном индексе: sitemap-cities-0.xml и sitemap-pages-0.xml.
+      chunks: {
+        cities: (item) => (isCitySitemapUrl(item.url) ? item : undefined),
+      },
     }),
     llms({
       name: 'За рулём — техпомощь на дороге в Тюмени',
