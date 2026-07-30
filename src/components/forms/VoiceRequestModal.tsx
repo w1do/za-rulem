@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useId, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { PHONE_NUMBER, PHONE_NUMBER_FORMATTED } from '../../lib/seo';
 
 export const VOICE_OPEN_EVENT = 'za-rulem:open-voice-request';
 export const SERVICE_OPEN_EVENT = 'za-rulem:open-service-request';
@@ -263,19 +262,6 @@ export default function VoiceRequestModal() {
 							
 							{status === 'idle' && (
 								<>
-									<div className="text-center mb-5">
-										<a href={`tel:${PHONE_NUMBER}`} className="voice-modal-phone-btn">
-											<i className="fa-solid fa-phone"></i> {PHONE_NUMBER_FORMATTED}
-										</a>
-										<div className="mt-3 text-muted" style={{ fontSize: '14px' }}>
-											Нажмите для прямого звонка
-										</div>
-									</div>
-
-									<div className="voice-modal-separator mb-5">
-										<span>ИЛИ ОПИШИТЕ ГОЛОСОМ</span>
-									</div>
-
 									<div className="voice-modal-instructions mb-4" style={{ textAlign: 'left', fontSize: '14px', background: '#f9f9f9', padding: '15px', borderRadius: '8px', borderLeft: '4px solid #ffb700' }}>
 										<p style={{ margin: 0, color: '#555', lineHeight: '1.6' }}>
 											Включите запись, произнесите <strong>где стоите</strong>, <strong>номер телефона</strong>, 
@@ -394,48 +380,6 @@ export default function VoiceRequestModal() {
 				.voice-record-btn:hover {
 					transform: scale(1.05);
 					box-shadow: 0 6px 20px rgba(255, 183, 0, 0.4);
-				}
-				.voice-modal-phone-btn {
-					display: inline-flex;
-					align-items: center;
-					gap: 12px;
-					background: #000;
-					color: #ffb700;
-					padding: 15px 30px;
-					border-radius: 50px;
-					font-size: 20px;
-					font-weight: 700;
-					text-decoration: none;
-					transition: all 0.3s ease;
-					border: 2px solid #ffb700;
-				}
-				.voice-modal-phone-btn:hover {
-					background: #ffb700;
-					color: #000;
-				}
-				.voice-modal-separator {
-					position: relative;
-					text-align: center;
-				}
-				.voice-modal-separator::before {
-					content: "";
-					position: absolute;
-					top: 50%;
-					left: 0;
-					right: 0;
-					height: 1px;
-					background: #eee;
-					z-index: 1;
-				}
-				.voice-modal-separator span {
-					position: relative;
-					z-index: 2;
-					background: #fff;
-					padding: 0 15px;
-					color: #999;
-					font-size: 12px;
-					font-weight: 600;
-					letter-spacing: 1px;
 				}
 				.voice-record-btn.recording {
 					background: #ff4444;

@@ -8,7 +8,7 @@ import ServiceSidebar from '../components/services/single/ServiceSidebar.astro';
 import ServiceSingleImage from '../components/services/single/ServiceSingleImage.astro';
 import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 import FuelDeliveryCalculator from '../components/calculators/FuelDeliveryCalculator.tsx';
-import FuelPricesTable from '../components/FuelPricesTable.tsx';
+import FuelPricesSection from '../components/gas-prices/FuelPricesSection.astro';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
 import type { ChatCity } from '../data/cities';
 import { getCityBySlug, replaceCityPlaceholders, removeCityPlaceholders, getCityUrl } from '../lib/city';
@@ -96,10 +96,7 @@ const replacedContentHtml = replaceCityPlaceholders(contentHtml, city);
 
 						{
 							showFuelPricesTable && (
-								<div className="fuel-prices-section mt-4 mb-4">
-									<h3 class="mb-4">Справочные цены на топливо в сетях РФ (июль 2026)</h3>
-									<FuelPricesTable client:visible />
-								</div>
+								<FuelPricesSection city={city} />
 							)
 						}
 

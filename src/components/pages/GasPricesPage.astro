@@ -6,6 +6,7 @@ import PageHeader from '../../components/shared/PageHeader.astro';
 import Alert from '../../components/shared/Alert.astro';
 import GasPricesIntro from '../../components/gas-prices/GasPricesIntro.astro';
 import GasPricesMapSection from '../../components/gas-prices/GasPricesMapSection.astro';
+import FuelPricesSection from '../../components/gas-prices/FuelPricesSection.astro';
 import FuelDeliveryCalculator from '../../components/calculators/FuelDeliveryCalculator';
 import HomeHowItWork from '../../components/home/HomeHowItWork.astro';
 import HomeWhyChoose from '../../components/home/HomeWhyChoose.astro';
@@ -66,6 +67,8 @@ const queueGasStations = Object.values(gasStationLabels);
 	<GasPricesIntro {...intro} />
 
 	<Alert chatHref={chatAppUrl(city.slug)} />
+
+	<FuelPricesSection city={city} stations={stations} />
 
 	<GasPricesMapSection stations={stations} bounds={city.bounds} chatUrl={chatAppUrl(city.slug)} />
 	<!-- Gasoline Map Section End -->

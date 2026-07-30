@@ -65,6 +65,13 @@ export interface StationFilters {
 	queue: QueueFilter;
 }
 
+export interface PriceRow {
+	brand: string;
+	ai92: string;
+	ai95: string;
+	diesel: string;
+}
+
 const STATIONS_API_URL = 'https://benzin.api.2gis.ru/api/v1/stations';
 const STATIONS_REQUEST_TIMEOUT_MS = 8000;
 
@@ -210,4 +217,62 @@ export const filterStations = (
 
 		return true;
 	});
+};
+
+/**
+ * Рассчитывает средние цены на топливо по брендам АЗС на основе списка станций.
+ * Используется для сводной таблицы цен в городе.
+ */
+export const getFuelPricesFromStations = (stations: StationData[]): PriceRow[] => {
+	if (!Array.isArray(stations)) return [];
+
+	const brandPrices: Record<string, { ai92: number[]; ai95: number[]; dt: number[] }> = {};
+
+	stations.forEach((item) => {
+		const station = item.station;
+		if (!station) return;
+
+		// Используем бренд или первое слово из названия
+		const brand = station.brand || station.name.split(' ')[0];
+		if (!brand) return;
+
+		if (!brandPrices[brand]) {
+			brandPrices[brand] = { ai92: [], ai95: [], dt: [] };
+		}
+
+		item.prices?.forEach((p) => {
+			if (p.fuel_type === 'AI_92' && p.price > 0) brandPrices[brand].ai92.push(p.price);
+			if (p.fuel_type === 'AI_95' && p.price > 0) brandPrices[brand].ai95.push(p.price);
+			if (p.fuel_type === 'DT' && p.price > 0) brandPrices[brand].dt.push(p.price);
+		});
+	});
+
+	return Object.keys(brandPrices)
+		.map((brand) => {
+			const avg = (arr: number[]) =>
+				arr.length
+					? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2) + ' ₽'
+					: '-';
+
+			return {
+				brand,
+				ai92: avg(brandPrices[brand].ai92),
+				ai95: avg(brandPrices[brand].ai95),
+				diesel: avg(brandPrices[brand].dt),
+			};
+		})
+		.filter((p) => p.ai92 !== '-' || p.ai95 !== '-' || p.diesel !== '-')
+		// Сортируем по бренду, но Газпромнефть, Лукойл и Роснефть выносим вперед, если они есть
+		.sort((a, b) => {
+			const priorityBrands = ['Газпромнефть', 'Лукойл', 'Роснефть'];
+			const aIndex = priorityBrands.indexOf(a.brand);
+			const bIndex = priorityBrands.indexOf(b.brand);
+
+			if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+			if (aIndex !== -1) return -1;
+			if (bIndex !== -1) return 1;
+
+			return a.brand.localeCompare(b.brand);
+		})
+		.slice(0, 10);
 };

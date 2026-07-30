@@ -5,7 +5,7 @@ import Footer from '../components/shared/footer/Footer.astro';
 import BlogSingleHeader from '../components/blog/BlogSingleHeader.astro';
 import BlogSingleImage from '../components/blog/BlogSingleImage.astro';
 import BlogPostTagLinks from '../components/blog/BlogPostTagLinks.astro';
-import FuelPricesTable from '../components/FuelPricesTable.tsx';
+import FuelPricesSection from '../components/gas-prices/FuelPricesSection.astro';
 import { articleNode, breadcrumbNode } from '../lib/seo';
 
 const { frontmatter } = Astro.props;
@@ -71,10 +71,10 @@ const jsonLd = [
 							<slot />
 							{
 								showFuelPricesTable && (
-									<div class="fuel-prices-section mt-5 mb-5">
-										<h3 class="mb-4">Справочные цены на топливо в сетях РФ (июль 2026)</h3>
-										<FuelPricesTable client:load />
-									</div>
+									<FuelPricesSection 
+										title="Справочные цены на топливо в сетях РФ" 
+										subtitle="Мониторинг цен"
+									/>
 								)
 							}
 						</div>

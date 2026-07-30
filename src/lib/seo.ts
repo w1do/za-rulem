@@ -4,7 +4,7 @@
 import type { ChatCity } from './cities/types';
 import { replaceCityPlaceholders } from './cityText';
 
-const rawPhone = import.meta.env.PUBLIC_PHONE_NUMBER || import.meta.env.PHONE_NUMBER || '+79088712026';
+const rawPhone = import.meta.env.PUBLIC_PHONE_NUMBER || import.meta.env.PHONE_NUMBER || '';
 
 /** Форматирует номер телефона из формата +79998887766 в +7 (999) 888-77-66. */
 export function formatPhoneNumber(phone: string): string {
