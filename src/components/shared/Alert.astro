@@ -3,9 +3,16 @@ interface Props {
 	class?: string;
 	/** Ссылка на чат: по умолчанию общий чат без предвыбранного города. */
 	chatHref?: string;
+	title?: string;
+	description?: string;
 }
 
-const { class: className = '', chatHref = '/chat' } = Astro.props;
+const { 
+	class: className = '', 
+	chatHref = '/chat',
+	title = "Хотите быть в курсе всех заправок, очередей и наличия бензина?",
+	description = "Вступайте в Telegram и VK группу, давайте развивать сообщество и помогать друг другу в такие непростые времена!"
+} = Astro.props;
 ---
 <div class:list={["dark-section bg-section community-alert", className]}>
 	<div class="container-fluid py-4">
@@ -13,8 +20,8 @@ const { class: className = '', chatHref = '/chat' } = Astro.props;
 			<div class="col-xl-9 col-lg-8">
 				<div class="section-title mb-lg-0">
 					<span class="section-sub-title wow fadeInUp" style="color: var(--accent-color);">Сообщество водителей</span>
-					<h2 class="text-anime-style-3 mb-2" data-cursor="-opaque" style="color: white; font-size: 28px;">Хотите быть в курсе всех заправок, очередей и наличия бензина?</h2>
-					<p class="wow fadeInUp mb-0" data-wow-delay="0.2s" style="color: white; opacity: 0.9;">Вступайте в Telegram и VK группу, давайте развивать сообщество и помогать друг другу в такие непростые времена!</p>
+					<h2 class="text-anime-style-3 mb-2" data-cursor="-opaque" style="color: white; font-size: 28px;">{title}</h2>
+					<p class="wow fadeInUp mb-0" data-wow-delay="0.2s" style="color: white; opacity: 0.9;">{description}</p>
 				</div>
 			</div>
 			<div class="col-xl-3 col-lg-4 text-lg-end mt-4 mt-lg-0">

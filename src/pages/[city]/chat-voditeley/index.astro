@@ -8,4 +8,8 @@ const city = findCity(Astro.params.city);
 if (!city) return new Response('Город не найден', { status: 404 });
 ---
 
-<ChatCityLanding city={city} />
+<ChatCityLanding 
+    city={city} 
+    alertTitle="Оперативно присылаем цены в Телеграм — вступайте!"
+    alertDescription="Мониторинг цен каждые 5 минут."
+/>
