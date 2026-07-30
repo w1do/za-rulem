@@ -1,6 +1,7 @@
 ---
 import { type ChatCity } from '../../data/cities';
 import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import { MIN_TOTAL_PRICE, DEPARTURE_PRICE_PER_KM, MIN_FUEL_LITERS } from '../../data/prices';
 import AppImage from '../shared/ui/AppImage.astro';
 
 import fleet1 from '../../assets/images/fleets-image-1.jpg';
@@ -82,10 +83,10 @@ const slides = propSlides ?? [
 		image: fleet4,
 		cursor: 'Подвоз топлива',
 		label: 'Подвоз топлива',
-		price: 'от 6 500 ₽',
+		price: `от ${MIN_TOTAL_PRICE.toLocaleString('ru-RU')} ₽`,
 		priceUnit: '/выезд',
-		priceNote: 'включено 20 л',
-		amenities: ['20 л бензина включено', 'АИ-92, АИ-95 и дизель'],
+		priceNote: `включено ${MIN_FUEL_LITERS} л`,
+		amenities: [`${MIN_FUEL_LITERS} л бензина включено`, 'АИ-92, АИ-95 и дизель'],
 		href: getCityUrl('/services/toplivo', city.slug),
 	},
 	{
@@ -156,7 +157,7 @@ const slides = propSlides ?? [
                                                 <h2>
                                                     {slide.price} {slide.priceUnit && <sub>{slide.priceUnit}</sub>}
                                                     {(slide.priceNote || /₽\/л|\/л|\/литр/i.test(`${slide.price}${slide.priceUnit ?? ''}`)) && (
-                                                        <span class="price-min-note">{slide.priceNote ?? 'выезд 80 руб/км'}</span>
+                                                        <span class="price-min-note">{slide.priceNote ?? `выезд ${DEPARTURE_PRICE_PER_KM} руб/км`}</span>
                                                     )}
                                                 </h2>
                                             </div>

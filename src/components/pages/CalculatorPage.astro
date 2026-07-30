@@ -10,6 +10,7 @@ import AboutCta from '../../components/about/AboutCta.astro';
 import { breadcrumbNode, faqNode, webPageNode } from '../../lib/seo';
 import type { ChatCity } from '../../data/cities';
 import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import { MIN_TOTAL_PRICE, DEPARTURE_PRICE_PER_KM, MIN_FUEL_LITERS } from '../../data/prices';
 
 export interface Props {
 	city: ChatCity;
@@ -18,13 +19,13 @@ export interface Props {
 const { city } = Astro.props;
 
 const title = replaceCityPlaceholders('Расчет доставки топлива {inCity} | Цена подвоза топлива', city);
-const description = replaceCityPlaceholders('Рассчитайте цену доставки бензина {inCity}: минимальный выезд от 6 500 ₽ (включая 20 л), скидка 10% от 60 л. Посмотрите предварительную стоимость и оставьте заявку.', city);
+const description = replaceCityPlaceholders(`Рассчитайте цену доставки бензина {inCity}: минимальный выезд от ${MIN_TOTAL_PRICE.toLocaleString('ru-RU')} ₽ (включая ${MIN_FUEL_LITERS} л), скидка 10% от 60 л. Посмотрите предварительную стоимость и оставьте заявку.`, city);
 const url = getCityUrl('/calculator', city.slug);
 
 const faqs = [
 	{
 		question: 'Что входит в расчет доставки топлива?',
-		answer: 'Калькулятор складывает минимальную стоимость выезда от 6 500 ₽ (в неё уже входит 20 литров бензина) и выезд за город по 80 ₽ за километр. Если топлива нужно больше 20 литров, они оплачиваются отдельно.',
+		answer: `Калькулятор складывает минимальную стоимость выезда от ${MIN_TOTAL_PRICE.toLocaleString('ru-RU')} ₽ (в неё уже входит ${MIN_FUEL_LITERS} литров бензина) и выезд за город по ${DEPARTURE_PRICE_PER_KM} ₽ за километр. Если топлива нужно больше ${MIN_FUEL_LITERS} литров, они оплачиваются отдельно.`,
 	},
 	{
 		question: 'Какой объём бензина можно рассчитать?',
@@ -64,12 +65,12 @@ const jsonLd = [
 				<div class="calculator-intro__content section-title wow fadeInUp">
 					<span class="section-sub-title wow fadeInUp">Цена до оформления заявки</span>
 					<h2>Стоимость подвоза бензина</h2>
-					<p>{replaceCityPlaceholders("Я сделал расчёт прозрачным: минимальная стоимость выезда от 6 500 ₽. В неё уже включено 20 литров бензина. От 60 литров действует скидка 10% на общую сумму. Выезд за город показан отдельно, а выбранные марка и объём сохранятся в заявке.", city)}</p>
+					<p>{replaceCityPlaceholders(`Я сделал расчёт прозрачным: минимальная стоимость выезда от ${MIN_TOTAL_PRICE.toLocaleString('ru-RU')} ₽. В неё уже включено ${MIN_FUEL_LITERS} литров бензина. От 60 литров действует скидка 10% на общую сумму. Выезд за город показан отдельно, а выбранные марка и объём сохранятся в заявке.`, city)}</p>
 					<ul>
 						<li>АИ-92, АИ-95 или дизель</li>
-						<li>Выезд от 6 500 ₽ (включает 20 л)</li>
+						<li>Выезд от {MIN_TOTAL_PRICE.toLocaleString('ru-RU')} ₽ (включает {MIN_FUEL_LITERS} л)</li>
 						<li>Скидка 10% при заказе от 60 л</li>
-						<li>Сверх 20 литров — оплата по чеку АЗС</li>
+						<li>Сверх {MIN_FUEL_LITERS} литров — оплата по чеку АЗС</li>
 						<li>До 100 литров</li>
 						<li>Разбивка суммы до заказа</li>
 					</ul>
@@ -88,7 +89,7 @@ const jsonLd = [
 				{ icon: '/images/icon-how-it-work-2-gold.svg', number: '02', title: 'Проверяю расчет', text: 'Сразу вижу топливо, выезд и предварительную итоговую цену.' },
 				{ icon: '/images/icon-how-it-work-3-gold.svg', number: '03', title: 'Оставляю заявку', text: 'Передаю адрес, после чего я подтверждаю и фиксирую сумму.' },
 			]}
-			footerList={['Выезд от 6 500 ₽ (с 20 л)', 'Скидка 10% от 60 л', 'До 100 литров', replaceCityPlaceholders('Выезд {byCity}', city)]}
+			footerList={[`Выезд от ${MIN_TOTAL_PRICE.toLocaleString('ru-RU')} ₽ (с ${MIN_FUEL_LITERS} л)`, 'Скидка 10% от 60 л', 'До 100 литров', replaceCityPlaceholders('Выезд {byCity}', city)]}
 			footerText="Нужен бензин на дороге?"
 			footerLinkText="Рассчитать цену"
 			footerLinkHref="#fuel-calculator-title"

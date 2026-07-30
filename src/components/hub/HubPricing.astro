@@ -1,5 +1,7 @@
 ---
 // Блок цен хаба. Разметка our-pricing-gold из source/index-3 (как HomePricing).
+import { DEPARTURE_PRICE_PER_KM } from '../../data/prices';
+
 interface PricingItem {
 	title: string;
 	price: string;
@@ -35,7 +37,7 @@ const {
 	benefits = ['Цена до выезда', 'До 100 л', 'Скидка от 60 л'],
 } = Astro.props;
 
-const defaultPriceNote = 'выезд 80 руб/км';
+const defaultPriceNote = `выезд ${DEPARTURE_PRICE_PER_KM} руб/км`;
 ---
 
 {

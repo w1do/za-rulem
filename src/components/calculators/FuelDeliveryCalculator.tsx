@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { FUEL_PRICE_PER_LITER, DEPARTURE_PRICE_PER_KM, SERVICE_FEE } from '../../data/prices';
 
 type FuelType = 'ai92' | 'ai95';
 
@@ -12,14 +13,10 @@ const FUEL_OPTIONS: Record<FuelType, FuelOption> = {
 	ai95: { label: 'АИ-95', shortLabel: '95' },
 };
 
-const FUEL_PRICE_PER_LITER = 110;
-const SERVICE_FEE = 4300;
-
 const MIN_LITERS = 1;
 const MAX_LITERS = 100;
 const MIN_DISTANCE = 1;
 const MAX_DISTANCE = 50;
-const DEPARTURE_PRICE_PER_KM = 80;
 const LITER_PRESETS = [10, 20, 40, 60, 80, 100];
 
 const formatPrice = (value: number) =>
