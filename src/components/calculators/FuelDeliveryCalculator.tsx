@@ -19,7 +19,7 @@ const MIN_LITERS = 1;
 const MAX_LITERS = 100;
 const MIN_DISTANCE = 1;
 const MAX_DISTANCE = 50;
-const DEPARTURE_PRICE_PER_KM = 220;
+const DEPARTURE_PRICE_PER_KM = 80;
 const LITER_PRESETS = [10, 20, 40, 60, 80, 100];
 
 const formatPrice = (value: number) =>

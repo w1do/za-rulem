@@ -30,6 +30,10 @@ export const getCityUrl = (path: string, citySlug?: string): string => {
 		return `/${cleanPath}`;
 	}
 	
+	if (cleanPath === '') {
+		return `/${citySlug}`;
+	}
+	
 	return `/${citySlug}/${cleanPath}`;
 };
 
