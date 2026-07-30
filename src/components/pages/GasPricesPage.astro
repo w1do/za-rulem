@@ -63,15 +63,16 @@ const queueGasStations = Object.values(gasStationLabels);
 		showChatButton={true}
 	/>
 
-	<!-- Gasoline Map Section Start -->
-	<GasPricesIntro {...intro} />
+	<div class="mt-5">
+		<Alert chatHref={chatAppUrl(city.slug)} title="Оперативно присылаем цены в Телеграм — вступайте!" description="Мониторинг цен каждые 5 минут." />
+	</div>
 
-	<Alert chatHref={chatAppUrl(city.slug)} />
-
-	<FuelPricesSection city={city} stations={stations} />
-
-	<GasPricesMapSection stations={stations} bounds={city.bounds} chatUrl={chatAppUrl(city.slug)} />
-	<!-- Gasoline Map Section End -->
+	{city.bounds && (
+		<>
+			<FuelPricesSection city={city} stations={stations} />
+			<GasPricesMapSection stations={stations} bounds={city.bounds} chatUrl={chatAppUrl(city.slug)} />
+		</>
+	)}
 
 	<section class="gas-prices-calculator bg-section">
 		<div class="container">
