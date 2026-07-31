@@ -80,6 +80,9 @@ const structuredData = {
 		<!-- Structured Data (JSON-LD / Schema.org) -->
 		<script type="application/ld+json" set:html={JSON.stringify(structuredData)} is:inline />
 
+		<script>window.yaContextCb=window.yaContextCb||[]</script>
+		<script src="https://yandex.ru/ads/system/context.js" async></script>
+
 		<!-- Favicon Icon -->
 		<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.png" />
 
@@ -289,6 +292,16 @@ const structuredData = {
 		<noscript><div><img src="https://mc.yandex.ru/watch/108393118" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 		<!-- /Yandex.Metrika counter -->
 
+		<!-- Yandex.RTB R-A-19681102-1 -->
+		<script>
+			window.yaContextCb.push(() => {
+				Ya.Context.AdvManager.render({
+					"blockId": "R-A-19681102-1",
+					"type": "fullscreen",
+					"platform": "touch"
+				})
+			})
+		</script>
 
 		<!-- Jquery Library File -->
 		<script is:inline defer src="/js/jquery-3.7.1.min.js"></script>
