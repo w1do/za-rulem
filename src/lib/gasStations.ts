@@ -111,10 +111,18 @@ export const fetchGasStations = async (bounds: MapBounds): Promise<StationData[]
 	}
 };
 
-export const getBoundsCenter = (bounds: MapBounds): [number, number] => [
-	(bounds.minLat + bounds.maxLat) / 2,
-	(bounds.minLon + bounds.maxLon) / 2,
-];
+/** Вычисляет геометрический центр области для инициализации карты. */
+export const getBoundsCenter = (bounds: MapBounds): [number, number] => {
+	const lat = (Number(bounds.minLat) + Number(bounds.maxLat)) / 2;
+	const lng = (Number(bounds.minLon) + Number(bounds.maxLon)) / 2;
+
+	if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+		// Fallback на Тюмень, если координаты битые, чтобы карта не падала
+		return [57.1522, 65.5272];
+	}
+
+	return [lat, lng];
+};
 
 export const isStationDataFresh = (station: StationData, now = Date.now()): boolean => {
 	const updatedAt = Date.parse(station.station?.last_transaction_at);

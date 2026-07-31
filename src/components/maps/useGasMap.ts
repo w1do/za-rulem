@@ -86,8 +86,14 @@ export const useGasMap = ({
 			}
 
 			try {
+				const center = getBoundsCenter(bounds);
+				
+				if (!Number.isFinite(center[0]) || !Number.isFinite(center[1])) {
+					console.error('2GIS Map error: Invalid center coordinates', center, bounds);
+				}
+
 				const map = DG.map(containerRef.current, {
-					center: getBoundsCenter(bounds),
+					center,
 					zoom: CITY_ZOOM,
 					zoomControl: true,
 					fullscreenControl: false,
@@ -103,9 +109,15 @@ export const useGasMap = ({
 
 				stations.forEach((item) => {
 					const { station } = item;
-					if (!station?.lat || !station?.lng) return;
+					const lat = Number(station?.lat);
+					const lng = Number(station?.lng);
 
-					const marker = DG.marker([station.lat, station.lng], { icon: gasIcon }).addTo(map);
+					if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+						console.warn('2GIS Map: skipping station with invalid coordinates', item.station.id, lat, lng);
+						return;
+					}
+
+					const marker = DG.marker([lat, lng], { icon: gasIcon }).addTo(map);
 					marker.bindPopup(buildStationPopupHtml(item, chatUrl));
 					marker.on('click', () => onMarkerClick(station.id));
 					markersRef.current[station.id] = marker;
@@ -127,9 +139,12 @@ export const useGasMap = ({
 
 	const focusStation = (item: StationData) => {
 		const { station } = item;
-		if (!mapRef.current || !station.lat || !station.lng) return;
+		const lat = Number(station?.lat);
+		const lng = Number(station?.lng);
 
-		mapRef.current.setView([station.lat, station.lng], STATION_ZOOM);
+		if (!mapRef.current || !Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+		mapRef.current.setView([lat, lng], STATION_ZOOM);
 		markersRef.current[station.id]?.openPopup();
 	};
 

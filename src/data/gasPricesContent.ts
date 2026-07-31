@@ -32,7 +32,7 @@ export interface GasPricesIntroContent {
 }
 
 export const buildGasPricesMeta = (city: ChatCity): GasPricesMeta => ({
-	title: replaceCityPlaceholders('Цены на бензин {inCity} сегодня | Где бензин', city),
+	title: replaceCityPlaceholders('Цены на бензин {inCity} сегодня | Где бензин | Карта АЗС', city),
 	h1: replaceCityPlaceholders('Цены на бензин {inCity} сегодня: где заправиться дешевле?', city),
 	description: replaceCityPlaceholders(
 		'Актуальные цены на бензин АИ-92, АИ-95 и ДТ {inCity} на сегодня. Смотрите карту заправок с ценами и экономьте на топливе.',

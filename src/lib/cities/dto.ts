@@ -59,6 +59,10 @@ export const toCity = (dto: CityDto): ChatCity | null => {
 	if (!/^[a-z0-9-]+$/.test(slug) || !name || !inCity || !ofCity || !byCity || !forCity) return null;
 	if (minLat === null || maxLat === null || minLon === null || maxLon === null) return null;
 	if (minLat >= maxLat || minLon >= maxLon) return null;
+	
+	// Защита от "нулевых" координат, которые могут прийти при ошибке геокодирования.
+	// Координаты 0,0 невозможны для городов РФ (это Гвинейский залив).
+	if (Math.abs(minLat) < 0.1 && Math.abs(minLon) < 0.1) return null;
 
 	return {
 		slug,
