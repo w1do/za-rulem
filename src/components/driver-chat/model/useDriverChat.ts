@@ -16,14 +16,15 @@ export interface DriverChatState {
 }
 
 /** Единая точка входа для UI: связывает сессию чата и ленту сообщений канала. */
-export function useDriverChat(): DriverChatState {
-	const session = useChatSession();
+export function useDriverChat(defaultCitySlug: string): DriverChatState {
+	const session = useChatSession(defaultCitySlug);
 	const { messages, error: sendError, send, resetMessages } = useChatMessages({
 		isJoined: session.isJoined,
 		phone: session.phone,
 		topic: session.topic,
 		city: session.city,
 		sessionId: session.sessionId,
+		defaultCitySlug,
 	});
 
 	// При смене канала или города лента начинается заново, чтобы не показывать чужой контекст.

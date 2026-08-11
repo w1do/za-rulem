@@ -2,7 +2,7 @@
 import ContactsPage from '../components/pages/ContactsPage.astro';
 import { getCityBySlug } from '../lib/city';
 
-const city = getCityBySlug('tyumen');
+const city = getCityBySlug();
 ---
 
 <ContactsPage city={city} />

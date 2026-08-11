@@ -1,5 +1,3 @@
-// Отдельный модуль без зависимостей: константу можно импортировать из клиентского кода,
-// не втягивая справочник городов и серверный config с process.env.
-
-/** Базовый город кластера: его посадочные живут на /chat-voditeley/{fuel}. */
-export const DEFAULT_CITY_SLUG = 'tyumen';
+// Server-only точка импорта. Клиент получает slug через сериализованный props,
+// чтобы приватная env-переменная не попадала в browser bundle.
+export { DEFAULT_CITY_SLUG } from './config';

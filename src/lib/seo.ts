@@ -20,9 +20,9 @@ const phoneFormatted = formatPhoneNumber(rawPhone);
 
 export const SITE = {
 	name: 'За рулём',
-	brand: 'За рулём — техпомощь на дороге в {city}',
+	brand: 'За рулём — техпомощь на дороге {inCity}',
 	description:
-		'Круглосуточная автопомощь и техпомощь на дороге в {inCity} с выездом: прикурю авто, заменю аккумулятор, отогрею машину, привезу топливо, вскрою автомобиль, вызову эвакуатор.',
+		'Круглосуточная автопомощь и техпомощь на дороге {inCity} с выездом: прикурю авто, заменю аккумулятор, отогрею машину, привезу топливо, вскрою автомобиль, вызову эвакуатор.',
 	url: 'https://za-rulem.org',
 	email: 'info@za-rulem.org',
 	phone,
@@ -30,9 +30,7 @@ export const SITE = {
 	logo: 'https://za-rulem.org/images/logo.svg',
 	image: 'https://za-rulem.org/images/logo.svg',
 	addressLocality: '{city}',
-	addressRegion: 'Тюменская область', // Default region, might need adjustment per city
 	addressCountry: 'RU',
-	geo: { latitude: 57.153033, longitude: 65.534328 }, // Default geo, might need adjustment
 	areaServed: ['{city}'],
 	priceRange: '₽₽',
 	openingHours: 'Mo-Su 00:00-24:00',
@@ -40,21 +38,23 @@ export const SITE = {
 } as const;
 
 /** Получает данные сайта с учетом города. */
-export function getSiteData(city?: ChatCity) {
-	const effectiveCity = city || {
-		slug: 'tyumen',
-		name: 'Тюмень',
-		inCity: 'в Тюмени',
-		ofCity: 'Тюмени',
-		byCity: 'по Тюмени',
-		forCity: 'для Тюмени',
-	} as ChatCity;
+export function getSiteData(effectiveCity: ChatCity) {
+	const geo = {
+		latitude: (effectiveCity.bounds.minLat + effectiveCity.bounds.maxLat) / 2,
+		longitude: (effectiveCity.bounds.minLon + effectiveCity.bounds.maxLon) / 2,
+	};
 
 	return {
 		...SITE,
+		inCity: effectiveCity.inCity,
+		ofCity: effectiveCity.ofCity,
+		byCity: effectiveCity.byCity,
+		forCity: effectiveCity.forCity,
 		brand: replaceCityPlaceholders(SITE.brand, effectiveCity),
 		description: replaceCityPlaceholders(SITE.description, effectiveCity),
 		addressLocality: replaceCityPlaceholders(SITE.addressLocality, effectiveCity),
+		addressRegion: effectiveCity.region,
+		geo,
 		areaServed: SITE.areaServed.map((s) => replaceCityPlaceholders(s, effectiveCity)),
 	};
 }
@@ -75,7 +75,7 @@ type FaqItem = { question: string; answer: string };
 type BreadcrumbItem = { name: string; url: string };
 
 /** Узел WebSite для базового графа. */
-export function websiteNode(city?: ChatCity) {
+export function websiteNode(city: ChatCity) {
 	const site = getSiteData(city);
 	return {
 		'@type': 'WebSite',
@@ -89,7 +89,7 @@ export function websiteNode(city?: ChatCity) {
 }
 
 /** Узел LocalBusiness (автопомощь на дороге) для базового графа. */
-export function businessNode(city?: ChatCity) {
+export function businessNode(city: ChatCity) {
 	const site = getSiteData(city);
 	return {
 		'@type': ['LocalBusiness', 'AutomotiveBusiness'],
@@ -137,7 +137,7 @@ export function businessNode(city?: ChatCity) {
 }
 
 /** Базовый граф: WebSite + LocalBusiness, присутствует на всех страницах. */
-export function baseGraph(city?: ChatCity) {
+export function baseGraph(city: ChatCity) {
 	return [websiteNode(city), businessNode(city)];
 }
 
@@ -178,7 +178,7 @@ export function serviceNode(opts: {
 	description: string;
 	url: string;
 	serviceType?: string;
-	city?: ChatCity;
+	city: ChatCity;
 }) {
 	const site = getSiteData(opts.city);
 	return {

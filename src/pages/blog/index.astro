@@ -6,6 +6,10 @@ import Footer from '../../components/shared/footer/Footer.astro';
 import BlogPageHeader from '../../components/blog/BlogPageHeader.astro';
 import PostCard from '../../components/blog/PostCard.astro';
 import BlogPagination from '../../components/blog/BlogPagination.astro';
+import { webPageNode, breadcrumbNode, itemListNode } from '../../lib/seo';
+import { getCityBySlug, replaceCityPlaceholders } from '../../lib/city';
+
+const city = getCityBySlug();
 
 const posts = (await getCollection('blog')).sort(
 	(a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf(),
@@ -14,14 +18,14 @@ const posts = (await getCollection('blog')).sort(
 const POSTS_PER_PAGE = 9;
 const totalPages = Math.max(1, Math.ceil(posts.length / POSTS_PER_PAGE));
 
-import { webPageNode, breadcrumbNode, itemListNode } from '../../lib/seo';
-
 const jsonLd = [
 	webPageNode({
 		type: 'Blog',
-		name: 'Блог о техпомощи на дороге — советы автовладельцам Тюмени',
-		description:
-			'Разбираю частые дорожные ситуации: почему не заводится авто, как прикурить машину, что делать в мороз и как выбрать аккумулятор. Опыт мастера автопомощи из Тюмени.',
+		name: replaceCityPlaceholders('Блог о техпомощи на дороге — советы автовладельцам {ofCity}', city),
+		description: replaceCityPlaceholders(
+			'Разбираю частые дорожные ситуации: почему не заводится авто, как прикурить машину, что делать в мороз и как выбрать аккумулятор. Опыт мастера автопомощи {inCity}.',
+			city,
+		),
 		url: '/blog',
 	}),
 	breadcrumbNode([
@@ -33,12 +37,13 @@ const jsonLd = [
 ---
 
 <Layout
-	title="Блог о техпомощи на дороге — советы автовладельцам Тюмени | За рулём"
-	description="Разбираю частые дорожные ситуации: почему не заводится авто, как прикурить машину, что делать в мороз и как выбрать аккумулятор. Опыт мастера из Тюмени."
-	keywords="блог техпомощь тюмень, не заводится авто, как прикурить машину, отогрев авто, выбор аккумулятора"
+	title={replaceCityPlaceholders('Блог о техпомощи на дороге — советы автовладельцам {ofCity} | За рулём', city)}
+	description={replaceCityPlaceholders('Разбираю частые дорожные ситуации: почему не заводится авто, как прикурить машину, что делать в мороз и как выбрать аккумулятор. Опыт мастера {inCity}.', city)}
+	keywords={`блог техпомощь ${city.name}, не заводится авто, как прикурить машину, отогрев авто, выбор аккумулятора`}
 	jsonLd={jsonLd}
+	city={city}
 >
-	<Header />
+	<Header city={city} />
 
 	<BlogPageHeader title="Блог" breadcrumb="Блог" />
 
@@ -64,5 +69,5 @@ const jsonLd = [
 	</div>
 	<!-- Page Blog End -->
 
-	<Footer />
+	<Footer city={city} />
 </Layout>

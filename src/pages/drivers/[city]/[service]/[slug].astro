@@ -17,6 +17,7 @@ import HomeBlog from '../../../../components/home/HomeBlog.astro';
 import ServiceFaqs from '../../../../components/services/single/ServiceFaqs.astro';
 import { fuelDrivers, fuelLabels, getFuelDriverPath, statusLabels, type FuelDriver } from '../../../../data/fuelDrivers';
 import { breadcrumbNode, faqNode, serviceNode } from '../../../../lib/seo';
+import { getCityBySlug } from '../../../../lib/city';
 
 export function getStaticPaths() {
 	return fuelDrivers.map((driver) => ({
@@ -28,13 +29,14 @@ export function getStaticPaths() {
 interface Props { driver: FuelDriver }
 
 const { driver } = Astro.props;
+const city = getCityBySlug(driver.citySlug);
 const fuelList = driver.fuels.map((fuel) => fuelLabels[fuel]);
 const fuelText = fuelList.join(', ');
 const pageUrl = getFuelDriverPath(driver);
 const orderTitle = 'Вызвать водителя';
 
 const services = [
-	{ icon: '/images/icon-service-1.svg', title: 'Доставка топлива', text: `${driver.name} привезёт ${fuelText} к автомобилю в районе ${driver.district}, по Тюмени, на дачу или к месту остановки на трассе.`, href: '/contacts', linkText: 'Заказать топливо' },
+	{ icon: '/images/icon-service-1.svg', title: 'Доставка топлива', text: `${driver.name} привезёт ${fuelText} к автомобилю в районе ${driver.district}, ${city.byCity}, на дачу или к месту остановки на трассе.`, href: '/contacts', linkText: 'Заказать топливо' },
 	{ icon: '/images/icon-service-2.svg', title: 'Помощь при поломке', text: 'Проверит базовые причины остановки, поможет запустить двигатель, прикурить аккумулятор или заменить колесо, если ремонт безопасен на месте.', href: '/contacts', linkText: 'Вызвать помощь' },
 	{ icon: '/images/icon-service-3.svg', title: 'Буксировка автомобиля', text: 'Поможет дотащить неисправный автомобиль до безопасной стоянки или сервиса, когда продолжать движение после поломки нельзя.', href: '/contacts', linkText: 'Заказать буксировку' },
 ];
@@ -59,7 +61,7 @@ const faqs = [
 ];
 
 const jsonLd = [
-	serviceNode({ name: `Доставка бензина водителем ${driver.name} в Тюмени`, description: `${driver.name} доставляет ${fuelText} в район ${driver.district} ${driver.deliveryTime}. Цена выезда от ${driver.price} ₽.`, url: pageUrl, serviceType: 'Доставка топлива и помощь на дороге' }),
+	serviceNode({ name: `Доставка бензина водителем ${driver.name} ${city.inCity}`, description: `${driver.name} доставляет ${fuelText} в район ${driver.district} ${driver.deliveryTime}. Цена выезда от ${driver.price} ₽.`, url: pageUrl, serviceType: 'Доставка топлива и помощь на дороге', city }),
 	breadcrumbNode([{ name: 'Главная', url: '/' }, { name: 'Водители', url: '/drivers' }, { name: driver.name, url: pageUrl }]),
 	faqNode(faqs),
 ];
@@ -67,16 +69,17 @@ const jsonLd = [
 
 <Layout
 	title={`${driver.name} — доставка бензина ${driver.districtSeo} от ${driver.price} ₽`}
-	description={`${driver.name} доставляет бензин ${driver.districtSeo}: ${fuelText}, выезд ${driver.deliveryTime}, цена от ${driver.price} ₽. Помощь на дороге и буксировка в Тюмени.`}
+	description={`${driver.name} доставляет бензин ${driver.districtSeo}: ${fuelText}, выезд ${driver.deliveryTime}, цена от ${driver.price} ₽. Помощь на дороге и буксировка ${city.inCity}.`}
 	ogTitle={`${driver.name} — доставка бензина ${driver.districtSeo}`}
-	ogDescription={`${fuelText} ${driver.districtSeo}, выезд ${driver.deliveryTime}, цена от ${driver.price} ₽. Вызвать водителя в Тюмени.`}
+	ogDescription={`${fuelText} ${driver.districtSeo}, выезд ${driver.deliveryTime}, цена от ${driver.price} ₽. Вызвать водителя ${city.inCity}.`}
 	keywords={`доставка бензина ${driver.district}, водитель ${driver.name} тюмень, привезти бензин тюмень, доставка топлива на дорогу, помощь на дороге ${driver.district}, подвоз топлива тюмень`}
 	jsonLd={jsonLd}
+	city={city}
 >
 	<Header />
 	<HomeHero
 		subtitle={`Доставка бензина в районе ${driver.district}`}
-		title={`${driver.name} доставит топливо и поможет на дороге в Тюмени`}
+		title={`${driver.name} доставит топливо и поможет на дороге ${city.inCity}`}
 		description={`Привезёт ${fuelText} к машине с пустым баком, поможет запустить двигатель или дотащить автомобиль до сервиса. Ориентировочный выезд — ${driver.deliveryTime}, стоимость — от ${driver.price} ₽.`}
 		ctaText={orderTitle}
 		reviewText={statusLabels[driver.status]}
@@ -86,7 +89,7 @@ const jsonLd = [
 	/>
 	<HomeAbout
 		subtitle={`Водитель ${driver.name}`}
-		title={`Выезд в район ${driver.district}, по Тюмени и за город`}
+		title={`Выезд в район ${driver.district}, ${city.byCity} и за город`}
 		taskTitle="С какой проблемой можно обратиться"
 		taskText="Закончился бензин или дизель, автомобиль заглох, разрядился аккумулятор, повреждено колесо либо машину нужно дотащить до сервиса."
 		principleTitle="Что согласуется до выезда"
@@ -113,7 +116,7 @@ const jsonLd = [
 	<HomeWhyChoose
 		subtitle="Условия выезда"
 		title="Срок и стоимость известны до начала поездки"
-		description={`Основная зона водителя — район ${driver.district}. Для другого района Тюмени, пригорода или трассы время и цена рассчитываются после получения точки остановки.`}
+		description={`Основная зона водителя — район ${driver.district}. Для другого района ${city.ofCity}, пригорода или трассы время и цена рассчитываются после получения точки остановки.`}
 		items={[
 			{ icon: '/images/icon-why-choose-body-1-gold.svg', title: 'Точный заказ', text: 'Марка, объём топлива, адрес и состояние машины уточняются до покупки на АЗС.' },
 			{ icon: '/images/icon-why-choose-body-2-gold.svg', title: 'Понятный расчёт', text: 'Отдельно фиксируются топливо, доставка, загородный пробег и дополнительные дорожные работы.' },
@@ -166,7 +169,7 @@ const jsonLd = [
 		title={`Где ${driver.name} оказывает помощь`}
 		drivers={[
 			{ image: '/images/driver/ekip-1.jpg', title: `Район ${driver.district}`, text: `Основная зона с ориентиром прибытия ${driver.deliveryTime}.`, href: '/contacts' },
-			{ image: '/images/driver/ekip-2.jpg', title: 'Другие районы Тюмени', text: 'Выезд подтверждается после проверки адреса, маршрута и дорожной обстановки.', href: '/contacts' },
+			{ image: '/images/driver/ekip-2.jpg', title: `Другие районы ${city.ofCity}`, text: 'Выезд подтверждается после проверки адреса, маршрута и дорожной обстановки.', href: '/contacts' },
 			{ image: '/images/driver/ekip-3.jpg', title: 'Пригород и трасса', text: 'Стоимость рассчитывается по расстоянию; нужен точный ориентир места остановки.', href: '/contacts' },
 		]}
 		footerText="Уточните адрес, чтобы проверить доступность выезда —"
@@ -211,7 +214,7 @@ const jsonLd = [
 		posts={[
 			{ image: '/images/post-1.jpg', title: 'Как заказать доставку бензина или дизеля', href: '/services/toplivo', btnText: 'Условия доставки' },
 			{ image: '/images/post-2.jpg', title: 'Какая помощь возможна прямо на дороге', href: '/services/tehpomosch', btnText: 'Виды техпомощи' },
-			{ image: '/images/post-3.jpg', title: `Вызвать водителя ${driver.name} в Тюмени`, href: '/contacts', btnText: 'Оставить заявку' },
+			{ image: '/images/post-3.jpg', title: `Вызвать водителя ${driver.name} ${city.inCity}`, href: '/contacts', btnText: 'Оставить заявку' },
 		]}
 	/>
 	<ServiceFaqs faqs={faqs} title={`Вопросы о выезде водителя ${driver.name}`} />

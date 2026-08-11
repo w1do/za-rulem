@@ -2,7 +2,7 @@
 import GasPricesPage from '../components/pages/GasPricesPage.astro';
 import { getCityBySlug } from '../lib/city';
 
-const city = getCityBySlug('tyumen');
+const city = getCityBySlug();
 ---
 
 <GasPricesPage city={city} />

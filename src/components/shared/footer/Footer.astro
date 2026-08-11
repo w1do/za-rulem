@@ -1,6 +1,6 @@
 ---
 import type { ChatCity } from '../../../data/cities';
-import { getCityUrl, replaceCityPlaceholders } from '../../../lib/city';
+import { getCityBySlug, getCityUrl, replaceCityPlaceholders } from '../../../lib/city';
 import { getSiteData } from '../../../lib/seo';
 
 export interface Props {
@@ -8,26 +8,27 @@ export interface Props {
 }
 
 const { city } = Astro.props;
-const site = getSiteData(city);
+const effectiveCity = city ?? getCityBySlug();
+const site = getSiteData(effectiveCity);
 
 // Общий подвал сайта. Структура перенесена из шаблона, изменены только тексты и ссылки.
 const quickLinks = [
-	{ label: 'Главная', href: getCityUrl('/', city?.slug) },
-	{ label: 'О сервисе', href: getCityUrl('/about', city?.slug) },
-	{ label: 'Услуги', href: getCityUrl('/services', city?.slug) },
-	{ label: 'Отзывы', href: getCityUrl('/testimonials', city?.slug) },
+	{ label: 'Главная', href: getCityUrl('/', effectiveCity.slug) },
+	{ label: 'О сервисе', href: getCityUrl('/about', effectiveCity.slug) },
+	{ label: 'Услуги', href: getCityUrl('/services', effectiveCity.slug) },
+	{ label: 'Отзывы', href: getCityUrl('/testimonials', effectiveCity.slug) },
 	{ label: 'Блог', href: '/blog' },
-	{ label: 'Партнёрам', href: getCityUrl('/partners', city?.slug) },
-	{ label: 'Контакты', href: getCityUrl('/contacts', city?.slug) },
+	{ label: 'Партнёрам', href: getCityUrl('/partners', effectiveCity.slug) },
+	{ label: 'Контакты', href: getCityUrl('/contacts', effectiveCity.slug) },
 ];
 
 const serviceLinks = [
-	{ label: 'Прикурить авто', href: getCityUrl('/services/tehpomosch/prikurit-avto', city?.slug) },
-	{ label: 'Замена аккумулятора', href: getCityUrl('/services/tehpomosch/zamena-akkumulyatora', city?.slug) },
-	{ label: 'Отогрев автомобиля', href: getCityUrl('/services/tehpomosch/otogrev-avto', city?.slug) },
-	{ label: 'Подвоз бензина', href: getCityUrl('/services/toplivo/podvoz-benzina', city?.slug) },
-	{ label: 'Подвоз дизеля', href: getCityUrl('/services/toplivo/podvoz-dizelya', city?.slug) },
-	{ label: 'Все услуги', href: getCityUrl('/services', city?.slug) },
+	{ label: 'Прикурить авто', href: getCityUrl('/services/tehpomosch/prikurit-avto', effectiveCity.slug) },
+	{ label: 'Замена аккумулятора', href: getCityUrl('/services/tehpomosch/zamena-akkumulyatora', effectiveCity.slug) },
+	{ label: 'Отогрев автомобиля', href: getCityUrl('/services/tehpomosch/otogrev-avto', effectiveCity.slug) },
+	{ label: 'Подвоз бензина', href: getCityUrl('/services/toplivo/podvoz-benzina', effectiveCity.slug) },
+	{ label: 'Подвоз дизеля', href: getCityUrl('/services/toplivo/podvoz-dizelya', effectiveCity.slug) },
+	{ label: 'Все услуги', href: getCityUrl('/services', effectiveCity.slug) },
 ];
 ---
 
@@ -96,7 +97,7 @@ const serviceLinks = [
 						<h2>Контакты</h2>
 						<div class="footer-contact-info-list-gold">
 							<ul>
-								<li><img src="/images/icon-phone-accent.svg" alt="Заявка" width="20" height="20" /><a href={getCityUrl('/contacts', city?.slug)} data-service-request data-service-title="Вызвать помощь">Выезд только по заявке</a></li>
+								<li><img src="/images/icon-phone-accent.svg" alt="Заявка" width="20" height="20" /><a href={getCityUrl('/contacts', effectiveCity.slug)} data-service-request data-service-title="Вызвать помощь">Выезд только по заявке</a></li>
 								<li><img src="/images/icon-location-accent.svg" alt="Адрес" width="20" height="20" />{site.addressLocality} и {site.addressRegion}, выезд 24/7</li>
 							</ul>
 						</div>
@@ -109,7 +110,7 @@ const serviceLinks = [
 						<div class="about-footer-content-gold">
 							<p>Оставьте заявку — перезвоню в течение пары минут и выеду на место.</p>
 						</div>
-						<a href={getCityUrl('/contacts', city?.slug)} class="btn-default btn-highlighted">Оставить заявку</a>
+						<a href={getCityUrl('/contacts', effectiveCity.slug)} class="btn-default btn-highlighted">Оставить заявку</a>
 					</div>
 					<!-- Footer Link End -->
 				</div>
@@ -128,8 +129,8 @@ const serviceLinks = [
 					<!-- Footer Privacy Policy Start -->
 					<div class="footer-privacy-policy-gold">
 						<ul>
- 						<li><a href={getCityUrl('/privacy-policy', city?.slug)}>Политика конфиденциальности</a></li>
- 						<li><a href={getCityUrl('/terms', city?.slug)}>Условия обслуживания</a></li>
+						<li><a href={getCityUrl('/privacy-policy', effectiveCity.slug)}>Политика конфиденциальности</a></li>
+						<li><a href={getCityUrl('/terms', effectiveCity.slug)}>Условия обслуживания</a></li>
 						</ul>
 					</div>
 					<!-- Footer Privacy Policy End -->

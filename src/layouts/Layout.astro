@@ -7,6 +7,7 @@ import '../styles/main.css';
 import criticalStyles from '../styles/critical.css?inline';
 import lazyStylesUrl from '../styles/lazy.css?url';
 import heroBgUrl from '../assets/images/hero-bg-image-gold.webp?url';
+import { getCityBySlug } from '../lib/city';
 
 export interface Props {
 	title: string;
@@ -32,7 +33,9 @@ const {
 	city,
 } = Astro.props;
 
-const site = getSiteData(city);
+const defaultCity = getCityBySlug();
+const effectiveCity = city ?? defaultCity;
+const site = getSiteData(effectiveCity);
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImageAbsolute = new URL(ogImage, Astro.site).href;
 
@@ -41,7 +44,7 @@ const ogImageAbsolute = new URL(ogImage, Astro.site).href;
 const pageNodes = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
 const structuredData = {
 	'@context': 'https://schema.org',
-	'@graph': [...baseGraph(city), ...pageNodes],
+	'@graph': [...baseGraph(effectiveCity), ...pageNodes],
 };
 ---
 
@@ -136,12 +139,19 @@ const structuredData = {
 		<VoiceRequestModal client:idle />
 
 		<!-- Синхронизация города с URL и localStorage -->
-		<script is:inline define:vars={{ citySlug: city?.slug || 'tyumen' }}>
+		<script is:inline define:vars={{ citySlug: effectiveCity.slug, defaultCitySlug: defaultCity.slug, defaultCity }}>
 			(function() {
 				try {
 					const CITY_STORAGE_KEY = 'za-rulem-city';
+					const DEFAULT_CITY_STORAGE_KEY = 'default_city';
 					if (typeof localStorage !== 'undefined') {
-						if (localStorage.getItem(CITY_STORAGE_KEY) !== citySlug) {
+						const serializedDefaultCity = JSON.stringify(defaultCity);
+						if (localStorage.getItem(DEFAULT_CITY_STORAGE_KEY) !== serializedDefaultCity) {
+							localStorage.setItem(DEFAULT_CITY_STORAGE_KEY, serializedDefaultCity);
+						}
+						const storedCity = localStorage.getItem(CITY_STORAGE_KEY);
+						const shouldSyncCity = citySlug !== defaultCitySlug || storedCity === null;
+						if (shouldSyncCity && storedCity !== citySlug) {
 							localStorage.setItem(CITY_STORAGE_KEY, citySlug);
 							window.dispatchEvent(new CustomEvent('city-change', { detail: citySlug }));
 						}

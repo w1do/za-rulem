@@ -4,12 +4,21 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import llms from 'astro-llms-md';
 import compress from 'astro-compress';
+import { loadEnv } from 'vite';
 
 import node from '@astrojs/node';
 
-import { getCitySitemapUrls, isCitySitemapUrl } from './src/lib/sitemap/cityUrls';
-
 const SITE = 'https://za-rulem.org';
+const mode = process.env.NODE_ENV ?? 'development';
+const env = loadEnv(mode, process.cwd(), '');
+
+// Конфигурационные модули загружаются до Astro runtime, поэтому передаём им
+// env явно. Переменная остаётся server-only и не получает префикс PUBLIC_.
+process.env.DEFAULT_CITY_SLUG ??= env.DEFAULT_CITY_SLUG;
+
+const { getCitySitemapUrls, isCitySitemapUrl } = await import('./src/lib/sitemap/cityUrls');
+const { getCityBySlug } = await import('./src/lib/city');
+const defaultCity = getCityBySlug();
 
 // https://astro.build/config
 export default defineConfig({
@@ -55,9 +64,9 @@ export default defineConfig({
       },
     }),
     llms({
-      name: 'За рулём — техпомощь на дороге в Тюмени',
+      name: `За рулём — техпомощь на дороге ${defaultCity.inCity}`,
       description:
-        'Круглосуточная автопомощь на дороге в Тюмени и области: прикурить авто, замена аккумулятора, отогрев машины, вскрытие автомобиля и подвоз топлива. Выезд 24/7 за 20–40 минут.',
+        `Круглосуточная автопомощь на дороге ${defaultCity.inCity}: прикурить авто, замена аккумулятора, отогрев машины, вскрытие автомобиля и подвоз топлива. Выезд 24/7 за 20–40 минут.`,
       contentSelector: 'body',
       excludeSelectors: [
         'header',

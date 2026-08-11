@@ -1,11 +1,16 @@
 ---
 // Блок «О чате водителей» для посадочной страницы.
 // Рассказывает от первого лица, зачем нужен чат и как он устроен.
+import type { ChatCity } from '../../data/cities';
+import { getCityBySlug, getCityUrl } from '../../lib/city';
+
 interface Props {
 	class?: string;
+	city?: ChatCity;
 }
 
-const { class: className = '' } = Astro.props;
+const { class: className = '', city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
 
 const features = [
 	{
@@ -20,7 +25,7 @@ const features = [
 	},
 	{
 		icon: 'fa-location-dot',
-		title: 'По Тюмени и районам',
+		title: `${city.byCity} и районам`,
 		text: 'Каналы по маркам топлива и очередям помогают быстро найти обстановку рядом со мной.',
 	},
 ];
@@ -34,7 +39,7 @@ const features = [
 				<!-- Chat About Image Start -->
 				<div class="chat-about-image wow fadeInUp">
 					<figure class="image-anime">
-						<img src="/images/about-us-image.jpg" alt="Водители Тюмени в чате о наличии топлива" />
+						<img src="/images/about-us-image.jpg" alt={`Водители ${city.ofCity} в чате о наличии топлива`} />
 					</figure>
 					<div class="chat-about-badge">
 						<span class="chat-about-badge__num"><i class="fa-solid fa-comments"></i></span>
@@ -50,7 +55,7 @@ const features = [
 					<div class="section-title">
 						<span class="section-sub-title wow fadeInUp">О чате</span>
 						<h2 class="text-anime-style-3" data-cursor="-opaque">Я собрал живой чат, где видно, где сейчас есть топливо</h2>
-						<p class="wow fadeInUp" data-wow-delay="0.2s">Когда бензин и дизель пропадают с АЗС, важнее всего актуальная подсказка от тех, кто уже проехал рядом. Поэтому я сделал простой чат: захожу по номеру, выбираю канал по марке топлива или очередям — и сразу вижу обстановку по Тюмени.</p>
+						<p class="wow fadeInUp" data-wow-delay="0.2s">Когда бензин и дизель пропадают с АЗС, важнее всего актуальная подсказка от тех, кто уже проехал рядом. Поэтому я сделал простой чат: захожу по номеру, выбираю канал по марке топлива или очередям — и сразу вижу обстановку {city.byCity}.</p>
 					</div>
 
 					<div class="chat-about-list">
@@ -67,7 +72,7 @@ const features = [
 
 					<div class="chat-about-footer wow fadeInUp" data-wow-delay="0.4s">
 						<a href="#chat" class="btn-default">Войти в чат</a>
-						<a href="/chat" class="btn-default btn-highlighted">Открыть как приложение</a>
+						<a href={getCityUrl('/chat', city.slug)} class="btn-default btn-highlighted">Открыть как приложение</a>
 					</div>
 				</div>
 				<!-- Chat About Content End -->

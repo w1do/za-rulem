@@ -2,8 +2,8 @@
 import HeaderNav from './HeaderNav.astro';
 import CitySelector from '../city-selector/CitySelector.astro';
 import type { ChatCity } from '../../../data/cities';
-import { DEFAULT_CITY_SLUG, chatAppUrl } from '../../../data/cities';
-import { getCityUrl } from '../../../lib/city';
+import { chatAppUrl } from '../../../data/cities';
+import { getCityBySlug, getCityUrl } from '../../../lib/city';
 import { getSiteData } from '../../../lib/seo';
 
 export interface Props {
@@ -11,8 +11,9 @@ export interface Props {
 }
 
 const { city } = Astro.props;
-const site = getSiteData(city);
-const chatUrl = chatAppUrl(city?.slug ?? DEFAULT_CITY_SLUG);
+const effectiveCity = city ?? getCityBySlug();
+const site = getSiteData(effectiveCity);
+const chatUrl = chatAppUrl(effectiveCity.slug);
 ---
 
 <!-- Header Start -->
@@ -20,10 +21,10 @@ const chatUrl = chatAppUrl(city?.slug ?? DEFAULT_CITY_SLUG);
 	<div class="header-sticky">
 		<nav class="navbar navbar-expand-lg">
 			<div class="container">
-				<CitySelector currentCity={city} />
+				<CitySelector currentCity={effectiveCity} />
 				
 				<!-- Main Menu Start -->
-				<HeaderNav city={city} />
+				<HeaderNav city={effectiveCity} />
 				<!-- Main Menu End -->
 				<a
 					href="#"

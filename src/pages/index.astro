@@ -2,7 +2,7 @@
 import HomePage from '../components/pages/HomePage.astro';
 import { getCityBySlug } from '../lib/city';
 
-const city = getCityBySlug('tyumen');
+const city = getCityBySlug();
 ---
 
 <HomePage city={city} />

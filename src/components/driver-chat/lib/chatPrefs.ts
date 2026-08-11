@@ -1,4 +1,3 @@
-import { DEFAULT_CITY_SLUG } from '../../../lib/cities/default';
 import { isChatTopic, type ChatTopic } from '../model/types';
 import { isValidPhone, normalizePhone } from './phone';
 
@@ -17,7 +16,8 @@ const CITY_SLUG_PATTERN = /^[a-z0-9-]{2,50}$/;
 export const isKnownCity = (slug: unknown): slug is string =>
 	typeof slug === 'string' && CITY_SLUG_PATTERN.test(slug);
 
-export const resolveCity = (slug: unknown): string => (isKnownCity(slug) ? slug : DEFAULT_CITY_SLUG);
+export const resolveCity = (slug: unknown, defaultCitySlug: string): string =>
+	isKnownCity(slug) ? slug : defaultCitySlug;
 
 const readStoredPrefs = (): Partial<ChatPrefs> => {
 	const saved = window.localStorage.getItem(STORAGE_KEY);
@@ -52,7 +52,7 @@ const readUrlPrefs = (): Partial<ChatPrefs> => {
 /**
  * Начальные настройки чата. Приоритет: URL → глобальный город → сохранённый конфиг чата.
  */
-export const readInitialPrefs = (): ChatPrefs => {
+export const readInitialPrefs = (defaultCitySlug: string): ChatPrefs => {
 	const globalCity = window.localStorage.getItem(CITY_STORAGE_KEY);
 	const stored = readStoredPrefs();
 	const url = readUrlPrefs();
@@ -60,7 +60,7 @@ export const readInitialPrefs = (): ChatPrefs => {
 	return {
 		phone: url.phone ?? (typeof stored.phone === 'string' ? stored.phone : ''),
 		topic: url.topic ?? (isChatTopic(stored.topic) ? stored.topic : 'general'),
-		city: url.city ?? (isKnownCity(globalCity) ? globalCity : resolveCity(stored.city)),
+		city: url.city ?? (isKnownCity(globalCity) ? globalCity : resolveCity(stored.city, defaultCitySlug)),
 	};
 };
 

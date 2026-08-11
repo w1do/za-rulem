@@ -2,6 +2,7 @@ export type DriverStatus = 'free' | 'busy' | 'driving';
 
 export interface QueueDriver {
 	id: number;
+	citySlug: string;
 	name: string;
 	gasStation: string;
 	location: string;
@@ -53,6 +54,7 @@ export const queueDrivers: QueueDriver[] = Array.from({ length: 40 }).map((_, in
 	
 	return {
 		id: index + 1,
+		citySlug: 'tyumen',
 		name,
 		gasStation: gasStationValues[gasStationIdx],
 		location: locations[locationIdx],

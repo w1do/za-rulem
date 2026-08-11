@@ -43,8 +43,8 @@ const {
 
 const city = propCity ?? getCityBySlug();
 
-const subtitle = propSubtitle ?? replaceCityPlaceholders('Техпомощь на дороге в {city} 24/7', city);
-const title = propTitle ?? replaceCityPlaceholders('Срочная автопомощь на дороге в {city} с выездом', city);
+const subtitle = propSubtitle ?? replaceCityPlaceholders('Техпомощь на дороге {inCity} 24/7', city);
+const title = propTitle ?? replaceCityPlaceholders('Срочная автопомощь на дороге {inCity} с выездом', city);
 const description =
 	propDescription ??
 	replaceCityPlaceholders(
@@ -66,7 +66,7 @@ const benefits = propBenefits ?? [
 	{
 		icon: '/images/icon-hero-info-list-2-gold.svg',
 		title: '02. Я выезжаю',
-		text: replaceCityPlaceholders('Уточню адрес в {inCity} и сразу выезжаю к вам с нужным оборудованием.', city),
+		text: replaceCityPlaceholders('Уточню адрес {inCity} и сразу выезжаю к вам с нужным оборудованием.', city),
 	},
 	{
 		icon: '/images/icon-hero-info-list-3-gold.svg',

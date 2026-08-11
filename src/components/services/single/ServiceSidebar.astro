@@ -1,5 +1,15 @@
 ---
-const { title = 'Мои услуги', links = [] } = Astro.props;
+import type { ChatCity } from '../../../data/cities';
+import { getCityBySlug, getCityUrl } from '../../../lib/city';
+
+interface Props {
+	title?: string;
+	links?: Array<{ title: string; url: string }>;
+	city?: ChatCity;
+}
+
+const { title = 'Мои услуги', links = [], city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
 ---
 
 <!-- Page Single Sidebar Start -->
@@ -52,7 +62,7 @@ const { title = 'Мои услуги', links = [] } = Astro.props;
 
 				<!-- Satisfy CTA Client Content Start -->
 				<div class="sidebar-cta-client-content">
-					<p>Выезжаю по Тюмени и области</p>
+					<p>Выезжаю {city.byCity} и по региону {city.region}</p>
 				</div>
 				<!-- Satisfy CTA Client Content End -->
 			</div>
@@ -62,7 +72,7 @@ const { title = 'Мои услуги', links = [] } = Astro.props;
 
 		<!-- Sidebar CTA Contact Button Start -->
 		<div class="sidebar-cta-contact-btn">
-   <a href="/contacts" data-service-request data-service-title="Вызвать помощь"><i class="fa-solid fa-paper-plane"></i> Оставить заявку</a>
+			<a href={getCityUrl('/contacts', city.slug)} data-service-request data-service-title="Вызвать помощь"><i class="fa-solid fa-paper-plane"></i> Оставить заявку</a>
 		</div>
 		<!-- Sidebar CTA Contact Button End -->
 	</div>

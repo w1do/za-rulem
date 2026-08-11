@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { DEFAULT_CITY_SLUG } from '../../../lib/cities/default';
 import {
 	persistCity,
 	persistPrefs,
@@ -13,8 +12,6 @@ import {
 import { createId } from '../lib/id';
 import { isValidPhone, normalizePhone } from '../lib/phone';
 import type { ChatTopic } from './types';
-
-const INITIAL_PREFS: ChatPrefs = { phone: '', topic: 'general', city: DEFAULT_CITY_SLUG };
 
 export interface ChatSession extends ChatPrefs {
 	sessionId: string;
@@ -31,9 +28,9 @@ export interface ChatSession extends ChatPrefs {
  * Кто участвует в чате и какой канал открыт: номер, топик, город.
  * Настройки читаются из URL/localStorage и туда же сохраняются.
  */
-export function useChatSession(): ChatSession {
+export function useChatSession(defaultCitySlug: string): ChatSession {
 	const [sessionId] = useState(createId);
-	const [prefs, setPrefs] = useState<ChatPrefs>(INITIAL_PREFS);
+	const [prefs, setPrefs] = useState<ChatPrefs>({ phone: '', topic: 'general', city: defaultCitySlug });
 	const [isJoined, setIsJoined] = useState(false);
 	const [error, setError] = useState('');
 
@@ -68,7 +65,7 @@ export function useChatSession(): ChatSession {
 	};
 
 	const selectCity = (citySlug: string): boolean => {
-		const city = resolveCity(citySlug);
+		const city = resolveCity(citySlug, defaultCitySlug);
 		if (city === prefsRef.current.city) return false;
 		const next = update({ city });
 		persistPrefs(next);
@@ -77,7 +74,7 @@ export function useChatSession(): ChatSession {
 	};
 
 	useEffect(() => {
-		const initial = readInitialPrefs();
+		const initial = readInitialPrefs(defaultCitySlug);
 		update(initial);
 		persistCity(initial.city);
 		if (initial.phone) {

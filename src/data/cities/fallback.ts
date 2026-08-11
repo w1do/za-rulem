@@ -12,7 +12,7 @@ export const fallbackCities: ChatCity[] = [
 		ofCity: 'Тюмени',
 		byCity: 'по Тюмени',
 		forCity: 'для Тюмени',
-		hint: 'Базовый город чата',
+		hint: 'Тюмень и ближайшие районы',
 		region: 'Тюменская область',
 		population: 861098,
 		isFeatured: true,
@@ -320,7 +320,7 @@ export const fallbackCities: ChatCity[] = [
 	{
 		slug: 'irkutsk',
 		name: 'Иркутск',
-		inCity: 'в Иркутке',
+		inCity: 'в Иркутске',
 		ofCity: 'Иркутска',
 		byCity: 'по Иркутску',
 		forCity: 'для Иркутска',

@@ -81,7 +81,7 @@ const faqs = [
 
 					<!-- Fleet Item List Start -->
 					<div class="driver-grid" id="queue-options">
-						{queueDrivers.map((driver) => <QueueDriverCard driver={driver} city={city} />)}
+						{queueDrivers.map((driver) => <QueueDriverCard driver={driver} />)}
 					</div>
 					<p class="driver-grid__empty" id="drivers-empty" hidden>По выбранным параметрам водителей пока нет. Попробуйте изменить фильтры.</p>
 					<nav class="driver-pagination" id="driver-pagination" aria-label="Страницы водителей"></nav>

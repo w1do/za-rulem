@@ -2,7 +2,7 @@
 import ServicesIndexPage from '../../components/pages/ServicesIndexPage.astro';
 import { getCityBySlug } from '../../lib/city';
 
-const city = getCityBySlug('tyumen');
+const city = getCityBySlug();
 ---
 
 <ServicesIndexPage city={city} />

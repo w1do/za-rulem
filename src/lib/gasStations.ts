@@ -117,8 +117,8 @@ export const getBoundsCenter = (bounds: MapBounds): [number, number] => {
 	const lng = (Number(bounds.minLon) + Number(bounds.maxLon)) / 2;
 
 	if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-		// Fallback на Тюмень, если координаты битые, чтобы карта не падала
-		return [57.1522, 65.5272];
+		// Нейтральный центр России: не связываем аварийный fallback с базовым городом.
+		return [61.524, 105.319];
 	}
 
 	return [lat, lng];

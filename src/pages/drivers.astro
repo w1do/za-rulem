@@ -2,7 +2,7 @@
 import DriversPage from '../components/pages/DriversPage.astro';
 import { getCityBySlug } from '../lib/city';
 
-const city = getCityBySlug('tyumen');
+const city = getCityBySlug();
 ---
 
 <DriversPage city={city} />

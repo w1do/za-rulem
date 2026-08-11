@@ -5,7 +5,7 @@ export { removeCityPlaceholders, replaceCityPlaceholders } from './cityText';
 
 /**
  * Получает объект города по его слагу. 
- * Если слаг не передан или не найден, возвращает город по умолчанию (Тюмень).
+ * Если слаг не передан или не найден, возвращает город по умолчанию.
  */
 export const getCityBySlug = (slug?: string): ChatCity => {
 	const city = chatCities.find((c) => c.slug === slug);
@@ -20,7 +20,7 @@ export const getCityBySlug = (slug?: string): ChatCity => {
 
 /**
  * Формирует URL с учетом текущего города.
- * Если город — Тюмень (дефолт), префикс не добавляется.
+ * Если город базовый, префикс не добавляется.
  */
 export const getCityUrl = (path: string, citySlug?: string): string => {
 	// Убираем лишние слэши в начале, чтобы не было двойных

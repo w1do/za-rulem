@@ -13,13 +13,14 @@ export interface DriverChatProps {
 	variant?: 'app' | 'section';
 	// Справочник городов приходит с сервера: клиент не должен знать про Directus.
 	cities: ChatCityOption[];
+	defaultCitySlug: string;
 }
 
 const cityName = (cities: ChatCityOption[], slug: string): string =>
 	cities.find((city) => city.slug === slug)?.name ?? cities[0]?.name ?? '';
 
-export default function DriverChat({ variant = 'section', cities }: DriverChatProps) {
-	const { phone, topic, setTopic, city, setCity, isJoined, messages, error, join, send } = useDriverChat();
+export default function DriverChat({ variant = 'section', cities, defaultCitySlug }: DriverChatProps) {
+	const { phone, topic, setTopic, city, setCity, isJoined, messages, error, join, send } = useDriverChat(defaultCitySlug);
 	const [isAsideOpen, setIsAsideOpen] = useState(false);
 
 	if (!isJoined) {

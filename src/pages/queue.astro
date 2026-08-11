@@ -2,7 +2,7 @@
 import QueuePage from '../components/pages/QueuePage.astro';
 import { getCityBySlug } from '../lib/city';
 
-const city = getCityBySlug('tyumen');
+const city = getCityBySlug();
 ---
 
 <QueuePage city={city} />

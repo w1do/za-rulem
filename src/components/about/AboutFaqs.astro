@@ -1,3 +1,14 @@
+---
+import type { ChatCity } from '../../data/cities';
+import { getCityBySlug } from '../../lib/city';
+
+interface Props {
+	city?: ChatCity;
+}
+
+const city = Astro.props.city ?? getCityBySlug();
+---
+
 <!-- Our Faqs Section Start -->
 <div class="our-faqs bg-section">
 	<div class="container">
@@ -45,7 +56,7 @@
 							</h2>
 							<div id="collapse1" class="accordion-collapse collapse show" role="region" aria-labelledby="heading1" data-bs-parent="#accordion">
 								<div class="accordion-body">
-									<p>Я стараюсь приехать в течение 20–40 минут по Тюмени. Точное время зависит от вашего адреса, погоды и дорожной обстановки, поэтому уточняю его сразу при звонке.</p>
+									<p>Я стараюсь приехать в течение 20–40 минут {city.byCity}. Точное время зависит от вашего адреса, погоды и дорожной обстановки, поэтому уточняю его сразу при звонке.</p>
 								</div>
 							</div>
 						</div>
@@ -60,7 +71,7 @@
 							</h2>
 							<div id="collapse2" class="accordion-collapse collapse" role="region" aria-labelledby="heading2" data-bs-parent="#accordion">
 								<div class="accordion-body">
-									<p>Я выезжаю по всей Тюмени и в ближайшие районы области. Если вы находитесь за городом, я подскажу по телефону, смогу ли добраться и сколько времени займёт дорога.</p>
+									<p>Я выезжаю {city.byCity} и в ближайшие районы {city.region}. Если вы находитесь за городом, я подскажу по телефону, смогу ли добраться и сколько времени займёт дорога.</p>
 								</div>
 							</div>
 						</div>

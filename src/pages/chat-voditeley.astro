@@ -9,7 +9,7 @@ import HubCta from '../components/hub/HubCta.astro';
 import { webPageNode, breadcrumbNode } from '../lib/seo';
 import { getCityBySlug } from '../lib/city';
 
-const city = getCityBySlug('tyumen');
+const city = getCityBySlug();
 
 // SEO Data
 const title = 'Чат водителей: города, цены на бензин и наличие топлива на АЗС';
@@ -37,6 +37,18 @@ const jsonLd = [
 				</div>
 			</div>
 		</section>
+
+		<!-- Yandex.RTB R-A-19681102-1 -->
+		<div id="yandex_rtb_R-A-19681102-2"></div>
+		<script>
+			window.yaContextCb.push(() => {
+				Ya.Context.AdvManager.render({
+					"blockId": "R-A-19681102-2",
+					"renderTo": "yandex_rtb_R-A-19681102-2",
+					"type": "feed"
+				})
+			})
+		</script>
 
 		<ChatCityCards />
 

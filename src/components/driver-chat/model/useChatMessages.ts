@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { DEFAULT_CITY_SLUG } from '../../../lib/cities/default';
 import {
 	createChatMessage,
 	fetchChatHistory,
@@ -27,6 +26,7 @@ export interface ChatMessagesParams {
 	topic: ChatTopic;
 	city: string;
 	sessionId: string;
+	defaultCitySlug: string;
 }
 
 export interface ChatMessagesState {
@@ -40,7 +40,7 @@ export interface ChatMessagesState {
  * Лента канала: история через REST, новые сообщения через WebSocket
  * и резервный опрос, если realtime недоступен.
  */
-export function useChatMessages({ isJoined, phone, topic, city, sessionId }: ChatMessagesParams): ChatMessagesState {
+export function useChatMessages({ isJoined, phone, topic, city, sessionId, defaultCitySlug }: ChatMessagesParams): ChatMessagesState {
 	const [messages, setMessages] = useState<ChatMessage[]>([welcomeMessage]);
 	const [error, setError] = useState('');
 
@@ -83,12 +83,12 @@ export function useChatMessages({ isJoined, phone, topic, city, sessionId }: Cha
 			// Свои сообщения уже показаны оптимистично.
 			if (raw.sessionId === sessionId) return;
 			// city может отсутствовать у старых сообщений — считаем их городом по умолчанию.
-			if (raw.topic !== channel.topic || (raw.city || DEFAULT_CITY_SLUG) !== channel.city) return;
+			if (raw.topic !== channel.topic || (raw.city || defaultCitySlug) !== channel.city) return;
 
 			appendMessage(toChatMessage(raw, channel.phone));
 			if (raw.phone !== channel.phone) notifyNewMessage(raw.text);
 		},
-		[appendMessage, sessionId],
+		[appendMessage, defaultCitySlug, sessionId],
 	);
 
 	useEffect(() => {

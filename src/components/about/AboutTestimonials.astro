@@ -1,3 +1,14 @@
+---
+import type { ChatCity } from '../../data/cities';
+import { getCityBySlug } from '../../lib/city';
+
+interface Props {
+	city?: ChatCity;
+}
+
+const city = Astro.props.city ?? getCityBySlug();
+---
+
 <!-- Our Testimonials Section Start -->
 <div class="our-testimonials">
 	<div class="container">
@@ -25,7 +36,7 @@
 									<!-- Testimonial Item Image Start -->
 									<div class="testimonial-item-image">
 										<figure>
-											<img src="/images/testimonial-image.jpg" alt="Отзыв о техпомощи в Тюмени" />
+											<img src="/images/testimonial-image.jpg" alt={`Отзыв о техпомощи ${city.inCity}`} />
 										</figure>
 									</div>
 									<!-- Testimonial Item Image End -->

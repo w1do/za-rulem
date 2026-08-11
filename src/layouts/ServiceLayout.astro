@@ -10,10 +10,18 @@ import ServiceFeatures from '../components/services/single/ServiceFeatures.astro
 import ServiceProcess from '../components/services/single/ServiceProcess.astro';
 import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
+import { getCityBySlug, replaceCityPlaceholders } from '../lib/city';
 
 const { frontmatter, spokes = [] } = Astro.props;
-const seoTitle = frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь в Тюмени`;
-const seoDescription = frontmatter.seo?.description ?? frontmatter.description;
+const city = getCityBySlug();
+const seoTitle = replaceCityPlaceholders(
+	frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь {inCity}`,
+	city,
+);
+const seoDescription = replaceCityPlaceholders(
+	frontmatter.seo?.description ?? frontmatter.description,
+	city,
+);
 
 const image = frontmatter.image ?? '/images/service-single-image.jpg';
 const imageAlt = frontmatter.title;
@@ -23,6 +31,7 @@ const jsonLd = [
 		name: frontmatter.title,
 		description: frontmatter.description,
 		url: Astro.url.pathname,
+		city,
 	}),
 	breadcrumbNode([
 		{ name: 'Главная', url: '/' },
@@ -45,8 +54,8 @@ const steps = process
 	: [];
 ---
 
-<Layout title={seoTitle} description={seoDescription} jsonLd={jsonLd}>
-	<Header />
+<Layout title={seoTitle} description={seoDescription} jsonLd={jsonLd} city={city}>
+	<Header city={city} />
 
 	<ServicePageHeader title={frontmatter.title} showChatButton={frontmatter.cluster === 'toplivo'} />
 
@@ -55,7 +64,7 @@ const steps = process
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-4">
-					<ServiceSidebar links={sidebarLinks} />
+					<ServiceSidebar links={sidebarLinks} city={city} />
 				</div>
 
 				<div class="col-lg-8">
@@ -95,5 +104,5 @@ const steps = process
 	</div>
 	<!-- Page Service Single End -->
 
-	<Footer />
+	<Footer city={city} />
 </Layout>

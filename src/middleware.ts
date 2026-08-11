@@ -1,0 +1,32 @@
+import { defineMiddleware } from 'astro:middleware';
+import { DEFAULT_CITY_SLUG } from './lib/cities/default';
+
+const ROOT_MIRRORED_SECTIONS = new Set([
+	'about',
+	'calculator',
+	'ceny-na-benzin',
+	'chat',
+	'contacts',
+	'drivers',
+	'partners',
+	'privacy-policy',
+	'queue',
+	'services',
+	'terms',
+	'testimonials',
+]);
+
+export const onRequest = defineMiddleware(({ redirect, url }, next) => {
+	const cityPrefix = `/${DEFAULT_CITY_SLUG}`;
+	if (url.pathname !== cityPrefix && !url.pathname.startsWith(`${cityPrefix}/`)) {
+		return next();
+	}
+
+	const rootPath = url.pathname.slice(cityPrefix.length) || '/';
+	const [section] = rootPath.split('/').filter(Boolean);
+	if (rootPath !== '/' && (!section || !ROOT_MIRRORED_SECTIONS.has(section))) {
+		return next();
+	}
+
+	return redirect(`${rootPath}${url.search}`, 301);
+});

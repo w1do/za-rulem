@@ -3,6 +3,7 @@
 // Встраивается на любую страницу как компонент, а также используется
 // на отдельной PWA-странице /chat. Стили общие для обоих сценариев.
 import { chatCities } from '../../data/cities';
+import { getCityBySlug } from '../../lib/city';
 import DriverChat from './DriverChat';
 
 interface Props {
@@ -14,10 +15,11 @@ const { variant = 'section' } = Astro.props;
 
 // В island уходит только slug и название: остальные поля городу в браузере не нужны.
 const cities = chatCities.map(({ slug, name }) => ({ slug, name }));
+const defaultCitySlug = getCityBySlug().slug;
 ---
 
 <div class:list={["dc-container", { 'dc-container--section': variant === 'section', 'dc-container--app': variant === 'app' }]}>
-	<DriverChat client:load variant={variant} cities={cities} />
+	<DriverChat client:load variant={variant} cities={cities} defaultCitySlug={defaultCitySlug} />
 </div>
 
 <style is:global>

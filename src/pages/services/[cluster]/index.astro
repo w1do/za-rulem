@@ -6,7 +6,7 @@ import { getCityBySlug, removeCityPlaceholders, getCityUrl } from '../../../lib/
 export async function getStaticPaths() {
 	const hubs = await getCollection('services', ({ data }) => data.hub === true);
 	const spokes = await getCollection('serviceLanding');
-	const city = getCityBySlug('tyumen');
+	const city = getCityBySlug();
 	return hubs.map((pillar) => ({
 		params: { cluster: pillar.id },
 		props: {
@@ -27,7 +27,7 @@ export async function getStaticPaths() {
 }
 
 const { pillar, spokes } = Astro.props;
-const city = getCityBySlug('tyumen');
+const city = getCityBySlug();
 const { Content } = await render(pillar);
 ---
 

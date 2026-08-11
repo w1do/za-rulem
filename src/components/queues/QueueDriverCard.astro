@@ -1,15 +1,14 @@
 ---
 import type { QueueDriver } from '../../data/queueDrivers';
 import { statusLabels } from '../../data/queueDrivers';
-import type { ChatCity } from '../../data/cities';
+import { getCityBySlug } from '../../lib/city';
 
 interface Props {
 	driver: QueueDriver;
-	city?: ChatCity;
 }
 
-const { driver, city } = Astro.props;
-const cityName = city?.name || 'Тюмень';
+const { driver } = Astro.props;
+const cityName = getCityBySlug(driver.citySlug).name;
 ---
 
 <article

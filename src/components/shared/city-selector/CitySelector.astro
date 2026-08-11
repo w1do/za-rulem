@@ -3,14 +3,16 @@ import type { ChatCity } from '../../../data/cities';
 import { getCityOptions } from './lib/cityOptions';
 import CityModal from './ui/CityModal.astro';
 import CityTrigger from './ui/CityTrigger.astro';
+import { getCityBySlug } from '../../../lib/city';
 
 interface Props {
 	currentCity?: ChatCity;
 }
 
 const { currentCity } = Astro.props;
-const options = getCityOptions(currentCity?.slug);
-const cityName = currentCity?.name ?? 'Тюмень';
+const effectiveCity = currentCity ?? getCityBySlug();
+const options = getCityOptions(effectiveCity.slug);
+const cityName = effectiveCity.name;
 const modalId = 'city-modal';
 ---
 

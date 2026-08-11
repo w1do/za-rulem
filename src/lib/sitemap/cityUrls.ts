@@ -3,7 +3,7 @@
 // как customPages, чтобы карта городов генерировалась той же интеграцией.
 
 import { chatFuels } from '../../data/chatCluster';
-import { chatCities, cityLandingUrl, fuelLandingUrl } from '../../data/cities';
+import { chatCities, cityLandingUrl, DEFAULT_CITY_SLUG, fuelLandingUrl } from '../../data/cities';
 
 /** Маршруты города, кроме служебных: чат-приложение и юридические страницы дублируют корень. */
 const CITY_PATHS = [
@@ -22,9 +22,11 @@ const absolute = (site: string, path: string): string => new URL(path, site).hre
 /** Полные URL всех индексируемых городских страниц для sitemap. */
 export const getCitySitemapUrls = (site: string): string[] =>
 	chatCities
-		.filter((city) => city.isIndexable)
+		.filter((city) => city.isIndexable !== false)
 		.flatMap((city) => [
-			...CITY_PATHS.map((path) => absolute(site, `/${city.slug}${path}`)),
+			...(city.slug === DEFAULT_CITY_SLUG
+				? []
+				: CITY_PATHS.map((path) => absolute(site, `/${city.slug}${path}`))),
 			absolute(site, cityLandingUrl(city.slug)),
 			...chatFuels.map((fuel) => absolute(site, fuelLandingUrl(city.slug, fuel.slug))),
 		]);

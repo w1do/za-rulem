@@ -1,11 +1,15 @@
 ---
 import DriverChatBox from './DriverChatBox.astro';
+import type { ChatCity } from '../../data/cities';
+import { getCityBySlug } from '../../lib/city';
 
 interface Props {
 	class?: string;
+	city?: ChatCity;
 }
 
-const { class: className = '' } = Astro.props;
+const { class: className = '', city: propCity } = Astro.props;
+const city = propCity ?? getCityBySlug();
 ---
 
 <div class:list={["driver-chat-section bg-section", className]} id="chat">
@@ -13,7 +17,7 @@ const { class: className = '' } = Astro.props;
 		<div class="row section-row">
 			<div class="col-lg-12">
 				<div class="section-title section-title-center">
-					<span class="section-sub-title">Чат водителей · Тюмень</span>
+					<span class="section-sub-title">Чат водителей · {city.name}</span>
 					<h2>Чат, где видно, где сейчас есть топливо</h2>
 					<p>Живой чат для тех, кто ищет, где заправиться прямо сейчас. Водители подсказывают друг другу, на каких АЗС есть бензин и дизель и где меньше очередь. Указываешь номер — и сразу в общий разговор.</p>
 				</div>
