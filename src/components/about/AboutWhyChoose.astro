@@ -1,6 +1,6 @@
 ---
-import { getCityBySlug, replaceCityPlaceholders } from '../../lib/city';
-import type { ChatCity } from '../../data/cities';
+import { defaultCity, replaceCityPlaceholders } from '../../lib/cities';
+import type { ChatCity } from '../../lib/cities';
 import { Image } from 'astro:assets';
 
 import whyChooseImg1 from '../../assets/images/why-choose-image-1.jpg';
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const { city: propCity } = Astro.props;
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 ---
 
 <!-- Why Choose Us Section Start -->

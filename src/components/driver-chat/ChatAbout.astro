@@ -1,8 +1,8 @@
 ---
 // Блок «О чате водителей» для посадочной страницы.
 // Рассказывает от первого лица, зачем нужен чат и как он устроен.
-import type { ChatCity } from '../../data/cities';
-import { getCityBySlug, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../lib/cities';
+import { defaultCity, getCityUrl } from '../../lib/cities';
 
 interface Props {
 	class?: string;
@@ -10,7 +10,7 @@ interface Props {
 }
 
 const { class: className = '', city: propCity } = Astro.props;
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 
 const features = [
 	{

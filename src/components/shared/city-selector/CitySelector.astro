@@ -1,16 +1,15 @@
 ---
-import type { ChatCity } from '../../../data/cities';
+import { defaultCity, type ChatCity } from '../../../lib/cities';
 import { getCityOptions } from './lib/cityOptions';
 import CityModal from './ui/CityModal.astro';
 import CityTrigger from './ui/CityTrigger.astro';
-import { getCityBySlug } from '../../../lib/city';
 
 interface Props {
 	currentCity?: ChatCity;
 }
 
 const { currentCity } = Astro.props;
-const effectiveCity = currentCity ?? getCityBySlug();
+const effectiveCity = currentCity ?? defaultCity;
 const options = getCityOptions(effectiveCity.slug);
 const cityName = effectiveCity.name;
 const modalId = 'city-modal';
@@ -30,7 +29,7 @@ const modalId = 'city-modal';
 
 <script>
 	import { createCityModal } from './lib/cityModal';
-	import { saveCity, syncCityFromUrl } from './lib/cityStorage';
+	import { saveCity } from './lib/cityStorage';
 
 	let destroy: (() => void) | null = null;
 
@@ -64,7 +63,6 @@ const modalId = 'city-modal';
 			});
 		}
 
-		syncCityFromUrl(options.map((option) => option.dataset.citySlug ?? ''));
 	}
 
 	initCitySelector();

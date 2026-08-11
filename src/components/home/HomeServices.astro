@@ -1,6 +1,6 @@
 ---
-import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
-import type { ChatCity } from '../../data/cities';
+import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
+import type { ChatCity } from '../../lib/cities';
 
 interface ServiceItem {
 	icon: string;
@@ -34,7 +34,7 @@ const {
 	ratingText = 'Отзывы о моей работе',
 } = Astro.props;
 
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 const title = propTitle ?? replaceCityPlaceholders('Помогу при любой поломке авто {inCity}', city);
 const footerLinkHref = propFooterLinkHref ?? getCityUrl('/services', city.slug);
 

@@ -1,6 +1,5 @@
 ---
-import { fuelLandingUrl, DEFAULT_CITY_SLUG, type ChatCity } from '../../../data/cities';
-import { getCityUrl } from '../../../lib/city';
+import { defaultCity, fuelLandingUrl, getCityUrl, type ChatCity } from '../../../lib/cities';
 
 export interface Props {
 	city?: ChatCity;
@@ -29,9 +28,9 @@ const menu = [
 		label: 'Чат',
 		href: getCityUrl('/chat-voditeley', city?.slug),
 		children: [
-			{ label: '92', href: fuelLandingUrl(city?.slug || DEFAULT_CITY_SLUG, 'ai92') },
-			{ label: '95', href: fuelLandingUrl(city?.slug || DEFAULT_CITY_SLUG, 'ai95') },
-			{ label: 'ДТ', href: fuelLandingUrl(city?.slug || DEFAULT_CITY_SLUG, 'dt') },
+			{ label: '92', href: fuelLandingUrl(city?.slug ?? defaultCity.slug, 'ai92') },
+			{ label: '95', href: fuelLandingUrl(city?.slug ?? defaultCity.slug, 'ai95') },
+			{ label: 'ДТ', href: fuelLandingUrl(city?.slug ?? defaultCity.slug, 'dt') },
 		],
 	},
 	{ label: 'Контакты', href: getCityUrl('/contacts', city?.slug) },

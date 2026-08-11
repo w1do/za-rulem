@@ -1,6 +1,6 @@
 ---
-import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
-import type { ChatCity } from '../../data/cities';
+import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
+import type { ChatCity } from '../../lib/cities';
 
 interface WorkStep {
 	icon: string;
@@ -36,7 +36,7 @@ const {
 	footerLinkHref: propFooterLinkHref,
 } = Astro.props;
 
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 const footerLinkHref = propFooterLinkHref ?? getCityUrl('/contacts', city.slug);
 
 const steps = propSteps ?? [

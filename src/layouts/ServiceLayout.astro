@@ -10,10 +10,10 @@ import ServiceFeatures from '../components/services/single/ServiceFeatures.astro
 import ServiceProcess from '../components/services/single/ServiceProcess.astro';
 import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
-import { getCityBySlug, replaceCityPlaceholders } from '../lib/city';
+import { defaultCity, replaceCityPlaceholders } from '../lib/cities';
 
 const { frontmatter, spokes = [] } = Astro.props;
-const city = getCityBySlug();
+const city = defaultCity;
 const seoTitle = replaceCityPlaceholders(
 	frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь {inCity}`,
 	city,

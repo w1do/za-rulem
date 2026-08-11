@@ -15,8 +15,8 @@ import HomeTestimonials from '../../components/home/HomeTestimonials.astro';
 import HomePricing from '../../components/home/HomePricing.astro';
 import HomeBlog from '../../components/home/HomeBlog.astro';
 import { breadcrumbNode, webPageNode } from '../../lib/seo';
-import type { ChatCity } from '../../data/cities';
-import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../lib/cities';
+import { replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
 
 export interface Props {
 	city: ChatCity;

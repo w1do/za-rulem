@@ -1,8 +1,8 @@
 ---
 import ChatAppPage from '../components/pages/ChatAppPage.astro';
-import { getCityBySlug } from '../lib/city';
+import { defaultCity } from '../lib/cities';
 
-const city = getCityBySlug();
+const city = defaultCity;
 ---
 
 <ChatAppPage city={city} />

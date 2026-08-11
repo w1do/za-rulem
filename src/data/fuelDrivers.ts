@@ -1,3 +1,5 @@
+import type { ChatCity } from '../lib/cities';
+
 export type DriverStatus = 'free' | 'busy' | 'driving';
 
 export interface FuelDriver {
@@ -29,13 +31,12 @@ const nameSlugs = [
 	'georgiy', 'yaroslav', 'timofey', 'vitaliy', 'grigoriy', 'fyodor', 'kirill', 'ruslan', 'leonid', 'boris',
 ];
 
-const districts = ['Мыс', 'Центр', 'Заречный', 'КПД', 'Ватутино', 'Тюменский', 'Дом Обороны'];
-const districtSeo = ['на Мысу', 'в центре Тюмени', 'в Заречном', 'на КПД', 'в Ватутино', 'в Тюменском', 'в Доме Обороны'];
-const services = [
+const districts = ['Центр', 'Северный район', 'Южный район', 'Восточная часть города', 'Западная часть города'];
+const services = (city: ChatCity): string[] => [
 	'Отстою очередь на заправке',
 	'Привезу на дом бензин',
 	'Доставка топлива на дом и дачу',
-	'Доставка бензина по Тюмени',
+	`Доставка бензина ${city.byCity}`,
 	'Доставка топлива за город',
 ];
 const reasons = ['stalled', 'empty-tank', 'refueling', 'highway', 'country-trip'];
@@ -61,25 +62,29 @@ export const statusLabels: Record<DriverStatus, string> = {
 	driving: 'Едет на заказ',
 };
 
-export const fuelDrivers: FuelDriver[] = names.map((name, index) => {
-	const fast = index % 3 !== 1;
-	return {
-		id: index + 1,
-		slug: nameSlugs[index],
-		citySlug: 'tyumen',
-		serviceSlug: 'binzin',
-		name,
-		district: districts[index % districts.length],
-		districtSeo: districtSeo[index % districtSeo.length],
-		deliveryTime: fast ? (index % 2 === 0 ? 'от 1–2 часов' : 'от 2–3 часов') : 'от 2–5 часов',
-		speed: fast ? 'fast' : 'wait',
-		price: `${5_500 + (index % 6) * 500}`.replace(/(\d)(?=(\d{3})+$)/g, '$1 '),
-		status: statuses[index % statuses.length],
-		fuels: fuelSets[index % fuelSets.length],
-		service: services[index % services.length],
-		reason: reasons[index % reasons.length],
-	};
-});
+export const getFuelDrivers = (city: ChatCity): FuelDriver[] => {
+	const cityServices = services(city);
+
+	return names.map((name, index) => {
+		const fast = index % 3 !== 1;
+		return {
+			id: index + 1,
+			slug: nameSlugs[index],
+			citySlug: city.slug,
+			serviceSlug: 'binzin',
+			name,
+			district: districts[index % districts.length],
+			districtSeo: city.inCity,
+			deliveryTime: fast ? (index % 2 === 0 ? 'от 1–2 часов' : 'от 2–3 часов') : 'от 2–5 часов',
+			speed: fast ? 'fast' : 'wait',
+			price: `${5_500 + (index % 6) * 500}`.replace(/(\d)(?=(\d{3})+$)/g, '$1 '),
+			status: statuses[index % statuses.length],
+			fuels: fuelSets[index % fuelSets.length],
+			service: cityServices[index % cityServices.length],
+			reason: reasons[index % reasons.length],
+		};
+	});
+};
 
 export const getFuelDriverPath = (driver: FuelDriver) =>
 	`/drivers/${driver.citySlug}/${driver.serviceSlug}/${driver.slug}`;

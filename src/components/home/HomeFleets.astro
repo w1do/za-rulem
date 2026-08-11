@@ -1,6 +1,6 @@
 ---
-import { type ChatCity } from '../../data/cities';
-import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import { type ChatCity } from '../../lib/cities';
+import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
 import { MIN_TOTAL_PRICE, DEPARTURE_PRICE_PER_KM, MIN_FUEL_LITERS } from '../../data/prices';
 import AppImage from '../shared/ui/AppImage.astro';
 
@@ -46,7 +46,7 @@ const {
 	footerLinkHref: propFooterLinkHref,
 } = Astro.props;
 
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 
 const title = propTitle ?? replaceCityPlaceholders('Чем помогу на дороге {inCity}', city);
 const footerLinkHref = propFooterLinkHref ?? getCityUrl('/services', city.slug);

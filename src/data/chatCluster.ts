@@ -2,18 +2,6 @@
 // Используется посадочными страницами /chat-voditeley/... и самим чатом
 // для привязки диалогов к городам.
 
-import {
-	chatCities,
-	type ChatCity,
-	DEFAULT_CITY_SLUG,
-	cityLandingUrl,
-	fuelLandingUrl,
-	chatAppUrl,
-} from './cities';
-
-export type { ChatCity };
-export { chatCities, DEFAULT_CITY_SLUG, cityLandingUrl, fuelLandingUrl, chatAppUrl };
-
 export interface ChatFuel {
 	/** Слаг в URL и topic диалога чата. */
 	slug: string;
@@ -32,5 +20,4 @@ export const chatFuels: ChatFuel[] = [
 	{ slug: 'dt', name: 'ДТ', title: 'Дизельное топливо', icon: 'fa-truck-moving' },
 ];
 
-export const getCity = (slug: string) => chatCities.find((c) => c.slug === slug);
 export const getFuel = (slug: string) => chatFuels.find((f) => f.slug === slug);

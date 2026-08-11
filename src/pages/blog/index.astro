@@ -7,9 +7,9 @@ import BlogPageHeader from '../../components/blog/BlogPageHeader.astro';
 import PostCard from '../../components/blog/PostCard.astro';
 import BlogPagination from '../../components/blog/BlogPagination.astro';
 import { webPageNode, breadcrumbNode, itemListNode } from '../../lib/seo';
-import { getCityBySlug, replaceCityPlaceholders } from '../../lib/city';
+import { defaultCity, replaceCityPlaceholders } from '../../lib/cities';
 
-const city = getCityBySlug();
+const city = defaultCity;
 
 const posts = (await getCollection('blog')).sort(
 	(a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf(),

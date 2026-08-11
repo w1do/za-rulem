@@ -1,7 +1,7 @@
 ---
 import DriverChatBox from './DriverChatBox.astro';
-import type { ChatCity } from '../../data/cities';
-import { getCityBySlug } from '../../lib/city';
+import type { ChatCity } from '../../lib/cities';
+import { defaultCity } from '../../lib/cities';
 
 interface Props {
 	class?: string;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 const { class: className = '', city: propCity } = Astro.props;
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 ---
 
 <div class:list={["driver-chat-section bg-section", className]} id="chat">
@@ -27,7 +27,7 @@ const city = propCity ?? getCityBySlug();
 		<div class="row">
 			<div class="col-lg-12">
 				<div class="driver-chat-wrap">
-					<DriverChatBox variant="section" />
+					<DriverChatBox variant="section" city={city} />
 				</div>
 			</div>
 		</div>

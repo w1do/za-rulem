@@ -1,4 +1,4 @@
-import { chatCities, DEFAULT_CITY_SLUG, type ChatCity } from '../../../../data/cities';
+import { cities, defaultCity, type ChatCity } from '../../../../lib/cities';
 
 export interface CityOption {
 	city: ChatCity;
@@ -10,11 +10,11 @@ export interface CityOption {
 
 /** Города по алфавиту со ссылкой на их главную: базовый город живёт в корне сайта. */
 export const getCityOptions = (currentSlug?: string): CityOption[] =>
-	[...chatCities]
+	[...cities]
 		.sort((a, b) => a.name.localeCompare(b.name, 'ru'))
 		.map((city) => ({
 			city,
 			region: city.region,
-			href: city.slug === DEFAULT_CITY_SLUG ? '/' : `/${city.slug}`,
+			href: city.slug === defaultCity.slug ? '/' : `/${city.slug}`,
 			isActive: city.slug === currentSlug,
 		}));

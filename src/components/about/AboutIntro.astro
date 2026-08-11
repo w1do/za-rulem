@@ -1,6 +1,6 @@
 ---
-import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
-import type { ChatCity } from '../../data/cities';
+import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
+import type { ChatCity } from '../../lib/cities';
 import AppImage from '../shared/ui/AppImage.astro';
 
 import aboutImg from '../../assets/images/about-us-image.jpg';
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const { city: propCity } = Astro.props;
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 ---
 
 <!-- About Us Section Start -->

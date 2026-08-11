@@ -1,8 +1,13 @@
 import { isChatTopic, type ChatTopic } from '../model/types';
 import { isValidPhone, normalizePhone } from './phone';
+import {
+	CITY_CHANGE_EVENT,
+	CITY_STORAGE_KEY,
+	readCity,
+	saveCity,
+} from '../../shared/city-selector/lib/cityStorage';
 
 const STORAGE_KEY = 'za-rulem-driver-chat';
-const CITY_STORAGE_KEY = 'za-rulem-city';
 
 export interface ChatPrefs {
 	phone: string;
@@ -53,7 +58,7 @@ const readUrlPrefs = (): Partial<ChatPrefs> => {
  * Начальные настройки чата. Приоритет: URL → глобальный город → сохранённый конфиг чата.
  */
 export const readInitialPrefs = (defaultCitySlug: string): ChatPrefs => {
-	const globalCity = window.localStorage.getItem(CITY_STORAGE_KEY);
+	const globalCity = readCity();
 	const stored = readStoredPrefs();
 	const url = readUrlPrefs();
 
@@ -67,18 +72,14 @@ export const readInitialPrefs = (defaultCitySlug: string): ChatPrefs => {
 export const persistPrefs = ({ phone, topic, city }: ChatPrefs): void => {
 	try {
 		window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ phone, topic, city }));
-		window.localStorage.setItem(CITY_STORAGE_KEY, city);
+		saveCity(city);
 	} catch (e) {
 		console.warn('Chat persistence failed:', e);
 	}
 };
 
 export const persistCity = (city: string): void => {
-	try {
-		window.localStorage.setItem(CITY_STORAGE_KEY, city);
-	} catch {
-		// Приватный режим — просто работаем без сохранения.
-	}
+	saveCity(city);
 };
 
 /**
@@ -108,11 +109,11 @@ export const subscribeToCityChange = (onCityChange: (city: string) => void): (()
 		if (event.key === CITY_STORAGE_KEY && event.newValue) onCityChange(event.newValue);
 	};
 
-	window.addEventListener('city-change', handleCityEvent);
+	window.addEventListener(CITY_CHANGE_EVENT, handleCityEvent);
 	window.addEventListener('storage', handleStorage);
 
 	return () => {
-		window.removeEventListener('city-change', handleCityEvent);
+		window.removeEventListener(CITY_CHANGE_EVENT, handleCityEvent);
 		window.removeEventListener('storage', handleStorage);
 	};
 };

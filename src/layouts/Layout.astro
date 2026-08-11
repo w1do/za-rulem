@@ -1,13 +1,12 @@
 ---
 import { SITE, baseGraph, getSiteData } from '../lib/seo';
 import VoiceRequestModal from '../components/forms/VoiceRequestModal.tsx';
-import type { ChatCity } from '../data/cities';
+import { defaultCity, type ChatCity } from '../lib/cities';
 import '../styles/fonts.css';
 import '../styles/main.css';
 import criticalStyles from '../styles/critical.css?inline';
 import lazyStylesUrl from '../styles/lazy.css?url';
 import heroBgUrl from '../assets/images/hero-bg-image-gold.webp?url';
-import { getCityBySlug } from '../lib/city';
 
 export interface Props {
 	title: string;
@@ -33,11 +32,12 @@ const {
 	city,
 } = Astro.props;
 
-const defaultCity = getCityBySlug();
 const effectiveCity = city ?? defaultCity;
 const site = getSiteData(effectiveCity);
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImageAbsolute = new URL(ogImage, Astro.site).href;
+const cityContextJson = JSON.stringify({ currentCitySlug: effectiveCity.slug, defaultCity })
+	.replace(/</g, '\\u003c');
 
 // Единый граф структурированных данных: базовые узлы (WebSite + LocalBusiness)
 // объединяются со страничными узлами, переданными через проп jsonLd.
@@ -139,27 +139,26 @@ const structuredData = {
 		<VoiceRequestModal client:idle />
 
 		<!-- Синхронизация города с URL и localStorage -->
-		<script is:inline define:vars={{ citySlug: effectiveCity.slug, defaultCitySlug: defaultCity.slug, defaultCity }}>
-			(function() {
-				try {
-					const CITY_STORAGE_KEY = 'za-rulem-city';
-					const DEFAULT_CITY_STORAGE_KEY = 'default_city';
-					if (typeof localStorage !== 'undefined') {
-						const serializedDefaultCity = JSON.stringify(defaultCity);
-						if (localStorage.getItem(DEFAULT_CITY_STORAGE_KEY) !== serializedDefaultCity) {
-							localStorage.setItem(DEFAULT_CITY_STORAGE_KEY, serializedDefaultCity);
-						}
-						const storedCity = localStorage.getItem(CITY_STORAGE_KEY);
-						const shouldSyncCity = citySlug !== defaultCitySlug || storedCity === null;
-						if (shouldSyncCity && storedCity !== citySlug) {
-							localStorage.setItem(CITY_STORAGE_KEY, citySlug);
-							window.dispatchEvent(new CustomEvent('city-change', { detail: citySlug }));
-						}
-					}
-				} catch (e) {
-					console.error('City sync failed:', e);
-				}
+		<script id="city-context" type="application/json" set:html={cityContextJson} />
+		<script>
+			import type { ChatCity } from '../lib/cities';
+			import { syncCityContext } from '../components/shared/city-selector/lib/cityStorage';
 
+			const contextNode = document.querySelector<HTMLScriptElement>('#city-context');
+			if (contextNode?.textContent) {
+				try {
+					const context = JSON.parse(contextNode.textContent) as {
+						currentCitySlug: string;
+						defaultCity: ChatCity;
+					};
+					syncCityContext(context.currentCitySlug, context.defaultCity);
+				} catch (error) {
+					console.error('City sync failed:', error);
+				}
+			}
+		</script>
+		<script is:inline>
+			(function() {
 				// Скрытие прелоадера по готовности DOM
 				const hidePreloader = function() {
 					const preloader = document.querySelector('.preloader');

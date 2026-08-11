@@ -1,6 +1,6 @@
 ---
-import type { ChatCity } from '../../../data/cities';
-import { getCityBySlug, getCityUrl, replaceCityPlaceholders } from '../../../lib/city';
+import type { ChatCity } from '../../../lib/cities';
+import { defaultCity, getCityUrl, replaceCityPlaceholders } from '../../../lib/cities';
 import { getSiteData } from '../../../lib/seo';
 
 export interface Props {
@@ -8,7 +8,7 @@ export interface Props {
 }
 
 const { city } = Astro.props;
-const effectiveCity = city ?? getCityBySlug();
+const effectiveCity = city ?? defaultCity;
 const site = getSiteData(effectiveCity);
 
 // Общий подвал сайта. Структура перенесена из шаблона, изменены только тексты и ссылки.

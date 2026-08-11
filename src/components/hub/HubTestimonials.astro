@@ -1,13 +1,13 @@
 ---
-import { getCityBySlug, replaceCityPlaceholders } from '../../lib/city';
-import type { ChatCity } from '../../data/cities';
+import { defaultCity, replaceCityPlaceholders } from '../../lib/cities';
+import type { ChatCity } from '../../lib/cities';
 
 interface Props {
 	city?: ChatCity;
 }
 
 const { city: propCity } = Astro.props;
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 ---
 
 <!-- Our Testimonials Section Start -->

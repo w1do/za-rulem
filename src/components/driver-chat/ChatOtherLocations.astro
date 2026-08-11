@@ -1,5 +1,5 @@
 ---
-import { chatCities, DEFAULT_CITY_SLUG, cityLandingUrl, fuelLandingUrl, chatAppUrl } from '../../data/cities';
+import { cities, cityLandingUrl, fuelLandingUrl, chatAppUrl } from '../../lib/cities';
 import { chatFuels } from '../../data/chatCluster';
 
 interface Props {
@@ -12,10 +12,10 @@ const { currentCitySlug, currentFuelSlug } = Astro.props;
 /** Показываем ограниченный набор локаций: полный список городов живёт на /chat-voditeley. */
 const OTHER_CITIES_LIMIT = 12;
 
-const currentRegion = chatCities.find(c => c.slug === currentCitySlug)?.region ?? '';
+const currentRegion = cities.find(c => c.slug === currentCitySlug)?.region ?? '';
 
 /** Сначала города того же региона: в поездке по своей области они полезнее всего. */
-const otherCities = chatCities
+const otherCities = cities
     .filter(c => c.slug !== currentCitySlug)
     .map(c => ({ city: c, region: c.region }))
     .sort((a, b) => Number(b.region === currentRegion) - Number(a.region === currentRegion))

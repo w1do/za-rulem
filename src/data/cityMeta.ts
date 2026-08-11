@@ -1,4 +1,4 @@
-import type { ChatCity } from './cities';
+import type { ChatCity } from '../lib/cities';
 
 /** Федеральный округ каждого субъекта РФ, встречающегося в справочнике. */
 const districtByRegion: Record<string, string> = {

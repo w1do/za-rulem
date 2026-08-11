@@ -1,9 +1,9 @@
 import type { APIRoute } from 'astro';
 
-import { getCityBySlug } from '../lib/city';
+import { defaultCity } from '../lib/cities';
 
 export const GET: APIRoute = () => {
-	const city = getCityBySlug();
+	const city = defaultCity;
 	const manifest = {
 		name: `Чат водителей — где есть топливо · ${city.name}`,
 		short_name: 'Чат топлива',

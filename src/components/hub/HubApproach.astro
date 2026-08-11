@@ -1,6 +1,6 @@
 ---
-import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
-import type { ChatCity } from '../../data/cities';
+import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
+import type { ChatCity } from '../../lib/cities';
 
 // Блок «Мой подход» хаба. Разметка our-apporach из source. Контент — через props.
 interface ApproachItem {
@@ -24,7 +24,7 @@ interface Props {
 }
 
 const { city: propCity } = Astro.props;
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 
 const defaultItems: ApproachItem[] = [
 	{

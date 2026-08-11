@@ -1,12 +1,12 @@
 ---
-import type { ChatCity } from '../../data/cities';
-import { getCityBySlug } from '../../lib/city';
+import type { ChatCity } from '../../lib/cities';
+import { defaultCity } from '../../lib/cities';
 
 interface Props {
 	city?: ChatCity;
 }
 
-const city = Astro.props.city ?? getCityBySlug();
+const city = Astro.props.city ?? defaultCity;
 ---
 
 <!-- Our Faqs Section Start -->

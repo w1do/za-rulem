@@ -4,21 +4,13 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import llms from 'astro-llms-md';
 import compress from 'astro-compress';
-import { loadEnv } from 'vite';
 
 import node from '@astrojs/node';
 
 const SITE = 'https://za-rulem.org';
-const mode = process.env.NODE_ENV ?? 'development';
-const env = loadEnv(mode, process.cwd(), '');
-
-// Конфигурационные модули загружаются до Astro runtime, поэтому передаём им
-// env явно. Переменная остаётся server-only и не получает префикс PUBLIC_.
-process.env.DEFAULT_CITY_SLUG ??= env.DEFAULT_CITY_SLUG;
 
 const { getCitySitemapUrls, isCitySitemapUrl } = await import('./src/lib/sitemap/cityUrls');
-const { getCityBySlug } = await import('./src/lib/city');
-const defaultCity = getCityBySlug();
+const { defaultCity } = await import('./src/lib/cities');
 
 // https://astro.build/config
 export default defineConfig({

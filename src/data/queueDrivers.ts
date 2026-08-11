@@ -1,3 +1,5 @@
+import type { ChatCity } from '../lib/cities';
+
 export type DriverStatus = 'free' | 'busy' | 'driving';
 
 export interface QueueDriver {
@@ -23,8 +25,8 @@ const gasStations = ['Лукойл', 'Газпромнефть', 'Роснефт
 const gasStationValues = ['lukoil', 'gazpromneft', 'rosneft', 'ntp', 'tpk'];
 
 const locations = [
-	'Тобольский тракт', 'Московский тракт', 'Червишевский тракт', 'Велижанский тракт',
-	'Ялуторовский тракт', 'Старый Тобольский тракт', 'Салаирский тракт', 'Центр', 'Окружная дорога'
+	'Центр', 'Северный район', 'Южный район', 'Восточная часть города',
+	'Западная часть города', 'Окружная дорога'
 ];
 
 const times = ['С 4:00 утра', 'С 5:00 утра', 'С 6:00 утра', 'С 7:00 утра', 'Круглосуточно', 'Вечернее время'];
@@ -46,7 +48,7 @@ export const statusLabels: Record<DriverStatus, string> = {
 	driving: 'На заказе',
 };
 
-export const queueDrivers: QueueDriver[] = Array.from({ length: 40 }).map((_, index) => {
+export const getQueueDrivers = (city: ChatCity): QueueDriver[] => Array.from({ length: 40 }).map((_, index) => {
 	const name = names[index % names.length];
 	const gasStationIdx = index % gasStations.length;
 	const locationIdx = index % locations.length;
@@ -54,7 +56,7 @@ export const queueDrivers: QueueDriver[] = Array.from({ length: 40 }).map((_, in
 	
 	return {
 		id: index + 1,
-		citySlug: 'tyumen',
+		citySlug: city.slug,
 		name,
 		gasStation: gasStationValues[gasStationIdx],
 		location: locations[locationIdx],
@@ -62,6 +64,6 @@ export const queueDrivers: QueueDriver[] = Array.from({ length: 40 }).map((_, in
 		price: `${800 + (index % 5) * 200}`.replace(/(\d)(?=(\d{3})+$)/g, '$1 '),
 		status: statuses[index % statuses.length],
 		phone: '+7 (922) ' + Math.floor(100 + Math.random() * 900) + '-' + Math.floor(10 + Math.random() * 90) + '-' + Math.floor(10 + Math.random() * 90),
-		service: `Займу очередь на ${gasStations[gasStationIdx]}, ${locations[locationIdx]} ${times[timeIdx].toLowerCase()}`,
+		service: `Займу очередь на ${gasStations[gasStationIdx]}, ${locations[locationIdx]} ${city.inCity} ${times[timeIdx].toLowerCase()}`,
 	};
 });

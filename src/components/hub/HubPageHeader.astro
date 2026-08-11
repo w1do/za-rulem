@@ -2,8 +2,8 @@
 import PageHeaderHelpButton from '../shared/PageHeaderHelpButton.astro';
 import PageHeaderChatButton from '../shared/PageHeaderChatButton.astro';
 
-import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
-import type { ChatCity } from '../../data/cities';
+import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
+import type { ChatCity } from '../../lib/cities';
 
 // Шапка хаба услуги. Разметка перенесена из шаблона (page-header parallaxie),
 // как на странице «О сервисе», с хлебными крошками до раздела услуг.
@@ -16,7 +16,7 @@ interface Props {
 }
 
 const { city: propCity } = Astro.props;
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 
 const {
 	title: propTitle,

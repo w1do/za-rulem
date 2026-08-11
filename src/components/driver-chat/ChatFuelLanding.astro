@@ -9,8 +9,7 @@ import HubFaqs from '../hub/HubFaqs.astro';
 import HubCta from '../hub/HubCta.astro';
 import ChatOtherLocations from './ChatOtherLocations.astro';
 import { webPageNode, breadcrumbNode, faqNode } from '../../lib/seo';
-import type { ChatCity } from '../../data/cities';
-import { DEFAULT_CITY_SLUG, chatAppUrl, fuelLandingUrl, cityLandingUrl } from '../../data/cities';
+import { chatAppUrl, cityLandingUrl, defaultCity, fuelLandingUrl, type ChatCity } from '../../lib/cities';
 import { chatFuels, type ChatFuel } from '../../data/chatCluster';
 
 interface Props {
@@ -21,7 +20,7 @@ interface Props {
 const { city, fuel } = Astro.props;
 
 // SEO
-const isDefaultCity = city.slug === DEFAULT_CITY_SLUG;
+const isDefaultCity = city.slug === defaultCity.slug;
 const title = `Чат водителей: где есть ${fuel.name} ${city.inCity} сейчас`;
 const h1 = `Чат водителей ${city.ofCity}: наличие ${fuel.name} на АЗС и очереди`;
 const description = `Узнайте, на каких АЗС ${city.inCity} сейчас есть ${fuel.name}. Живой чат водителей: актуальные цены, очереди на заправках и наличие топлива в реальном времени.`;
@@ -70,7 +69,7 @@ breadcrumbItems.push({ label: fuel.name });
 ---
 
 <Layout title={title} description={description} jsonLd={jsonLd}>
-	<Header />
+	<Header city={city} />
 	<main>
 		<PageHeader title={h1} items={breadcrumbItems} showChatButton={true} chatLink={chatAppUrl(city.slug, fuel.slug)} />
 
@@ -97,6 +96,7 @@ breadcrumbItems.push({ label: fuel.name });
 		/>
 
 		<HubCta
+			city={city}
 			subtitle="Живое общение"
 			title={`Зайти в чат водителей ${city.ofCity}`}
 			description={`Присоединяйтесь к сообществу, чтобы всегда знать обстановку на АЗС. Спрашивайте про ${fuel.name}, делитесь ценами и помогайте другим водителям.`}
@@ -194,7 +194,7 @@ breadcrumbItems.push({ label: fuel.name });
 			</div>
 		</section>
 	</main>
-	<Footer />
+	<Footer city={city} />
 </Layout>
 
 <style>

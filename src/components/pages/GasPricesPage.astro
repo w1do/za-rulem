@@ -13,10 +13,8 @@ import HomeWhyChoose from '../../components/home/HomeWhyChoose.astro';
 import HubFaqs from '../../components/hub/HubFaqs.astro';
 import HubCta from '../../components/hub/HubCta.astro';
 import QueueDriversPreview from '../../components/queues/QueueDriversPreview.astro';
-import { gasStationLabels, queueDrivers } from '../../data/queueDrivers';
-import type { ChatCity } from '../../data/cities';
-import { chatAppUrl } from '../../data/cities';
-import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import { gasStationLabels, getQueueDrivers } from '../../data/queueDrivers';
+import { chatAppUrl, getCityUrl, replaceCityPlaceholders, type ChatCity } from '../../lib/cities';
 import { fetchGasStations } from '../../lib/gasStations';
 import {
 	buildGasPricesFaqs,
@@ -50,7 +48,7 @@ const jsonLd = [
 	]),
 ];
 
-const availableQueueDrivers = queueDrivers.filter((driver) => driver.status === "free").slice(0, 6);
+const availableQueueDrivers = getQueueDrivers(city).filter((driver) => driver.status === "free").slice(0, 6);
 const queueGasStations = Object.values(gasStationLabels);
 ---
 
@@ -96,7 +94,7 @@ const queueGasStations = Object.values(gasStationLabels);
 
 	<HomeHowItWork city={city} />
 
-	<HomeWhyChoose />
+	<HomeWhyChoose ctaHref={getCityUrl('/contacts', city.slug)} />
 
 	<section class="gas-prices-faq">
 		<div class="container">
@@ -104,7 +102,7 @@ const queueGasStations = Object.values(gasStationLabels);
 		</div>
 	</section>
 
-	<HubCta />
+	<HubCta city={city} />
 
 	<Footer city={city} />
 </Layout>

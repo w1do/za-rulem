@@ -1,8 +1,8 @@
 ---
 import QueuePage from '../components/pages/QueuePage.astro';
-import { getCityBySlug } from '../lib/city';
+import { defaultCity } from '../lib/cities';
 
-const city = getCityBySlug();
+const city = defaultCity;
 ---
 
 <QueuePage city={city} />

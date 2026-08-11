@@ -1,5 +1,5 @@
 import { defineMiddleware } from 'astro:middleware';
-import { DEFAULT_CITY_SLUG } from './lib/cities/default';
+import { defaultCity } from './lib/cities';
 
 const ROOT_MIRRORED_SECTIONS = new Set([
 	'about',
@@ -17,7 +17,7 @@ const ROOT_MIRRORED_SECTIONS = new Set([
 ]);
 
 export const onRequest = defineMiddleware(({ redirect, url }, next) => {
-	const cityPrefix = `/${DEFAULT_CITY_SLUG}`;
+	const cityPrefix = `/${defaultCity.slug}`;
 	if (url.pathname !== cityPrefix && !url.pathname.startsWith(`${cityPrefix}/`)) {
 		return next();
 	}

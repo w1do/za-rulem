@@ -13,6 +13,7 @@ export type CityDto = {
 	region?: unknown;
 	population?: unknown;
 	is_featured?: unknown;
+	is_default?: unknown;
 	is_indexable?: unknown;
 	seo_title?: unknown;
 	seo_description?: unknown;
@@ -34,6 +35,7 @@ export const CITY_FIELDS = [
 	'region',
 	'population',
 	'is_featured',
+	'is_default',
 	'is_indexable',
 	'seo_title',
 	'seo_description',
@@ -59,7 +61,7 @@ export const toCity = (dto: CityDto): ChatCity | null => {
 	if (!/^[a-z0-9-]+$/.test(slug) || !name || !inCity || !ofCity || !byCity || !forCity) return null;
 	if (minLat === null || maxLat === null || minLon === null || maxLon === null) return null;
 	if (minLat >= maxLat || minLon >= maxLon) return null;
-	
+
 	// Защита от "нулевых" координат, которые могут прийти при ошибке геокодирования.
 	// Координаты 0,0 невозможны для городов РФ (это Гвинейский залив).
 	if (Math.abs(minLat) < 0.1 && Math.abs(minLon) < 0.1) return null;
@@ -75,6 +77,7 @@ export const toCity = (dto: CityDto): ChatCity | null => {
 		region: toText(dto.region),
 		population: toNumber(dto.population) ?? 0,
 		isFeatured: dto.is_featured === true,
+		isDefault: dto.is_default === true,
 		isIndexable: dto.is_indexable !== false,
 		seoTitle: toText(dto.seo_title),
 		seoDescription: toText(dto.seo_description),

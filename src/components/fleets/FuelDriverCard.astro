@@ -1,14 +1,14 @@
 ---
 import type { FuelDriver } from '../../data/fuelDrivers';
 import { fuelLabels, getFuelDriverPath, statusLabels } from '../../data/fuelDrivers';
-import { getCityBySlug } from '../../lib/city';
+import { findCity } from '../../lib/cities';
 
 interface Props {
 	driver: FuelDriver;
 }
 
 const { driver } = Astro.props;
-const cityName = getCityBySlug(driver.citySlug).name;
+const cityName = findCity(driver.citySlug)?.name ?? driver.citySlug;
 ---
 
 <article

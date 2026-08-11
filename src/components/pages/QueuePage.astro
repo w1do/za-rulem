@@ -9,16 +9,16 @@ import AboutCta from '../../components/about/AboutCta.astro';
 import QueueFilters from '../../components/queues/QueueFilters.astro';
 import QueueDriverCard from '../../components/queues/QueueDriverCard.astro';
 import Alert from '../../components/shared/Alert.astro';
-import { queueDrivers } from '../../data/queueDrivers';
-import type { ChatCity } from '../../data/cities';
-import { chatAppUrl } from '../../data/cities';
-import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import { getQueueDrivers } from '../../data/queueDrivers';
+import { chatAppUrl, getCityUrl, replaceCityPlaceholders, type ChatCity } from '../../lib/cities';
 
 export interface Props {
 	city: ChatCity;
 }
 
 const { city } = Astro.props;
+const queueDrivers = getQueueDrivers(city);
+const locations = [...new Set(queueDrivers.map((driver) => driver.location))];
 
 const title = replaceCityPlaceholders("Занять очередь на АЗС {inCity} — Лукойл, Газпромнефть, Роснефть", city);
 const description = replaceCityPlaceholders("Маркетплейс водителей, которые займут для вас очередь на заправке {inCity}. Экономьте свое время!", city);
@@ -64,7 +64,7 @@ const faqs = [
 
 			<div class="row fuel-delivery-layout">
 				<div class="col-lg-3">
-					<QueueFilters />
+					<QueueFilters city={city} locations={locations} />
 				</div>
 
 				<div class="col-lg-9">

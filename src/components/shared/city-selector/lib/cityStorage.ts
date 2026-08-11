@@ -1,12 +1,26 @@
-/** Ключ и событие, по которым остальные острова узнают выбранный город. */
+import type { ChatCity } from '../../../../lib/cities';
+
+/** Ключи и событие — единый клиентский контракт города. */
 export const CITY_STORAGE_KEY = 'za-rulem-city';
+const DEFAULT_CITY_STORAGE_KEY = 'default_city';
 export const CITY_CHANGE_EVENT = 'city-change';
 
-const readCity = (): string | null => {
+export const readCity = (): string | null => {
 	try {
 		return window.localStorage.getItem(CITY_STORAGE_KEY);
 	} catch {
 		return null;
+	}
+};
+
+const saveDefaultCity = (city: ChatCity): void => {
+	try {
+		const serializedCity = JSON.stringify(city);
+		if (window.localStorage.getItem(DEFAULT_CITY_STORAGE_KEY) !== serializedCity) {
+			window.localStorage.setItem(DEFAULT_CITY_STORAGE_KEY, serializedCity);
+		}
+	} catch {
+		// Приватный режим — работаем без сохранения.
 	}
 };
 
@@ -21,8 +35,8 @@ export const saveCity = (slug: string): void => {
 	window.dispatchEvent(new CustomEvent(CITY_CHANGE_EVENT, { detail: slug }));
 };
 
-/** Город из адреса страницы важнее сохранённого: пользователь пришёл по ссылке. */
-export const syncCityFromUrl = (knownSlugs: readonly string[]): void => {
-	const [firstSegment] = window.location.pathname.split('/').filter(Boolean);
-	if (firstSegment && knownSlugs.includes(firstSegment)) saveCity(firstSegment);
+/** URL всегда главный: `/` передаёт default, `/{city}` — явный город. */
+export const syncCityContext = (currentCitySlug: string, defaultCity: ChatCity): void => {
+	saveDefaultCity(defaultCity);
+	saveCity(currentCitySlug);
 };

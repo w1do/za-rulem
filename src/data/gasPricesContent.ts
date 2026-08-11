@@ -1,5 +1,4 @@
-import type { ChatCity } from './cities';
-import { replaceCityPlaceholders } from '../lib/city';
+import { replaceCityPlaceholders, type ChatCity } from '../lib/cities';
 
 /**
  * Тексты страницы «Цены на бензин»: метаданные, интро и FAQ.

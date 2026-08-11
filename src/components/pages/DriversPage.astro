@@ -9,16 +9,16 @@ import FuelDeliveryCalculator from '../../components/calculators/FuelDeliveryCal
 import FuelDeliveryFilters from '../../components/fleets/FuelDeliveryFilters.astro';
 import FuelDriverCard from '../../components/fleets/FuelDriverCard.astro';
 import Alert from '../../components/shared/Alert.astro';
-import { fuelDrivers } from '../../data/fuelDrivers';
-import type { ChatCity } from '../../data/cities';
-import { chatAppUrl } from '../../data/cities';
-import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import { getFuelDrivers } from '../../data/fuelDrivers';
+import { chatAppUrl, getCityUrl, replaceCityPlaceholders, type ChatCity } from '../../lib/cities';
 
 export interface Props {
 	city: ChatCity;
 }
 
 const { city } = Astro.props;
+const fuelDrivers = getFuelDrivers(city);
+const districts = [...new Set(fuelDrivers.map((driver) => driver.district))];
 
 const title = replaceCityPlaceholders("Доставка бензина от 1 часа {inCity} — АИ-92, АИ-98, АИ-100 и ДТ", city);
 const description = replaceCityPlaceholders("Закажу доставку бензина и дизельного топлива от 1 часа {inCity} и районах города. Выберите топливо, адрес и скорость выезда.", city);
@@ -88,7 +88,7 @@ const faqs = [
 		<div class="container mt-5">
 			<div class="row fuel-delivery-layout">
 				<div class="col-lg-3">
-					<FuelDeliveryFilters />
+					<FuelDeliveryFilters city={city} districts={districts} />
 				</div>
 
 				<div class="col-lg-9">

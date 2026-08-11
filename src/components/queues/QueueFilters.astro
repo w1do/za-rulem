@@ -1,25 +1,28 @@
+---
+import type { ChatCity } from '../../lib/cities';
+
+interface Props {
+	city: ChatCity;
+	locations: string[];
+}
+
+const { city, locations } = Astro.props;
+---
+
 <aside class="page-single-sidebar queue-sidebar" aria-label="Параметры очереди на АЗС">
 	<div class="fleet-category-item wow fadeInUp">
 		<div class="fleets-search-box">
 			<div class="form-group">
 				<label for="city">Город</label>
 				<select class="form-control" id="city">
-					<option>Тюмень</option>
+					<option>{city.name}</option>
 				</select>
 			</div>
 			<div class="form-group">
 				<label for="location">Тракт / Район</label>
 				<select class="form-control" id="location">
 					<option value="all">Все локации</option>
-					<option value="Тобольский тракт">Тобольский тракт</option>
-					<option value="Московский тракт">Московский тракт</option>
-					<option value="Червишевский тракт">Червишевский тракт</option>
-					<option value="Велижанский тракт">Велижанский тракт</option>
-					<option value="Ялуторовский тракт">Ялуторовский тракт</option>
-					<option value="Старый Тобольский тракт">Старый Тобольский тракт</option>
-					<option value="Салаирский тракт">Салаирский тракт</option>
-					<option value="Центр">Центр</option>
-					<option value="Окружная дорога">Окружная дорога</option>
+					{locations.map((location) => <option value={location}>{location}</option>)}
 				</select>
 			</div>
 		</div>

@@ -8,8 +8,8 @@ import HomeHowItWork from '../../components/home/HomeHowItWork.astro';
 import HubFaqs from '../../components/hub/HubFaqs.astro';
 import AboutCta from '../../components/about/AboutCta.astro';
 import { breadcrumbNode, faqNode, webPageNode } from '../../lib/seo';
-import type { ChatCity } from '../../data/cities';
-import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../lib/cities';
+import { replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
 import { MIN_TOTAL_PRICE, DEPARTURE_PRICE_PER_KM, MIN_FUEL_LITERS } from '../../data/prices';
 
 export interface Props {

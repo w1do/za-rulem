@@ -11,8 +11,8 @@ import ChatOtherLocations from './ChatOtherLocations.astro';
 import FuelPricesSection from '../gas-prices/FuelPricesSection.astro';
 import GasPricesMapSection from '../gas-prices/GasPricesMapSection.astro';
 import { webPageNode, breadcrumbNode, faqNode } from '../../lib/seo';
-import type { ChatCity } from '../../data/cities';
-import { DEFAULT_CITY_SLUG, chatAppUrl, fuelLandingUrl, cityLandingUrl } from '../../data/cities';
+import type { ChatCity } from '../../lib/cities';
+import { defaultCity, chatAppUrl, fuelLandingUrl, cityLandingUrl } from '../../lib/cities';
 import { districtOfRegion, formatPopulation, citySeoTitle, citySeoDescription } from '../../data/cityMeta';
 import { chatFuels } from '../../data/chatCluster';
 import Alert from "../shared/Alert.astro";
@@ -48,15 +48,15 @@ const region = city.region;
 const district = districtOfRegion(region);
 const population = city.population;
 
-const title = propsTitle || (city.slug === DEFAULT_CITY_SLUG 
-    ? `Чат водителей ${city.ofCity}: цены на бензин сегодня, очереди и наличие топлива на АЗС`
-    : citySeoTitle(city));
+const title = propsTitle || (city.slug === defaultCity.slug
+	? `Чат водителей ${city.ofCity}: цены на бензин сегодня, очереди и наличие топлива на АЗС`
+	: citySeoTitle(city));
 
-const h1 = propsH1 || (city.slug === DEFAULT_CITY_SLUG
+const h1 = propsH1 || (city.slug === defaultCity.slug
     ? `Чат водителей ${city.ofCity}: АЗС, цены на бензин и очереди`
     : `Чат водителей ${city.name}: обстановка на АЗС, цены и очереди`);
 
-const description = propsDescription || (city.slug === DEFAULT_CITY_SLUG
+const description = propsDescription || (city.slug === defaultCity.slug
     ? `Актуальные цены на бензин АИ-95, АИ-92 и дизель ${city.inCity} сегодня. Живой чат водителей: где сейчас есть топливо и какие очереди на АЗС. Смотрите карту заправок в реальном времени.`
     : citySeoDescription(city));
 
@@ -197,6 +197,7 @@ const breadcrumbItems = [
 		</section>
 
 		<HubCta
+			city={city}
 			subtitle="Присоединяйтесь"
 			title={`Войти в чат ${city.ofCity}`}
 			description={`Я приглашаю вас в сообщество водителей ${city.ofCity}. Делитесь информацией с дорог, спрашивайте совета и узнавайте про бензин первыми.`}

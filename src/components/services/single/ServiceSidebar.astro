@@ -1,6 +1,6 @@
 ---
-import type { ChatCity } from '../../../data/cities';
-import { getCityBySlug, getCityUrl } from '../../../lib/city';
+import type { ChatCity } from '../../../lib/cities';
+import { defaultCity, getCityUrl } from '../../../lib/cities';
 
 interface Props {
 	title?: string;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 const { title = 'Мои услуги', links = [], city: propCity } = Astro.props;
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 ---
 
 <!-- Page Single Sidebar Start -->

@@ -2,8 +2,7 @@
 import FuelPricesTable from './FuelPricesTable';
 import { fetchGasStations, getFuelPricesFromStations } from '../../lib/gasStations';
 import type { MapBounds, StationData } from '../../lib/gasStations';
-import { chatCities, DEFAULT_CITY_SLUG } from '../../data/cities';
-import type { ChatCity } from '../../data/cities';
+import { defaultCity, type ChatCity } from '../../lib/cities';
 
 interface Props {
 	city?: ChatCity;
@@ -13,7 +12,7 @@ interface Props {
 }
 
 const { 
-	city = chatCities.find(c => c.slug === DEFAULT_CITY_SLUG),
+	city = defaultCity,
 	title,
 	subtitle = "Сводка по городу",
 	stations: initialStations
@@ -30,8 +29,8 @@ if (stations) {
 	prices = getFuelPricesFromStations(stations);
 }
 
-// Fallback for default city if API is down or returned no data
-if (prices.length === 0 && city?.slug === DEFAULT_CITY_SLUG) {
+// Резервные цены относятся только к базовому городу, а не к справочнику городов.
+if (prices.length === 0 && city?.slug === defaultCity.slug) {
 	prices = [
 		{ brand: 'Газпромнефть', ai92: '63.60 ₽', ai95: '69.05 ₽', diesel: '80.80 ₽' },
 		{ brand: 'Лукойл', ai92: '65.20 ₽', ai95: '71.40 ₽', diesel: '81.90 ₽' },

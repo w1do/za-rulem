@@ -1,8 +1,8 @@
 ---
-import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
 import type { ChatCity } from '../../lib/cities/types';
 import AppImage from '../shared/ui/AppImage.astro';
-import { chatAppUrl } from '../../data/cities';
+import { chatAppUrl } from '../../lib/cities';
 
 import author1 from '../../assets/images/author-1.jpg';
 import author2 from '../../assets/images/author-2.jpg';
@@ -41,7 +41,7 @@ const {
 	benefits: propBenefits,
 } = Astro.props;
 
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 
 const subtitle = propSubtitle ?? replaceCityPlaceholders('Техпомощь на дороге {inCity} 24/7', city);
 const title = propTitle ?? replaceCityPlaceholders('Срочная автопомощь на дороге {inCity} с выездом', city);

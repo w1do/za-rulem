@@ -10,8 +10,8 @@ import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 import FuelDeliveryCalculator from '../components/calculators/FuelDeliveryCalculator.tsx';
 import FuelPricesSection from '../components/gas-prices/FuelPricesSection.astro';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
-import type { ChatCity } from '../data/cities';
-import { getCityBySlug, replaceCityPlaceholders, removeCityPlaceholders, getCityUrl } from '../lib/city';
+import type { ChatCity } from '../lib/cities';
+import { defaultCity, replaceCityPlaceholders, removeCityPlaceholders, getCityUrl } from '../lib/cities';
 
 export interface Props {
 	frontmatter: any;
@@ -19,7 +19,7 @@ export interface Props {
 }
 
 const { frontmatter, city: propCity } = Astro.props;
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 
 const cluster = frontmatter.cluster;
 const pillar = await getEntry('services', cluster);

@@ -1,5 +1,5 @@
 ---
-import { chatCities, DEFAULT_CITY_SLUG, cityLandingUrl, fuelLandingUrl, chatAppUrl } from '../../data/cities';
+import { cities, cityLandingUrl, fuelLandingUrl, chatAppUrl } from '../../lib/cities';
 import { chatFuels } from '../../data/chatCluster';
 ---
 
@@ -17,7 +17,7 @@ import { chatFuels } from '../../data/chatCluster';
 
 		<div class="row">
 			{
-				chatCities.map((city, index) => (
+				cities.map((city, index) => (
 					<div class="col-xl-4 col-md-6 mb-4">
 						<div class="service-item wow fadeInUp" data-wow-delay={`${index * 0.1}s`}>
 							<div class="icon-box">

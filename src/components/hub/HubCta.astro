@@ -1,6 +1,6 @@
 ---
-import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
-import type { ChatCity } from '../../data/cities';
+import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
+import type { ChatCity } from '../../lib/cities';
 
 // Блок призыва к действию хаба. Разметка перенесена из шаблона (cta-box bg-section dark-section parallaxie).
 interface Props {
@@ -20,7 +20,7 @@ interface Props {
 }
 
 const { city: propCity } = Astro.props;
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 
 const {
 	subtitle = 'Связаться со мной',

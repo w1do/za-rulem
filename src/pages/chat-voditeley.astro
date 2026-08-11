@@ -7,9 +7,9 @@ import ChatCityCards from '../components/driver-chat/ChatCityCards.astro';
 import HubProcess from '../components/hub/HubProcess.astro';
 import HubCta from '../components/hub/HubCta.astro';
 import { webPageNode, breadcrumbNode } from '../lib/seo';
-import { getCityBySlug } from '../lib/city';
+import { defaultCity } from '../lib/cities';
 
-const city = getCityBySlug();
+const city = defaultCity;
 
 // SEO Data
 const title = 'Чат водителей: города, цены на бензин и наличие топлива на АЗС';

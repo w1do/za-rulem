@@ -17,8 +17,8 @@ import HomePricing from '../../components/home/HomePricing.astro';
 import HomeBlog from '../../components/home/HomeBlog.astro';
 
 import { webPageNode, itemListNode } from '../../lib/seo';
-import type { ChatCity } from '../../data/cities';
-import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../lib/cities';
+import { replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
 
 export interface Props {
 	city: ChatCity;
@@ -60,11 +60,11 @@ const jsonLd = [
 	<HomeHero city={city} />
 	<HomeAbout city={city} />
 	<HomeServices city={city} />
-	<HomeWhyChoose />
+	<HomeWhyChoose ctaHref={getCityUrl('/contacts', city.slug)} />
 	<HomeFleets city={city} />
 	<HomeWhatWeDo city={city} />
-	<HomeCollection />
-	<HomeDrivers />
+	<HomeCollection ctaHref={getCityUrl('/contacts', city.slug)} />
+	<HomeDrivers city={city} />
 	<HomeHowItWork city={city} />
 	<HomeTestimonials city={city} />
 	<HomePricing city={city} />

@@ -20,8 +20,8 @@ import HubFaqs from '../components/hub/HubFaqs.astro';
 import HubTestimonials from '../components/hub/HubTestimonials.astro';
 import FuelDeliveryCalculator from '../components/calculators/FuelDeliveryCalculator.tsx';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
-import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../lib/city';
-import type { ChatCity } from '../data/cities';
+import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../lib/cities';
+import type { ChatCity } from '../lib/cities';
 
 export interface Props {
 	frontmatter: any;
@@ -31,7 +31,7 @@ export interface Props {
 }
 
 const { frontmatter, spokes = [], cluster, city: propCity } = Astro.props;
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 
 const seoTitle = replaceCityPlaceholders(frontmatter.seo?.title ?? `${frontmatter.title} — техпомощь {inCity}`, city);
 const seoDescription = replaceCityPlaceholders(frontmatter.seo?.description ?? frontmatter.description, city);

@@ -15,8 +15,8 @@ import AboutTestimonials from '../../components/about/AboutTestimonials.astro';
 import HomeDrivers from "../../components/home/HomeDrivers.astro";
 
 import { webPageNode, breadcrumbNode } from '../../lib/seo';
-import type { ChatCity } from '../../data/cities';
-import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../lib/cities';
+import { replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
 
 export interface Props {
 	city: ChatCity;
@@ -57,7 +57,7 @@ const jsonLd = [
 	<AboutApproach city={city} />
 	<AboutWhyChoose city={city} />
 	<AboutWhatWeDo city={city} />
-	<HomeDrivers />
+	<HomeDrivers city={city} />
 	<AboutCta city={city} />
 	<AboutExpertise city={city} />
 	<AboutFaqs city={city} />

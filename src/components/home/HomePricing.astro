@@ -1,7 +1,7 @@
 ---
-import { getCityBySlug, replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
 import { DEPARTURE_PRICE_PER_KM } from '../../data/prices';
-import type { ChatCity } from '../../data/cities';
+import type { ChatCity } from '../../lib/cities';
 
 interface PricingPlan {
 	icon: string;
@@ -36,7 +36,7 @@ const {
 	benefits = ['Выезд от 5 500 руб', 'Цена до начала работ', 'Помощь круглосуточно'],
 } = Astro.props;
 
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 
 const plans = propPlans ?? [
 	{

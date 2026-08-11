@@ -6,8 +6,8 @@ import Footer from '../../components/shared/footer/Footer.astro';
 import PageHeaderHelpButton from '../../components/shared/PageHeaderHelpButton.astro';
 import ServiceCard from '../../components/services/ServiceCard.astro';
 import { webPageNode, breadcrumbNode, itemListNode } from '../../lib/seo';
-import type { ChatCity } from '../../data/cities';
-import { replaceCityPlaceholders, removeCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../lib/cities';
+import { replaceCityPlaceholders, removeCityPlaceholders, getCityUrl } from '../../lib/cities';
 
 export interface Props {
 	city: ChatCity;

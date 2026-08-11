@@ -1,6 +1,6 @@
 ---
-import { getCityBySlug, replaceCityPlaceholders } from '../../lib/city';
-import type { ChatCity } from '../../data/cities';
+import { defaultCity, replaceCityPlaceholders } from '../../lib/cities';
+import type { ChatCity } from '../../lib/cities';
 
 // Вводный блок хаба (стиль about-us из шаблона). Заголовок и описание берутся
 // из frontmatter услуги, а тело pillar-страницы выводится через <slot />.
@@ -12,7 +12,7 @@ interface Props {
 }
 
 const { city: propCity } = Astro.props;
-const city = propCity ?? getCityBySlug();
+const city = propCity ?? defaultCity;
 
 const {
 	subtitle = 'О сервисе',

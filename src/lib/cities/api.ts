@@ -1,4 +1,3 @@
-import { fallbackCities } from '../../data/cities/fallback';
 import { readFreshCities, readInFlight, readStaleCities, storeCities, trackInFlight } from './cache';
 import { DIRECTUS_URL, REQUEST_TIMEOUT_MS } from './config';
 import { CITY_FIELDS, toCity, type CityDto } from './dto';
@@ -7,7 +6,7 @@ import type { ChatCity } from './types';
 const citiesUrl = (): string =>
 	`${DIRECTUS_URL}/items/cities?limit=-1&fields=${CITY_FIELDS}&sort=sort,name&filter[status][_eq]=published`;
 
-/** Запрос к Directus: бросает ошибку, решение о fallback принимает `fetchCities`. */
+/** Запрос к единственному источнику городов — Directus. */
 const requestCities = async (): Promise<ChatCity[]> => {
 	const response = await fetch(citiesUrl(), { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
 	if (!response.ok) throw new Error(`Directus ответил ${response.status}`);
@@ -28,19 +27,23 @@ const loadCities = async (): Promise<ChatCity[]> => {
 		storeCities(cities);
 		return cities;
 	} catch (error) {
-		console.error(
-			'[cities] Directus недоступен, используется кеш или резервный список:',
-			error instanceof Error ? error.message : error,
-		);
-		// Ошибку не кешируем как свежий результат, чтобы следующий рендер попробовал снова.
-		return readStaleCities() ?? fallbackCities;
+		const staleCities = readStaleCities();
+		if (staleCities) {
+			console.error(
+				'[cities] Directus недоступен, используется последний успешный кеш:',
+				error instanceof Error ? error.message : error,
+			);
+			return staleCities;
+		}
+
+		throw error;
 	}
 };
 
 /**
  * Читает опубликованные города из Directus через кеш процесса.
- * Пока кеш свежий, запрос не выполняется; при ошибке отдаётся предыдущий
- * успешный список, а если его нет — резервный, чтобы сайт не падал без бэкенда.
+ * Пока кеш свежий, запрос не выполняется. При ошибке допустим только предыдущий
+ * успешный ответ Directus; без него ошибка передаётся вызывающему коду.
  */
 export const fetchCities = async (): Promise<ChatCity[]> =>
 	readFreshCities() ?? readInFlight() ?? trackInFlight(loadCities());

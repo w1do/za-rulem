@@ -1,12 +1,12 @@
 ---
 import { getCollection, render } from 'astro:content';
 import HubLayout from '../../../layouts/HubLayout.astro';
-import { getCityBySlug, removeCityPlaceholders, getCityUrl } from '../../../lib/city';
+import { defaultCity, removeCityPlaceholders, getCityUrl } from '../../../lib/cities';
 
 export async function getStaticPaths() {
 	const hubs = await getCollection('services', ({ data }) => data.hub === true);
 	const spokes = await getCollection('serviceLanding');
-	const city = getCityBySlug();
+	const city = defaultCity;
 	return hubs.map((pillar) => ({
 		params: { cluster: pillar.id },
 		props: {
@@ -27,7 +27,7 @@ export async function getStaticPaths() {
 }
 
 const { pillar, spokes } = Astro.props;
-const city = getCityBySlug();
+const city = defaultCity;
 const { Content } = await render(pillar);
 ---
 

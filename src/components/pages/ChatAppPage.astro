@@ -2,8 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import DriverChatBox from '../../components/driver-chat/DriverChatBox.astro';
 import { breadcrumbNode, webPageNode } from '../../lib/seo';
-import type { ChatCity } from '../../data/cities';
-import { replaceCityPlaceholders, getCityUrl } from '../../lib/city';
+import type { ChatCity } from '../../lib/cities';
+import { replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
 
 export interface Props {
 	city: ChatCity;
@@ -32,7 +32,7 @@ const jsonLd = [
 
 	<div class="chat-app">
 		<main class="chat-app__body">
-			<DriverChatBox variant="app" />
+			<DriverChatBox variant="app" city={city} />
 		</main>
 
 		<dialog class="chat-about" id="chat-about-modal" aria-labelledby="chat-about-title">

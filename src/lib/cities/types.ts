@@ -22,6 +22,8 @@ export interface ChatCity {
 	population: number;
 	/** Показывать город первым в списках и меню. */
 	isFeatured: boolean;
+	/** Единственный базовый город сайта; управляется в Directus. */
+	isDefault: boolean;
 	/** Разрешено ли индексировать страницы города. */
 	isIndexable: boolean;
 	/** Переопределение title из Directus; пусто — используется шаблон. */
