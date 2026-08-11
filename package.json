@@ -9,7 +9,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test:road-stations": "node --experimental-strip-types --test tests/road-gas-stations.test.ts"
   },
   "dependencies": {
     "@astrojs/node": "^11.0.2",

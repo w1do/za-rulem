@@ -4,6 +4,7 @@ import type { PriceRow } from '../../lib/gasStations';
 interface FuelPricesTableProps {
 	prices: PriceRow[];
 	dateLabel?: string;
+	disclaimer?: string;
 }
 
 /**
@@ -17,7 +18,7 @@ const getCurrentDateLabel = () => {
 	return `${month} ${year}`;
 };
 
-export default function FuelPricesTable({ prices, dateLabel }: FuelPricesTableProps) {
+export default function FuelPricesTable({ prices, dateLabel, disclaimer }: FuelPricesTableProps) {
 	const displayDate = dateLabel || getCurrentDateLabel();
 
 	if (!prices || prices.length === 0) {
@@ -49,7 +50,7 @@ export default function FuelPricesTable({ prices, dateLabel }: FuelPricesTablePr
 				</table>
 			</div>
 			<p className="table-disclaimer">
-				* Средние данные по городу на {displayDate}
+				{disclaimer ?? `* Средние данные по городу на ${displayDate}`}
 			</p>
 
 			<style dangerouslySetInnerHTML={{ __html: `

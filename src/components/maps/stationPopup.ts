@@ -3,6 +3,7 @@ import {
 	getFuelName,
 	getQueueInfo,
 	type StationData,
+	type StationMapAction,
 } from '../../lib/gasStations';
 
 const SERVICE_ICONS: { key: keyof StationData['station']; label: string; icon: string }[] = [
@@ -18,8 +19,26 @@ const PAYMENT_LABELS: { key: keyof StationData['station']; label: string }[] = [
 	{ key: 'pay_cash', label: 'Нал' },
 ];
 
-/** Собирает HTML подсказки маркера: только представление, без обращений к сети. */
-export const buildStationPopupHtml = (item: StationData, chatUrl: string): string => {
+const escapeHtml = (value: unknown): string =>
+	String(value ?? '')
+		.replaceAll('&', '&amp;')
+		.replaceAll('<', '&lt;')
+		.replaceAll('>', '&gt;')
+		.replaceAll('"', '&quot;')
+		.replaceAll("'", '&#039;');
+
+const actionAttributes = (action: StationMapAction): string =>
+	[
+		action.service ? 'data-service-request' : '',
+		action.service ? `data-service="${escapeHtml(action.service)}"` : '',
+		action.subject ? `data-service-subject="${escapeHtml(action.subject)}"` : '',
+		action.title ? `data-service-title="${escapeHtml(action.title)}"` : '',
+	]
+		.filter(Boolean)
+		.join(' ');
+
+/** Собирает безопасный HTML подсказки маркера: только представление, без сети. */
+export const buildStationPopupHtml = (item: StationData, action: StationMapAction): string => {
 	const { station, prices, fuel_statuses, queue_level, closed } = item;
 
 	const queue = getQueueInfo(queue_level);
@@ -29,7 +48,7 @@ export const buildStationPopupHtml = (item: StationData, chatUrl: string): strin
 	const services = SERVICE_ICONS.filter(({ key }) => station[key])
 		.map(
 			({ label, icon }) =>
-				`<span class="svc-ico" data-tip="${label}"><i class="fas ${icon}"></i></span>`,
+				`<span class="svc-ico" data-tip="${escapeHtml(label)}"><i class="fas ${escapeHtml(icon)}"></i></span>`,
 		)
 		.join('');
 
@@ -42,11 +61,11 @@ export const buildStationPopupHtml = (item: StationData, chatUrl: string): strin
 			const availability = getFuelAvailability(fuel_statuses, price.fuel_type);
 			return `
 					<div class="price-item">
-						<span class="fuel">${getFuelName(price.fuel_type)}</span>
+						<span class="fuel">${escapeHtml(getFuelName(price.fuel_type))}</span>
 						<div class="price-details">
-							<span class="value">${price.price} ₽</span>
+							<span class="value">${escapeHtml(price.price)} ₽</span>
 							<span class="avail ${availability === 'Закончился' ? 'out' : ''}">
-								${availability}
+								${escapeHtml(availability)}
 							</span>
 						</div>
 					</div>`;
@@ -56,16 +75,16 @@ export const buildStationPopupHtml = (item: StationData, chatUrl: string): strin
 	return `
 		<div class="custom-gas-popup ${closed ? 'is-closed' : ''}">
 			<div class="popup-header" style="background: ${statusColor}">
-				<h4>${station.name}</h4>
-				<div class="popup-availability">${statusTitle}</div>
+				<h4>${escapeHtml(station.name)}</h4>
+				<div class="popup-availability">${escapeHtml(statusTitle)}</div>
 			</div>
 			<div class="popup-body">
-				<p class="popup-address"><i class="fas fa-map-marker-alt"></i> ${station.address}</p>
+				<p class="popup-address"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(station.address)}</p>
 
 				<div class="popup-status-row">
 					<div class="status-item">
 						<i class="fas ${queue.icon}" style="color: ${queue.color}"></i>
-						<span>Очередь: <b>${queue.status}</b></span>
+						<span>Очередь: <b>${escapeHtml(queue.status)}</b></span>
 					</div>
 				</div>
 
@@ -74,11 +93,11 @@ export const buildStationPopupHtml = (item: StationData, chatUrl: string): strin
 				<div class="popup-prices">${priceItems}</div>
 			</div>
 			<div class="popup-footer">
-				<div class="popup-payments-row">${payments}</div>
-				<span>Обновлено: ${new Date(station.last_transaction_at).toLocaleDateString('ru-RU')}</span>
+				<div class="popup-payments-row">${escapeHtml(payments)}</div>
+				<span>Обновлено: ${escapeHtml(new Date(station.last_transaction_at).toLocaleDateString('ru-RU'))}</span>
 			</div>
-			<a class="popup-chat-btn" href="${chatUrl}">
-				<i class="fas fa-comments"></i> Перейти в чат
+			<a class="popup-chat-btn" href="${escapeHtml(action.href)}" ${actionAttributes(action)}>
+				<i class="fas ${action.service ? 'fa-headset' : 'fa-comments'}"></i> ${escapeHtml(action.label)}
 			</a>
 		</div>
 	`;

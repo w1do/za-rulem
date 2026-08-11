@@ -72,8 +72,21 @@ export interface PriceRow {
 	diesel: string;
 }
 
+export interface StationMapAction {
+	href: string;
+	label: string;
+	service?: string;
+	subject?: string;
+	title?: string;
+}
+
 const STATIONS_API_URL = 'https://benzin.api.2gis.ru/api/v1/stations';
 const STATIONS_REQUEST_TIMEOUT_MS = 8000;
+
+export interface StationsFetchResult {
+	stations: StationData[];
+	isSuccessful: boolean;
+}
 
 /** Данные станции считаются устаревшими и не показываются через сутки. */
 export const MAX_STATION_AGE_MS = 24 * 60 * 60 * 1000;
@@ -90,25 +103,103 @@ export const buildStationsUrl = (bounds: MapBounds): string => {
 	return `${STATIONS_API_URL}?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`;
 };
 
-/**
- * Загружает станции по границам города.
- * Ошибка сети или неуспешный ответ не ломают страницу: возвращается пустой список.
- */
-export const fetchGasStations = async (bounds: MapBounds): Promise<StationData[]> => {
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+	typeof value === 'object' && value !== null;
+
+export const isStationData = (value: unknown): value is StationData => {
+	if (!isRecord(value) || !isRecord(value.station)) return false;
+	const { station } = value;
+	return (
+		typeof station.id === 'string' &&
+		typeof station.name === 'string' &&
+		typeof station.address === 'string' &&
+		Number.isFinite(Number(station.lat)) &&
+		Number.isFinite(Number(station.lng)) &&
+		Array.isArray(value.fuel_statuses) &&
+		Array.isArray(value.prices)
+	);
+};
+
+const mapStationData = (value: StationData): StationData => ({
+	station: {
+		id: value.station.id,
+		region_id: Number(value.station.region_id) || 0,
+		name: value.station.name,
+		brand: typeof value.station.brand === 'string' ? value.station.brand : '',
+		address: value.station.address,
+		lat: Number(value.station.lat),
+		lng: Number(value.station.lng),
+		last_transaction_at:
+			typeof value.station.last_transaction_at === 'string'
+				? value.station.last_transaction_at
+				: '',
+		has_shop: Boolean(value.station.has_shop),
+		has_cafe: Boolean(value.station.has_cafe),
+		has_toilet: Boolean(value.station.has_toilet),
+		has_car_wash: Boolean(value.station.has_car_wash),
+		pay_card: Boolean(value.station.pay_card),
+		pay_cash: Boolean(value.station.pay_cash),
+		pay_sbp: Boolean(value.station.pay_sbp),
+		fuel_assortment: Array.isArray(value.station.fuel_assortment)
+			? value.station.fuel_assortment.filter((fuel): fuel is string => typeof fuel === 'string')
+			: [],
+	},
+	fuel_statuses: value.fuel_statuses
+		.filter((status) => isRecord(status) && typeof status.fuel_type === 'string')
+		.map((status) => ({
+			station_id: typeof status.station_id === 'string' ? status.station_id : value.station.id,
+			fuel_type: status.fuel_type,
+			available: typeof status.available === 'boolean' ? status.available : null,
+			queue_level: typeof status.queue_level === 'string' ? status.queue_level : 'UNKNOWN',
+			limit_liters: Number.isFinite(Number(status.limit_liters))
+				? Number(status.limit_liters)
+				: undefined,
+			reports_count: Number.isFinite(Number(status.reports_count))
+				? Number(status.reports_count)
+				: undefined,
+			last_report_at: typeof status.last_report_at === 'string' ? status.last_report_at : undefined,
+		})),
+	prices: value.prices
+		.filter((price) => isRecord(price) && typeof price.fuel_type === 'string')
+		.map((price) => ({
+			station_id: typeof price.station_id === 'string' ? price.station_id : value.station.id,
+			fuel_type: price.fuel_type,
+			price: Number(price.price) || 0,
+			updated_at: typeof price.updated_at === 'string' ? price.updated_at : '',
+		})),
+	status: typeof value.status === 'string' ? value.status : 'UNKNOWN',
+	closed: Boolean(value.closed),
+	queue_level: typeof value.queue_level === 'string' ? value.queue_level : 'UNKNOWN',
+	can_use_canister:
+		typeof value.can_use_canister === 'boolean' ? value.can_use_canister : undefined,
+});
+
+/** Запрашивает и проверяет внешний ответ, сохраняя признак transport-ошибки. */
+export const fetchGasStationsResult = async (bounds: MapBounds): Promise<StationsFetchResult> => {
 	try {
 		const response = await fetch(buildStationsUrl(bounds), {
 			signal: AbortSignal.timeout(STATIONS_REQUEST_TIMEOUT_MS),
 		});
 		if (!response.ok) {
 			console.error(`2GIS stations request failed with status ${response.status}`);
-			return [];
+			return { stations: [], isSuccessful: false };
 		}
 		const data: unknown = await response.json();
-		return Array.isArray(data) ? (data as StationData[]) : [];
+		if (!Array.isArray(data)) return { stations: [], isSuccessful: false };
+		return { stations: data.filter(isStationData).map(mapStationData), isSuccessful: true };
 	} catch (error) {
 		console.error('Error fetching gas stations from 2GIS:', error);
-		return [];
+		return { stations: [], isSuccessful: false };
 	}
+};
+
+/**
+ * Загружает станции по границам города.
+ * Ошибка сети или неуспешный ответ не ломают страницу: возвращается пустой список.
+ */
+export const fetchGasStations = async (bounds: MapBounds): Promise<StationData[]> => {
+	const result = await fetchGasStationsResult(bounds);
+	return result.stations;
 };
 
 /** Вычисляет геометрический центр области для инициализации карты. */

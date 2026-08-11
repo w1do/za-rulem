@@ -12,6 +12,7 @@ import ServiceProcess from '../components/services/single/ServiceProcess.astro';
 import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 import { roadSituations } from '../data/roadAssistance';
 import { breadcrumbNode, faqNode, serviceNode } from '../lib/seo';
+import { RoadGasStations } from '../features/road-gas-stations';
 
 export type RoadLink = {
 	code: string;
@@ -79,7 +80,14 @@ const jsonLd = [
 	ogTitle={road.seo.ogTitle ?? road.seo.title}
 	ogDescription={road.seo.ogDescription ?? road.seo.description}
 	ogImage={road.image}
-	keywords={[...road.aliases, `помощь на трассе ${road.code}`, `эвакуатор ${road.code}`].join(', ')}
+	keywords={[
+		...road.aliases,
+		`помощь на трассе ${road.code}`,
+		`эвакуатор ${road.code}`,
+		`АЗС ${road.code}`,
+		`карта АЗС ${road.code}`,
+		`заправки на трассе ${road.code}`,
+	].join(', ')}
 	jsonLd={jsonLd}
 	isNational
 >
@@ -95,6 +103,12 @@ const jsonLd = [
 		helpService={voiceService}
 		helpSubject={voiceSubject}
 		helpTitle={`Помощь на трассе ${road.code}`}
+	/>
+
+	<RoadGasStations
+		client:visible
+		slug={entry.id}
+		code={road.code}
 	/>
 
 	<!-- Page Service Single Start -->

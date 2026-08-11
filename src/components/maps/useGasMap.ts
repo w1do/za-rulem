@@ -1,5 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { getBoundsCenter, type MapBounds, type StationData } from '../../lib/gasStations';
+import {
+	getBoundsCenter,
+	type MapBounds,
+	type StationData,
+	type StationMapAction,
+} from '../../lib/gasStations';
 import { buildStationPopupHtml } from './stationPopup';
 
 const DG_LOADER_URL = 'https://maps.api.2gis.ru/2.0/loader.js?pkg=full';
@@ -23,9 +28,27 @@ const MARKER_SVG = [
 
 type DGGlobal = {
 	then: (callback: () => void) => void;
-	map: (container: HTMLElement, options: Record<string, unknown>) => any;
-	marker: (position: [number, number], options: Record<string, unknown>) => any;
-	icon: (options: Record<string, unknown>) => any;
+	map: (container: HTMLElement, options: Record<string, unknown>) => DGMap;
+	marker: (position: [number, number], options: Record<string, unknown>) => DGMarker;
+	icon: (options: Record<string, unknown>) => unknown;
+	polyline: (positions: [number, number][][], options: Record<string, unknown>) => DGPolyline;
+};
+
+type DGMap = {
+	remove: () => void;
+	setView: (position: [number, number], zoom: number) => void;
+	fitBounds: (bounds: [[number, number], [number, number]], options?: Record<string, unknown>) => void;
+};
+
+type DGMarker = {
+	addTo: (map: DGMap) => DGMarker;
+	bindPopup: (html: string) => void;
+	on: (event: string, callback: () => void) => void;
+	openPopup: () => void;
+};
+
+type DGPolyline = {
+	addTo: (map: DGMap) => DGPolyline;
 };
 
 const getDG = (): DGGlobal | undefined => (window as unknown as { DG?: DGGlobal }).DG;
@@ -47,8 +70,9 @@ const loadDG = (onReady: () => void): void => {
 interface UseGasMapOptions {
 	stations: StationData[];
 	bounds: MapBounds;
-	/** Ссылка на чат города для кнопки в подсказке маркера. */
-	chatUrl: string;
+	action: StationMapAction;
+	/** GeoJSON-линии в порядке [longitude, latitude]. */
+	routeLines?: [number, number][][];
 	/** Вызывается при клике по маркеру, чтобы синхронизировать выбор со списком. */
 	onMarkerClick: (stationId: string) => void;
 }
@@ -66,12 +90,13 @@ interface UseGasMapResult {
 export const useGasMap = ({
 	stations,
 	bounds,
-	chatUrl,
+	action,
+	routeLines,
 	onMarkerClick,
 }: UseGasMapOptions): UseGasMapResult => {
 	const containerRef = useRef<HTMLDivElement>(null);
-	const mapRef = useRef<any>(null);
-	const markersRef = useRef<Record<string, any>>({});
+	const mapRef = useRef<DGMap | null>(null);
+	const markersRef = useRef<Record<string, DGMarker>>({});
 
 	useEffect(() => {
 		if (typeof window === 'undefined' || !containerRef.current) return;
@@ -94,11 +119,29 @@ export const useGasMap = ({
 
 				const map = DG.map(containerRef.current, {
 					center,
-					zoom: CITY_ZOOM,
+					zoom: routeLines ? 5 : CITY_ZOOM,
 					zoomControl: true,
 					fullscreenControl: false,
 				});
 				mapRef.current = map;
+
+				if (routeLines) {
+					const positions = routeLines.map((line) =>
+						line.map(([longitude, latitude]): [number, number] => [latitude, longitude]),
+					);
+					DG.polyline(positions, {
+						color: '#F5B754',
+						weight: 5,
+						opacity: 0.9,
+					}).addTo(map);
+					map.fitBounds(
+						[
+							[bounds.minLat, bounds.minLon],
+							[bounds.maxLat, bounds.maxLon],
+						],
+						{ padding: [24, 24] },
+					);
+				}
 
 				const gasIcon = DG.icon({
 					iconUrl: 'data:image/svg+xml;base64,' + btoa(MARKER_SVG),
@@ -118,7 +161,7 @@ export const useGasMap = ({
 					}
 
 					const marker = DG.marker([lat, lng], { icon: gasIcon }).addTo(map);
-					marker.bindPopup(buildStationPopupHtml(item, chatUrl));
+					marker.bindPopup(buildStationPopupHtml(item, action));
 					marker.on('click', () => onMarkerClick(station.id));
 					markersRef.current[station.id] = marker;
 				});
@@ -135,7 +178,7 @@ export const useGasMap = ({
 				mapRef.current = null;
 			}
 		};
-	}, [stations, bounds, chatUrl, onMarkerClick]);
+	}, [stations, bounds, action, routeLines, onMarkerClick]);
 
 	const focusStation = (item: StationData) => {
 		const { station } = item;
