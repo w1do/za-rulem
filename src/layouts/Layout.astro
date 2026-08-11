@@ -1,5 +1,5 @@
 ---
-import { SITE, baseGraph, getSiteData } from '../lib/seo';
+import { SITE, baseGraph, getSiteData, nationalBaseGraph } from '../lib/seo';
 import VoiceRequestModal from '../components/forms/VoiceRequestModal.tsx';
 import { defaultCity, type ChatCity } from '../lib/cities';
 import '../styles/fonts.css';
@@ -18,6 +18,7 @@ export interface Props {
 	keywords?: string;
 	jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
 	city?: ChatCity;
+	isNational?: boolean;
 }
 
 const {
@@ -30,6 +31,7 @@ const {
 	keywords,
 	jsonLd,
 	city,
+	isNational = false,
 } = Astro.props;
 
 const effectiveCity = city ?? defaultCity;
@@ -44,7 +46,7 @@ const cityContextJson = JSON.stringify({ currentCitySlug: effectiveCity.slug, de
 const pageNodes = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
 const structuredData = {
 	'@context': 'https://schema.org',
-	'@graph': [...baseGraph(effectiveCity), ...pageNodes],
+	'@graph': [...(isNational ? nationalBaseGraph() : baseGraph(effectiveCity)), ...pageNodes],
 };
 ---
 
@@ -58,7 +60,7 @@ const structuredData = {
 		<meta name="theme-color" content="#F5B754" />
 		<meta name="description" content={description} />
 		{keywords && <meta name="keywords" content={keywords} />}
-		<meta name="author" content={`${site.name} — техпомощь ${site.addressLocality}`} />
+		<meta name="author" content={isNational ? SITE.name : `${site.name} — техпомощь ${site.addressLocality}`} />
 
 		<!-- Page Title -->
 		<title>{title}</title>
@@ -66,7 +68,7 @@ const structuredData = {
 
 		<!-- Open Graph -->
 		<meta property="og:type" content={ogType} />
-		<meta property="og:site_name" content={site.brand} />
+		<meta property="og:site_name" content={isNational ? SITE.name : site.brand} />
 		<meta property="og:title" content={ogTitle ?? title} />
 		<meta property="og:description" content={ogDescription ?? description} />
 		<meta property="og:image" content={ogImageAbsolute} />
@@ -216,6 +218,11 @@ const structuredData = {
 					if (href.indexOf('tel:') === 0) return true;
 					if (/wa\.me|api\.whatsapp\.com/i.test(href)) return true;
 					if (anchor.hasAttribute('data-service-request')) return true;
+					if (
+						isContactsHref(href) &&
+						anchor.closest &&
+						anchor.closest('[data-selection-voice-request]')
+					) return true;
 
 					var isBtn =
 						anchor.classList.contains('btn-default') ||
@@ -237,10 +244,17 @@ const structuredData = {
 					var href = anchor.getAttribute('href') || '';
 					var isTel = href.indexOf('tel:') === 0;
 					var isWhatsApp = /wa\.me|api\.whatsapp\.com/i.test(href);
+					var requestContext = anchor.closest
+						? anchor.closest('[data-selection-voice-request]')
+						: null;
 					var detail = {
-						service: anchor.getAttribute('data-service') || undefined,
+						service:
+							anchor.getAttribute('data-service') ||
+							(requestContext && requestContext.getAttribute('data-request-service')) ||
+							undefined,
 						subject:
 							anchor.getAttribute('data-service-subject') ||
+							(requestContext && requestContext.getAttribute('data-request-subject')) ||
 							(isTel
 								? 'Заявка перед звонком — za-rulem'
 								: isWhatsApp
@@ -248,6 +262,7 @@ const structuredData = {
 									: 'Заявка с CTA — za-rulem'),
 						title:
 							anchor.getAttribute('data-service-title') ||
+							(requestContext && requestContext.getAttribute('data-request-title')) ||
 							(isTel || isWhatsApp ? 'Сначала заявка — потом звонок' : 'Заявка на выезд'),
 					};
 

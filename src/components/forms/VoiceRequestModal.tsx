@@ -28,6 +28,8 @@ export default function VoiceRequestModal() {
 	const [phone, setPhone] = useState('');
 	const [error, setError] = useState('');
 	const [recordingTime, setRecordingTime] = useState(0);
+	const isCarSelection = service === 'vladivostok-car-selection';
+	const isPartsSelection = service === 'vladivostok-contract-parts';
 
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const chunksRef = useRef<Blob[]>([]);
@@ -246,7 +248,7 @@ export default function VoiceRequestModal() {
 					{status === 'success' ? (
 						<div className="text-center">
 							<p className="ajax-response success mb-4" style={{ color: '#28a745', fontWeight: '600' }}>
-								Заявка успешно отправлена! Я перезвоню вам в течение пары минут.
+								Заявка успешно отправлена! Я свяжусь с вами по указанному номеру.
 							</p>
 							<button type="button" className="btn-default" onClick={closeModal}>
 								Закрыть
@@ -264,8 +266,13 @@ export default function VoiceRequestModal() {
 								<>
 									<div className="voice-modal-instructions mb-4" style={{ textAlign: 'left', fontSize: '14px', background: '#f9f9f9', padding: '15px', borderRadius: '8px', borderLeft: '4px solid #ffb700' }}>
 										<p style={{ margin: 0, color: '#555', lineHeight: '1.6' }}>
-											Включите запись, произнесите <strong>где стоите</strong>, <strong>номер телефона</strong>, 
-											<strong>что требуется</strong>, <strong>когда нужно</strong> — система автоматически распознает вашу заявку.
+											{isCarSelection ? (
+												<>Включите запись и назовите <strong>бюджет</strong>, <strong>параметры автомобиля</strong> и <strong>город получения</strong>. После распознавания текст можно проверить и дополнить.</>
+											) : isPartsSelection ? (
+												<>Включите запись и назовите <strong>VIN, frame или OEM</strong>, <strong>нужную деталь</strong> и <strong>город доставки</strong>. После распознавания текст можно проверить и дополнить.</>
+											) : (
+												<>Включите запись, произнесите <strong>где стоите</strong>, <strong>номер телефона</strong>, <strong>что требуется</strong>, <strong>когда нужно</strong> — система автоматически распознает вашу заявку.</>
+											)}
 										</p>
 									</div>
 

@@ -15,6 +15,38 @@ https://za-rulem.org/benzin-tyumen
 https://za-rulem.org/calculator
 https://za-rulem.org/chat-voditeley
 https://za-rulem.org/chat
+
+# Федеральные трассы
+https://za-rulem.org/route
+https://za-rulem.org/route/m-1
+https://za-rulem.org/route/m-2
+https://za-rulem.org/route/m-4
+https://za-rulem.org/route/m-5
+https://za-rulem.org/route/m-7
+https://za-rulem.org/route/m-8
+https://za-rulem.org/route/m-9
+https://za-rulem.org/route/m-10
+https://za-rulem.org/route/m-11
+https://za-rulem.org/route/m-12
+https://za-rulem.org/route/r-21
+https://za-rulem.org/route/r-22
+https://za-rulem.org/route/r-23
+https://za-rulem.org/route/r-132
+https://za-rulem.org/route/r-176
+https://za-rulem.org/route/r-217
+https://za-rulem.org/route/r-254
+https://za-rulem.org/route/r-255
+https://za-rulem.org/route/r-256
+https://za-rulem.org/route/r-257
+https://za-rulem.org/route/r-258
+https://za-rulem.org/route/r-297
+https://za-rulem.org/route/r-504
+https://za-rulem.org/route/a-113
+https://za-rulem.org/route/a-121
+https://za-rulem.org/route/a-147
+https://za-rulem.org/route/a-181
+https://za-rulem.org/route/a-290
+https://za-rulem.org/route/a-370
 https://za-rulem.org/tyumen/drivers/binzin/aleksey
 https://za-rulem.org/tyumen/drivers/binzin/mihail
 https://za-rulem.org/tyumen/drivers/binzin/sergey
@@ -59,6 +91,10 @@ https://za-rulem.org/services/tehpomosch/vytaschit-iz-gryazi-lebedkoy
 https://za-rulem.org/services/toplivo
 https://za-rulem.org/services/toplivo/podvoz-benzina
 https://za-rulem.org/services/toplivo/podvoz-dizelya
+
+# Подбор во Владивостоке
+https://za-rulem.org/podbor-avtomobiley-iz-vladivostoka
+https://za-rulem.org/podbor-kontraktnyh-zapchastey-iz-vladivostoka
 
 # Блог
 https://za-rulem.org/blog

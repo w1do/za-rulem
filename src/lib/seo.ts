@@ -141,6 +141,31 @@ export function baseGraph(city: ChatCity) {
 	return [websiteNode(city), businessNode(city)];
 }
 
+/** Национальный граф для страниц без привязки к конкретному городу. */
+export function nationalBaseGraph() {
+	return [
+		{
+			'@type': 'WebSite',
+			'@id': WEBSITE_ID,
+			url: `${SITE.url}/`,
+			name: SITE.name,
+			description:
+				'Сервис для автомобилистов в России: техпомощь на трассах, подбор автомобилей и контрактных запчастей.',
+			inLanguage: 'ru-RU',
+			publisher: { '@id': BUSINESS_ID },
+		},
+		{
+			'@type': 'Organization',
+			'@id': BUSINESS_ID,
+			name: SITE.name,
+			url: SITE.url,
+			logo: SITE.logo,
+			email: SITE.email,
+			...(SITE.phone ? { telephone: SITE.phone } : {}),
+		},
+	];
+}
+
 /** Хлебные крошки. Элементы принимают абсолютные или относительные URL. */
 export function breadcrumbNode(items: BreadcrumbItem[]) {
 	return {
@@ -178,9 +203,10 @@ export function serviceNode(opts: {
 	description: string;
 	url: string;
 	serviceType?: string;
-	city: ChatCity;
+	city?: ChatCity;
+	areaServed?: string[];
 }) {
-	const site = getSiteData(opts.city);
+	const areaServed = opts.areaServed ?? (opts.city ? getSiteData(opts.city).areaServed : ['Россия']);
 	return {
 		'@type': 'Service',
 		name: opts.name,
@@ -188,7 +214,7 @@ export function serviceNode(opts: {
 		url: abs(opts.url),
 		serviceType: opts.serviceType ?? 'Техпомощь на дороге',
 		provider: { '@id': BUSINESS_ID },
-		areaServed: site.areaServed.map((name) => ({ '@type': 'AdministrativeArea', name })),
+		areaServed: areaServed.map((name) => ({ '@type': 'AdministrativeArea', name })),
 		availableChannel: {
 			'@type': 'ServiceChannel',
 			serviceUrl: `${SITE.url}/contacts`,

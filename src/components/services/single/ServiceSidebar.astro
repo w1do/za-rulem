@@ -6,10 +6,28 @@ interface Props {
 	title?: string;
 	links?: Array<{ title: string; url: string }>;
 	city?: ChatCity;
+	reviewText?: string;
+	ctaHref?: string;
+	ctaLabel?: string;
+	ctaService?: string;
+	ctaSubject?: string;
+	ctaTitle?: string;
 }
 
-const { title = 'Мои услуги', links = [], city: propCity } = Astro.props;
+const {
+	title = 'Мои услуги',
+	links = [],
+	city: propCity,
+	reviewText,
+	ctaHref,
+	ctaLabel = 'Оставить заявку',
+	ctaService,
+	ctaSubject,
+	ctaTitle = 'Вызвать помощь',
+} = Astro.props;
 const city = propCity ?? defaultCity;
+const effectiveReviewText = reviewText ?? `Выезжаю ${city.byCity} и по региону ${city.region}`;
+const effectiveCtaHref = ctaHref ?? getCityUrl('/contacts', city.slug);
 ---
 
 <!-- Page Single Sidebar Start -->
@@ -62,7 +80,7 @@ const city = propCity ?? defaultCity;
 
 				<!-- Satisfy CTA Client Content Start -->
 				<div class="sidebar-cta-client-content">
-					<p>Выезжаю {city.byCity} и по региону {city.region}</p>
+					<p>{effectiveReviewText}</p>
 				</div>
 				<!-- Satisfy CTA Client Content End -->
 			</div>
@@ -72,7 +90,13 @@ const city = propCity ?? defaultCity;
 
 		<!-- Sidebar CTA Contact Button Start -->
 		<div class="sidebar-cta-contact-btn">
-			<a href={getCityUrl('/contacts', city.slug)} data-service-request data-service-title="Вызвать помощь"><i class="fa-solid fa-paper-plane"></i> Оставить заявку</a>
+			<a
+				href={effectiveCtaHref}
+				data-service-request
+				data-service={ctaService}
+				data-service-subject={ctaSubject}
+				data-service-title={ctaTitle}
+			><i class="fa-solid fa-paper-plane"></i> {ctaLabel}</a>
 		</div>
 		<!-- Sidebar CTA Contact Button End -->
 	</div>

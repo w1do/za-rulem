@@ -48,6 +48,12 @@ export default defineConfig({
       changefreq: 'weekly',
       priority: 1.0,
       lastmod: new Date(),
+      filter: (page) => {
+        const path = new URL(page).pathname.replace(/\/$/, '');
+        const isCompactRoadAlias = /^\/route\/[amr]\d+$/.test(path);
+        const isLegacyRoadAlias = /^\/route\/m-(?:6|18|20|29|51|52|53|54|55|56|58|60)$/.test(path);
+        return !isCompactRoadAlias && !isLegacyRoadAlias;
+      },
       // Городские маршруты работают через SSR, поэтому в pages их нет.
       customPages: getCitySitemapUrls(SITE),
       // Две карты в одном индексе: sitemap-cities-0.xml и sitemap-pages-0.xml.

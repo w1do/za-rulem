@@ -1,5 +1,29 @@
 ---
-const { title = 'Что я предлагаю', description, items = [] } = Astro.props;
+interface Props {
+	title?: string;
+	description?: string;
+	items?: Array<{ icon: string; title: string }>;
+	footerBadge?: string;
+	footerText?: string;
+	footerLinkLabel?: string;
+	footerLinkHref?: string;
+	service?: string;
+	subject?: string;
+	requestTitle?: string;
+}
+
+const {
+	title = 'Что я предлагаю',
+	description,
+	items = [],
+	footerBadge = '24/7',
+	footerText = 'Опишите ситуацию, и я выеду на место.',
+	footerLinkLabel = 'Оставить заявку.',
+	footerLinkHref = '/contacts',
+	service,
+	subject,
+	requestTitle = 'Вызвать помощь',
+} = Astro.props;
 ---
 
 {
@@ -25,7 +49,13 @@ const { title = 'Что я предлагаю', description, items = [] } = Astr
 
 			<!-- Section Footer Text Start -->
 			<div class="section-footer-text wow fadeInUp" data-wow-delay="0.8s">
-				<p><span>24/7</span> Опишите ситуацию, и я выеду на место. <a href="/contacts">Оставить заявку.</a></p>
+				<p><span>{footerBadge}</span> {footerText} <a
+					href={footerLinkHref}
+					data-service-request
+					data-service={service}
+					data-service-subject={subject}
+					data-service-title={requestTitle}
+				>{footerLinkLabel}</a></p>
 			</div>
 			<!-- Section Footer Text End -->
 		</div>

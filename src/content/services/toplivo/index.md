@@ -6,7 +6,7 @@ seo:
   title: "Доставка бензина {inCity} | от 6 500 ₽ | За рулём"
   description: "Доставка АИ-92, АИ-95 и дизеля {inCity} от 6 500 ₽ (включая 20 л бензина). Выезд рассчитывается отдельно."
 description: "Привезу бензин или дизель {inCity} до дома, на дачу и к машине на дороге. Минимальная стоимость выезда — от 6 500 ₽."
-image: /images/service-single-image.jpg
+image: /images/road-page-single-image.jpg
 no: "02"
 icon: /images/icon-service-4.svg
 tags:

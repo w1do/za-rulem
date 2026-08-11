@@ -1,0 +1,239 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../shared/header/Header.astro';
+import Footer from '../shared/footer/Footer.astro';
+import HomeHero from '../home/HomeHero.astro';
+import HomeAbout from '../home/HomeAbout.astro';
+import HomeServices from '../home/HomeServices.astro';
+import HomeWhyChoose from '../home/HomeWhyChoose.astro';
+import HomeFleets from '../home/HomeFleets.astro';
+import HomeCollection from '../home/HomeCollection.astro';
+import HomeDrivers from '../home/HomeDrivers.astro';
+import HomeHowItWork from '../home/HomeHowItWork.astro';
+import HomePricing from '../home/HomePricing.astro';
+import HubProcess from '../hub/HubProcess.astro';
+import HubFaqs from '../hub/HubFaqs.astro';
+import HubCta from '../hub/HubCta.astro';
+import type {SelectionLandingContent} from '../../data/vladivostokSelection';
+import {breadcrumbNode, faqNode, serviceNode, webPageNode} from '../../lib/seo';
+
+import carInspectionImage from '../../assets/images/vladivostok-car-inspection.jpg';
+import contractPartsImage from '../../assets/images/vladivostok-contract-parts.jpg';
+
+interface Props {
+    content: SelectionLandingContent;
+}
+
+const {content} = Astro.props;
+const isCars = content.kind === 'cars';
+const primaryImage = isCars ? carInspectionImage : contractPartsImage;
+const secondaryImage = isCars ? contractPartsImage : carInspectionImage;
+const primaryImageAlt = isCars
+    ? 'Осмотр автомобиля перед покупкой во Владивостоке'
+    : 'Двигатель и контрактные автозапчасти для подбора во Владивостоке';
+const secondaryImageAlt = isCars
+    ? 'Двигатель и детали автомобиля'
+    : 'Осмотр автомобиля и проверка применимости запчасти';
+
+const fleetSlides = content.checks.items.map((item, index) => ({
+    image: index === 1 ? secondaryImage : primaryImage,
+    alt: `${item.label} — ${primaryImageAlt.toLowerCase()}`,
+    cursor: item.label,
+    label: item.label,
+    price: item.price,
+    amenities: item.amenities,
+    href: '/contacts',
+}));
+
+const driverItems = content.formats.items.map((item, index) => ({
+    image: index === 1 ? secondaryImage : primaryImage,
+    title: item.title,
+    text: item.text,
+    href: '/contacts',
+}));
+
+const faqSchema = faqNode(content.faq.items);
+const jsonLd: Record<string, unknown>[] = [
+    webPageNode({
+        name: content.h1,
+        description: content.description,
+        url: content.path,
+    }),
+    breadcrumbNode([
+        {name: 'Главная', url: '/'},
+        {name: content.h1, url: content.path},
+    ]),
+    serviceNode({
+        name: content.h1,
+        description: content.description,
+        url: content.path,
+        serviceType: isCars ? 'Подбор автомобилей' : 'Подбор контрактных автозапчастей',
+        areaServed: ['Россия'],
+    }),
+];
+
+if (faqSchema) {
+    jsonLd.push(faqSchema);
+}
+---
+
+<Layout
+        title={content.title}
+        description={content.description}
+        ogTitle={content.title}
+        ogDescription={content.description}
+        ogImage={primaryImage.src}
+        keywords={content.keywords}
+        jsonLd={jsonLd}
+        isNational
+>
+    <Header isNational/>
+
+    <main
+            data-selection-voice-request
+            data-request-subject={content.request.subject}
+            data-request-title={content.request.title}
+            data-request-service={isCars ? 'vladivostok-car-selection' : 'vladivostok-contract-parts'}
+    >
+        <HomeHero
+                subtitle={content.hero.subtitle}
+                title={content.h1}
+                description={content.hero.description}
+                ctaText={isCars ? 'Описать автомобиль' : 'Отправить данные детали'}
+                ctaHref="/contacts"
+                secondaryCtaText={content.request.sibling.label}
+                secondaryCtaHref={content.request.sibling.href}
+                reviewText={content.hero.reviewText}
+                counterValue={content.hero.counterValue}
+                counterSuffix=""
+                counterText={content.hero.counterText}
+                benefits={content.hero.benefits}
+                showClientImages={false}
+        />
+
+        <HomeAbout
+                subtitle={content.about.subtitle}
+                title={content.about.title}
+                taskTitle={content.about.taskTitle}
+                taskText={content.about.taskText}
+                principleTitle={content.about.principleTitle}
+                principleText={content.about.principleText}
+                counters={content.about.counters}
+                footerText={content.about.footerText}
+                footerLinkText="перейти к заявке"
+                footerLinkHref="/contacts"
+                imageOne={primaryImage}
+                imageTwo={secondaryImage}
+                imageOneAlt={primaryImageAlt}
+                imageTwoAlt={secondaryImageAlt}
+        />
+
+        <HomeServices
+                subtitle={content.services.subtitle}
+                title={content.services.title}
+                services={content.services.items}
+                footerText={content.services.footerText}
+                footerLinkText="оставить заявку"
+                footerLinkHref="/contacts"
+                showRating={false}
+        />
+
+        <HomeWhyChoose
+                subtitle={content.risks.subtitle}
+                title={content.risks.title}
+                description={content.risks.description}
+                items={content.risks.items}
+                ctaText="Обсудить проверку"
+                ctaHref="/contacts"
+                authorName="За рулём"
+                authorText={content.risks.authorText}
+                imageOne={primaryImage}
+                imageTwo={secondaryImage}
+                imageOneAlt={primaryImageAlt}
+                imageTwoAlt={secondaryImageAlt}
+        />
+
+        <HomeFleets
+                subtitle={content.checks.subtitle}
+                title={content.checks.title}
+                slides={fleetSlides}
+                footerText={content.checks.footerText}
+                footerLinkText="согласовать объём"
+                footerLinkHref="/contacts"
+        />
+
+        <HomeCollection
+                subtitle={content.inputs.subtitle}
+                title={content.inputs.title}
+                description={content.inputs.description}
+                ctaText="Передать параметры"
+                ctaHref="/contacts"
+                categories={content.inputs.categories}
+        />
+
+        <HomeDrivers
+                subtitle={content.formats.subtitle}
+                title={content.formats.title}
+                drivers={driverItems}
+                footerText={content.formats.footerText}
+                footerLinkText="описать задачу"
+                footerLinkHref="/contacts"
+                showSocialLinks={false}
+        />
+
+        <HomeHowItWork
+                subtitle={content.clientSteps.subtitle}
+                title={content.clientSteps.title}
+                steps={content.clientSteps.steps}
+                footerList={content.clientSteps.footerList}
+                footerText={content.clientSteps.footerText}
+                footerLinkText="Перейти к форме"
+                footerLinkHref="/contacts"
+                class="mb-4"
+        />
+
+
+        <HubProcess
+                subtitle={content.process.subtitle}
+                title={content.process.title}
+                steps={content.process.steps}
+        />
+
+
+        <HomePricing
+                subtitle={content.pricing.subtitle}
+                title={content.pricing.title}
+                plans={content.pricing.plans}
+                benefits={content.pricing.benefits}
+        />
+
+        <HubFaqs
+                subtitle={content.faq.subtitle}
+                title={content.faq.title}
+                description={content.faq.description}
+                faqs={content.faq.items}
+                benefits={content.faq.benefits}
+                buttonLabel="Задать свой вопрос"
+                buttonHref="/contacts"
+        />
+
+        <HubCta
+                subtitle={content.request.subtitle}
+                title={content.request.title}
+                description={content.request.description}
+                btnText="Записать голосовую заявку"
+                btnHref="/contacts"
+                features={isCars
+                    ? ['Продиктуйте бюджет и критерии автомобиля', 'Назовите город получения']
+                    : ['Продиктуйте VIN, frame или OEM', 'Назовите деталь и город доставки']}
+                showContact={false}
+        />
+    </main>
+
+    <Footer
+            isNational
+            nationalVariant="selection"
+            selectionSubject={content.request.subject}
+            selectionService={isCars ? 'vladivostok-car-selection' : 'vladivostok-contract-parts'}
+    />
+</Layout>

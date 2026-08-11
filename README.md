@@ -101,14 +101,14 @@
 
 - Каждая страница — посадочная под запрос из папки `seo/`.
 - Все тексты пишутся на русском языке от первого лица (я, меня), без «вы/компания».
-- Правила написания контента и заполнения страниц — в навыках `.junie/skills/seo-write`, `.junie/skills/cluster-pilar-page`, `.junie/skills/source-copy`.
+- Правила написания контента и заполнения страниц — в навыках `.codex/skills/seo-write`, `.codex/skills/cluster-pilar-page`, `.codex/skills/source-copy`.
 - Актуальная карта страниц ведётся в `urls-seo.txt`.
 
 ## 📝 Документация
 
 - **[SUMMARY.md](./SUMMARY.md)** — сжатый контекст текущего состояния проекта (статус, изменения, tech debt, следующие шаги).
 - **[idea.md](./idea.md)** — идея и стратегия наполнения сайта.
-- Правила документирования — `.junie/skills/documentation/SKILL.md`.
+- Правила документирования — `.codex/skills/documentation/SKILL.md`.
 
 ## Контакты
 

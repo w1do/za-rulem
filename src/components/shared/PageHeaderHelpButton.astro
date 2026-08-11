@@ -1,11 +1,29 @@
+---
+interface Props {
+	label?: string;
+	service?: string;
+	subject?: string;
+	title?: string;
+}
+
+const {
+	label = 'Вызвать помощь',
+	service,
+	subject,
+	title = 'Вызвать помощь',
+} = Astro.props;
+---
+
 <div class="page-header-help wow fadeInUp" data-wow-delay="0.2s">
 	<a
 		href="/contacts"
 		class="btn-default btn-highlighted"
 		data-service-request
-		data-service-title="Вызвать помощь"
+		data-service={service}
+		data-service-subject={subject}
+		data-service-title={title}
 	>
-		Вызвать помощь
+		{label}
 	</a>
 </div>
 

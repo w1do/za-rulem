@@ -1,0 +1,179 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Layout from './Layout.astro';
+import Header from '../components/shared/header/Header.astro';
+import Footer from '../components/shared/footer/Footer.astro';
+import PageHeader from '../components/shared/PageHeader.astro';
+import ServiceSidebar from '../components/services/single/ServiceSidebar.astro';
+import ServiceSingleImage from '../components/services/single/ServiceSingleImage.astro';
+import ServiceWhyChoose from '../components/services/single/ServiceWhyChoose.astro';
+import ServiceFeatures from '../components/services/single/ServiceFeatures.astro';
+import ServiceProcess from '../components/services/single/ServiceProcess.astro';
+import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
+import { roadSituations } from '../data/roadAssistance';
+import { breadcrumbNode, faqNode, serviceNode } from '../lib/seo';
+
+export type RoadLink = {
+	code: string;
+	name: string;
+	route: string;
+	url: string;
+};
+
+export interface Props {
+	entry: CollectionEntry<'routes'>;
+	relatedRoutes?: RoadLink[];
+}
+
+const { entry, relatedRoutes = [] } = Astro.props;
+const road = entry.data;
+const voiceService = `route:${entry.id}`;
+const voiceSubject = `Голосовая заявка с трассы ${road.code} — za-rulem`;
+const sidebarLinks = [
+	{ title: 'Все федеральные трассы', url: '/route' },
+	...relatedRoutes.map((relatedRoad) => ({
+		title: `${relatedRoad.code} «${relatedRoad.name}»`,
+		url: relatedRoad.url,
+	})),
+];
+const situationItems = road.situations.map((id) => roadSituations[id].title);
+const voicePromptItems = [
+	{ icon: '/images/icon-service-feature-1.svg', title: 'Трасса, километр и направление' },
+	{ icon: '/images/icon-service-feature-2.svg', title: 'Что произошло с автомобилем' },
+	{ icon: '/images/icon-service-feature-3.svg', title: 'Телефон для обратной связи' },
+];
+const voiceSteps = [
+	{
+		title: 'Нажмите «Рассказать голосом»',
+		description: `Страница уже передаст в заявку код трассы ${road.code}.`,
+	},
+	{
+		title: 'Назовите место и проблему',
+		description: 'Продиктуйте километр, направление, ближайший ориентир и симптомы автомобиля.',
+	},
+	{
+		title: 'Дождитесь подтверждения',
+		description: 'Диспетчер проверит доступного партнёра и согласует условия выезда.',
+	},
+];
+const jsonLd = [
+	serviceNode({
+		name: road.title,
+		description: road.seo.description,
+		url: `/route/${entry.id}`,
+		serviceType: `Техпомощь на трассе ${road.code}`,
+		areaServed: road.regions,
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Федеральные трассы', url: '/route' },
+		{ name: road.code, url: `/route/${entry.id}` },
+	]),
+	faqNode(road.faqs),
+].filter(Boolean);
+---
+
+<Layout
+	title={road.seo.title}
+	description={road.seo.description}
+	ogTitle={road.seo.ogTitle ?? road.seo.title}
+	ogDescription={road.seo.ogDescription ?? road.seo.description}
+	ogImage={road.image}
+	keywords={[...road.aliases, `помощь на трассе ${road.code}`, `эвакуатор ${road.code}`].join(', ')}
+	jsonLd={jsonLd}
+	isNational
+>
+	<Header isNational />
+	<PageHeader
+		title={road.title}
+		items={[
+			{ label: 'Главная', href: '/' },
+			{ label: 'Федеральные трассы', href: '/route' },
+			{ label: road.code },
+		]}
+		helpLabel="Рассказать голосом"
+		helpService={voiceService}
+		helpSubject={voiceSubject}
+		helpTitle={`Помощь на трассе ${road.code}`}
+	/>
+
+	<!-- Page Service Single Start -->
+	<div class="page-service-single">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-4">
+					<ServiceSidebar
+						title="Федеральные трассы"
+						links={sidebarLinks}
+						reviewText={`Проверяем доступную помощь на трассе ${road.code} по партнёрской сети`}
+						ctaHref="/contacts"
+						ctaLabel="Рассказать голосом"
+						ctaService={voiceService}
+						ctaSubject={voiceSubject}
+						ctaTitle={`Помощь на трассе ${road.code}`}
+					/>
+				</div>
+
+				<div class="col-lg-8">
+					<!-- Service Single Content Start -->
+					<div class="service-single-content">
+						<ServiceSingleImage image={road.image} alt={road.imageAlt} />
+
+						<!-- Service Entry Start -->
+						<div class="service-entry post-body">
+							<p><strong>{road.code} «{road.name}»:</strong> {road.route}</p>
+							<p>{road.description}</p>
+							<p><strong>Основные города:</strong> {road.majorCities.join(', ')}.</p>
+							<p><strong>Регионы маршрута:</strong> {road.regions.join(', ')}.</p>
+
+							<slot />
+
+							{road.conditions.length > 0 && (
+								<>
+									<h2>Условия на отдельных участках {road.code}</h2>
+									{road.conditions.map((condition) => (
+										<>
+											<h3>{condition.title}</h3>
+											<p>{condition.description}</p>
+										</>
+									))}
+								</>
+							)}
+
+							<ServiceWhyChoose
+								title={`С какой проблемой можно обратиться на ${road.code}`}
+								description="Голосом назовите ситуацию своими словами — выбирать точную категорию не требуется."
+								items={situationItems}
+							/>
+
+							<ServiceFeatures
+								title="Что продиктовать в голосовой заявке"
+								description="Короткого сообщения достаточно, чтобы диспетчер понял участок трассы и требуемый тип помощи."
+								items={voicePromptItems}
+								footerBadge="VOICE"
+								footerText="Не заполняйте форму — расскажите ситуацию голосом."
+								footerLinkLabel="Начать запись."
+								service={voiceService}
+								subject={voiceSubject}
+								requestTitle={`Помощь на трассе ${road.code}`}
+							/>
+
+							<ServiceProcess
+								title="Как передать заявку"
+								steps={voiceSteps}
+								image="/images/road-service-process-image.jpg"
+							/>
+						</div>
+						<!-- Service Entry End -->
+
+						<ServiceFaqs faqs={road.faqs} />
+					</div>
+					<!-- Service Single Content End -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Page Service Single End -->
+
+	<Footer isNational />
+</Layout>

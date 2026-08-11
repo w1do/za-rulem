@@ -20,6 +20,7 @@ interface Props {
 	footerLinkHref?: string;
 	rating?: string;
 	ratingText?: string;
+	showRating?: boolean;
 }
 
 const {
@@ -32,6 +33,7 @@ const {
 	footerLinkHref: propFooterLinkHref,
 	rating = '4.9',
 	ratingText = 'Отзывы о моей работе',
+	showRating = true,
 } = Astro.props;
 
 const city = propCity ?? defaultCity;
@@ -112,7 +114,7 @@ const services = propServices ?? [
                         </div>
                         <!-- Satisfy Client Images End -->
                         <p>{footerText} <a href={footerLinkHref}>{footerLinkText}</a></p>
-                        <ul>
+                        {showRating && <ul>
                             <li><span class="counter">{rating}</span></li>
                             <li>
                                 <i class="fa-solid fa-star"></i>
@@ -122,7 +124,7 @@ const services = propServices ?? [
                                 <i class="fa-solid fa-star"></i>
                             </li>
                             <li>{ratingText}</li>
-                        </ul>
+                        </ul>}
                     </div>
                     <!-- Section Footer Text End -->
                 </div>

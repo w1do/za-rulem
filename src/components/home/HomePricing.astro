@@ -8,7 +8,7 @@ interface PricingPlan {
 	title: string;
 	text: string;
 	price: string;
-	priceUnit: string;
+	priceUnit?: string;
 	features: string[];
 	ctaText: string;
 	ctaHref: string;
@@ -71,7 +71,7 @@ const plans = propPlans ?? [
 	},
 ];
 
-const isPerLiter = (price: string, unit: string) =>
+const isPerLiter = (price: string, unit = '') =>
 	/₽\/л|\/л|\/литр/i.test(`${price}${unit}`);
 ---
 
@@ -103,7 +103,7 @@ const isPerLiter = (price: string, unit: string) =>
                      							<span class="pricing-item-title-gold">{plan.title}</span>
                      							<p>{plan.text}</p>
                      							<h2>
-                     								{plan.price}<sub>{plan.priceUnit}</sub>
+								{plan.price}{plan.priceUnit && <sub>{plan.priceUnit}</sub>}
                      								{isPerLiter(plan.price, plan.priceUnit) && (
                                             <span class="price-min-note">выезд {DEPARTURE_PRICE_PER_KM} руб/км</span>
                      								)}

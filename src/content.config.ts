@@ -93,6 +93,17 @@ const seoSchema = z
 	})
 	.optional();
 
+const roadSituationSchema = z.enum([
+	'stalled',
+	'towing',
+	'fuel',
+	'battery',
+	'wheel',
+	'ditch',
+	'accident',
+	'other',
+]);
+
 // services — pillar (хабы)
 const services = defineCollection({
 	loader: glob({
@@ -166,4 +177,41 @@ const blog = defineCollection({
 	}),
 });
 
-export const collections = { services, serviceLanding, blog };
+// routes — федеральные трассы и посадочные страницы помощи на дороге
+const routes = defineCollection({
+	loader: glob({ pattern: '*.md', base: './src/content/routes' }),
+	schema: z.object({
+		code: z.string(),
+		name: z.string(),
+		route: z.string(),
+		title: z.string(),
+		description: z.string(),
+		seo: z.object({
+			title: z.string(),
+			description: z.string(),
+			ogTitle: z.string().optional(),
+			ogDescription: z.string().optional(),
+		}),
+		aliases: z.array(z.string()).default([]),
+		legacySlugs: z.array(z.string()).default([]),
+		regions: z.array(z.string()).min(1),
+		majorCities: z.array(z.string()).default([]),
+		situations: z.array(roadSituationSchema).min(1),
+		conditions: z
+			.array(
+				z.object({
+					title: z.string(),
+					description: z.string(),
+				}),
+			)
+			.default([]),
+		faqs: z.array(faqSchema).default([]),
+		relatedRoutes: z.array(z.string()).default([]),
+		image: z.string().default('/images/road-page-single-image.jpg'),
+		imageAlt: z.string(),
+		order: z.number().int().nonnegative(),
+		featured: z.boolean().default(false),
+	}),
+});
+
+export const collections = { services, serviceLanding, blog, routes };

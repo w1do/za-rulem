@@ -5,7 +5,7 @@ dist
 .env
 .gitignore
 README.md
-.junie
+.codex
 .ai
 /source
 /seo

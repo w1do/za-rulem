@@ -41,7 +41,7 @@ const faqs = (frontmatter.faqs ?? []).map((faq: any) => ({
 	question: replaceCityPlaceholders(faq.question, city),
 	answer: replaceCityPlaceholders(faq.answer, city),
 }));
-const image = frontmatter.image ?? '/images/service-single-image.jpg';
+const image = frontmatter.image ?? '/images/road-page-single-image.jpg';
 const imageAlt = replaceCityPlaceholders(frontmatter.imageAlt ?? frontmatter.title, city);
 const showFuelCalculator = cluster === 'toplivo' && /бензин/i.test(frontmatter.title);
 const showFuelPricesTable = cluster === 'toplivo' && /очередь/i.test(frontmatter.title);

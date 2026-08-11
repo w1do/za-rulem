@@ -14,6 +14,7 @@ interface Props {
 	ctaText?: string;
 	ctaHref?: string;
 	categories?: CollectionCategory[];
+	interceptCta?: boolean;
 }
 
 const {
@@ -22,6 +23,7 @@ const {
 	description = 'Выезжаю по любому направлению: прикуривание, замена аккумулятора, отогрев, эвакуация, автоэлектрик и диагностика или подвоз топлива — выбирайте нужное и оставляйте заявку.',
 	ctaText = 'Вызвать помощь',
 	ctaHref = '/contacts',
+	interceptCta = true,
 	categories = [
 		{ icon: '/images/icon-car-collection-1-gold.svg', title: 'Прикурить автомобиль', image: '/images/car-collection-image-1-gold.png' },
 		{ icon: '/images/icon-car-collection-2-gold.svg', title: 'Заменить аккумулятор', image: '/images/car-collection-image-2-gold.png' },
@@ -53,7 +55,7 @@ const {
                             <a
 								href={ctaHref}
 								class="btn-default btn-highlighted"
-								data-service-request
+								data-service-request={interceptCta ? '' : undefined}
 								data-service-title={ctaText}
 							>
 								{ctaText}

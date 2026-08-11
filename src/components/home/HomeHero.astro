@@ -22,10 +22,15 @@ interface Props {
 	description?: string;
 	ctaText?: string;
 	ctaHref?: string;
+	secondaryCtaText?: string;
+	secondaryCtaHref?: string;
 	reviewText?: string;
 	counterValue?: string;
+	counterSuffix?: string;
 	counterText?: string;
 	benefits?: HeroBenefit[];
+	showClientImages?: boolean;
+	interceptPrimaryCta?: boolean;
 }
 
 const {
@@ -35,10 +40,15 @@ const {
 	description: propDescription,
 	ctaText = 'Вызвать помощь',
 	ctaHref: propCtaHref,
+	secondaryCtaText = 'Перейти в чат',
+	secondaryCtaHref: propSecondaryCtaHref,
 	reviewText: propReviewText,
 	counterValue = '6',
+	counterSuffix = '+',
 	counterText: propCounterText,
 	benefits: propBenefits,
+	showClientImages = true,
+	interceptPrimaryCta = true,
 } = Astro.props;
 
 const city = propCity ?? defaultCity;
@@ -52,6 +62,7 @@ const description =
 		city,
 	);
 const ctaHref = propCtaHref ?? getCityUrl('/contacts', city.slug);
+const secondaryCtaHref = propSecondaryCtaHref ?? chatAppUrl(city.slug);
 const reviewText = propReviewText ?? replaceCityPlaceholders('Круглосуточно на связи с водителями {ofCity}', city);
 const counterText =
 	propCounterText ??
@@ -96,13 +107,13 @@ const benefits = propBenefits ?? [
                             <a
 								href={ctaHref}
 								class="btn-default btn-highlighted"
-								data-service-request
+								data-service-request={interceptPrimaryCta ? '' : undefined}
 								data-service-title={ctaText}
 							>
 								{ctaText}
 							</a>
-							<a href={chatAppUrl(city.slug)} class="btn-default">
-								Перейти в чат
+							<a href={secondaryCtaHref} class="btn-default">
+								{secondaryCtaText}
 							</a>
                         </div>
                         <!-- Hero Content Button End -->
@@ -122,7 +133,7 @@ const benefits = propBenefits ?? [
                             <!-- Hero Client Review Counter End -->
 
                             <!-- Satisfy Client Images Start -->
-                            <div class="satisfy-client-images">
+                            {showClientImages && <div class="satisfy-client-images">
                                 <div class="satisfy-client-image">
                                     <figure class="image-anime">
                                         <AppImage src={author1} alt="Водитель 1" width={60} height={60} />
@@ -143,14 +154,14 @@ const benefits = propBenefits ?? [
                                         <AppImage src={author4} alt="Водитель 4" width={60} height={60} />
                                     </figure>
                                 </div>
-                            </div>
+                            </div>}
                             <!-- Satisfy Client Images End -->
                         </div>
                         <!-- Hero Client Review Box End -->
 
                         <!-- Hero Client Counter Box Start -->
                         <div class="hero-client-counter-box-gold">
-                            <h2><span class="counter">{counterValue}</span>+</h2>
+                            <h2><span class="counter">{counterValue}</span>{counterSuffix}</h2>
                             <p>{counterText}</p>
                         </div>
                         <!-- Hero Client Counter Box End -->

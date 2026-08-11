@@ -1,5 +1,6 @@
 ---
 import type { ChatCity } from '../../lib/cities';
+import type { ImageMetadata } from 'astro';
 import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
 import AppImage from '../shared/ui/AppImage.astro';
 import aboutImg1 from '../../assets/images/about-us-image-1-gold.jpg';
@@ -24,6 +25,10 @@ interface Props {
 	footerText?: string;
 	footerLinkText?: string;
 	footerLinkHref?: string;
+	imageOne?: ImageMetadata;
+	imageTwo?: ImageMetadata;
+	imageOneAlt?: string;
+	imageTwoAlt?: string;
 }
 
 const {
@@ -38,6 +43,10 @@ const {
 	footerText: propFooterText,
 	footerLinkText = 'Оставить заявку',
 	footerLinkHref: propFooterLinkHref,
+	imageOne = aboutImg1,
+	imageTwo = aboutImg2,
+	imageOneAlt = 'Техпомощь на дороге',
+	imageTwoAlt: propImageTwoAlt,
 } = Astro.props;
 
 const city = propCity ?? defaultCity;
@@ -46,6 +55,7 @@ const title = propTitle ?? replaceCityPlaceholders('Верну вашу маши
 const footerText =
 	propFooterText ?? replaceCityPlaceholders('Подберу решение для любой поломки на дороге {inCity} —', city);
 const footerLinkHref = propFooterLinkHref ?? getCityUrl('/contacts', city.slug);
+const imageTwoAlt = propImageTwoAlt ?? `Автопомощь ${city.inCity}`;
 
 const counters = propCounters ?? [
 	{ value: '6', suffix: '+', label: 'Мои услуги на дороге' },
@@ -94,7 +104,7 @@ const counters = propCounters ?? [
                             <!-- About Us Item Image Start -->
                             <div class="about-us-image-gold">
                                 <figure class="image-anime reveal">
-                                    <AppImage src={aboutImg1} alt="Техпомощь на дороге" />
+                                    <AppImage src={imageOne} alt={imageOneAlt} />
                                 </figure>
                             </div>
                             <!-- About Us Item Image End -->
@@ -106,7 +116,7 @@ const counters = propCounters ?? [
                             <!-- About Us Item Image Start -->
                             <div class="about-us-image-gold">
                                 <figure class="image-anime reveal">
-                                    <AppImage src={aboutImg2} alt={`Автопомощь ${city.inCity}`} />
+                                    <AppImage src={imageTwo} alt={imageTwoAlt} />
                                 </figure>
                             </div>
                             <!-- About Us Item Image End -->

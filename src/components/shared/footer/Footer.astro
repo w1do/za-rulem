@@ -5,30 +5,45 @@ import { getSiteData } from '../../../lib/seo';
 
 export interface Props {
 	city?: ChatCity;
+	isNational?: boolean;
+	nationalVariant?: 'roads' | 'selection';
+	selectionSubject?: string;
+	selectionService?: string;
 }
 
-const { city } = Astro.props;
+const {
+	city,
+	isNational = false,
+	nationalVariant = 'roads',
+	selectionSubject,
+	selectionService,
+} = Astro.props;
 const effectiveCity = city ?? defaultCity;
 const site = getSiteData(effectiveCity);
+const pageUrl = (path: string): string => isNational ? path : getCityUrl(path, effectiveCity.slug);
+const isSelectionNational = isNational && nationalVariant === 'selection';
 
 // Общий подвал сайта. Структура перенесена из шаблона, изменены только тексты и ссылки.
 const quickLinks = [
-	{ label: 'Главная', href: getCityUrl('/', effectiveCity.slug) },
-	{ label: 'О сервисе', href: getCityUrl('/about', effectiveCity.slug) },
-	{ label: 'Услуги', href: getCityUrl('/services', effectiveCity.slug) },
-	{ label: 'Отзывы', href: getCityUrl('/testimonials', effectiveCity.slug) },
+	{ label: 'Главная', href: pageUrl('/') },
+	{ label: 'О сервисе', href: pageUrl('/about') },
+	{ label: 'Услуги', href: pageUrl('/services') },
+	{ label: 'Федеральные трассы', href: '/route' },
+	{ label: 'Отзывы', href: pageUrl('/testimonials') },
 	{ label: 'Блог', href: '/blog' },
-	{ label: 'Партнёрам', href: getCityUrl('/partners', effectiveCity.slug) },
-	{ label: 'Контакты', href: getCityUrl('/contacts', effectiveCity.slug) },
+	{ label: 'Партнёрам', href: pageUrl('/partners') },
+	{ label: 'Контакты', href: pageUrl('/contacts') },
 ];
 
 const serviceLinks = [
-	{ label: 'Прикурить авто', href: getCityUrl('/services/tehpomosch/prikurit-avto', effectiveCity.slug) },
-	{ label: 'Замена аккумулятора', href: getCityUrl('/services/tehpomosch/zamena-akkumulyatora', effectiveCity.slug) },
-	{ label: 'Отогрев автомобиля', href: getCityUrl('/services/tehpomosch/otogrev-avto', effectiveCity.slug) },
-	{ label: 'Подвоз бензина', href: getCityUrl('/services/toplivo/podvoz-benzina', effectiveCity.slug) },
-	{ label: 'Подвоз дизеля', href: getCityUrl('/services/toplivo/podvoz-dizelya', effectiveCity.slug) },
-	{ label: 'Все услуги', href: getCityUrl('/services', effectiveCity.slug) },
+	{ label: 'Подбор авто из Владивостока', href: '/podbor-avtomobiley-iz-vladivostoka' },
+	{ label: 'Контрактные запчасти', href: '/podbor-kontraktnyh-zapchastey-iz-vladivostoka' },
+	{ label: 'Прикурить авто', href: pageUrl('/services/tehpomosch/prikurit-avto') },
+	{ label: 'Замена аккумулятора', href: pageUrl('/services/tehpomosch/zamena-akkumulyatora') },
+	{ label: 'Отогрев автомобиля', href: pageUrl('/services/tehpomosch/otogrev-avto') },
+	{ label: 'Подвоз бензина', href: pageUrl('/services/toplivo/podvoz-benzina') },
+	{ label: 'Подвоз дизеля', href: pageUrl('/services/toplivo/podvoz-dizelya') },
+	{ label: 'Все услуги', href: pageUrl('/services') },
 ];
 ---
 
@@ -41,17 +56,13 @@ const serviceLinks = [
 				<div class="about-footer-gold">
 					<!-- Footer Logo Start -->
 					<div class="footer-logo-gold">
-						<img src="/images/logo.svg" alt={site.brand} width="140" height="35" />
+						<img src="/images/logo.svg" alt={isNational ? 'За рулём' : site.brand} width="140" height="35" />
 					</div>
 					<!-- Footer Logo End -->
 
 					<!-- About Footer Content Start -->
 					<div class="about-footer-content-gold">
-						<p>
-							Я — мастер техпомощи на дороге {site.inCity}. Приезжаю на вызов круглосуточно:
-							прикурю автомобиль, заменю аккумулятор, отогрею машину в мороз и выручу
-							в других дорожных ситуациях.
-						</p>
+						<p>{isSelectionNational ? 'Подбор автомобилей и контрактных запчастей во Владивостоке с согласованием проверки, покупки и отправки по России.' : isNational ? 'Сервис помогает найти доступную техпомощь или эвакуатор на федеральных трассах России. Возможность и условия выезда подтверждает диспетчер.' : `Я — мастер техпомощи на дороге ${site.inCity}. Приезжаю на вызов круглосуточно: прикурю автомобиль, заменю аккумулятор, отогрею машину в мороз и выручу в других дорожных ситуациях.`}</p>
 					</div>
 					<!-- About Footer Content End -->
 
@@ -97,8 +108,19 @@ const serviceLinks = [
 						<h2>Контакты</h2>
 						<div class="footer-contact-info-list-gold">
 							<ul>
-								<li><img src="/images/icon-phone-accent.svg" alt="Заявка" width="20" height="20" /><a href={getCityUrl('/contacts', effectiveCity.slug)} data-service-request data-service-title="Вызвать помощь">Выезд только по заявке</a></li>
-								<li><img src="/images/icon-location-accent.svg" alt="Адрес" width="20" height="20" />{site.addressLocality} и {site.addressRegion}, выезд 24/7</li>
+								<li>
+									<img src="/images/icon-phone-accent.svg" alt="Заявка" width="20" height="20" />
+									<a
+										href={pageUrl('/contacts')}
+										data-service-request
+										data-service-title={isSelectionNational ? 'Голосовая заявка на подбор' : 'Вызвать помощь'}
+										data-service-subject={isSelectionNational ? selectionSubject : undefined}
+										data-service={isSelectionNational ? selectionService : undefined}
+									>
+										{isSelectionNational ? 'Заявка на подбор' : 'Выезд только по заявке'}
+									</a>
+								</li>
+								<li><img src="/images/icon-location-accent.svg" alt="Адрес" width="20" height="20" />{isSelectionNational ? 'Владивосток — отправка по России' : isNational ? 'Федеральные трассы России, по доступности партнёров' : `${site.addressLocality} и ${site.addressRegion}, выезд 24/7`}</li>
 							</ul>
 						</div>
 					</div>
@@ -106,11 +128,20 @@ const serviceLinks = [
 
 					<!-- Footer Link Start -->
 					<div class="footer-links-gold footer-newsletter-form-box-gold">
-						<h2>Нужна помощь на дороге?</h2>
+						<h2>{isSelectionNational ? 'Нужен автомобиль или запчасть?' : 'Нужна помощь на дороге?'}</h2>
 						<div class="about-footer-content-gold">
-							<p>Оставьте заявку — перезвоню в течение пары минут и выеду на место.</p>
+							<p>{isSelectionNational ? 'Опишите задачу — я уточню параметры подбора и подготовлю порядок работы.' : isNational ? 'Оставьте заявку — диспетчер уточнит участок трассы и проверит доступного партнёра.' : 'Оставьте заявку — перезвоню в течение пары минут и выеду на место.'}</p>
 						</div>
-						<a href={getCityUrl('/contacts', effectiveCity.slug)} class="btn-default btn-highlighted">Оставить заявку</a>
+						<a
+							href={pageUrl('/contacts')}
+							class="btn-default btn-highlighted"
+							data-service-request={isSelectionNational ? '' : undefined}
+							data-service-title={isSelectionNational ? 'Голосовая заявка на подбор' : undefined}
+							data-service-subject={isSelectionNational ? selectionSubject : undefined}
+							data-service={isSelectionNational ? selectionService : undefined}
+						>
+							{isSelectionNational ? 'Записать голосовую заявку' : 'Оставить заявку'}
+						</a>
 					</div>
 					<!-- Footer Link End -->
 				</div>
@@ -122,7 +153,7 @@ const serviceLinks = [
 				<div class="footer-copyright-gold">
 					<!-- Footer Copyright Text Start -->
 					<div class="footer-copyright-text-gold">
-						<p>© 2026 «За рулём» — техпомощь на дороге {site.inCity}. Разработано <a href="https://w1do.ru" target="_blank" rel="noopener noreferrer">W1DO DIGITAL</a>.</p>
+						<p>© 2026 «За рулём» — {isSelectionNational ? 'подбор автомобилей и запчастей из Владивостока' : isNational ? 'поиск техпомощи на федеральных трассах' : `техпомощь на дороге ${site.inCity}`}. Разработано <a href="https://w1do.ru" target="_blank" rel="noopener noreferrer">W1DO DIGITAL</a>.</p>
 					</div>
 					<!-- Footer Copyright Text End -->
 

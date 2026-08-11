@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import whyChooseImage1 from '../../assets/images/why-choose-image-1-gold.jpg';
 import whyChooseImage2 from '../../assets/images/why-choose-image-2-gold.jpg';
 import author1 from '../../assets/images/author-1.jpg';
@@ -19,6 +20,10 @@ interface Props {
 	ctaHref?: string;
 	authorName?: string;
 	authorText?: string;
+	imageOne?: ImageMetadata;
+	imageTwo?: ImageMetadata;
+	imageOneAlt?: string;
+	imageTwoAlt?: string;
 }
 
 const {
@@ -41,6 +46,10 @@ const {
 	ctaHref = '/contacts',
 	authorName = 'Я — «За рулём»',
 	authorText = 'Я помогаю на дороге',
+	imageOne = whyChooseImage1,
+	imageTwo = whyChooseImage2,
+	imageOneAlt = '',
+	imageTwoAlt = '',
 } = Astro.props;
 ---
 
@@ -117,7 +126,7 @@ const {
                         <!-- Why Choose Image Start -->
                         <div class="why-choose-image-gold box-1">
                             <figure class="image-anime">
-                                <Image src={whyChooseImage1} alt="" width={740} height={468} />
+                                <Image src={imageOne} alt={imageOneAlt} width={740} height={468} />
                             </figure>
                         </div>
                         <!-- Why Choose Image End -->
@@ -125,7 +134,7 @@ const {
                         <!-- Why Choose Image Start -->
                         <div class="why-choose-image-gold box-2">
                             <figure class="image-anime">
-                                <Image src={whyChooseImage2} alt="" width={740} height={510} />
+                                <Image src={imageTwo} alt={imageTwoAlt} width={740} height={510} />
                             </figure>
                         </div>
                         <!-- Why Choose Image End -->

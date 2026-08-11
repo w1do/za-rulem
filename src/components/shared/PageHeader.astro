@@ -12,9 +12,22 @@ interface Props {
 	items: BreadcrumbItem[];
 	showChatButton?: boolean;
 	chatLink?: string;
+	helpLabel?: string;
+	helpService?: string;
+	helpSubject?: string;
+	helpTitle?: string;
 }
 
-const { title, items, showChatButton, chatLink } = Astro.props;
+const {
+	title,
+	items,
+	showChatButton,
+	chatLink,
+	helpLabel,
+	helpService,
+	helpSubject,
+	helpTitle,
+} = Astro.props;
 ---
 
 <div class="page-header parallaxie">
@@ -35,7 +48,12 @@ const { title, items, showChatButton, chatLink } = Astro.props;
 							))}
 						</ol>
 					</nav>
-					<PageHeaderHelpButton />
+					<PageHeaderHelpButton
+						label={helpLabel}
+						service={helpService}
+						subject={helpSubject}
+						title={helpTitle}
+					/>
 					{showChatButton && <PageHeaderChatButton href={chatLink} />}
 				</div>
 			</div>

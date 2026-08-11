@@ -1,0 +1,42 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import RoadLandingLayout from '../../layouts/RoadLandingLayout.astro';
+
+type Props = {
+	entry: CollectionEntry<'routes'>;
+	redirectTo?: string;
+};
+
+export async function getStaticPaths() {
+	const routes = await getCollection('routes');
+	return routes.flatMap((entry) => [
+		{ params: { slug: entry.id }, props: { entry } },
+		...entry.data.legacySlugs.map((legacySlug) => ({
+			params: { slug: legacySlug },
+			props: { entry, redirectTo: entry.id },
+		})),
+	]);
+}
+
+const { entry, redirectTo } = Astro.props as Props;
+if (redirectTo) {
+	return Astro.redirect(`/route/${redirectTo}`, 301);
+}
+
+const allRoutes = await getCollection('routes');
+const routeById = new Map(allRoutes.map((road) => [road.id, road]));
+const relatedRoutes = entry.data.relatedRoutes
+	.map((id) => routeById.get(id))
+	.filter((road): road is CollectionEntry<'routes'> => road !== undefined)
+	.map((road) => ({
+		code: road.data.code,
+		name: road.data.name,
+		route: road.data.route,
+		url: `/route/${road.id}`,
+	}));
+const { Content } = await render(entry);
+---
+
+<RoadLandingLayout entry={entry} relatedRoutes={relatedRoutes}>
+	<Content />
+</RoadLandingLayout>

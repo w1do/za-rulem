@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/shared/header/Header.astro';
+import Footer from '../../components/shared/footer/Footer.astro';
+import PageHeader from '../../components/shared/PageHeader.astro';
+import ServiceCard from '../../components/services/ServiceCard.astro';
+import { breadcrumbNode, itemListNode, webPageNode } from '../../lib/seo';
+
+const routes = (await getCollection('routes')).sort((a, b) => a.data.order - b.data.order);
+const icons = [
+	'/images/icon-service-1.svg',
+	'/images/icon-service-2.svg',
+	'/images/icon-service-3.svg',
+	'/images/icon-service-4.svg',
+	'/images/icon-service-5.svg',
+	'/images/icon-service-6.svg',
+];
+const cards = routes.map((route, index) => ({
+	title: `${route.data.code} «${route.data.name}»`,
+	description: route.data.route,
+	icon: icons[index % icons.length],
+	url: `/route/${route.id}`,
+	delay: index % 3 === 0 ? undefined : `${(index % 3) * 0.2}s`,
+}));
+const title = 'Помощь на федеральных трассах России — найти техпомощь';
+const description = 'Выберите федеральную трассу и оставьте заявку на техпомощь, эвакуатор, подвоз топлива, запуск двигателя или замену колеса.';
+const jsonLd = [
+	webPageNode({ type: 'CollectionPage', name: title, description, url: '/route' }),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Федеральные трассы', url: '/route' },
+	]),
+	itemListNode(routes.map((route) => ({ name: `${route.data.code} «${route.data.name}»`, url: `/route/${route.id}` }))),
+];
+---
+
+<Layout
+	title={title}
+	description={description}
+	ogTitle="Помощь на федеральных трассах России"
+	ogDescription="Найдите трассу по номеру или названию и передайте диспетчеру заявку на помощь."
+	keywords="помощь на федеральной трассе, эвакуатор на трассе, техпомощь на дороге, заглох на трассе"
+	jsonLd={jsonLd}
+	isNational
+>
+	<Header isNational />
+	<PageHeader
+		title="Помощь на федеральных трассах России"
+		items={[{ label: 'Главная', href: '/' }, { label: 'Федеральные трассы' }]}
+		helpLabel="Рассказать голосом"
+		helpService="route-directory"
+		helpSubject="Голосовая заявка с федеральной трассы — za-rulem"
+		helpTitle="Помощь на федеральной трассе"
+	/>
+
+	<!-- page Services Start -->
+	<div class="page-services">
+		<div class="container">
+			<div class="row">
+				{cards.map((card) => (
+					<ServiceCard
+						title={card.title}
+						description={card.description}
+						icon={card.icon}
+						url={card.url}
+						delay={card.delay}
+					/>
+				))}
+			</div>
+		</div>
+	</div>
+	<!-- page Services End -->
+
+	<Footer isNational />
+</Layout>
