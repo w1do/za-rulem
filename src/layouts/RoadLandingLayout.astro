@@ -28,6 +28,12 @@ export interface Props {
 
 const { entry, relatedRoutes = [] } = Astro.props;
 const road = entry.data;
+const firstCity = road.majorCities.at(0) ?? road.regions.at(0) ?? road.code;
+const lastCity = road.majorCities.at(-1) ?? road.regions.at(-1) ?? road.name;
+const seoTitle = `Помощь на дороге ${road.code} ${road.name}, где бензин сегодня | Карта АЗС`;
+const seoDescription = `Карта АЗС на трассе ${road.code} ${road.name}: где есть бензин сегодня, цены и очереди. Найдите заправку по пути ${firstCity} — ${lastCity} или спросите в чате.`;
+const ogTitle = `${road.code} ${road.name}: карта АЗС и бензин сегодня`;
+const ogDescription = `Проверьте заправки, цены и очереди на маршруте ${firstCity} — ${lastCity}. Выберите сеть АЗС или обсудите станцию в чате водителей.`;
 const voiceService = `route:${entry.id}`;
 const voiceSubject = `Голосовая заявка с трассы ${road.code} — za-rulem`;
 const sidebarLinks = [
@@ -60,7 +66,7 @@ const voiceSteps = [
 const jsonLd = [
 	serviceNode({
 		name: road.title,
-		description: road.seo.description,
+		description: seoDescription,
 		url: `/route/${entry.id}`,
 		serviceType: `Техпомощь на трассе ${road.code}`,
 		areaServed: road.regions,
@@ -75,10 +81,10 @@ const jsonLd = [
 ---
 
 <Layout
-	title={road.seo.title}
-	description={road.seo.description}
-	ogTitle={road.seo.ogTitle ?? road.seo.title}
-	ogDescription={road.seo.ogDescription ?? road.seo.description}
+	title={seoTitle}
+	description={seoDescription}
+	ogTitle={ogTitle}
+	ogDescription={ogDescription}
 	ogImage={road.image}
 	keywords={[
 		...road.aliases,
@@ -105,11 +111,18 @@ const jsonLd = [
 		helpTitle={`Помощь на трассе ${road.code}`}
 	/>
 
+
 	<RoadGasStations
 		client:visible
 		slug={entry.id}
 		code={road.code}
+		name={road.name}
+		route={road.route}
+		gasBrands={road.gasBrands}
 	/>
+
+	<!-- Yandex.RTB R-A-19681102-1 -->
+	<div id="yandex_rtb_R-A-19681102-2"></div>
 
 	<!-- Page Service Single Start -->
 	<div class="page-service-single">

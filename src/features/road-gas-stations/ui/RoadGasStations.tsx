@@ -7,13 +7,22 @@ import {
 	isStationData,
 } from '../../../lib/gasStations';
 import { getRoadBounds } from '../model/geometry';
+import {
+	buildRoadGasBrandCards,
+	type RoadGasBrandCard,
+	type RoadGasBrandConfig,
+} from '../model/brands';
 import { loadRoadGeometry } from '../model/loadRoadGeometry';
 import type { RoadGeometry, RoadStationsResponse } from '../model/types';
+import RoadGasBrandCards from './RoadGasBrandCards';
 import './RoadGasStations.css';
 
 interface Props {
 	slug: string;
 	code: string;
+	name: string;
+	route: string;
+	gasBrands: RoadGasBrandConfig[];
 }
 
 type LoadState =
@@ -33,20 +42,23 @@ const parseResponse = (value: unknown): RoadStationsResponse | null => {
 	return { stations: value.stations, fetchedAt: value.fetchedAt, isPartial: value.isPartial };
 };
 
-const RoadGasStations = ({ slug, code }: Props) => {
+const RoadGasStations = ({ slug, code, name, route, gasBrands }: Props) => {
 	const [state, setState] = useState<LoadState>({ status: 'loading' });
 	const [geometry, setGeometry] = useState<RoadGeometry | null>(null);
 	const [geometryError, setGeometryError] = useState('');
 	const [retryNumber, setRetryNumber] = useState(0);
+	const [selectedBrand, setSelectedBrand] = useState<RoadGasBrandCard | null>(null);
+	const brandCards = useMemo(
+		() => buildRoadGasBrandCards(gasBrands, { code, name, route }),
+		[code, gasBrands, name, route],
+	);
 	const action = useMemo(
 		() => ({
-			href: '/contacts',
-			label: `Нужна помощь на ${code}`,
-			service: `route:${slug}`,
-			subject: `Голосовая заявка с трассы ${code} — za-rulem`,
-			title: `Помощь на трассе ${code}`,
+			href: '/chat?topic=general',
+			label: 'Обсудить АЗС в чате',
+			draftContext: `Трасса ${code}`,
 		}),
-		[code, slug],
+		[code],
 	);
 
 	useEffect(() => {
@@ -120,17 +132,6 @@ const RoadGasStations = ({ slug, code }: Props) => {
 					</p>
 				</div>
 
-				{prices.length > 0 && (
-					<div className="road-gas-prices">
-						<h3>Средние цены на АЗС вдоль трассы {code}</h3>
-						<FuelPricesTable
-							prices={prices}
-							dateLabel={dateLabel}
-							disclaimer={`* Средние данные по станциям вдоль трассы ${code}${dateLabel ? ` на ${dateLabel}` : ''}`}
-						/>
-					</div>
-				)}
-
 				<div className="road-gas-status" aria-live="polite">
 					{geometryError ? geometryError : state.status === 'loading' ? (
 						'Загружаем актуальные АЗС вдоль всей трассы…'
@@ -148,19 +149,39 @@ const RoadGasStations = ({ slug, code }: Props) => {
 					) : null}
 				</div>
 
+				<div id="yandex_rtb_R-A-19681102-2"></div>
+
 				{geometry && bounds && (
-					<div className="road-gas-map-card">
+					<div className="road-gas-map-card mb-5">
 						<GasMapView
 							stations={stations}
 							bounds={bounds}
 							action={action}
+							brandAliases={selectedBrand?.aliases ?? []}
 							routeLines={geometry.coordinates}
 						/>
 					</div>
 				)}
-				<p className="road-map-attribution">
-					Геометрия трассы: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a>.
-				</p>
+
+				<RoadGasBrandCards
+					brands={brandCards}
+					stations={stations}
+					isDataLoaded={state.status === 'success'}
+					selectedBrand={selectedBrand?.name ?? null}
+					onSelect={setSelectedBrand}
+				/>
+
+				{prices.length > 0 && (
+					<div className="road-gas-prices">
+						<h3>Средние цены на АЗС вдоль трассы {code}</h3>
+						<FuelPricesTable
+							prices={prices}
+							dateLabel={dateLabel}
+							disclaimer={`* Средние данные по станциям вдоль трассы ${code}${dateLabel ? ` на ${dateLabel}` : ''}`}
+						/>
+					</div>
+				)}
+
 			</div>
 		</section>
 	);

@@ -1,12 +1,17 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 
 interface ChatComposerProps {
 	placeholder: string;
+	initialMessage?: string;
 	onSend: (text: string) => Promise<boolean>;
 }
 
-export default function ChatComposer({ placeholder, onSend }: ChatComposerProps) {
+export default function ChatComposer({ placeholder, initialMessage = '', onSend }: ChatComposerProps) {
 	const [message, setMessage] = useState('');
+
+	useEffect(() => {
+		if (initialMessage) setMessage((current) => current || initialMessage);
+	}, [initialMessage]);
 
 	const handleSubmit = async (event: FormEvent) => {
 		event.preventDefault();

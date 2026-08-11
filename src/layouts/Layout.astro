@@ -361,5 +361,14 @@ const structuredData = {
 		<script is:inline defer src="/js/wow.min.js"></script>
 		<!-- Main Custom js file -->
 		<script is:inline defer src="/js/function.js"></script>
+		<script>
+			window.yaContextCb.push(() => {
+				Ya.Context.AdvManager.render({
+					"blockId": "R-A-19681102-2",
+					"renderTo": "yandex_rtb_R-A-19681102-2",
+					"type": "feed"
+				})
+			})
+		</script>
 	</body>
 </html>

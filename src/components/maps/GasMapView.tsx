@@ -14,13 +14,14 @@ interface Props {
 	stations: StationData[];
 	bounds: MapBounds;
 	action: StationMapAction;
+	brandAliases?: string[];
 	routeLines?: [number, number][][];
 }
 
 const MOBILE_MEDIA_QUERY = '(max-width: 767px)';
 
 /** Общее контролируемое представление списка, фильтров и карты АЗС. */
-const GasMapView = ({ stations, bounds, action, routeLines }: Props) => {
+const GasMapView = ({ stations, bounds, action, brandAliases = [], routeLines }: Props) => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [fuelTypes, setFuelTypes] = useState<string[]>([]);
 	const [fuelLimit, setFuelLimit] = useState<number | null>(null);
@@ -30,8 +31,16 @@ const GasMapView = ({ stations, bounds, action, routeLines }: Props) => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
 	const filteredStations = useMemo(
-		() => filterStations(stations, { searchQuery, fuelTypes, fuelLimit, onlyCanister, queue }),
-		[stations, searchQuery, fuelTypes, fuelLimit, onlyCanister, queue],
+		() =>
+			filterStations(stations, {
+				searchQuery,
+				brandAliases,
+				fuelTypes,
+				fuelLimit,
+				onlyCanister,
+				queue,
+			}),
+		[stations, searchQuery, brandAliases, fuelTypes, fuelLimit, onlyCanister, queue],
 	);
 
 	const handleMarkerClick = useCallback((stationId: string) => {
@@ -82,6 +91,7 @@ const GasMapView = ({ stations, bounds, action, routeLines }: Props) => {
 					<i className="fas fa-times" aria-hidden="true"></i>
 				</button>
 
+
 				<StationFiltersPanel
 					searchQuery={searchQuery}
 					fuelTypes={fuelTypes}
@@ -94,6 +104,8 @@ const GasMapView = ({ stations, bounds, action, routeLines }: Props) => {
 					onToggleCanister={() => setOnlyCanister(!onlyCanister)}
 					onToggleQueue={(next) => setQueue(queue === next ? 'ALL' : next)}
 				/>
+
+
 
 				<div className="sidebar-list">
 					{filteredStations.map((item) => (

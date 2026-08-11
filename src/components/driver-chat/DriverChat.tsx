@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { clearChatDraft, readChatDraft } from './lib/chatDraft';
 import type { ChatCityOption, ChatTopic } from './model/types';
 import { useDriverChat } from './model/useDriverChat';
 import { findChannel } from './ui/channels';
@@ -22,11 +23,20 @@ const cityName = (cities: ChatCityOption[], slug: string): string =>
 export default function DriverChat({ variant = 'section', cities, defaultCitySlug }: DriverChatProps) {
 	const { phone, topic, setTopic, city, setCity, isJoined, messages, error, join, send } = useDriverChat(defaultCitySlug);
 	const [isAsideOpen, setIsAsideOpen] = useState(false);
+	const [initialDraft, setInitialDraft] = useState('');
+
+	useEffect(() => {
+		setInitialDraft(readChatDraft());
+	}, []);
+
+	useEffect(() => {
+		if (isJoined && initialDraft) clearChatDraft();
+	}, [initialDraft, isJoined]);
 
 	if (!isJoined) {
 		return (
 			<div className={`dc dc--${variant} dc--login`}>
-				<ChatLogin city={city} topic={topic} error={error} onJoin={join} />
+				<ChatLogin city={city} topic={topic} draft={initialDraft} error={error} onJoin={join} />
 			</div>
 		);
 	}
@@ -61,7 +71,11 @@ export default function DriverChat({ variant = 'section', cities, defaultCitySlu
 
 				{error && <div className="dc-alert dc-alert--inline" role="alert">{error}</div>}
 
-				<ChatComposer placeholder={channel.placeholder} onSend={send} />
+				<ChatComposer
+					placeholder={channel.placeholder}
+					initialMessage={initialDraft}
+					onSend={send}
+				/>
 			</section>
 
 			<button

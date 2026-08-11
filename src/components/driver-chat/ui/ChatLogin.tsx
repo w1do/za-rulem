@@ -5,11 +5,12 @@ import type { ChatTopic } from '../model/types';
 interface ChatLoginProps {
 	city: string;
 	topic: ChatTopic;
+	draft?: string;
 	error: string;
 	onJoin: (phoneInput: string) => void;
 }
 
-export default function ChatLogin({ city, topic, error, onJoin }: ChatLoginProps) {
+export default function ChatLogin({ city, topic, draft = '', error, onJoin }: ChatLoginProps) {
 	const [phoneInput, setPhoneInput] = useState('');
 
 	const handleSubmit = (event: FormEvent) => {
@@ -31,6 +32,7 @@ export default function ChatLogin({ city, topic, error, onJoin }: ChatLoginProps
 		>
 			<input type="hidden" name="city" value={city} />
 			<input type="hidden" name="topic" value={topic} />
+			{draft && <input type="hidden" name="draft" value={draft} />}
 			<div className="dc-login__badge"><i className="fa-solid fa-gas-pump"></i></div>
 			<span className="section-sub-title">Чат водителей</span>
 			<h3>Укажи номер — и сразу в чат</h3>

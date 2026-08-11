@@ -104,6 +104,11 @@ const roadSituationSchema = z.enum([
 	'other',
 ]);
 
+const roadGasBrandSchema = z.object({
+	name: z.string(),
+	aliases: z.array(z.string()).default([]),
+});
+
 // services — pillar (хабы)
 const services = defineCollection({
 	loader: glob({
@@ -193,6 +198,7 @@ const routes = defineCollection({
 			ogDescription: z.string().optional(),
 		}),
 		aliases: z.array(z.string()).default([]),
+		gasBrands: z.array(roadGasBrandSchema).min(3).max(6),
 		legacySlugs: z.array(z.string()).default([]),
 		regions: z.array(z.string()).min(1),
 		majorCities: z.array(z.string()).default([]),

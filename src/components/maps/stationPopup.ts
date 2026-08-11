@@ -1,4 +1,5 @@
 import {
+	buildStationActionHref,
 	getFuelAvailability,
 	getFuelName,
 	getQueueInfo,
@@ -72,6 +73,8 @@ export const buildStationPopupHtml = (item: StationData, action: StationMapActio
 		})
 		.join('');
 
+	const actionHref = buildStationActionHref(action, item);
+
 	return `
 		<div class="custom-gas-popup ${closed ? 'is-closed' : ''}">
 			<div class="popup-header" style="background: ${statusColor}">
@@ -96,7 +99,7 @@ export const buildStationPopupHtml = (item: StationData, action: StationMapActio
 				<div class="popup-payments-row">${escapeHtml(payments)}</div>
 				<span>Обновлено: ${escapeHtml(new Date(station.last_transaction_at).toLocaleDateString('ru-RU'))}</span>
 			</div>
-			<a class="popup-chat-btn" href="${escapeHtml(action.href)}" ${actionAttributes(action)}>
+			<a class="popup-chat-btn" href="${escapeHtml(actionHref)}" ${actionAttributes(action)}>
 				<i class="fas ${action.service ? 'fa-headset' : 'fa-comments'}"></i> ${escapeHtml(action.label)}
 			</a>
 		</div>

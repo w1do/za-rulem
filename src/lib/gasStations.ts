@@ -59,6 +59,7 @@ export type QueueFilter = 'ALL' | 'SMALL' | 'LARGE';
 
 export interface StationFilters {
 	searchQuery: string;
+	brandAliases: string[];
 	fuelTypes: string[];
 	fuelLimit: number | null;
 	onlyCanister: boolean;
@@ -75,10 +76,31 @@ export interface PriceRow {
 export interface StationMapAction {
 	href: string;
 	label: string;
+	draftContext?: string;
 	service?: string;
 	subject?: string;
 	title?: string;
 }
+
+export const buildStationActionHref = (
+	action: StationMapAction,
+	item: StationData,
+): string => {
+	if (!action.draftContext) return action.href;
+	const url = new URL(action.href, 'https://za-rulem.local');
+	const draft = [
+		`АЗС «${item.station.name}»`,
+		item.station.address,
+		action.draftContext,
+		'Подскажите, какая сейчас обстановка с топливом и очередью?',
+	]
+		.filter(Boolean)
+		.join('. ');
+	url.searchParams.set('draft', draft);
+	return /^https?:\/\//i.test(action.href)
+		? url.toString()
+		: `${url.pathname}${url.search}${url.hash}`;
+};
 
 const STATIONS_API_URL = 'https://benzin.api.2gis.ru/api/v1/stations';
 const STATIONS_REQUEST_TIMEOUT_MS = 8000;
@@ -281,6 +303,27 @@ const matchesSearch = (station: StationData, searchQuery: string): boolean => {
 	);
 };
 
+const normalizeBrand = (value: string): string =>
+	value.toLocaleLowerCase('ru-RU').replaceAll('ё', 'е').replace(/\s+/g, ' ').trim();
+
+/** Сопоставляет бренд с полями feed без ложного совпадения «Газпром» → «Газпромнефть». */
+export const matchesStationBrand = (station: StationData, aliases: string[]): boolean => {
+	if (aliases.length === 0) return true;
+	const candidates = [station.station.brand, station.station.name]
+		.filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+		.map(normalizeBrand);
+
+	return aliases.some((alias) => {
+		const normalizedAlias = normalizeBrand(alias);
+		return candidates.some(
+			(candidate) =>
+				candidate === normalizedAlias ||
+				candidate.startsWith(`${normalizedAlias},`) ||
+				candidate.startsWith(`${normalizedAlias} `),
+		);
+	});
+};
+
 /** Применяет пользовательские фильтры к списку станций и отбрасывает устаревшие данные. */
 export const filterStations = (
 	stations: StationData[],
@@ -288,11 +331,12 @@ export const filterStations = (
 	now = Date.now(),
 ): StationData[] => {
 	if (!Array.isArray(stations)) return [];
-	const { searchQuery, fuelTypes, fuelLimit, onlyCanister, queue } = filters;
+	const { searchQuery, brandAliases, fuelTypes, fuelLimit, onlyCanister, queue } = filters;
 
 	return stations.filter((s) => {
 		if (!isStationDataFresh(s, now)) return false;
 		if (!matchesSearch(s, searchQuery)) return false;
+		if (!matchesStationBrand(s, brandAliases)) return false;
 
 		if (fuelTypes.length > 0) {
 			const hasFuel = s.prices?.some((p) => fuelTypes.includes(p.fuel_type));
