@@ -1,0 +1,47 @@
+---
+interface Props {
+	statId: number;
+}
+
+const { statId } = Astro.props;
+---
+
+<section class="yandex-rtb-feed" aria-label="Реклама" data-yandex-stat-id={statId}>
+	<div class="container">
+		<div id="yandex_rtb_R-A-19681102-2"></div>
+	</div>
+</section>
+
+<script is:inline>
+	window.yaContextCb = window.yaContextCb || [];
+	window.yaContextCb.push(() => {
+		const container = document.getElementById('yandex_rtb_R-A-19681102-2');
+		if (!container || !window.Ya?.Context?.AdvManager) return;
+
+		const statId = Number(container.closest('[data-yandex-stat-id]')?.dataset.yandexStatId);
+		window.Ya.Context.AdvManager.render({
+			blockId: 'R-A-19681102-2',
+			renderTo: 'yandex_rtb_R-A-19681102-2',
+			type: 'feed',
+			...(Number.isFinite(statId) ? { statId } : {}),
+		});
+	});
+</script>
+
+<style>
+	.yandex-rtb-feed {
+		padding: 56px 0;
+		background: var(--section-bg-color, #f7f7f7);
+	}
+
+	.yandex-rtb-feed :global(#yandex_rtb_R-A-19681102-2) {
+		min-height: 90px;
+		width: 100%;
+	}
+
+	@media (max-width: 767px) {
+		.yandex-rtb-feed {
+			padding: 32px 0;
+		}
+	}
+</style>

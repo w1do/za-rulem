@@ -1,0 +1,34 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BlogLayout from '../../../layouts/BlogLayout.astro';
+import RouteGuideArticle from '../../../components/blog/RouteGuideArticle.astro';
+
+type Props = { entry: CollectionEntry<'routes'> };
+export async function getStaticPaths() {
+	const routes = await getCollection('routes');
+	return routes.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props as Props;
+const { Content } = await render(entry);
+const road = entry.data;
+const title = `Наличие бензина на ${road.code}: где заправиться и что делать в дороге`;
+const description = `Практический гид по ${road.code} «${road.name}»: как проверить наличие АИ-92, АИ-95, АИ-100 и ДТ, дотянуть до АЗС и вызвать подвоз топлива или техпомощь.`;
+const frontmatter = {
+	title,
+	description,
+	seo: { title: `${title} | За рулём`, description },
+	date: new Date('2026-08-12'),
+	author: 'Редакция «За рулём»',
+	image: road.image,
+	imageAlt: road.imageAlt,
+	category: 'Помощь на трассе',
+	tags: [road.code, 'наличие бензина', 'подвоз топлива', 'АЗС на трассе'],
+};
+---
+
+<BlogLayout frontmatter={frontmatter}>
+	<RouteGuideArticle entry={entry} />
+	<h2>Данные страницы трассы</h2>
+	<Content />
+</BlogLayout>
