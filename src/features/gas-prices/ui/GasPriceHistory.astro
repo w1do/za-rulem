@@ -1,0 +1,89 @@
+---
+import type { GasPriceSnapshot } from '../model/types';
+import { formatFuelLabel, formatGasDate, formatPrice } from '../model/format';
+
+interface Props {
+	history: GasPriceSnapshot[];
+	historyTotal: number;
+	page: number;
+	perPage: number;
+	baseUrl: string;
+}
+const { history, historyTotal, page, perPage, baseUrl } = Astro.props;
+const totalPages = Math.max(1, Math.ceil(historyTotal / perPage));
+const chartHistory = [...history].reverse();
+const chartFuels = [...new Set(chartHistory.flatMap((item) => item.fuels.map((fuel) => fuel.fuelType)))].slice(0, 4);
+const colors = ['#f5b754', '#175cd3', '#067647', '#b42318'];
+const values = chartHistory.flatMap((item) => item.fuels.map((fuel) => fuel.average));
+const min = values.length ? Math.min(...values) : 0;
+const max = values.length ? Math.max(...values) : 0;
+const span = Math.max(max - min, 1);
+const pointsFor = (fuelType: string): string => chartHistory
+	.map((item, index) => {
+		const value = item.fuels.find((fuel) => fuel.fuelType === fuelType)?.average;
+		if (value === undefined) return null;
+		const x = chartHistory.length === 1 ? 50 : 20 + index * (760 / (chartHistory.length - 1));
+		const y = 180 - ((value - min) / span) * 140;
+		return `${x},${y}`;
+	})
+	.filter(Boolean)
+	.join(' ');
+const pageUrl = (target: number): string => target === 1 ? baseUrl : `${baseUrl}?page=${target}`;
+---
+
+<section class="history" aria-labelledby="history-title">
+	<div class="container">
+		<div class="section-title">
+			<span class="section-sub-title">Ежедневные отчёты</span>
+			<h2 id="history-title">Динамика цен</h2>
+			<p>История начинает формироваться с момента запуска ежедневного сборщика. Один снимок на сеть и город в сутки обновляется идемпотентно.</p>
+		</div>
+		{history.length > 0 ? (
+			<>
+				<div class="chart-card">
+					<div class="chart-legend">
+						{chartFuels.map((fuel, index) => <span><i style={`background:${colors[index]}`}></i>{formatFuelLabel(fuel)}</span>)}
+					</div>
+					<svg viewBox="0 0 800 210" role="img" aria-label="График средней стоимости топлива">
+						<line x1="20" y1="180" x2="780" y2="180" stroke="#ddd" />
+						{chartFuels.map((fuel, index) => <polyline points={pointsFor(fuel)} fill="none" stroke={colors[index]} stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />)}
+					</svg>
+				</div>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>Дата</th><th>Станций</th><th>Средние цены</th></tr></thead>
+						<tbody>{history.map((snapshot) => (
+							<tr>
+								<td>{formatGasDate(snapshot.snapshotDate)}</td>
+								<td>{snapshot.stationCount}</td>
+								<td>{snapshot.fuels.map((fuel) => `${formatFuelLabel(fuel.fuelType)} — ${formatPrice(fuel.average)}`).join(' · ')}</td>
+							</tr>
+						))}</tbody>
+					</table>
+				</div>
+				{totalPages > 1 && <nav class="pagination" aria-label="Страницы истории">
+					{page > 1 && <a rel="prev" href={pageUrl(page - 1)}>← Новее</a>}
+					<span>Страница {page} из {totalPages}</span>
+					{page < totalPages && <a rel="next" href={pageUrl(page + 1)}>Раньше →</a>}
+				</nav>}
+			</>
+		) : <div class="history-empty">Первый ежедневный снимок ещё не сохранён. Текущие цены и список станций доступны выше и ниже.</div>}
+	</div>
+</section>
+
+<style>
+	.history { padding: 90px 0; background: #f7f7f7; }
+	.section-title { max-width: 780px; margin-bottom: 35px; }
+	.chart-card, .table-wrap { padding: 24px; border-radius: 18px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.05); }
+	.chart-card { margin-bottom: 24px; overflow-x: auto; }
+	.chart-card svg { width: 100%; min-width: 600px; }
+	.chart-legend { display: flex; flex-wrap: wrap; gap: 18px; }
+	.chart-legend span { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; }
+	.chart-legend i { width: 12px; height: 12px; border-radius: 50%; }
+	.table-wrap { overflow-x: auto; }
+	table { width: 100%; border-collapse: collapse; }
+	th, td { padding: 15px; text-align: left; border-bottom: 1px solid #e7e7e7; vertical-align: top; }
+	.pagination { display: flex; justify-content: center; gap: 24px; margin-top: 28px; }
+	.history-empty { padding: 30px; border-radius: 16px; background: #fff; }
+	@media (max-width: 767px) { .history { padding: 60px 0; } .chart-card, .table-wrap { padding: 14px; } }
+</style>

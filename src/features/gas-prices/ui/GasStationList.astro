@@ -1,0 +1,34 @@
+---
+import type { StationData } from '../../../lib/gasStations';
+import { formatFuelLabel, formatPrice } from '../model/format';
+
+interface Props { stations: StationData[]; brandName: string; }
+const { stations, brandName } = Astro.props;
+---
+
+<section class="station-list">
+	<div class="container">
+		<div class="section-title"><span class="section-sub-title">Адреса</span><h2>АЗС {brandName}</h2></div>
+		<div class="station-grid">
+			{stations.map((item) => (
+				<article id={`station-${item.station.id}`}>
+					<h3>{item.station.name}</h3>
+					<p>{item.station.address || 'Адрес не указан'}</p>
+					<ul>{item.prices.slice(0, 5).map((fuel) => <li><span>{formatFuelLabel(fuel.fuel_type)}</span><strong>{formatPrice(fuel.price)}</strong></li>)}</ul>
+				</article>
+			))}
+		</div>
+	</div>
+</section>
+
+<style>
+	.station-list { padding: 90px 0; background: #fff; }
+	.station-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+	.station-grid article { padding: 24px; border: 1px solid #e7e7e7; border-radius: 16px; }
+	.station-grid h3 { margin-bottom: 8px; font-size: 20px; }
+	.station-grid p { color: #6f6f6f; }
+	.station-grid ul { margin: 0; padding: 0; list-style: none; }
+	.station-grid li { display: flex; justify-content: space-between; padding: 6px 0; }
+	@media (max-width: 991px) { .station-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+	@media (max-width: 600px) { .station-list { padding: 60px 0; } .station-grid { grid-template-columns: 1fr; } }
+</style>

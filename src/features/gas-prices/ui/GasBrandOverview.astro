@@ -1,0 +1,47 @@
+---
+import type { GasBrandSummary } from '../model/types';
+import { formatDelta, formatFuelLabel, formatPrice } from '../model/format';
+
+interface Props { summary: GasBrandSummary; cityName: string; isPartial: boolean; }
+const { summary, cityName, isPartial } = Astro.props;
+---
+
+<section class="brand-overview">
+	<div class="container">
+		{isPartial && <div class="data-warning">Источник временно недоступен: показаны последние данные из краткосрочного кеша.</div>}
+		<div class="brand-overview__grid">
+			<div>
+				<span class="section-sub-title">Сводка по сети</span>
+				<h2>{summary.brand.name}: стоимость топлива</h2>
+				<p>В расчёте участвуют {summary.stationCount} станций сети в городе {cityName}. Это средние значения, фактическая цена на конкретной АЗС может отличаться.</p>
+			</div>
+			<div class="price-grid">
+				{summary.fuels.length > 0 ? summary.fuels.map((fuel) => (
+					<article class="price-tile">
+						<span>{formatFuelLabel(fuel.fuelType)}</span>
+						<strong>{formatPrice(fuel.average)}</strong>
+						<small class={`trend--${fuel.trend}`}>{formatDelta(fuel.delta)}</small>
+						<em>от {formatPrice(fuel.min)} до {formatPrice(fuel.max)} · {fuel.sampleCount} цен</em>
+					</article>
+				)) : <div class="price-empty">У сети есть станции в городе, но свежие цены пока не опубликованы.</div>}
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.brand-overview { padding: 80px 0; background: #fff; }
+	.brand-overview__grid { display: grid; grid-template-columns: .85fr 1.4fr; gap: 50px; align-items: start; }
+	.brand-overview h2 { margin: 10px 0 16px; }
+	.price-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+	.price-tile { padding: 22px; border: 1px solid #e7e7e7; border-radius: 16px; }
+	.price-tile span, .price-tile small, .price-tile em { display: block; }
+	.price-tile strong { display: block; margin: 7px 0; font-size: 27px; color: var(--primary-color); }
+	.price-tile small { margin-bottom: 8px; font-weight: 700; }
+	.price-tile em { color: #777; font-size: 12px; font-style: normal; }
+	.trend--up { color: #b42318; } .trend--down { color: #067647; } .trend--stable, .trend--unknown { color: #667085; }
+	.price-empty, .data-warning { padding: 18px; border-radius: 12px; background: #fff5d6; }
+	.data-warning { margin-bottom: 24px; }
+	@media (max-width: 991px) { .brand-overview__grid { grid-template-columns: 1fr; } }
+	@media (max-width: 600px) { .price-grid { grid-template-columns: 1fr; } }
+</style>

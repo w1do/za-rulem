@@ -1,0 +1,79 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../shared/header/Header.astro';
+import Footer from '../shared/footer/Footer.astro';
+import PageHeader from '../shared/PageHeader.astro';
+import GasPricesMapSection from '../gas-prices/GasPricesMapSection.astro';
+import HubFaqs from '../hub/HubFaqs.astro';
+import HubCta from '../hub/HubCta.astro';
+import GasBrandOverview from '../../features/gas-prices/ui/GasBrandOverview.astro';
+import GasPriceHistory from '../../features/gas-prices/ui/GasPriceHistory.astro';
+import GasStationList from '../../features/gas-prices/ui/GasStationList.astro';
+import { gasPricesUrl, isBrandReadyForIndexing } from '../../features/gas-prices';
+import type { GasBrandPriceData } from '../../features/gas-prices';
+import { chatAppUrl, findCity, getCityUrl, type ChatCity } from '../../lib/cities';
+import { breadcrumbNode, datasetNode, itemListNode, webPageNode } from '../../lib/seo';
+
+interface Props { city: ChatCity; data: GasBrandPriceData; }
+const { city, data } = Astro.props;
+const { summary } = data;
+const url = gasPricesUrl(city.slug, summary.brand.slug);
+const title = `Цены на АЗС ${summary.brand.name} ${city.inCity} сегодня`;
+const description = `Цены на бензин и дизель на АЗС ${summary.brand.name} ${city.inCity}: текущая стоимость, ежедневная динамика, адреса и карта ${data.stations.length} заправок.`;
+const h1 = `Цены на АЗС ${summary.brand.name} ${city.inCity}`;
+const robots = city.isIndexable !== false && data.page === 1 && isBrandReadyForIndexing(summary, data.history)
+	? undefined
+	: 'noindex, follow';
+const otherCities = data.otherCitySlugs
+	.map((slug) => findCity(slug))
+	.filter((item): item is ChatCity => Boolean(item) && item.slug !== city.slug && item.isIndexable !== false)
+	.slice(0, 20);
+const faqs = [
+	{ question: `Сколько стоит бензин на АЗС ${summary.brand.name} ${city.inCity}?`, answer: summary.fuels.length > 0 ? 'Актуальные средние цены указаны в сводке выше. Диапазон показывает минимальную и максимальную опубликованную цену среди станций сети.' : 'Свежая цена в источнике пока не опубликована. На странице остаются адреса найденных станций.' },
+	{ question: 'Почему цена на конкретной заправке может отличаться?', answer: 'В сводке показано среднее значение по сети в городе. Цена зависит от конкретной станции и времени обновления данных.' },
+	{ question: 'Как формируется история?', answer: 'Раз в сутки сохраняется один агрегированный снимок по сети и городу. Повторный запуск в тот же день обновляет существующую запись, а не создаёт дубль.' },
+];
+const jsonLd = [
+	webPageNode({ name: title, description, url }),
+	datasetNode({ name: title, description, url, dateModified: summary.sourceUpdatedAt || data.fetchedAt }),
+	itemListNode(data.stations.map((station) => ({ name: station.station.name, url: `${url}#station-${station.station.id}` }))),
+	breadcrumbNode([
+		{ name: 'Главная', url: getCityUrl('/', city.slug) },
+		{ name: 'Цены на АЗС', url: gasPricesUrl(city.slug) },
+		{ name: summary.brand.name, url },
+	]),
+];
+---
+
+<Layout title={title} description={description} jsonLd={jsonLd} city={city} robots={robots}>
+	<Header city={city} />
+	<PageHeader title={h1} items={[
+		{ label: 'главная', href: getCityUrl('/', city.slug) },
+		{ label: 'цены на АЗС', href: gasPricesUrl(city.slug) },
+		{ label: summary.brand.name },
+	]} showChatButton={true} chatLink={chatAppUrl(city.slug)} />
+	<GasBrandOverview summary={summary} cityName={city.name} isPartial={data.isPartial} />
+	<GasPriceHistory history={data.history} historyTotal={data.historyTotal} page={data.page} perPage={data.perPage} baseUrl={url} />
+	{city.bounds && data.stations.length > 0 && <GasPricesMapSection stations={data.stations} bounds={city.bounds} chatUrl={chatAppUrl(city.slug)} />}
+	<GasStationList stations={data.stations} brandName={summary.brand.name} />
+	<section class="related-links">
+		<div class="container">
+			<div class="related-links__grid">
+				<div><h2>Другие сети {city.inCity}</h2><ul>{data.relatedBrands.map((item) => <li><a href={gasPricesUrl(city.slug, item.brand.slug)}>{item.brand.name}</a></li>)}</ul></div>
+				{otherCities.length > 0 && <div><h2>{summary.brand.name} в других городах</h2><ul>{otherCities.map((item) => <li><a href={gasPricesUrl(item.slug, summary.brand.slug)}>{item.name}</a></li>)}</ul></div>}
+			</div>
+		</div>
+	</section>
+	<section class="gas-prices-faq"><div class="container"><HubFaqs faqs={faqs} title={`Вопросы о ценах ${summary.brand.name}`} /></div></section>
+	<HubCta city={city} />
+	<Footer city={city} />
+</Layout>
+
+<style>
+	.related-links { padding: 80px 0; background: #f7f7f7; }
+	.related-links__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 45px; }
+	.related-links ul { display: flex; flex-wrap: wrap; gap: 10px; padding: 0; list-style: none; }
+	.related-links a { display: inline-block; padding: 10px 14px; border-radius: 999px; background: #fff; color: var(--primary-color); font-weight: 700; }
+	.gas-prices-faq { padding: 90px 0; }
+	@media (max-width: 767px) { .related-links__grid { grid-template-columns: 1fr; } }
+</style>

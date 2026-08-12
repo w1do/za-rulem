@@ -272,3 +272,22 @@ export function itemListNode(items: { name: string; url: string }[]) {
 		})),
 	};
 }
+
+/** Набор наблюдений, собранных из публичных данных о ценах. */
+export function datasetNode(opts: {
+	name: string;
+	description: string;
+	url: string;
+	dateModified?: string;
+}) {
+	return {
+		'@type': 'Dataset',
+		name: opts.name,
+		description: opts.description,
+		url: abs(opts.url),
+		inLanguage: 'ru-RU',
+		spatialCoverage: 'Россия',
+		...(opts.dateModified ? { dateModified: opts.dateModified } : {}),
+		isAccessibleForFree: true,
+	};
+}

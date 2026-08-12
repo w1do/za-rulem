@@ -1,0 +1,73 @@
+---
+import type { GasBrandSummary } from '../model/types';
+import { formatDelta, formatFuelLabel, formatPrice } from '../model/format';
+import { gasPricesUrl } from '../model/urls';
+
+interface Props {
+	brands: GasBrandSummary[];
+	citySlug: string;
+}
+
+const { brands, citySlug } = Astro.props;
+---
+
+<section class="brand-catalog" aria-labelledby="brand-catalog-title">
+	<div class="container">
+		<div class="section-title text-center">
+			<span class="section-sub-title">Сети АЗС</span>
+			<h2 id="brand-catalog-title">Цены по сетям заправок</h2>
+			<p>Средняя стоимость рассчитана по опубликованным ценам станций сети. Изменение показано относительно предыдущего ежедневного снимка.</p>
+		</div>
+		{brands.length > 0 ? (
+			<div class="brand-grid">
+				{brands.map((item) => (
+					<article class="brand-card">
+						<div class="brand-card__heading">
+							<div>
+								<h3><a href={gasPricesUrl(citySlug, item.brand.slug)}>{item.brand.name}</a></h3>
+								<p>{item.stationCount} {item.stationCount === 1 ? 'станция' : 'станций'}</p>
+							</div>
+							<span class:list={['brand-card__status', { 'brand-card__status--empty': item.fuels.length === 0 }]}>
+								{item.fuels.length > 0 ? 'Есть цены' : 'Цена уточняется'}
+							</span>
+						</div>
+						{item.fuels.length > 0 ? (
+							<ul class="brand-card__prices">
+								{item.fuels.slice(0, 4).map((fuel) => (
+									<li>
+										<div><span>{formatFuelLabel(fuel.fuelType)}</span><strong>{formatPrice(fuel.average)}</strong></div>
+										<small class:list={[`trend--${fuel.trend}`]}>{formatDelta(fuel.delta)}</small>
+									</li>
+								))}
+							</ul>
+						) : <p class="brand-card__empty">Станции найдены, но свежие цены в источнике пока не опубликованы.</p>}
+						<a class="brand-card__link" href={gasPricesUrl(citySlug, item.brand.slug)}>Динамика и станции <span aria-hidden="true">→</span></a>
+					</article>
+				))}
+			</div>
+		) : <p class="brand-catalog__empty">Не удалось получить список заправок. Попробуйте обновить страницу позднее.</p>}
+	</div>
+</section>
+
+<style>
+	.brand-catalog { padding: 90px 0; background: #fff; }
+	.section-title { max-width: 850px; margin: 0 auto 45px; }
+	.brand-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+	.brand-card { display: flex; flex-direction: column; min-height: 340px; padding: 28px; border: 1px solid #e8e8e8; border-radius: 20px; background: #fff; box-shadow: 0 12px 35px rgba(22, 22, 22, .06); }
+	.brand-card__heading { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 20px; }
+	.brand-card h3 { margin: 0 0 4px; font-size: 24px; }
+	.brand-card h3 a { color: var(--primary-color); }
+	.brand-card__heading p, .brand-card__empty { margin: 0; color: #6f6f6f; }
+	.brand-card__status { flex: 0 0 auto; padding: 6px 10px; color: #246b3b; background: #eaf8ef; border-radius: 999px; font-size: 12px; font-weight: 700; }
+	.brand-card__status--empty { color: #755600; background: #fff5d6; }
+	.brand-card__prices { margin: 0 0 24px; padding: 0; list-style: none; }
+	.brand-card__prices li { padding: 11px 0; border-top: 1px solid #eee; }
+	.brand-card__prices div { display: flex; justify-content: space-between; gap: 12px; }
+	.brand-card__prices small { display: block; margin-top: 3px; }
+	.trend--up { color: #b42318; } .trend--down { color: #067647; } .trend--stable, .trend--unknown { color: #667085; }
+	.brand-card__empty { padding: 24px 0; }
+	.brand-card__link { margin-top: auto; font-weight: 700; color: var(--accent-color); }
+	.brand-catalog__empty { padding: 30px; text-align: center; border-radius: 16px; background: #f7f7f7; }
+	@media (max-width: 991px) { .brand-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+	@media (max-width: 767px) { .brand-catalog { padding: 60px 0; } .brand-grid { grid-template-columns: 1fr; } .brand-card { min-height: 0; } }
+</style>

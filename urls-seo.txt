@@ -12,9 +12,14 @@ https://za-rulem.org/drivers
 https://za-rulem.org/queue
 https://za-rulem.org/partners
 https://za-rulem.org/benzin-tyumen
+https://za-rulem.org/ceny-na-benzin
 https://za-rulem.org/calculator
 https://za-rulem.org/chat-voditeley
 https://za-rulem.org/chat
+
+# Цены АЗС: брендовые URL публикуются в sitemap после двух ежедневных снимков
+# https://za-rulem.org/ceny-na-benzin/{brand}
+# https://za-rulem.org/{city}/ceny-na-benzin/{brand}
 
 # Федеральные трассы
 https://za-rulem.org/route

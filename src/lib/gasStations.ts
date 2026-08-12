@@ -30,6 +30,7 @@ export interface StationData {
 		lat: number;
 		lng: number;
 		last_transaction_at: string;
+		timezone_offset?: number;
 		has_shop: boolean;
 		has_cafe: boolean;
 		has_toilet: boolean;
@@ -155,6 +156,9 @@ const mapStationData = (value: StationData): StationData => ({
 			typeof value.station.last_transaction_at === 'string'
 				? value.station.last_transaction_at
 				: '',
+		timezone_offset: Number.isFinite(Number(value.station.timezone_offset))
+			? Number(value.station.timezone_offset)
+			: undefined,
 		has_shop: Boolean(value.station.has_shop),
 		has_cafe: Boolean(value.station.has_cafe),
 		has_toilet: Boolean(value.station.has_toilet),

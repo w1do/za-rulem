@@ -30,6 +30,7 @@
 | `npm run build`   | Сборка продакшн-версии в `./dist/`                |
 | `npm run preview` | Локальный предпросмотр собранного сайта           |
 | `npm run astro`   | Команды Astro CLI (`astro add`, `astro check`)    |
+| `npm run test:gas-prices` | Unit-тесты агрегации и SEO-готовности цен АЗС |
 
 ### Справочник городов (Directus)
 
@@ -48,6 +49,12 @@
 Резервных и вручную описанных городов в коде нет. Последний успешно загруженный список может использоваться только как кеш Directus. В браузере объект базового города хранится в `localStorage.default_city`, а slug города текущей страницы — в `localStorage.za-rulem-city`.
 
 Кеш городов: список запрашивается не чаще, чем раз в `CITIES_CACHE_TTL_MS` (по умолчанию 600000 мс, `0` отключает кеш). Параллельные рендеры ждут один запрос, а при временной недоступности Directus может использоваться только последний успешный ответ Directus.
+
+### Цены АЗС
+
+`/ceny-na-benzin` и `/{city}/ceny-na-benzin` показывают сети из текущего среза 2GIS. Страницы сети доступны по `/ceny-na-benzin/{brand}` для базового города и `/{city}/ceny-na-benzin/{brand}` для остальных городов. Ежедневная история хранится в Directus (`gas_brands`, `gas_price_daily`) и собирается защищённым `POST /api/internal/gas-prices/snapshot`, который n8n вызывает пачками до 10 городов.
+
+Server-only переменные: `DIRECTUS_GAS_PRICES_TOKEN` и `GAS_PRICE_CRON_SECRET`. Дополнительно можно изменить `GAS_PRICE_CACHE_TTL_MS` и `GAS_PRICE_STALE_TTL_MS`. Полная схема коллекций, правила индексации и импортируемый workflow описаны в [docs/gas-prices-seo.md](./docs/gas-prices-seo.md).
 
 ### Рендеринг городских страниц
 

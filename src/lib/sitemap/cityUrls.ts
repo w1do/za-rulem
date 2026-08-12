@@ -22,7 +22,9 @@ const absolute = (site: string, path: string): string => new URL(path, site).hre
 
 /** Полные URL всех индексируемых городских страниц для sitemap. */
 export const getCitySitemapUrls = (site: string): string[] =>
-	cities
+	[
+		absolute(site, '/ceny-na-benzin'),
+		...cities
 		.filter((city) => city.isIndexable !== false)
 		.flatMap((city) => [
 			...(city.slug === defaultCity.slug
@@ -30,7 +32,8 @@ export const getCitySitemapUrls = (site: string): string[] =>
 				: CITY_PATHS.map((path) => absolute(site, `/${city.slug}${path}`))),
 			absolute(site, cityLandingUrl(city.slug)),
 			...chatFuels.map((fuel) => absolute(site, fuelLandingUrl(city.slug, fuel.slug))),
-		]);
+		]),
+	];
 
 /** Признак городского URL: первый сегмент пути совпадает со слагом города. */
 export const isCitySitemapUrl = (url: string): boolean => {
