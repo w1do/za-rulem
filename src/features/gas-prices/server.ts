@@ -1,6 +1,7 @@
 import { cities, type ChatCity } from '../../lib/cities';
 import {
 	ensureGasBrand,
+	readBrandHistory,
 	readBrandCitySlugs,
 	readCitySnapshots,
 	readGasBrands,
@@ -25,7 +26,7 @@ import type {
 	SnapshotBatchResult,
 } from './model/types';
 
-const HISTORY_PER_PAGE = 30;
+const HISTORY_PER_PAGE = 48;
 
 const optional = async <T>(operation: () => Promise<T>, fallback: T, label: string): Promise<T> => {
 	try {
@@ -70,23 +71,26 @@ export const getGasBrandPriceData = async (
 	const summaries = buildBrandSummaries(city.slug, stationResult.stations, allHistory, brands);
 	const summary = summaries.find((item) => item.brand.slug === brandSlug);
 	if (!summary) throw new GasBrandNotFoundError(`АЗС ${brandSlug} не найдена в городе ${city.slug}`);
-	const brandHistory = allHistory
-		.filter((snapshot) => snapshot.brandSlug === brandSlug)
-		.sort((left, right) => right.snapshotDate.localeCompare(left.snapshotDate));
 	const safePage = Math.max(1, Math.floor(page));
-	const start = (safePage - 1) * HISTORY_PER_PAGE;
 	const group = groupStationsByBrand(stationResult.stations, [summary.brand])
 		.find((item) => item.brand.slug === brandSlug);
-	const otherCitySlugs = await optional(
-		() => readBrandCitySlugs(brandSlug),
-		[],
-		`city links unavailable for ${brandSlug}`,
-	);
+	const [brandHistory, otherCitySlugs] = await Promise.all([
+		optional(
+			() => readBrandHistory(city.slug, brandSlug, safePage, HISTORY_PER_PAGE),
+			{ items: [], total: 0 },
+			`brand history unavailable for ${city.slug}/${brandSlug}`,
+		),
+		optional(
+			() => readBrandCitySlugs(brandSlug),
+			[],
+			`city links unavailable for ${brandSlug}`,
+		),
+	]);
 	return {
 		summary,
 		stations: group?.stations ?? [],
-		history: brandHistory.slice(start, start + HISTORY_PER_PAGE),
-		historyTotal: brandHistory.length,
+		history: brandHistory.items,
+		historyTotal: brandHistory.total,
 		page: safePage,
 		perPage: HISTORY_PER_PAGE,
 		relatedBrands: summaries.filter((item) => item.brand.slug !== brandSlug).slice(0, 8),

@@ -141,11 +141,14 @@ const fuelSortIndex = (fuelType: string): number => {
 	return index === -1 ? order.length : index;
 };
 
+/** Начало текущего получасового интервала в локальном времени города. */
 export const getSnapshotDate = (stations: StationData[], now = new Date()): string => {
 	const offset = stations.find((station) => Number.isFinite(station.station.timezone_offset))
 		?.station.timezone_offset ?? 3;
 	const localTimestamp = now.getTime() + offset * 60 * 60 * 1000;
-	return new Date(localTimestamp).toISOString().slice(0, 10);
+	const localDate = new Date(localTimestamp);
+	localDate.setUTCMinutes(localDate.getUTCMinutes() < 30 ? 0 : 30, 0, 0);
+	return localDate.toISOString().slice(0, 19);
 };
 
 export const createGasPriceSnapshots = (
@@ -221,7 +224,7 @@ export const buildBrandSummaries = (
 			.filter((item) => item.brandSlug === brand.slug)
 			.sort((left, right) => left.snapshotDate.localeCompare(right.snapshotDate));
 		const previous = brandHistory
-			.filter((item) => item.snapshotDate.slice(0, 10) < snapshot.snapshotDate.slice(0, 10))
+			.filter((item) => item.snapshotDate < snapshot.snapshotDate)
 			.sort((left, right) => right.snapshotDate.localeCompare(left.snapshotDate))[0];
 		return {
 			brand,
@@ -242,5 +245,5 @@ export const isBrandReadyForIndexing = (
 	if (!summary.brand.isIndexable || summary.brand.verificationStatus !== 'verified') return false;
 	const sourceUpdatedAt = Date.parse(summary.sourceUpdatedAt);
 	if (!Number.isFinite(sourceUpdatedAt) || now - sourceUpdatedAt > MAX_FUEL_PRICE_AGE_MS) return false;
-	return new Set(history.map((snapshot) => snapshot.snapshotDate.slice(0, 10))).size >= 2;
+	return new Set(history.map((snapshot) => snapshot.snapshotDate)).size >= 2;
 };

@@ -19,7 +19,7 @@ const { city, data } = Astro.props;
 const { summary } = data;
 const url = gasPricesUrl(city.slug, summary.brand.slug);
 const title = `Цены на АЗС ${summary.brand.name} ${city.inCity} сегодня`;
-const description = `Цены на бензин и дизель на АЗС ${summary.brand.name} ${city.inCity}: текущая стоимость, ежедневная динамика, адреса и карта ${data.stations.length} заправок.`;
+const description = `Цены на бензин и дизель на АЗС ${summary.brand.name} ${city.inCity}: текущая стоимость, динамика каждые 30 минут, адреса и карта ${data.stations.length} заправок.`;
 const h1 = `Цены на АЗС ${summary.brand.name} ${city.inCity}`;
 const robots = city.isIndexable !== false && data.page === 1 && isBrandReadyForIndexing(summary, data.history)
 	? undefined
@@ -31,7 +31,7 @@ const otherCities = data.otherCitySlugs
 const faqs = [
 	{ question: `Сколько стоит бензин на АЗС ${summary.brand.name} ${city.inCity}?`, answer: summary.fuels.length > 0 ? 'Актуальные средние цены указаны в сводке выше. Диапазон показывает минимальную и максимальную опубликованную цену среди станций сети.' : 'Свежая цена в источнике пока не опубликована. На странице остаются адреса найденных станций.' },
 	{ question: 'Почему цена на конкретной заправке может отличаться?', answer: 'В сводке показано среднее значение по сети в городе. Цена зависит от конкретной станции и времени обновления данных.' },
-	{ question: 'Как формируется история?', answer: 'Раз в сутки сохраняется один агрегированный снимок по сети и городу. Повторный запуск в тот же день обновляет существующую запись, а не создаёт дубль.' },
+	{ question: 'Как формируется история?', answer: 'Каждые 30 минут сохраняется агрегированный снимок по сети и городу. Повторный запуск внутри того же получасового интервала обновляет запись, следующий интервал создаёт новую точку графика.' },
 ];
 const jsonLd = [
 	webPageNode({ name: title, description, url }),

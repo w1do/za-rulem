@@ -21,8 +21,30 @@ export const formatFuelLabel = (fuelType: string): string => {
 };
 
 export const formatGasDate = (value: string): string => {
-	const date = new Date(`${value.slice(0, 10)}T00:00:00Z`);
+	const normalized = value.includes('T') ? `${value.slice(0, 19)}Z` : `${value.slice(0, 10)}T00:00:00Z`;
+	const date = new Date(normalized);
 	return Number.isNaN(date.getTime())
 		? value
-		: date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+		: date.toLocaleString('ru-RU', {
+			day: 'numeric',
+			month: 'long',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+			timeZone: 'UTC',
+		});
+};
+
+export const formatGasChartTime = (value: string): string => {
+	const normalized = value.includes('T') ? `${value.slice(0, 19)}Z` : `${value.slice(0, 10)}T00:00:00Z`;
+	const date = new Date(normalized);
+	return Number.isNaN(date.getTime())
+		? value
+		: date.toLocaleString('ru-RU', {
+			day: '2-digit',
+			month: '2-digit',
+			hour: '2-digit',
+			minute: '2-digit',
+			timeZone: 'UTC',
+		});
 };

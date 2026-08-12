@@ -98,9 +98,9 @@ test('cards include networks even when fresh prices are absent', () => {
 	assert.deepEqual(summaries[0]?.fuels, []);
 });
 
-test('delta is calculated against the previous daily snapshot in rubles', () => {
+test('delta is calculated against the previous half-hour snapshot in rubles', () => {
 	const previous: GasPriceSnapshot = {
-		citySlug: 'tyumen', brandSlug: 'test', snapshotDate: '2026-08-11',
+		citySlug: 'tyumen', brandSlug: 'test', snapshotDate: '2026-08-12T16:00:00',
 		stationCount: 1, sourceUpdatedAt: NOW.toISOString(),
 		fuels: [{ fuelType: 'AI_95', average: 60, min: 60, max: 60, sampleCount: 1, updatedAt: NOW.toISOString() }],
 	};
@@ -112,19 +112,19 @@ test('delta is calculated against the previous daily snapshot in rubles', () => 
 	assert.equal(current?.trend, 'up');
 });
 
-test('snapshot date uses station timezone and yields one deterministic daily key', () => {
+test('snapshot datetime uses station timezone and rounds down to a half-hour key', () => {
 	const stations = [station('1', 'Тест', [{ fuel_type: 'DT', price: 70 }], 5)];
-	const closeToMidnight = new Date('2026-08-12T21:30:00.000Z');
-	assert.equal(getSnapshotDate(stations, closeToMidnight), '2026-08-13');
-	const first = createGasPriceSnapshots('tyumen', stations, [verifiedBrand], closeToMidnight)[0];
-	const second = createGasPriceSnapshots('tyumen', stations, [verifiedBrand], closeToMidnight)[0];
+	const currentTime = new Date('2026-08-12T21:47:25.000Z');
+	assert.equal(getSnapshotDate(stations, currentTime), '2026-08-13T02:30:00');
+	const first = createGasPriceSnapshots('tyumen', stations, [verifiedBrand], currentTime)[0];
+	const second = createGasPriceSnapshots('tyumen', stations, [verifiedBrand], currentTime)[0];
 	assert.equal(
 		`${first?.snapshot.citySlug}:${first?.snapshot.brandSlug}:${first?.snapshot.snapshotDate}`,
 		`${second?.snapshot.citySlug}:${second?.snapshot.brandSlug}:${second?.snapshot.snapshotDate}`,
 	);
 });
 
-test('SEO readiness requires a verified brand, fresh source and two distinct days', () => {
+test('SEO readiness requires a verified brand, fresh source and two distinct snapshots', () => {
 	const summary = buildBrandSummaries(
 		'tyumen',
 		[station('1', 'Тест', [{ fuel_type: 'AI_92', price: 59 }])],
@@ -133,7 +133,7 @@ test('SEO readiness requires a verified brand, fresh source and two distinct day
 		NOW,
 	)[0];
 	assert.ok(summary);
-	const history: GasPriceSnapshot[] = ['2026-08-11', '2026-08-12'].map((snapshotDate) => ({
+	const history: GasPriceSnapshot[] = ['2026-08-12T16:00:00', '2026-08-12T16:30:00'].map((snapshotDate) => ({
 		citySlug: 'tyumen', brandSlug: 'test', snapshotDate, stationCount: 1,
 		sourceUpdatedAt: NOW.toISOString(), fuels: [],
 	}));

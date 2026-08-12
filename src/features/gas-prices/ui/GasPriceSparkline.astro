@@ -1,6 +1,6 @@
 ---
 import type { GasPriceSnapshot } from '../model/types';
-import { formatFuelLabel, formatPrice } from '../model/format';
+import { formatFuelLabel, formatGasChartTime, formatPrice } from '../model/format';
 
 interface Props {
 	history: GasPriceSnapshot[];
@@ -17,7 +17,7 @@ const fuelType = requestedFuelType
 const values = fuelType
 	? snapshots.flatMap((item) => {
 		const fuel = item.fuels.find((entry) => entry.fuelType === fuelType);
-		return fuel ? [{ date: item.snapshotDate.slice(0, 10), value: fuel.average }] : [];
+		return fuel ? [{ date: item.snapshotDate, value: fuel.average }] : [];
 	})
 	: [];
 const min = values.length > 0 ? Math.min(...values.map((item) => item.value)) : 0;
@@ -42,11 +42,11 @@ const latest = values.at(-1);
 				{values.length > 1 && <polyline points={points} fill="none" stroke="#f5b754" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />}
 				{values.map((item, index) => (
 					<circle cx={xFor(index)} cy={yFor(item.value)} r={values.length === 1 ? 5 : 3.5} fill="#f5b754">
-						<title>{item.date}: {formatPrice(item.value)}</title>
+						<title>{formatGasChartTime(item.date)}: {formatPrice(item.value)}</title>
 					</circle>
 				))}
 			</svg>
-			{values.length === 1 && <small>Линия появится после следующего дневного снимка</small>}
+			{values.length === 1 && <small>Линия появится после следующего получасового снимка</small>}
 		</>
 	) : <p>История пока не накоплена</p>}
 </div>

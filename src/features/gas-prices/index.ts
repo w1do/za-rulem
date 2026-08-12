@@ -1,4 +1,4 @@
-export { formatDelta, formatFuelLabel, formatGasDate, formatPrice } from './model/format';
+export { formatDelta, formatFuelLabel, formatGasChartTime, formatGasDate, formatPrice } from './model/format';
 export { gasPricesUrl } from './model/urls';
 export { isBrandReadyForIndexing } from './model/aggregate';
 export type {

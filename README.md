@@ -52,7 +52,7 @@
 
 ### Цены АЗС
 
-`/ceny-na-benzin` и `/{city}/ceny-na-benzin` показывают сети из текущего среза 2GIS. Страницы сети доступны по `/ceny-na-benzin/{brand}` для базового города и `/{city}/ceny-na-benzin/{brand}` для остальных городов. Ежедневная история хранится в Directus (`gas_brands`, `gas_price_daily`) и собирается защищённым `POST /api/internal/gas-prices/snapshot`, который n8n вызывает пачками до 10 городов.
+`/ceny-na-benzin` и `/{city}/ceny-na-benzin` показывают сети из текущего среза 2GIS. Страницы сети доступны по `/ceny-na-benzin/{brand}` для базового города и `/{city}/ceny-na-benzin/{brand}` для остальных городов. Получасовая история хранится в Directus (`gas_brands`, `gas_price_daily`) и собирается защищённым `POST /api/internal/gas-prices/snapshot`, который n8n вызывает пачками до 10 городов. Поле `gas_price_daily.snapshot_date` должно иметь тип `datetime`; уникальный ключ — город, сеть и получасовой интервал.
 
 Server-only переменные: `DIRECTUS_GAS_PRICES_TOKEN` и `GAS_PRICE_CRON_SECRET`. Дополнительно можно изменить `GAS_PRICE_CACHE_TTL_MS` и `GAS_PRICE_STALE_TTL_MS`. Полная схема коллекций, правила индексации и импортируемый workflow описаны в [docs/gas-prices-seo.md](./docs/gas-prices-seo.md).
 

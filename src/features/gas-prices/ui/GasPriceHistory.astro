@@ -1,6 +1,6 @@
 ---
 import type { GasPriceSnapshot } from '../model/types';
-import { formatFuelLabel, formatGasDate, formatPrice } from '../model/format';
+import { formatFuelLabel, formatGasChartTime, formatGasDate, formatPrice } from '../model/format';
 
 interface Props {
 	history: GasPriceSnapshot[];
@@ -45,9 +45,9 @@ const pageUrl = (target: number): string => target === 1 ? baseUrl : `${baseUrl}
 <section class="history" aria-labelledby="history-title">
 	<div class="container">
 		<div class="section-title">
-			<span class="section-sub-title">Ежедневные отчёты</span>
+			<span class="section-sub-title">Снимки каждые 30 минут</span>
 			<h2 id="history-title">Динамика цен</h2>
-			<p>История начинает формироваться с момента запуска ежедневного сборщика. Один снимок на сеть и город в сутки обновляется идемпотентно.</p>
+			<p>История формируется по получасовым интервалам. Повторный запуск внутри одного интервала обновляет снимок, следующий интервал создаёт новую точку.</p>
 		</div>
 		{history.length > 0 ? (
 			<>
@@ -56,7 +56,7 @@ const pageUrl = (target: number): string => target === 1 ? baseUrl : `${baseUrl}
 						{chartFuels.map((fuel, index) => <span><i style={`background:${colors[index]}`}></i>{formatFuelLabel(fuel)}</span>)}
 					</div>
 					<svg viewBox="0 0 800 250" role="img" aria-label="График средней стоимости топлива">
-						<title>Средняя стоимость топлива по ежедневным снимкам</title>
+						<title>Средняя стоимость топлива по получасовым снимкам</title>
 						{yTicks.map((tick, index) => {
 							const y = 50 + index * 77.5;
 							return <g><line x1="70" y1={y} x2="760" y2={y} stroke="#e7e7e7" /><text x="8" y={y + 4}>{tick.toFixed(2)} ₽</text></g>;
@@ -73,14 +73,14 @@ const pageUrl = (target: number): string => target === 1 ? baseUrl : `${baseUrl}
 						))}
 						{dateLabels.map((snapshot) => {
 							const index = chartHistory.indexOf(snapshot);
-							return <text class="chart-date" x={xFor(index)} y="238" text-anchor="middle">{formatGasDate(snapshot.snapshotDate).replace(` ${new Date(snapshot.snapshotDate).getFullYear()} г.`, '')}</text>;
+							return <text class="chart-date" x={xFor(index)} y="238" text-anchor="middle">{formatGasChartTime(snapshot.snapshotDate)}</text>;
 						})}
 					</svg>
-					{chartHistory.length === 1 && <p class="chart-notice">Первый снимок уже показан точками. Линии динамики появятся автоматически после сохранения следующего дня.</p>}
+					{chartHistory.length === 1 && <p class="chart-notice">Первый снимок уже показан точками. Линии динамики появятся после следующего получасового запуска.</p>}
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th>Дата</th><th>Станций</th><th>Средние цены</th></tr></thead>
+						<thead><tr><th>Дата и время</th><th>Станций</th><th>Средние цены</th></tr></thead>
 						<tbody>{history.map((snapshot) => (
 							<tr>
 								<td>{formatGasDate(snapshot.snapshotDate)}</td>
@@ -96,7 +96,7 @@ const pageUrl = (target: number): string => target === 1 ? baseUrl : `${baseUrl}
 					{page < totalPages && <a rel="next" href={pageUrl(page + 1)}>Раньше →</a>}
 				</nav>}
 			</>
-		) : <div class="history-empty">Первый ежедневный снимок ещё не сохранён. Текущие цены и список станций доступны выше и ниже.</div>}
+		) : <div class="history-empty">Первый получасовой снимок ещё не сохранён. Текущие цены и список станций доступны выше и ниже.</div>}
 	</div>
 </section>
 
