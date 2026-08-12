@@ -3,6 +3,7 @@ export { gasPricesUrl } from './model/urls';
 export { isBrandReadyForIndexing } from './model/aggregate';
 export type {
 	FuelPriceView,
+	GasBrand,
 	GasBrandPriceData,
 	GasBrandSummary,
 	GasCityPriceData,

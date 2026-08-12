@@ -4,9 +4,10 @@ import { defaultCity, fuelLandingUrl, getCityUrl, type ChatCity } from '../../..
 export interface Props {
 	city?: ChatCity;
 	isNational?: boolean;
+	showRequestButton?: boolean;
 }
 
-const { city, isNational = false } = Astro.props;
+const { city, isNational = false, showRequestButton = true } = Astro.props;
 const pageUrl = (path: string): string => isNational ? path : getCityUrl(path, city?.slug);
 
 // Главное меню сайта. Пункты вынесены в массив для переиспользования и лёгкого расширения.
@@ -75,7 +76,7 @@ const menu = [
 	</div>
 
 	<!-- Header Btn Start -->
-	<div class="header-btn d-flex align-items-center">
+	{showRequestButton && <div class="header-btn d-flex align-items-center">
 		<a
 			href="#"
 			class="btn-default btn-highlighted"
@@ -83,7 +84,7 @@ const menu = [
 		>
 			Позвонить
 		</a>
-	</div>
+	</div>}
 	<!-- Header Btn End -->
 </div>
 

@@ -41,6 +41,11 @@ const loadBrands = (): Promise<GasBrand[]> => optional(readGasBrands, [], 'brand
 const loadHistory = (citySlug: string): Promise<GasPriceSnapshot[]> =>
 	optional(() => readCitySnapshots(citySlug), [], `history unavailable for ${citySlug}`);
 
+export const getPopularGasBrands = async (): Promise<GasBrand[]> =>
+	(await readGasBrands())
+		.filter((brand) => brand.isIndexable && brand.verificationStatus === 'verified')
+		.sort((first, second) => first.name.localeCompare(second.name, 'ru'));
+
 export class GasBrandNotFoundError extends Error {}
 
 const loadCityPriceContext = async (city: ChatCity) => {

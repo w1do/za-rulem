@@ -17,6 +17,19 @@ https://za-rulem.org/calculator
 https://za-rulem.org/chat-voditeley
 https://za-rulem.org/chat
 
+# Топливные карты (хаб и брендовые страницы из проверенного gas_brands)
+https://za-rulem.org/toplivnye-karty
+https://za-rulem.org/toplivnye-karty/bashneft
+https://za-rulem.org/toplivnye-karty/gazprom
+https://za-rulem.org/toplivnye-karty/kondor
+https://za-rulem.org/toplivnye-karty/lukoil
+https://za-rulem.org/toplivnye-karty/n-1
+https://za-rulem.org/toplivnye-karty/rosneft
+https://za-rulem.org/toplivnye-karty/signal
+https://za-rulem.org/toplivnye-karty/surgutneftegaz
+https://za-rulem.org/toplivnye-karty/tatneft
+https://za-rulem.org/toplivnye-karty/tpk
+
 # Цены АЗС: брендовые URL публикуются в sitemap после двух ежедневных снимков
 # https://za-rulem.org/ceny-na-benzin/{brand}
 # https://za-rulem.org/{city}/ceny-na-benzin/{brand}

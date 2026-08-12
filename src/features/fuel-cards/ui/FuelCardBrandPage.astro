@@ -1,0 +1,221 @@
+---
+import Footer from '../../../components/shared/footer/Footer.astro';
+import Header from '../../../components/shared/header/Header.astro';
+import HomeHero from '../../../components/home/HomeHero.astro';
+import HubFaqs from '../../../components/hub/HubFaqs.astro';
+import HubProcess from '../../../components/hub/HubProcess.astro';
+import Layout from '../../../layouts/Layout.astro';
+import { breadcrumbNode, faqNode, itemListNode, serviceNode, webPageNode } from '../../../lib/seo';
+import { fuelCardBrandUrl } from '../model/brands';
+import type { FuelCardBrand, FuelCardCriterion, FuelCardFaq } from '../model/types';
+import FuelCardBrandGrid from './FuelCardBrandGrid.astro';
+
+interface Props {
+	brand: FuelCardBrand;
+	relatedBrands: FuelCardBrand[];
+}
+
+const { brand, relatedBrands } = Astro.props;
+const pagePath = fuelCardBrandUrl(brand.slug);
+const title = `Топливная карта ${brand.name} для бизнеса — заказать`;
+const h1 = `Топливная карта ${brand.name} для бизнеса`;
+const description = `Подбор топливной карты для заправок ${brand.name}: учитываем маршруты, автопарк, расход, документы и лимиты. Оставьте голосовую заявку.`;
+const requestService = `fuel-card-${brand.slug}`;
+const requestSubject = `Заявка на топливную карту ${brand.name}`;
+const requestTitle = `Заказать топливную карту ${brand.name}`;
+
+const criteria: FuelCardCriterion[] = [
+	{
+		title: 'Маршруты и покрытие',
+		text: `Отметьте города и трассы, где водителям нужны АЗС ${brand.name}. Так карта подбирается по реальным поездкам, а не по общему числу станций.`,
+		icon: '/images/icon-service-1.svg',
+	},
+	{
+		title: 'Расходы и документы',
+		text: 'Укажите месячный объём топлива, схему оплаты и требования бухгалтерии к отчётам, закрывающим документам и ЭДО.',
+		icon: '/images/icon-service-4.svg',
+	},
+	{
+		title: 'Лимиты и управление',
+		text: 'Определите число машин и водителей, нужные ограничения по литрам, сумме, виду топлива, времени и географии операций.',
+		icon: '/images/icon-service-5.svg',
+	},
+];
+
+const faqs: FuelCardFaq[] = [
+	{
+		question: `Как заказать топливную карту ${brand.name}?`,
+		answer: `Нажмите «Заказать», назовите форму бизнеса, число машин, месячный расход и основные маршруты через АЗС ${brand.name}. Голосовая заявка преобразуется в текст, который можно проверить и дополнить перед отправкой.`,
+	},
+	{
+		question: `Подойдёт ли карта для ИП и небольшого автопарка?`,
+		answer: 'При подборе учитывается фактический размер автопарка: от одной рабочей машины до транспорта компании. Важно указать регулярность заправок, объём топлива и необходимые функции контроля, чтобы не выбирать лишние опции.',
+	},
+	{
+		question: `Что проверить по АЗС ${brand.name} до оформления?`,
+		answer: 'Сопоставьте расположение станций с рабочими маршрутами, доступные виды топлива, полную стоимость обслуживания, комиссии, порядок выпуска и блокировки карт, комплект документов и возможности личного кабинета.',
+	},
+	{
+		question: 'Можно ли использовать одну карту для нескольких водителей?',
+		answer: 'Правила зависят от выбранного решения. В заявке укажите количество автомобилей и водителей, а также нужные лимиты. Для контроля расходов часто удобнее распределять карты или виртуальные идентификаторы по машинам и задавать ограничения отдельно.',
+	},
+];
+
+const faqSchema = faqNode(faqs);
+const jsonLd: Record<string, unknown>[] = [
+	webPageNode({ name: h1, description, url: pagePath }),
+	serviceNode({
+		name: `Подбор топливной карты для АЗС ${brand.name}`,
+		description,
+		url: pagePath,
+		serviceType: 'Подбор топливной карты для бизнеса',
+		areaServed: ['Россия'],
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Топливные карты', url: '/toplivnye-karty' },
+		{ name: brand.name, url: pagePath },
+	]),
+];
+
+if (relatedBrands.length > 0) {
+	jsonLd.push(itemListNode(relatedBrands.map((item) => ({
+		name: `Топливная карта ${item.name}`,
+		url: fuelCardBrandUrl(item.slug),
+	}))));
+}
+if (faqSchema) jsonLd.push(faqSchema);
+---
+
+<Layout
+	title={title}
+	description={description}
+	ogTitle={title}
+	ogDescription={`Подберите топливную карту для поездок через АЗС ${brand.name} под маршруты и задачи вашего автопарка.`}
+	keywords={`топливная карта ${brand.name}, карта АЗС ${brand.name}, топливная карта для бизнеса, топливная карта для ИП`}
+	jsonLd={jsonLd}
+	isNational
+>
+	<Header isNational showRequestButton={false} />
+
+	<main>
+		<HomeHero
+			subtitle={`Карты для заправок сети ${brand.name}`}
+			title={h1}
+			description={`Подберите решение для ООО, ИП или автопарка с учётом маршрутов через АЗС ${brand.name}, объёма топлива, документов и правил контроля расходов.`}
+			ctaText="Заказать"
+			ctaHref="/contacts"
+			requestService={requestService}
+			requestSubject={requestSubject}
+			requestTitle={requestTitle}
+			secondaryCtaText="Все топливные карты"
+			secondaryCtaHref="/toplivnye-karty"
+			reviewText="Заявка учитывает реальные маршруты и расход"
+			counterValue="4"
+			counterSuffix=""
+			counterText="Ключевых параметра: покрытие, стоимость, документы и контроль операций."
+			showClientImages={false}
+			benefits={[
+				{
+					icon: '/images/icon-hero-info-list-1-gold.svg',
+					title: '01. Опишите автопарк',
+					text: 'Количество машин, водителей и примерный месячный расход топлива.',
+				},
+				{
+					icon: '/images/icon-hero-info-list-2-gold.svg',
+					title: '02. Назовите маршруты',
+					text: `Города и трассы, где регулярно нужны заправки ${brand.name}.`,
+				},
+				{
+					icon: '/images/icon-hero-info-list-3-gold.svg',
+					title: '03. Оставьте заявку',
+					text: 'Запишите параметры голосом и проверьте распознанный текст.',
+				},
+			]}
+		/>
+
+		<section class="page-services fuel-card-brand-guide" aria-labelledby="fuel-card-brand-guide-title">
+			<div class="container">
+				<div class="row section-row">
+					<div class="col-xl-12">
+						<div class="section-title section-title-center">
+							<span class="section-sub-title wow fadeInUp">Параметры подбора</span>
+							<h2 id="fuel-card-brand-guide-title" class="text-anime-style-3" data-cursor="-opaque">Что учесть при выборе карты для АЗС {brand.name}</h2>
+							<p>Подготовьте исходные данные заранее — так проще сопоставить покрытие, расходы и инструменты контроля.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					{criteria.map((criterion, index) => (
+						<div class="col-xl-4 col-md-6">
+							<article class="service-item wow fadeInUp" data-wow-delay={index === 0 ? undefined : `${index * 0.2}s`}>
+								<div class="icon-box"><img src={criterion.icon} alt="" width="60" height="60" /></div>
+								<div class="service-item-body">
+									<div class="service-item-content">
+										<h3>{criterion.title}</h3>
+										<p>{criterion.text}</p>
+									</div>
+								</div>
+							</article>
+						</div>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<HubProcess
+			subtitle="Как оставить заявку"
+			title={`Заказ топливной карты ${brand.name} в четыре шага`}
+			steps={[
+				{ title: 'Нажмите «Заказать»', description: 'Откроется голосовая форма заявки без перехода на другую страницу.' },
+				{ title: 'Назовите параметры', description: 'Укажите бизнес, автомобили, расход, маршруты и нужные виды топлива.' },
+				{ title: 'Проверьте текст', description: 'После распознавания исправьте или дополните сведения перед отправкой.' },
+				{ title: 'Ожидайте связь', description: 'Оставьте телефон, чтобы обсудить подходящий вариант и порядок оформления.' },
+			]}
+		/>
+
+		<FuelCardBrandGrid
+			brands={relatedBrands}
+			id="related-fuel-card-brands"
+			subtitle="Другие сети АЗС"
+			title="Сравните карты для других заправок"
+			description="Если маршруты проходят через несколько сетей, посмотрите соседние страницы каталога или вернитесь к общему списку топливных карт."
+		/>
+
+		<HubFaqs
+			subtitle="Частые вопросы"
+			title={`Вопросы о топливной карте ${brand.name}`}
+			description="Что подготовить к заявке и какие параметры проверить перед оформлением."
+			faqs={faqs}
+			benefits={['Подбор по фактическим маршрутам', 'Заявка для ИП, ООО и автопарков']}
+			buttonLabel="Заказать"
+			buttonHref="/contacts"
+			requestService={requestService}
+			requestSubject={requestSubject}
+			requestTitle={requestTitle}
+		/>
+	</main>
+
+	<Footer
+		isNational
+		nationalVariant="fuel-cards"
+		fuelCardSubject={requestSubject}
+		fuelCardService={requestService}
+	/>
+</Layout>
+
+<style>
+	.fuel-card-brand-guide .section-title p {
+		max-width: 760px;
+		margin: 18px auto 0;
+	}
+
+	.fuel-card-brand-guide .service-item {
+		height: calc(100% - 30px);
+	}
+
+	.fuel-card-brand-guide .service-item-content h3 {
+		font-size: 21px;
+	}
+</style>

@@ -33,6 +33,7 @@ export default function VoiceRequestModal() {
 	const isCarSelection = service === 'vladivostok-car-selection';
 	const isPartsSelection = service === 'vladivostok-contract-parts';
 	const isPartnerApplication = service === 'partner-fuel-courier';
+	const isFuelCardRequest = service?.startsWith('fuel-card-') === true;
 
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const chunksRef = useRef<Blob[]>([]);
@@ -234,13 +235,19 @@ export default function VoiceRequestModal() {
 				<div className="service-request-modal__header">
 					<div>
 						<span className="service-request-modal__eyebrow">
-							{isPartnerApplication ? 'Анкета курьера' : 'Поиск исполнителя'}
+							{isPartnerApplication
+								? 'Анкета курьера'
+								: isFuelCardRequest
+									? 'Заявка на топливную карту'
+									: 'Поиск исполнителя'}
 						</span>
 						<h2 id={titleId}>{heading}</h2>
 						<p>
 							{isPartnerApplication
 								? 'Расскажите, где и какие заявки готовы выполнять'
-								: 'Опишите, где и какая помощь вам нужна'}
+								: isFuelCardRequest
+									? 'Опишите бизнес, автопарк, маршруты и расход топлива'
+									: 'Опишите, где и какая помощь вам нужна'}
 						</p>
 					</div>
 					<button
@@ -262,6 +269,11 @@ export default function VoiceRequestModal() {
 									сопоставляет её с подходящими обращениями, но не гарантирует трудоустройство,
 									количество или регулярность заявок.
 								</>
+							) : isFuelCardRequest ? (
+								<>
+									Заявка используется для подбора топливной карты по параметрам вашего бизнеса.
+									После записи проверьте распознанный текст и укажите телефон для связи.
+								</>
 							) : isCarSelection || isPartsSelection ? (
 								<>
 									Вы оставляете заявку, а Za-Rulem как агрегатор подбирает подходящего исполнителя по
@@ -282,7 +294,9 @@ export default function VoiceRequestModal() {
 							<p className="ajax-response success mb-4" style={{ color: '#28a745', fontWeight: '600' }}>
 								{isPartnerApplication
 									? 'Анкета отправлена. Если в указанном городе появится подходящая заявка, мы свяжемся с вами.'
-									: 'Заявка отправлена на подбор. Если подходящий курьер или исполнитель найдётся, он свяжется с вами.'}
+									: isFuelCardRequest
+										? 'Заявка на топливную карту отправлена. С вами свяжутся по указанному номеру.'
+										: 'Заявка отправлена на подбор. Если подходящий курьер или исполнитель найдётся, он свяжется с вами.'}
 							</p>
 							<button type="button" className="btn-default" onClick={closeModal}>
 								Закрыть
@@ -307,6 +321,8 @@ export default function VoiceRequestModal() {
 													<strong> районы выезда</strong>, время готовности и дополнительные навыки
 													автотехпомощи.
 												</>
+											) : isFuelCardRequest ? (
+												<>Включите запись и назовите <strong>ИП или ООО</strong>, <strong>количество машин</strong>, <strong>месячный расход</strong>, <strong>города и трассы</strong>, нужные сети АЗС и требования к документам.</>
 											) : isCarSelection ? (
 												<>Включите запись и назовите <strong>бюджет</strong>, <strong>параметры автомобиля</strong> и <strong>город получения</strong>. После распознавания текст можно проверить и дополнить.</>
 											) : isPartsSelection ? (
@@ -365,7 +381,11 @@ export default function VoiceRequestModal() {
 								<form onSubmit={handleSubmit} noValidate>
 									<div className="form-group mb-4">
 										<label className="service-request-modal__label">
-											{isPartnerApplication ? 'Данные анкеты (распознано):' : 'Ваша заявка (распознано):'}
+											{isPartnerApplication
+												? 'Данные анкеты (распознано):'
+												: isFuelCardRequest
+													? 'Параметры топливной карты (распознано):'
+													: 'Ваша заявка (распознано):'}
 										</label>
 										<textarea 
 											className="form-control" 
@@ -375,7 +395,9 @@ export default function VoiceRequestModal() {
 											placeholder={
 												isPartnerApplication
 													? 'Расскажите об автомобиле, городе и доступных заявках...'
-													: 'Опишите ситуацию...'
+													: isFuelCardRequest
+														? 'Укажите бизнес, автопарк, расход, маршруты и нужные сети АЗС...'
+														: 'Опишите ситуацию...'
 											}
 											required
 										/>

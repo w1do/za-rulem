@@ -31,6 +31,9 @@ interface Props {
 	benefits?: HeroBenefit[];
 	showClientImages?: boolean;
 	interceptPrimaryCta?: boolean;
+	requestService?: string;
+	requestSubject?: string;
+	requestTitle?: string;
 }
 
 const {
@@ -49,6 +52,9 @@ const {
 	benefits: propBenefits,
 	showClientImages = true,
 	interceptPrimaryCta = true,
+	requestService,
+	requestSubject,
+	requestTitle,
 } = Astro.props;
 
 const city = propCity ?? defaultCity;
@@ -108,7 +114,9 @@ const benefits = propBenefits ?? [
 								href={ctaHref}
 								class="btn-default btn-highlighted"
 								data-service-request={interceptPrimaryCta ? '' : undefined}
-								data-service-title={ctaText}
+								data-service-title={requestTitle ?? ctaText}
+								data-service={requestService}
+								data-service-subject={requestSubject}
 							>
 								{ctaText}
 							</a>

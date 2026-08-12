@@ -6,9 +6,10 @@ import { defaultCity, type ChatCity } from '../../../lib/cities';
 export interface Props {
 	city?: ChatCity;
 	isNational?: boolean;
+	showRequestButton?: boolean;
 }
 
-const { city, isNational = false } = Astro.props;
+const { city, isNational = false, showRequestButton = true } = Astro.props;
 const effectiveCity = city ?? defaultCity;
 ---
 
@@ -20,9 +21,9 @@ const effectiveCity = city ?? defaultCity;
 				{isNational ? <a class="navbar-brand" href="/" aria-label="За рулём — главная"><img src="/images/logo.svg" alt="За рулём" width="140" height="35" /></a> : <CitySelector currentCity={effectiveCity} />}
 				
 				<!-- Main Menu Start -->
-				<HeaderNav city={effectiveCity} isNational={isNational} />
+				<HeaderNav city={effectiveCity} isNational={isNational} showRequestButton={showRequestButton} />
 				<!-- Main Menu End -->
-				<a
+				{showRequestButton && <a
 					href="#"
 					class="mobile-call-button"
 					aria-label="Позвонить"
@@ -30,7 +31,7 @@ const effectiveCity = city ?? defaultCity;
 					onclick="event.preventDefault(); window.openVoiceRequest && window.openVoiceRequest()"
 				>
 					<div class="icon-box"><img src="/images/icon-phone-white.svg" alt="Заявка" width="20" height="20" /></div>
-				</a>
+				</a>}
 
 				<div class="navbar-toggle"></div>
 			</div>

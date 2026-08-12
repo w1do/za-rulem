@@ -1,0 +1,286 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Header from '../../../components/shared/header/Header.astro';
+import Footer from '../../../components/shared/footer/Footer.astro';
+import HomeHero from '../../../components/home/HomeHero.astro';
+import HubProcess from '../../../components/hub/HubProcess.astro';
+import HubFaqs from '../../../components/hub/HubFaqs.astro';
+import { breadcrumbNode, faqNode, itemListNode, webPageNode } from '../../../lib/seo';
+import { fuelCardCriteria, fuelCardFaqs, fuelCardOffers } from '../model/content';
+import type { FuelCardBrand } from '../model/types';
+import FuelCardBrandGrid from './FuelCardBrandGrid.astro';
+
+interface Props {
+	brands: FuelCardBrand[];
+}
+
+const { brands } = Astro.props;
+
+const pagePath = '/toplivnye-karty';
+const title = 'Топливные карты для бизнеса — сравнение для ИП и ООО';
+const description =
+	'Подберите топливную карту для бизнеса по сетям АЗС, маршрутам, расходу, документам и лимитам. Заявка для ИП, ООО и автопарков.';
+const h1 = 'Топливные карты для бизнеса: сравнение условий';
+const faqSchema = faqNode(fuelCardFaqs);
+const jsonLd: Record<string, unknown>[] = [
+	webPageNode({ name: h1, description, url: pagePath }),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Топливные карты', url: pagePath },
+	]),
+];
+
+if (faqSchema) jsonLd.push(faqSchema);
+if (brands.length > 0) {
+	jsonLd.push(itemListNode(brands.map((brand) => ({
+		name: `Топливная карта ${brand.name}`,
+		url: `/toplivnye-karty/${brand.slug}`,
+	}))));
+}
+---
+
+<Layout
+	title={title}
+	description={description}
+	ogTitle={title}
+	ogDescription="Подберите топливную карту под маршруты, автопарк и правила учёта расходов компании."
+	keywords="топливные карты, топливные карты для юридических лиц, топливная карта для ИП, сравнение топливных карт"
+	jsonLd={jsonLd}
+	isNational
+>
+	<Header isNational showRequestButton={false} />
+
+	<main>
+		<HomeHero
+			subtitle="Каталог для ИП и юридических лиц"
+			title={h1}
+			description="Подберите вариант под географию поездок, расход топлива, число машин, документы, лимиты и возможности личного кабинета. Заявка принимается голосом — после записи текст можно проверить и дополнить."
+			ctaText="Смотреть карточки"
+			ctaHref="#fuel-card-offers"
+			secondaryCtaText="Карты по сетям АЗС"
+			secondaryCtaHref="#fuel-card-brands"
+			reviewText="Подбор по маршрутам и задачам автопарка"
+			counterValue={String(brands.length)}
+			counterSuffix=""
+			counterText="Популярных сетей АЗС доступно для выбора и оформления заявки."
+			showClientImages={false}
+			interceptPrimaryCta={false}
+			benefits={[
+				{
+					icon: '/images/icon-hero-info-list-1-gold.svg',
+					title: '01. Для бизнеса',
+					text: 'Сравнение условий для ООО, ИП и компаний с собственным автопарком.',
+				},
+				{
+					icon: '/images/icon-hero-info-list-2-gold.svg',
+					title: '02. По маршрутам',
+					text: 'Покрытие нужно проверять по городам и трассам, где действительно ездят машины.',
+				},
+				{
+					icon: '/images/icon-hero-info-list-3-gold.svg',
+					title: '03. По полной цене',
+					text: 'Выгоду определяют не только скидки, но и комиссии, обслуживание и документы.',
+				},
+			]}
+		/>
+
+		<section id="fuel-card-offers" class="our-pricing-gold bg-section fuel-card-offers" aria-labelledby="fuel-card-offers-title">
+			<div class="container">
+				<div class="row section-row">
+					<div class="col-xl-12">
+						<div class="section-title section-title-center">
+							<span class="section-sub-title wow fadeInUp">Предложения топливных карт</span>
+							<h2 id="fuel-card-offers-title" class="text-anime-style-3" data-cursor="-opaque">Выберите сценарий использования</h2>
+							<p>Оставьте заявку по подходящему сценарию — при подборе будут учтены маршруты, расход, количество машин и требования к отчётности.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					{fuelCardOffers.map((offer, index) => (
+						<div class="col-xl-4 col-md-6">
+							<article class="pricing-item-gold fuel-card-offer wow fadeInUp" data-wow-delay={index === 0 ? undefined : `${index * 0.2}s`}>
+								<div class="pricing-item-header-gold">
+									<div class="icon-box fuel-card-offer__logo">
+										<img src={offer.logo ?? offer.icon} alt={offer.logo ? `Логотип ${offer.title}` : ''} width="50" height="50" />
+									</div>
+									<span class="fuel-card-offer__status">Подбор для бизнеса</span>
+									<div class="pricing-item-content-gold">
+										<h3 class="pricing-item-title-gold">{offer.title}</h3>
+										<p>{offer.summary}</p>
+										<p class="fuel-card-offer__audience"><strong>Подходит:</strong> {offer.audience}</p>
+									</div>
+								</div>
+
+								<div class="pricing-item-list-gold fuel-card-offer__details">
+									<h4>Что будет сравниваться</h4>
+									<dl>
+										{offer.features.map((feature) => (
+											<div class="fuel-card-offer__feature">
+												<dt>{feature.label}</dt>
+												<dd>{feature.value}</dd>
+											</div>
+										))}
+									</dl>
+
+									<div class="pricing-item-btn-gold">
+										<a
+											href="/contacts"
+											class="btn-default"
+											data-service-request
+											data-service={`fuel-card-${offer.id}`}
+											data-service-subject={`Заявка на топливную карту: ${offer.title}`}
+											data-service-title="Заказать топливную карту"
+										>
+											Заказать
+										</a>
+									</div>
+								</div>
+							</article>
+						</div>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<FuelCardBrandGrid brands={brands} />
+
+		<section id="fuel-card-guide" class="page-services fuel-card-guide" aria-labelledby="fuel-card-guide-title">
+			<div class="container">
+				<div class="row section-row">
+					<div class="col-xl-12">
+						<div class="section-title section-title-center">
+							<span class="section-sub-title wow fadeInUp">Как сравнивать предложения</span>
+							<h2 id="fuel-card-guide-title" class="text-anime-style-3" data-cursor="-opaque">Шесть критериев выбора топливной карты</h2>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					{fuelCardCriteria.map((criterion, index) => (
+						<div class="col-xl-4 col-md-6">
+							<article class="service-item wow fadeInUp" data-wow-delay={index === 0 ? undefined : `${(index % 3) * 0.2}s`}>
+								<div class="icon-box"><img src={criterion.icon} alt="" width="60" height="60" /></div>
+								<div class="service-item-body">
+									<div class="service-item-content">
+										<h3>{criterion.title}</h3>
+										<p>{criterion.text}</p>
+									</div>
+								</div>
+							</article>
+						</div>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<HubProcess
+			subtitle="Порядок выбора"
+			title="Четыре шага до оформления карты"
+			steps={[
+				{ title: 'Опишите маршруты', description: 'Составьте список городов, трасс и сетей АЗС, которыми пользуются водители.' },
+				{ title: 'Посчитайте расходы', description: 'Зафиксируйте месячный объём топлива, число машин и подходящую схему оплаты.' },
+				{ title: 'Сравните договоры', description: 'Проверьте обслуживание, комиссии, документы, лимиты и порядок блокировки карт.' },
+				{ title: 'Оставьте заявку', description: 'Запишите голосом параметры автопарка и проверьте распознанный текст перед отправкой.' },
+			]}
+		/>
+
+		<HubFaqs
+			subtitle="Частые вопросы"
+			title="Что важно знать о топливных картах"
+			description="Короткие ответы о выборе карты для ИП, ООО и корпоративного автопарка."
+			faqs={fuelCardFaqs}
+			benefits={['Сравнивайте полную стоимость', 'Проверяйте покрытие по своим маршрутам']}
+			buttonLabel="Смотреть карточки"
+			buttonHref="#fuel-card-offers"
+		/>
+	</main>
+
+	<Footer isNational nationalVariant="fuel-cards" />
+</Layout>
+
+<style>
+	.fuel-card-offers .section-title p {
+		max-width: 760px;
+		margin: 20px auto 0;
+	}
+
+	.fuel-card-offer {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.fuel-card-offer__logo {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 76px;
+		height: 76px;
+		border-radius: 18px;
+		background: var(--white-color);
+	}
+
+	.fuel-card-offer__status {
+		display: inline-flex;
+		width: fit-content;
+		margin-bottom: 14px;
+		padding: 7px 12px;
+		border-radius: 999px;
+		background: rgba(245, 183, 84, 0.18);
+		color: var(--primary-color);
+		font-size: 13px;
+		font-weight: 700;
+	}
+
+	.fuel-card-offer__audience {
+		padding-top: 14px;
+		border-top: 1px solid var(--divider-color);
+	}
+
+	.fuel-card-offer__details {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.fuel-card-offer__details h4 {
+		font-size: 21px;
+		border-bottom: 1px solid var(--divider-color);
+		padding-bottom: 20px;
+		margin-bottom: 20px;
+	}
+
+	.fuel-card-offer__details dl {
+		margin: 0;
+	}
+
+	.fuel-card-offer__feature {
+		padding: 12px 0;
+		border-bottom: 1px solid var(--divider-color);
+	}
+
+	.fuel-card-offer__feature dt {
+		font-weight: 700;
+		color: var(--primary-color);
+	}
+
+	.fuel-card-offer__feature dd {
+		margin: 4px 0 0;
+		font-size: 14px;
+		line-height: 1.5;
+	}
+
+	.fuel-card-offer__details .pricing-item-btn-gold {
+		margin-top: auto;
+		padding-top: 24px;
+	}
+
+	.fuel-card-guide .service-item {
+		height: calc(100% - 30px);
+	}
+
+	.fuel-card-guide .service-item-content h3 {
+		font-size: 21px;
+	}
+
+</style>

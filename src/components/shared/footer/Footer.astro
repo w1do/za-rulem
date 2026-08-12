@@ -6,9 +6,11 @@ import { getSiteData } from '../../../lib/seo';
 export interface Props {
 	city?: ChatCity;
 	isNational?: boolean;
-	nationalVariant?: 'roads' | 'selection';
+	nationalVariant?: 'roads' | 'selection' | 'fuel-cards';
 	selectionSubject?: string;
 	selectionService?: string;
+	fuelCardSubject?: string;
+	fuelCardService?: string;
 }
 
 const {
@@ -17,11 +19,25 @@ const {
 	nationalVariant = 'roads',
 	selectionSubject,
 	selectionService,
+	fuelCardSubject,
+	fuelCardService,
 } = Astro.props;
 const effectiveCity = city ?? defaultCity;
 const site = getSiteData(effectiveCity);
 const pageUrl = (path: string): string => isNational ? path : getCityUrl(path, effectiveCity.slug);
 const isSelectionNational = isNational && nationalVariant === 'selection';
+const isFuelCardsNational = isNational && nationalVariant === 'fuel-cards';
+const footerActionHref = pageUrl('/contacts');
+const footerRequestService = isSelectionNational
+	? selectionService
+	: isFuelCardsNational
+		? fuelCardService ?? 'fuel-card-catalog'
+		: undefined;
+const footerRequestSubject = isSelectionNational
+	? selectionSubject
+	: isFuelCardsNational
+		? fuelCardSubject ?? 'Заявка на топливную карту'
+		: undefined;
 
 // Общий подвал сайта. Структура перенесена из шаблона, изменены только тексты и ссылки.
 const quickLinks = [
@@ -29,6 +45,7 @@ const quickLinks = [
 	{ label: 'О сервисе', href: pageUrl('/about') },
 	{ label: 'Услуги', href: pageUrl('/services') },
 	{ label: 'Федеральные трассы', href: '/route' },
+	{ label: 'Топливные карты', href: '/toplivnye-karty' },
 	{ label: 'Отзывы', href: pageUrl('/testimonials') },
 	{ label: 'Блог', href: '/blog' },
 	{ label: 'Партнёрам', href: pageUrl('/partners') },
@@ -62,7 +79,7 @@ const serviceLinks = [
 
 					<!-- About Footer Content Start -->
 					<div class="about-footer-content-gold">
-						<p>{isSelectionNational ? 'Подбор автомобилей и контрактных запчастей во Владивостоке с согласованием проверки, покупки и отправки по России.' : isNational ? 'Сервис помогает найти доступную техпомощь или эвакуатор на федеральных трассах России. Возможность и условия выезда подтверждает диспетчер.' : `Я — мастер техпомощи на дороге ${site.inCity}. Приезжаю на вызов круглосуточно: прикурю автомобиль, заменю аккумулятор, отогрею машину в мороз и выручу в других дорожных ситуациях.`}</p>
+						<p>{isFuelCardsNational ? 'Каталог топливных карт помогает бизнесу сравнивать покрытие АЗС, обслуживание, документы и инструменты контроля расходов.' : isSelectionNational ? 'Подбор автомобилей и контрактных запчастей во Владивостоке с согласованием проверки, покупки и отправки по России.' : isNational ? 'Сервис помогает найти доступную техпомощь или эвакуатор на федеральных трассах России. Возможность и условия выезда подтверждает диспетчер.' : `Я — мастер техпомощи на дороге ${site.inCity}. Приезжаю на вызов круглосуточно: прикурю автомобиль, заменю аккумулятор, отогрею машину в мороз и выручу в других дорожных ситуациях.`}</p>
 					</div>
 					<!-- About Footer Content End -->
 
@@ -111,16 +128,16 @@ const serviceLinks = [
 								<li>
 									<img src="/images/icon-phone-accent.svg" alt="Заявка" width="20" height="20" />
 									<a
-										href={pageUrl('/contacts')}
+										href={footerActionHref}
 										data-service-request
-										data-service-title={isSelectionNational ? 'Голосовая заявка на подбор' : 'Вызвать помощь'}
-										data-service-subject={isSelectionNational ? selectionSubject : undefined}
-										data-service={isSelectionNational ? selectionService : undefined}
+										data-service-title={isFuelCardsNational ? 'Заказать топливную карту' : isSelectionNational ? 'Голосовая заявка на подбор' : 'Вызвать помощь'}
+										data-service-subject={footerRequestSubject}
+										data-service={footerRequestService}
 									>
-										{isSelectionNational ? 'Заявка на подбор' : 'Выезд только по заявке'}
+										{isFuelCardsNational ? 'Заказать топливную карту' : isSelectionNational ? 'Заявка на подбор' : 'Выезд только по заявке'}
 									</a>
 								</li>
-								<li><img src="/images/icon-location-accent.svg" alt="Адрес" width="20" height="20" />{isSelectionNational ? 'Владивосток — отправка по России' : isNational ? 'Федеральные трассы России, по доступности партнёров' : `${site.addressLocality} и ${site.addressRegion}, выезд 24/7`}</li>
+								<li><img src="/images/icon-location-accent.svg" alt="Адрес" width="20" height="20" />{isFuelCardsNational ? 'Предложения для бизнеса по России' : isSelectionNational ? 'Владивосток — отправка по России' : isNational ? 'Федеральные трассы России, по доступности партнёров' : `${site.addressLocality} и ${site.addressRegion}, выезд 24/7`}</li>
 							</ul>
 						</div>
 					</div>
@@ -128,19 +145,19 @@ const serviceLinks = [
 
 					<!-- Footer Link Start -->
 					<div class="footer-links-gold footer-newsletter-form-box-gold">
-						<h2>{isSelectionNational ? 'Нужен автомобиль или запчасть?' : 'Нужна помощь на дороге?'}</h2>
+						<h2>{isFuelCardsNational ? 'Выбираете топливную карту?' : isSelectionNational ? 'Нужен автомобиль или запчасть?' : 'Нужна помощь на дороге?'}</h2>
 						<div class="about-footer-content-gold">
-							<p>{isSelectionNational ? 'Опишите задачу — я уточню параметры подбора и подготовлю порядок работы.' : isNational ? 'Оставьте заявку — диспетчер уточнит участок трассы и проверит доступного партнёра.' : 'Оставьте заявку — перезвоню в течение пары минут и выеду на место.'}</p>
+							<p>{isFuelCardsNational ? 'Сравните предложения по маршрутам, полной стоимости, документам и возможностям контроля.' : isSelectionNational ? 'Опишите задачу — я уточню параметры подбора и подготовлю порядок работы.' : isNational ? 'Оставьте заявку — диспетчер уточнит участок трассы и проверит доступного партнёра.' : 'Оставьте заявку — перезвоню в течение пары минут и выеду на место.'}</p>
 						</div>
 						<a
-							href={pageUrl('/contacts')}
+							href={footerActionHref}
 							class="btn-default btn-highlighted"
-							data-service-request={isSelectionNational ? '' : undefined}
-							data-service-title={isSelectionNational ? 'Голосовая заявка на подбор' : undefined}
-							data-service-subject={isSelectionNational ? selectionSubject : undefined}
-							data-service={isSelectionNational ? selectionService : undefined}
+							data-service-request
+							data-service-title={isFuelCardsNational ? 'Заказать топливную карту' : isSelectionNational ? 'Голосовая заявка на подбор' : undefined}
+							data-service-subject={footerRequestSubject}
+							data-service={footerRequestService}
 						>
-							{isSelectionNational ? 'Записать голосовую заявку' : 'Оставить заявку'}
+							{isFuelCardsNational ? 'Заказать' : isSelectionNational ? 'Записать голосовую заявку' : 'Оставить заявку'}
 						</a>
 					</div>
 					<!-- Footer Link End -->
@@ -153,7 +170,7 @@ const serviceLinks = [
 				<div class="footer-copyright-gold">
 					<!-- Footer Copyright Text Start -->
 					<div class="footer-copyright-text-gold">
-						<p>© 2026 «За рулём» — {isSelectionNational ? 'подбор автомобилей и запчастей из Владивостока' : isNational ? 'поиск техпомощи на федеральных трассах' : `техпомощь на дороге ${site.inCity}`}. Разработано <a href="https://w1do.ru" target="_blank" rel="noopener noreferrer">W1DO DIGITAL</a>.</p>
+						<p>© 2026 «За рулём» — {isFuelCardsNational ? 'каталог топливных карт для бизнеса' : isSelectionNational ? 'подбор автомобилей и запчастей из Владивостока' : isNational ? 'поиск техпомощи на федеральных трассах' : `техпомощь на дороге ${site.inCity}`}. Разработано <a href="https://w1do.ru" target="_blank" rel="noopener noreferrer">W1DO DIGITAL</a>.</p>
 					</div>
 					<!-- Footer Copyright Text End -->
 

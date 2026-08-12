@@ -1,0 +1,29 @@
+---
+import {
+	FuelCardBrandPage,
+	selectRelatedFuelCardBrands,
+} from '../../features/fuel-cards';
+import type { GasBrand } from '../../features/gas-prices';
+import { getPopularGasBrands } from '../../features/gas-prices/server';
+
+interface Props {
+	brand: GasBrand;
+	relatedBrands: GasBrand[];
+}
+
+export async function getStaticPaths() {
+	const brands = await getPopularGasBrands();
+
+	return brands.map((brand) => ({
+		params: { brand: brand.slug },
+		props: {
+			brand,
+			relatedBrands: selectRelatedFuelCardBrands(brands, brand.slug),
+		},
+	}));
+}
+
+const { brand, relatedBrands } = Astro.props;
+---
+
+<FuelCardBrandPage brand={brand} relatedBrands={relatedBrands} />

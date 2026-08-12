@@ -1,0 +1,8 @@
+---
+import { FuelCardsLandingPage } from '../features/fuel-cards';
+import { getPopularGasBrands } from '../features/gas-prices/server';
+
+const brands = await getPopularGasBrands();
+---
+
+<FuelCardsLandingPage brands={brands} />
