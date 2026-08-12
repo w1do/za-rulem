@@ -34,6 +34,7 @@ export default function VoiceRequestModal() {
 	const isPartsSelection = service === 'vladivostok-contract-parts';
 	const isPartnerApplication = service === 'partner-fuel-courier';
 	const isFuelCardRequest = service?.startsWith('fuel-card-') === true;
+	const showFuelDeliveryLoadAlert = service === undefined || service === 'toplivo';
 
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const chunksRef = useRef<Blob[]>([]);
@@ -260,34 +261,78 @@ export default function VoiceRequestModal() {
 					</button>
 				</div>
 
-				<div className="service-request-modal__body" style={{ padding: '30px' }}>
-					<div className="voice-modal-disclosure mb-4" role="note">
-						<p>
-							{isPartnerApplication ? (
-								<>
-									Вы оставляете анкету курьера{city ? ` для города ${city}` : ''}. Za-Rulem
-									сопоставляет её с подходящими обращениями, но не гарантирует трудоустройство,
-									количество или регулярность заявок.
-								</>
-							) : isFuelCardRequest ? (
-								<>
-									Заявка используется для подбора топливной карты по параметрам вашего бизнеса.
-									После записи проверьте распознанный текст и укажите телефон для связи.
-								</>
-							) : isCarSelection || isPartsSelection ? (
-								<>
-									Вы оставляете заявку, а Za-Rulem как агрегатор подбирает подходящего исполнителя по
-									параметрам и местоположению. Если исполнитель найдётся, он свяжется с вами.
-								</>
-							) : (
-								<>
-									Вы оставляете заявку, а мы подбираем курьера по вашему местоположению. Если
-									подходящий курьер найдётся, он свяжется с вами. Сервис Za-Rulem выступает агрегатором
-									поиска курьеров.
-								</>
-							)}
-						</p>
-					</div>
+				<div className="service-request-modal__body">
+					{showFuelDeliveryLoadAlert && (
+						<div className="voice-load-alert mb-4" role="alert">
+							<div className="voice-load-alert__heading">
+								<span className="voice-load-alert__icon" aria-hidden="true">
+									<i className="fa-solid fa-triangle-exclamation"></i>
+								</span>
+								<div>
+									<strong>Высокая нагрузка на доставку топлива</strong>
+									<span>Очередь может занимать до 5 дней</span>
+								</div>
+							</div>
+							<p>
+								Мы понимаем, что бензин нужен прямо сейчас. Но сервис работает на пределе
+								загрузки во всех городах России. Мы подберём курьера, и он свяжется с вами,
+								если сможет принять заявку. Приносим извинения за неудобства.
+							</p>
+							<div className="voice-load-alert__offer">
+								В наших группах мы публикуем все новости о доступности топлива. Вступайте и
+								следите за обновлениями. Клиентам Za-Rulem — скидка 10%.
+							</div>
+							<div className="voice-load-alert__actions" aria-label="Сообщества Za-Rulem">
+								<a
+									className="voice-load-alert__link voice-load-alert__link--vk"
+									href="https://vk.ru/za_rulem72"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<i className="fa-brands fa-vk" aria-hidden="true"></i>
+									<span>ВКонтакте</span>
+								</a>
+								<a
+									className="voice-load-alert__link voice-load-alert__link--telegram"
+									href="https://t.me/zarulem72"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<i className="fa-brands fa-telegram" aria-hidden="true"></i>
+									<span>Telegram</span>
+								</a>
+							</div>
+						</div>
+					)}
+
+					{!showFuelDeliveryLoadAlert && (
+						<div className="voice-modal-disclosure mb-4" role="note">
+							<p>
+								{isPartnerApplication ? (
+									<>
+										Вы оставляете анкету курьера{city ? ` для города ${city}` : ''}. Za-Rulem
+										сопоставляет её с подходящими обращениями, но не гарантирует трудоустройство,
+										количество или регулярность заявок.
+									</>
+								) : isFuelCardRequest ? (
+									<>
+										Заявка используется для подбора топливной карты по параметрам вашего бизнеса.
+										После записи проверьте распознанный текст и укажите телефон для связи.
+									</>
+								) : isCarSelection || isPartsSelection ? (
+									<>
+										Вы оставляете заявку, а Za-Rulem как агрегатор подбирает подходящего исполнителя по
+										параметрам и местоположению. Если исполнитель найдётся, он свяжется с вами.
+									</>
+								) : (
+									<>
+										Вы оставляете заявку, а Za-Rulem подбирает исполнителя по параметрам и
+										местоположению. Если исполнитель найдётся, он свяжется с вами.
+									</>
+								)}
+							</p>
+						</div>
+					)}
 
 					{status === 'success' ? (
 						<div className="text-center">
@@ -437,6 +482,106 @@ export default function VoiceRequestModal() {
 			</div>
 
 			<style dangerouslySetInnerHTML={{ __html: `
+				.service-request-modal__body {
+					padding: 30px;
+				}
+				.voice-load-alert {
+					padding: 14px;
+					border: 1px solid #fed7aa;
+					border-left: 4px solid #ea580c;
+					border-radius: 10px;
+					background: #fff7ed;
+					color: #431407;
+				}
+				.voice-load-alert__heading {
+					display: flex;
+					align-items: center;
+					gap: 10px;
+					margin-bottom: 8px;
+				}
+				.voice-load-alert__heading strong,
+				.voice-load-alert__heading span {
+					display: block;
+				}
+				.voice-load-alert__heading strong {
+					font-size: 15px;
+					line-height: 1.3;
+				}
+				.voice-load-alert__heading span:not(.voice-load-alert__icon) {
+					margin-top: 2px;
+					color: #9a3412;
+					font-size: 12px;
+					font-weight: 700;
+				}
+				.voice-load-alert__icon {
+					flex: 0 0 auto;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					width: 34px;
+					height: 34px;
+					border-radius: 50%;
+					background: #ffedd5;
+					color: #c2410c;
+					font-size: 15px;
+				}
+				.voice-load-alert__icon i {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					width: 100%;
+					height: 100%;
+					line-height: 1;
+				}
+				.voice-load-alert p {
+					margin: 0;
+					font-size: 13px;
+					line-height: 1.45;
+				}
+				.voice-load-alert__offer {
+					margin-top: 9px;
+					padding-top: 9px;
+					border-top: 1px solid #fed7aa;
+					font-size: 13px;
+					font-weight: 700;
+					line-height: 1.4;
+				}
+				.voice-load-alert__actions {
+					display: grid;
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+					gap: 8px;
+					margin-top: 11px;
+				}
+				.voice-load-alert__link {
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					gap: 7px;
+					min-height: 40px;
+					padding: 8px 10px;
+					border-radius: 8px;
+					color: #fff;
+					font-size: 13px;
+					font-weight: 700;
+					line-height: 1;
+					text-decoration: none;
+					transition: filter 0.2s ease, transform 0.2s ease;
+				}
+				.voice-load-alert__link:hover {
+					color: #fff;
+					filter: brightness(0.94);
+					transform: translateY(-1px);
+				}
+				.voice-load-alert__link:focus-visible {
+					outline: 3px solid rgba(234, 88, 12, 0.3);
+					outline-offset: 2px;
+				}
+				.voice-load-alert__link--vk {
+					background: #0077ff;
+				}
+				.voice-load-alert__link--telegram {
+					background: #229ed9;
+				}
 				.voice-modal-disclosure {
 					padding: 15px;
 					border: 1px solid rgba(255, 183, 0, 0.45);
@@ -500,6 +645,17 @@ export default function VoiceRequestModal() {
 					text-decoration: underline;
 					cursor: pointer;
 					font-size: 14px;
+				}
+				@media (max-width: 575px) {
+					.service-request-modal__body {
+						padding: 0;
+					}
+					.voice-load-alert {
+						padding: 12px;
+					}
+					.voice-load-alert__heading strong {
+						font-size: 14px;
+					}
 				}
 			`}} />
 		</div>,
