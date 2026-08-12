@@ -241,9 +241,21 @@ export const isBrandReadyForIndexing = (
 	summary: GasBrandSummary,
 	history: GasPriceSnapshot[],
 	now = Date.now(),
+): boolean => isGasPriceHistoryReadyForIndexing(
+	summary.brand,
+	summary.sourceUpdatedAt,
+	new Set(history.map((snapshot) => snapshot.snapshotDate)).size,
+	now,
+);
+
+export const isGasPriceHistoryReadyForIndexing = (
+	brand: GasBrand,
+	sourceUpdatedAtValue: string,
+	snapshotCount: number,
+	now = Date.now(),
 ): boolean => {
-	if (!summary.brand.isIndexable || summary.brand.verificationStatus !== 'verified') return false;
-	const sourceUpdatedAt = Date.parse(summary.sourceUpdatedAt);
+	if (!brand.isIndexable || brand.verificationStatus !== 'verified') return false;
+	const sourceUpdatedAt = Date.parse(sourceUpdatedAtValue);
 	if (!Number.isFinite(sourceUpdatedAt) || now - sourceUpdatedAt > MAX_FUEL_PRICE_AGE_MS) return false;
-	return new Set(history.map((snapshot) => snapshot.snapshotDate)).size >= 2;
+	return snapshotCount >= 2;
 };

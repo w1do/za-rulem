@@ -2,6 +2,7 @@ import type {
 	FuelPriceSummary,
 	GasBrand,
 	GasPriceSnapshot,
+	GasPriceSitemapEntry,
 } from '../model/types';
 
 const DIRECTUS_URL = (
@@ -71,6 +72,17 @@ const parseSnapshot = (value: unknown): GasPriceSnapshot | null => {
 		createdAt: stringValue(value.date_created) || undefined,
 		fuels,
 	};
+};
+
+const parseSitemapEntry = (value: unknown): GasPriceSitemapEntry | null => {
+	if (!isRecord(value) || !isRecord(value.count) || !isRecord(value.max)) return null;
+	const citySlug = stringValue(value.city_slug);
+	const brandSlug = stringValue(value.brand_slug);
+	const latestSnapshotDate = stringValue(value.max.snapshot_date);
+	const sourceUpdatedAt = stringValue(value.max.source_updated_at);
+	const snapshotCount = numberValue(value.count.id);
+	if (!citySlug || !brandSlug || !latestSnapshotDate || snapshotCount < 1) return null;
+	return { citySlug, brandSlug, snapshotCount, latestSnapshotDate, sourceUpdatedAt };
 };
 
 const request = async (path: string, init?: RequestInit): Promise<unknown> => {
@@ -145,15 +157,22 @@ export const readBrandCitySlugs = async (brandSlug: string): Promise<string[]> =
 		.filter(Boolean))];
 };
 
-export const readRecentSnapshots = async (since: string): Promise<GasPriceSnapshot[]> => {
-	const params = new URLSearchParams({
-		limit: '-1',
-		fields: 'id,city_slug,brand_slug,snapshot_date,station_count,source_updated_at,fuel_prices,date_created',
-		sort: '-snapshot_date',
-	});
+/**
+ * Возвращает одну агрегированную запись на город и сеть. В sitemap не нужны
+ * fuel_prices: с получасовой историей их загрузка раздувает ответ на мегабайты.
+ */
+export const readGasPriceSitemapEntries = async (since: string): Promise<GasPriceSitemapEntry[]> => {
+	const params = new URLSearchParams({ limit: '-1' });
+	params.append('aggregate[count]', 'id');
+	params.append('aggregate[max]', 'snapshot_date');
+	params.append('aggregate[max]', 'source_updated_at');
+	params.append('groupBy[]', 'city_slug');
+	params.append('groupBy[]', 'brand_slug');
 	params.set('filter[snapshot_date][_gte]', since);
 	const payload = await request(`/items/gas_price_daily?${params.toString()}`);
-	return dataItems(payload).map(parseSnapshot).filter((item): item is GasPriceSnapshot => item !== null);
+	return dataItems(payload)
+		.map(parseSitemapEntry)
+		.filter((item): item is GasPriceSitemapEntry => item !== null);
 };
 
 export const ensureGasBrand = async (brand: GasBrand): Promise<void> => {

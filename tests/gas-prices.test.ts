@@ -8,6 +8,7 @@ import {
 	getSnapshotDate,
 	groupStationsByBrand,
 	isBrandReadyForIndexing,
+	isGasPriceHistoryReadyForIndexing,
 	normalizeBrandName,
 } from '../src/features/gas-prices/model/aggregate.ts';
 import type { GasBrand, GasPriceSnapshot } from '../src/features/gas-prices/model/types.ts';
@@ -139,4 +140,12 @@ test('SEO readiness requires a verified brand, fresh source and two distinct sna
 	}));
 	assert.equal(isBrandReadyForIndexing(summary, history, NOW.getTime()), true);
 	assert.equal(isBrandReadyForIndexing(summary, history.slice(0, 1), NOW.getTime()), false);
+	assert.equal(
+		isGasPriceHistoryReadyForIndexing(verifiedBrand, NOW.toISOString(), 2, NOW.getTime()),
+		true,
+	);
+	assert.equal(
+		isGasPriceHistoryReadyForIndexing(verifiedBrand, NOW.toISOString(), 1, NOW.getTime()),
+		false,
+	);
 });

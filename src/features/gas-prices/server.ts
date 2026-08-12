@@ -5,7 +5,7 @@ import {
 	readBrandCitySlugs,
 	readCitySnapshots,
 	readGasBrands,
-	readRecentSnapshots,
+	readGasPriceSitemapEntries,
 	upsertGasPriceSnapshot,
 } from './api/directusGasPrices';
 import { fetchCachedGasStations } from './api/stationCache';
@@ -13,7 +13,7 @@ import {
 	buildBrandSummaries,
 	createGasPriceSnapshots,
 	groupStationsByBrand,
-	isBrandReadyForIndexing,
+	isGasPriceHistoryReadyForIndexing,
 	mergeBrandRegistry,
 } from './model/aggregate';
 import { gasPricesUrl } from './model/urls';
@@ -165,34 +165,19 @@ export const collectGasPriceSnapshotBatch = async (
 
 export const getGasPriceSitemapUrls = async (site: string): Promise<string[]> => {
 	const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-	const [brands, snapshots] = await Promise.all([
-		loadBrands(),
-		optional(() => readRecentSnapshots(since), [], 'sitemap history unavailable'),
+	const [brands, entries] = await Promise.all([
+		readGasBrands(),
+		readGasPriceSitemapEntries(since),
 	]);
 	const registry = mergeBrandRegistry(brands);
-	const groups = new Map<string, GasPriceSnapshot[]>();
-	for (const snapshot of snapshots) {
-		const key = `${snapshot.citySlug}:${snapshot.brandSlug}`;
-		groups.set(key, [...(groups.get(key) ?? []), snapshot]);
-	}
 	const urls: string[] = [];
-	for (const [key, history] of groups) {
-		const [citySlug = '', brandSlug = ''] = key.split(':');
-		const city = cities.find((item) => item.slug === citySlug && item.isIndexable !== false);
-		const brand = registry.find((item) => item.slug === brandSlug);
-		const latest = history.sort((a, b) => b.snapshotDate.localeCompare(a.snapshotDate))[0];
-		if (!city || !brand || !latest) continue;
-		const summary = {
-			brand,
-			stationCount: latest.stationCount,
-			sourceUpdatedAt: latest.sourceUpdatedAt,
-			snapshotDate: latest.snapshotDate,
-			fuels: [],
-			history,
-		};
-		if (isBrandReadyForIndexing(summary, history)) {
+	for (const entry of entries) {
+		const city = cities.find((item) => item.slug === entry.citySlug && item.isIndexable !== false);
+		const brand = registry.find((item) => item.slug === entry.brandSlug);
+		if (!city || !brand) continue;
+		if (isGasPriceHistoryReadyForIndexing(brand, entry.sourceUpdatedAt, entry.snapshotCount)) {
 			urls.push(new URL(gasPricesUrl(city.slug, brand.slug), site).href);
 		}
 	}
-	return urls;
+	return [...new Set(urls)].sort();
 };

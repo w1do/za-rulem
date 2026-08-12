@@ -38,6 +38,15 @@ export interface GasPriceSnapshot {
 	fuels: FuelPriceSummary[];
 }
 
+/** Компактная проекция Directus, используемая только при сборке sitemap. */
+export interface GasPriceSitemapEntry {
+	citySlug: string;
+	brandSlug: string;
+	snapshotCount: number;
+	latestSnapshotDate: string;
+	sourceUpdatedAt: string;
+}
+
 export interface GasBrandSummary {
 	brand: GasBrand;
 	stationCount: number;
