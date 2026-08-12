@@ -1,0 +1,98 @@
+---
+import { cities, getCityUrl, type ChatCity } from '../../lib/cities';
+
+export interface Props {
+	city: ChatCity;
+}
+
+const { city } = Astro.props;
+const OTHER_CITIES_LIMIT = 12;
+
+const otherCities = cities
+	.filter((candidate) => candidate.slug !== city.slug && candidate.isIndexable)
+	.sort(
+		(a, b) =>
+			Number(b.region === city.region) - Number(a.region === city.region) ||
+			a.name.localeCompare(b.name, 'ru'),
+	)
+	.slice(0, OTHER_CITIES_LIMIT);
+---
+
+{
+	otherCities.length > 0 && (
+		<section class="partners-other-cities bg-section">
+			<div class="container">
+				<div class="row section-row">
+					<div class="col-lg-12">
+						<div class="section-title section-title-center">
+							<span class="section-sub-title">География заявок</span>
+							<h2>Ищем курьеров по доставке топлива в других городах</h2>
+							<p>
+								Выберите город, в котором готовы получать заявки. Для каждого города действует
+								отдельная анкета и локальный подбор исполнителей.
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					{otherCities.map((otherCity, index) => (
+						<div class="col-xl-4 col-md-6 mb-4">
+							<div class="service-item wow fadeInUp" data-wow-delay={`${index * 0.05}s`}>
+								<div class="icon-box">
+									<img src="/images/icon-location-primary.svg" alt="" />
+								</div>
+								<div class="service-item-body">
+									<div class="service-item-content">
+										<h3>
+											<a href={getCityUrl('/partners', otherCity.slug)}>
+												Курьер по доставке топлива {otherCity.inCity}
+											</a>
+										</h3>
+										<p>{otherCity.region || otherCity.hint}</p>
+									</div>
+									<a href={getCityUrl('/partners', otherCity.slug)} class="readmore-btn">
+										Посмотреть заявки
+									</a>
+								</div>
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+		</section>
+	)
+}
+
+<style>
+	.partners-other-cities {
+		padding: 100px 0 70px;
+	}
+
+	.service-item-content h3 {
+		font-size: 22px;
+		line-height: 1.35;
+		margin-bottom: 10px;
+	}
+
+	.service-item-content h3 a {
+		color: var(--primary-color);
+		text-decoration: none;
+	}
+
+	.service-item-content h3 a:hover,
+	.service-item-content h3 a:focus-visible {
+		color: var(--accent-color);
+	}
+
+	.readmore-btn {
+		display: inline-flex;
+		margin-top: 18px;
+	}
+
+	@media (max-width: 767px) {
+		.partners-other-cities {
+			padding: 60px 0 30px;
+		}
+	}
+</style>

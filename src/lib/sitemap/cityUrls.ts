@@ -12,6 +12,7 @@ const CITY_PATHS = [
 	'/queue',
 	'/drivers',
 	'/calculator',
+	'/partners',
 	'/services'
 ];
 

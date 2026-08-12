@@ -7,194 +7,355 @@ import HomeAbout from '../../components/home/HomeAbout.astro';
 import HomeServices from '../../components/home/HomeServices.astro';
 import HomeWhyChoose from '../../components/home/HomeWhyChoose.astro';
 import HomeFleets from '../../components/home/HomeFleets.astro';
-import HomeWhatWeDo from '../../components/home/HomeWhatWeDo.astro';
-import HomeCollection from '../../components/home/HomeCollection.astro';
 import HomeDrivers from '../../components/home/HomeDrivers.astro';
 import HomeHowItWork from '../../components/home/HomeHowItWork.astro';
-import HomeTestimonials from '../../components/home/HomeTestimonials.astro';
-import HomePricing from '../../components/home/HomePricing.astro';
-import HomeBlog from '../../components/home/HomeBlog.astro';
-import { breadcrumbNode, webPageNode } from '../../lib/seo';
+import HubFaqs from '../../components/hub/HubFaqs.astro';
+import PartnersOtherCities from '../../components/partners/PartnersOtherCities.astro';
+import { breadcrumbNode, faqNode, webPageNode } from '../../lib/seo';
 import type { ChatCity } from '../../lib/cities';
-import { replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
+import { getCityUrl, replaceCityPlaceholders } from '../../lib/cities';
 
 export interface Props {
 	city: ChatCity;
 }
 
 const { city } = Astro.props;
+const partnersUrl = getCityUrl('/partners', city.slug);
+const contactsUrl = getCityUrl('/contacts', city.slug);
+const partnerService = 'partner-fuel-courier';
+const partnerTitle = replaceCityPlaceholders('Анкета курьера по доставке топлива {inCity}', city);
+const partnerSubject = replaceCityPlaceholders('Анкета курьера по доставке топлива — {city}', city);
+
+const title = replaceCityPlaceholders('Курьер по доставке топлива {inCity} — заявки Za-Rulem', city);
+const description = replaceCityPlaceholders(
+	'Ищем водителей на своём авто для доставки АИ-92, АИ-95, АИ-100 и ДТ {inCity}. Оставьте анкету для получения подходящих заявок на дороге.',
+	city,
+);
 
 const services = [
-	{ icon: '/images/icon-service-1.svg', title: 'Доставлять бензин и дизель', text: replaceCityPlaceholders('Партнёр должен уточнить марку и объём топлива, купить его на АЗС и доставить к машине с пустым баком {inCity}, пригороде или на трассе.', city), href: getCityUrl('/contacts', city.slug), linkText: 'Подключить доставку' },
-	{ icon: '/images/icon-service-2.svg', title: 'Устранять поломки на месте', text: 'Партнёр должен запустить двигатель, провести первичную диагностику и выполнять только тот ремонт, для которого у него есть опыт, инструмент и расходники.', href: getCityUrl('/contacts', city.slug), linkText: 'Стать автомастером' },
-	{ icon: '/images/icon-service-3.svg', title: 'Буксировать и эвакуировать авто', text: 'Партнёр должен безопасно вытащить, дотащить или перевезти неисправный автомобиль до стоянки либо сервиса, если продолжать движение нельзя.', href: getCityUrl('/contacts', city.slug), linkText: 'Получать вызовы' },
+	{
+		icon: '/images/icon-service-1.svg',
+		title: 'Доставлять топливо водителям',
+		text: replaceCityPlaceholders(
+			'Получить заявку, уточнить АИ-92, АИ-95, АИ-100 или ДТ, купить согласованный объём на АЗС и привезти его к автомобилю {inCity}.',
+			city,
+		),
+		href: contactsUrl,
+		linkText: 'Оставить анкету',
+	},
+	{
+		icon: '/images/icon-service-2.svg',
+		title: 'Принимать заявки в своём районе',
+		text: replaceCityPlaceholders(
+			'В анкете указываются районы {ofCity}, радиус за городом и время готовности. Можно оценить адрес и отказаться от неподходящей заявки до подтверждения.',
+			city,
+		),
+		href: contactsUrl,
+		linkText: 'Указать район',
+	},
+	{
+		icon: '/images/icon-service-3.svg',
+		title: 'Оказывать автотехпомощь',
+		text: 'Если есть бустер, инструмент и опыт, дополнительно укажите запуск двигателя, замену колеса и другую помощь, которую можете безопасно выполнить на месте.',
+		href: contactsUrl,
+		linkText: 'Указать навыки',
+	},
 ];
 
 const benefits = [
-	{ icon: '/images/icon-hero-info-list-1-gold.svg', title: '01. Указать реальные услуги', text: 'Партнёр отмечает только те виды доставки, ремонта или буксировки, которые способен выполнить самостоятельно и безопасно.' },
-	{ icon: '/images/icon-hero-info-list-2-gold.svg', title: '02. Соблюдать район и срок', text: 'Партнёр заранее задаёт район выезда, радиус за городом и время прибытия, а после принятия вызова соблюдает эти условия.' },
-	{ icon: '/images/icon-hero-info-list-3-gold.svg', title: '03. Перечислить комиссию', text: 'После выполненного заказа партнёр передаёт системе 5% от согласованной стоимости и оставляет себе остальные 95%.' },
+	{
+		icon: '/images/icon-hero-info-list-1-gold.svg',
+		title: '01. Свой автомобиль',
+		text: 'Нужны водительские права, исправный автомобиль, телефон и возможность безопасно перевозить согласованный объём топлива.',
+	},
+	{
+		icon: '/images/icon-hero-info-list-2-gold.svg',
+		title: '02. Своя география',
+		text: replaceCityPlaceholders(
+			'Вы сами указываете районы {ofCity}, допустимое расстояние за городом и время, когда готовы рассматривать заявки.',
+			city,
+		),
+	},
+	{
+		icon: '/images/icon-hero-info-list-3-gold.svg',
+		title: '03. Подходящие заявки',
+		text: 'Za-Rulem сопоставляет местоположение и параметры заявки с анкетами курьеров, но не гарантирует количество или регулярность заказов.',
+	},
 ];
 
 const steps = [
-	{ icon: '/images/icon-how-it-work-1-gold.svg', number: '01', title: 'Заполнить анкету', text: 'Партнёр указывает контакты, данные автомобиля, перечень работ, районы выезда, оборудование и реальный срок прибытия.' },
-	{ icon: '/images/icon-how-it-work-2-gold.svg', number: '02', title: 'Подтвердить оснащение', text: 'Партнёр предоставляет документы, исправный транспорт и оснащение, необходимое для безопасного выполнения выбранных услуг.' },
-	{ icon: '/images/icon-how-it-work-3-gold.svg', number: '03', title: 'Выполнить первый заказ', text: 'Партнёр включает статус готовности, подтверждает подходящий вызов, согласует цену и приезжает к водителю в названный срок.' },
+	{
+		icon: '/images/icon-how-it-work-1-gold.svg',
+		number: '01',
+		title: 'Оставьте анкету',
+		text: 'Назовите город, автомобиль, доступные марки топлива, районы, время готовности и номер телефона.',
+	},
+	{
+		icon: '/images/icon-how-it-work-2-gold.svg',
+		number: '02',
+		title: 'Дождитесь подходящей заявки',
+		text: 'Агрегатор сопоставит ваше местоположение и возможности с обращением автомобилиста. Наличие заявки заранее не гарантируется.',
+	},
+	{
+		icon: '/images/icon-how-it-work-3-gold.svg',
+		number: '03',
+		title: 'Подтвердите условия',
+		text: 'До выезда уточните топливо, объём, адрес, расстояние, срок и расчёт. Выезжайте только после согласования с заказчиком.',
+	},
+];
+
+const faqs = [
+	{
+		question: replaceCityPlaceholders('Как стать курьером по доставке топлива {inCity}?', city),
+		answer:
+			'Оставьте голосовую анкету и назовите город, автомобиль, районы выезда, доступные марки топлива и время готовности. После проверки данных анкета может участвовать в подборе под локальные заявки.',
+	},
+	{
+		question: 'Какие марки топлива нужно доставлять?',
+		answer:
+			'Основные направления — бензин АИ-92, АИ-95, АИ-100 и дизельное топливо. Перед каждым выездом нужно отдельно подтвердить марку и объём, чтобы исключить ошибку при покупке.',
+	},
+	{
+		question: 'Гарантирует ли Za-Rulem постоянную работу и доход?',
+		answer:
+			'Нет. Za-Rulem — агрегатор поиска курьеров, а не работодатель. Количество обращений зависит от города, времени, спроса и совпадения параметров заявки с вашей анкетой.',
+	},
+	{
+		question: 'Можно ли принимать только заявки рядом с собой?',
+		answer: replaceCityPlaceholders(
+			'Да. Укажите районы {ofCity} и максимальный радиус выезда. До подтверждения можно оценить расстояние и не принимать заявку, которая находится вне вашей географии.',
+			city,
+		),
+	},
+	{
+		question: 'Можно ли дополнительно оказывать автотехпомощь?',
+		answer:
+			'Да, если у вас есть опыт и безопасное оборудование. В анкете можно указать запуск двигателя, замену колеса и другие доступные работы. Не отмечайте услуги, которые не можете выполнить самостоятельно.',
+	},
+	{
+		question: 'Кто согласовывает стоимость и время выезда?',
+		answer:
+			'Курьер и заказчик подтверждают условия до выезда. Страница не обещает фиксированную оплату, комиссию или количество заявок: актуальные условия зависят от конкретного обращения.',
+	},
 ];
 
 const jsonLd = [
-	webPageNode({ type: 'WebPage', name: replaceCityPlaceholders('Стать партнёром Za-Rulem.org — заказы водителям и мастерам {inCity}', city), description: replaceCityPlaceholders('Подключение водителей и выездных автомастеров {inCity} к заказам на доставку топлива, ремонт, буксировку и помощь на дороге. Комиссия — 5% только с выполненного заказа.', city), url: getCityUrl('/partners', city.slug) }),
-	breadcrumbNode([{ name: 'Главная', url: getCityUrl('/', city.slug) }, { name: 'Партнёрам', url: getCityUrl('/partners', city.slug) }]),
-];
+	webPageNode({
+		name: replaceCityPlaceholders('Поиск курьеров по доставке топлива {inCity}', city),
+		description,
+		url: partnersUrl,
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: getCityUrl('/', city.slug) },
+		{ name: 'Курьерам', url: partnersUrl },
+	]),
+	faqNode(faqs),
+].filter((node): node is Record<string, unknown> => node !== null);
 ---
 
 <Layout
-	title={replaceCityPlaceholders("Стать партнёром услуги помощи на дороге {inCity} — доставка бензина/дизеля", city)}
-	description={replaceCityPlaceholders("Заказы водителям и автомастерам {inCity}: доставка бензина, ремонт, буксировка и помощь на дороге 24/7. Комиссия — 5% только после выполнения.", city)}
-	ogTitle="Заказы водителям и автомастерам — комиссия 5%"
-	ogDescription="Станьте партнёром Za-Rulem.org: выбирайте районы и дорожные услуги, получайте вызовы и оставляйте себе 95% стоимости заказа."
-	keywords={replaceCityPlaceholders("стать партнером помощь на дороге, заказы водителям {city}, заказы автомастерам, водитель на своем авто {city}, доставка бензина работа, выездной автомастер работа, партнер эвакуатор, подработка помощь на дороге", city)}
+	title={title}
+	description={description}
+	ogTitle={replaceCityPlaceholders('Заявки курьерам по доставке топлива {inCity}', city)}
+	ogDescription="Оставьте анкету водителя на своём авто для доставки АИ-92, АИ-95, АИ-100, ДТ и дополнительной автотехпомощи."
+	keywords={replaceCityPlaceholders(
+		'курьер по доставке топлива {city}, работа курьером на своем авто {city}, доставка бензина работа, водитель курьер {city}, заявки автопомощь на дороге, доставка АИ-92 АИ-95 АИ-100 ДТ',
+		city,
+	)}
 	jsonLd={jsonLd}
-    city={city}
+	city={city}
+	robots={city.isIndexable ? undefined : 'noindex, follow'}
 >
 	<Header city={city} />
-	<HomeHero
-		city={city}
-		subtitle={replaceCityPlaceholders("Заказы водителям и автомастерам {inCity}", city)}
-		title="Станьте партнёром помощи на дороге с комиссией 5%"
-		description="Партнёр должен быть готов доставлять топливо, запускать и ремонтировать машины либо буксировать их после поломки. Он указывает реальные услуги и районы, соблюдает согласованные цену и срок, а после выполнения заказа передаёт системе 5%."
-		ctaText="Стать партнёром"
-		reviewText="Обязанности партнёра на каждом вызове"
-		counterValue="5"
-		counterText="Комиссия только после выполненного заказа."
-		benefits={benefits}
-	/>
-	<HomeAbout
-		city={city}
-		subtitle="Кому подходит партнёрство"
-		title="Водителям на своём авто и мастерам с выездным инструментом"
-		taskTitle="Что обязан делать партнёр"
-		taskText="Оставаться на связи в отмеченные часы, честно указывать компетенции, заранее подтверждать срок и цену, безопасно выполнять работу и отвечать за принятый вызов."
-		principleTitle="Что даёт Za-Rulem.org"
-		principleText="Система показывает профиль исполнителя людям с конкретной дорожной проблемой и передаёт заявку по услуге и географии. Партнёр перечисляет фиксированную комиссию 5% только после выполнения."
-		counters={[
-			{ value: '24', suffix: '/7', label: 'Готовность к заказам' },
-			{ value: '5', suffix: '%', label: 'Комиссия системы' },
-			{ value: '4', suffix: '+', label: 'Вида дорожных заказов' },
-			{ value: '95', suffix: '%', label: 'Оплаты остаётся партнёру' },
-		]}
-		footerText="Есть автомобиль, инструмент или эвакуатор и готовность отвечать за результат —"
-		footerLinkText="стать партнёром"
-	/>
-	<HomeServices
-		city={city}
-		subtitle="Что предстоит делать"
-		title="Что должен делать партнёр Za-Rulem.org"
-		services={services}
-		footerText="Партнёр отмечает только работы, которые может выполнить безопасно и без посредников —"
-		footerLinkText="стать партнёром"
-		footerLinkHref={getCityUrl("/contacts", city.slug)}
-		rating="24/7"
-		ratingText="Можно отмечать круглосуточную готовность"
-	/>
-	<HomeWhyChoose
-		city={city}
-		subtitle="Условия для партнёра"
-		title="Партнёр обязан заранее указать условия выезда"
-		description={replaceCityPlaceholders("В профиле партнёр фиксирует районы {ofCity}, пригород или трассу, доступные работы, ориентир цены и срок прибытия. Он не должен подтверждать вызов вне своего радиуса, оснащения или компетенции.", city)}
-		items={[
-			{ icon: '/images/icon-why-choose-body-1-gold.svg', title: 'Целевой профиль', text: 'Клиент видит специализацию, транспорт, районы, сроки, ориентиры стоимости и текущий статус до обращения.' },
-			{ icon: '/images/icon-why-choose-body-2-gold.svg', title: 'Понятный расчёт', text: 'Партнёр согласует с клиентом цену до выезда, не меняет её без дополнительной работы и после выполнения передаёт системе 5%.' },
-		]}
-		ctaText="Стать партнёром"
-		authorName="Za-Rulem.org"
-		authorText="Проект помощи на дороге"
-	/>
-	<HomeFleets
-		city={city}
-		subtitle="Направления партнёрства"
-		title="Четыре направления заказов для дорожного партнёра"
-		slides={[
-			{ image: '/images/fleets-image-4.jpg', label: 'Доставка топлива', price: '5%', priceUnit: '/заказ', amenities: ['АИ-92, 95, 100, ДТ', replaceCityPlaceholders('{city}, пригород, трасса', city)], href: getCityUrl('/services/toplivo', city.slug) },
-			{ image: '/images/fleets-image-3.jpg', label: 'Выездной ремонт', price: '5%', priceUnit: '/заказ', amenities: ['Поиск причины поломки', 'Ремонт на месте'], href: getCityUrl('/services/tehpomosch', city.slug) },
-			{ image: '/images/fleets-image-1.jpg', label: 'Запуск двигателя', price: '5%', priceUnit: '/заказ', amenities: ['Разряжен аккумулятор', 'Мотор не запускается'], href: getCityUrl('/services/tehpomosch/prikurit-avto', city.slug) },
-			{ image: '/images/fleets-image-5.jpg', label: 'Буксировка и эвакуация', price: '5%', priceUnit: '/заказ', amenities: ['Дотащить до сервиса', 'Перевезти неисправное авто'], href: getCityUrl('/services', city.slug) },
-		]}
-		footerText="В профиле партнёра фиксируются только подтверждённые направления —"
-		footerLinkText="подать заявку"
-		footerLinkHref={getCityUrl("/contacts", city.slug)}
-	/>
-	<HomeWhatWeDo city={city} />
-	<HomeCollection
-		subtitle="Семантика дорожных вызовов"
-		title="С какими проблемами обращаются к партнёру"
-		description="Партнёр должен уметь закрыть конкретную задачу: привезти топливо, запустить двигатель, устранить доступную поломку или перевезти машину. Для каждого направления он заранее указывает оборудование и границы работ."
-		ctaText="Стать партнёром"
-		categories={[
-			{ icon: '/images/icon-car-collection-1-gold.svg', title: 'Доставка бензина', image: '/images/car-collection-image-1-gold.png' },
-			{ icon: '/images/icon-car-collection-2-gold.svg', title: 'Запуск двигателя', image: '/images/car-collection-image-2-gold.png' },
-			{ icon: '/images/icon-car-collection-3-gold.svg', title: 'Помощь при поломке', image: '/images/car-collection-image-3-gold.png' },
-			{ icon: '/images/icon-car-collection-4-gold.svg', title: 'Буксировка и эвакуация', image: '/images/car-collection-image-4-gold.png' },
-			{ icon: '/images/icon-car-collection-5-gold.svg', title: 'Диагностика мотора', image: '/images/car-collection-image-5-gold.png' },
-			{ icon: '/images/icon-car-collection-6-gold.svg', title: 'Доставка дизеля', image: '/images/car-collection-image-6-gold.png' },
-		]}
-	/>
-	<HomeDrivers
-		subtitle="Кто может стать партнёром"
-		title="Кто может получать заказы на помощь автомобилистам"
-		drivers={[
-			{ image: '/images/driver/ekip-1.jpg', title: 'Водитель на своём авто', text: replaceCityPlaceholders('Подходит для доставки бензина и дизеля, прикуривания аккумулятора и передачи расходников {inCity} и за городом.', city), href: getCityUrl('/contacts', city.slug) },
-			{ image: '/images/driver/ekip-2.jpg', title: 'Выездной автомастер', text: 'Берёт заявки на диагностику двигателя, запуск, настройку и ремонт, который можно безопасно выполнить на месте остановки.', href: getCityUrl('/contacts', city.slug) },
-			{ image: '/images/driver/ekip-3.jpg', title: 'Владелец эвакуатора или тягача', text: 'Получает вызовы на буксировку, вытаскивание и перевозку автомобиля до выбранного сервиса или безопасной стоянки.', href: getCityUrl('/contacts', city.slug) },
-		]}
-		footerText="Есть транспорт, опыт и готовность помогать 24/7 —"
-		footerLinkText="подать заявку"
-		footerLinkHref={getCityUrl("/contacts", city.slug)}
-	/>
-	<HomeHowItWork
-		city={city}
-		subtitle="Подключение партнёра"
-		title="Как подключиться и начать получать дорожные заявки"
-		steps={steps}
-		footerList={['Исправный транспорт', 'Подтверждённые навыки', 'Безопасное оборудование', 'Связь во время заказа']}
-		footerText="Проверка нужна, чтобы клиент видел реальные услуги, а партнёр получал выполнимые вызовы без потери времени."
-		footerLinkText="Стать партнёром проекта"
-	/>
-	<HomeTestimonials
-		city={city}
-		subtitle="Ответственность сторон"
-		title="За что отвечает партнёр при выполнении заказа"
-		intro="Za-Rulem.org передаёт целевой запрос, а партнёр уточняет проблему, называет честный срок, согласует полную цену, соблюдает безопасность и доводит принятую работу до результата."
-		satisfyText="Партнёры дорожной помощи"
-		reviews={[
-			{ title: 'Система отвечает за точность заявки', text: 'В обращении должны быть услуга, место, контакты и описание ситуации. Эти данные позволяют сразу оценить маршрут, оборудование и возможность выполнить работу.', author: 'Za-Rulem.org', authorRole: 'Передача дорожного заказа', image: '/images/author-3.jpg' },
-			{ title: 'Партнёр отвечает за выполнение', text: 'После подтверждения партнёр приезжает в согласованный срок, не меняет цену без новой работы и соблюдает правила перевозки топлива, ремонта или буксировки.', author: 'Партнёр', authorRole: 'Выполнение помощи на дороге', image: '/images/author-2.jpg' },
-		]}
-		footerText="Готов принимать дорожные вызовы —"
-		footerLinkText="стать партнёром"
-		footerLinkHref={getCityUrl("/contacts", city.slug)}
-	/>
-	<HomePricing
-		city={city}
-		subtitle="Комиссия системы"
-		title="Одна комиссия для водителя, мастера и эвакуатора"
-		plans={[
-			{ icon: '/images/icon-pricing-1-gold.svg', title: 'Доставка топлива', text: 'Для водителя со своим исправным автомобилем и безопасной тарой.', price: '5%', priceUnit: '/заказ', features: ['Уточнить марку и объём', 'Соблюсти район и срок', 'Передать 5% после заказа'], ctaText: 'Подключить доставку', ctaHref: getCityUrl('/contacts', city.slug) },
-			{ icon: '/images/icon-pricing-2-gold.svg', title: 'Выездной ремонт', text: 'Для мастера с диагностикой, инструментом и опытом дорожных работ.', price: '5%', priceUnit: '/заказ', features: ['Уточнить симптомы поломки', 'Согласовать работу до выезда', 'Отвечать за результат'], ctaText: 'Стать мастером', ctaHref: getCityUrl('/contacts', city.slug) },
-			{ icon: '/images/icon-pricing-3-gold.svg', title: 'Буксировка', text: 'Для партнёра с подходящим транспортом и оснащением для перевозки.', price: '5%', priceUnit: '/заказ', features: ['Маршрут известен заранее', 'Городские и загородные вызовы', 'Цена согласуется до старта'], ctaText: 'Получать заказы', ctaHref: getCityUrl('/contacts', city.slug) },
-		]}
-		benefits={['Комиссия только с заказа', '95% остаётся партнёру', 'Готовность к вызовам 24/7']}
-	/>
-	<HomeBlog
-		city={city}
-		subtitle="Перед подключением"
-		title="Что проверить до подачи заявки партнёра"
-		description="Партнёр должен подготовить документы, проверить транспорт и связь, перечислить реальные услуги, районы и оборудование. Точная анкета сокращает неподходящие вызовы и споры о сроке или цене."
-		posts={[
-			{ image: '/images/post-1.jpg', title: 'Безопасная доставка бензина и дизеля водителю', href: getCityUrl('/services/toplivo', city.slug), btnText: 'Изучить направление' },
-			{ image: '/images/post-2.jpg', title: 'Какие поломки можно устранить прямо на дороге', href: getCityUrl('/services/tehpomosch', city.slug), btnText: 'Изучить направление' },
-			{ image: '/images/post-3.jpg', title: 'Как подготовиться к круглосуточным дорожным вызовам', href: getCityUrl('/contacts', city.slug), btnText: 'Стать партнёром' },
-		]}
-	/>
+
+	<div
+		data-selection-voice-request
+		data-request-service={partnerService}
+		data-request-subject={partnerSubject}
+		data-request-title={partnerTitle}
+		data-request-city={city.name}
+	>
+		<HomeHero
+			city={city}
+			subtitle={replaceCityPlaceholders('Заявки для водителей на своём авто {inCity}', city)}
+			title={replaceCityPlaceholders(
+				'Ищем курьеров для доставки АИ-92, АИ-95, АИ-100 и ДТ {inCity}',
+				city,
+			)}
+			description={replaceCityPlaceholders(
+				'Оставьте анкету, если готовы покупать согласованный объём топлива на АЗС и доставлять его к автомобилю {inCity}. Za-Rulem сопоставляет заявки с курьерами по местоположению и возможностям, но не гарантирует постоянный поток заказов.',
+				city,
+			)}
+			ctaText="Оставить анкету курьера"
+			ctaHref={contactsUrl}
+			secondaryCtaText="Какие заявки бывают"
+			secondaryCtaHref={getCityUrl('/services/toplivo', city.slug)}
+			reviewText={replaceCityPlaceholders('Локальный подбор заявок {inCity}', city)}
+			counterValue="4"
+			counterText="Четыре направления топлива: АИ-92, АИ-95, АИ-100 и дизельное топливо."
+			benefits={benefits}
+			showClientImages={false}
+		/>
+
+		<HomeAbout
+			city={city}
+			subtitle="Работа и подработка на своём авто"
+			title={replaceCityPlaceholders('Кому подходит доставка топлива {inCity}', city)}
+			taskTitle="Что делает курьер"
+			taskText="Уточняет марку и объём, подтверждает адрес, покупает топливо на согласованной АЗС, сохраняет чек и доставляет заказ к автомобилю без самовольной замены топлива."
+			principleTitle="Как работает Za-Rulem"
+			principleText="Сервис выступает агрегатором: принимает обращение автомобилиста и ищет курьера по местоположению, району выезда и возможностям анкеты. Если совпадение найдено, стороны связываются и согласуют условия."
+			counters={[
+				{ value: '4', suffix: '', label: 'Вида топлива' },
+				{ value: '1', suffix: '', label: 'Город в анкете' },
+				{ value: '0', suffix: '', label: 'Гарантий по числу заявок' },
+				{ value: '100', suffix: '%', label: 'Условий согласуются до выезда' },
+			]}
+			footerText="Есть исправный автомобиль и готовность принимать локальные заявки —"
+			footerLinkText="оставить анкету"
+			footerLinkHref={contactsUrl}
+		/>
+
+		<HomeServices
+			city={city}
+			subtitle="Формат заявок"
+			title="Что может делать курьер Za-Rulem"
+			services={services}
+			footerText="Указывайте только те районы и виды помощи, которые действительно доступны —"
+			footerLinkText="заполнить анкету"
+			footerLinkHref={contactsUrl}
+			rating="4"
+			ratingText="Марки топлива для доставки"
+		/>
+
+		<HomeFleets
+			city={city}
+			subtitle="Доставка топлива"
+			title="Заявки на АИ-92, АИ-95, АИ-100 и дизель"
+			slides={[
+				{
+					image: '/images/fleets-image-1.jpg',
+					label: 'Бензин Regular',
+					price: 'АИ-92',
+					priceUnit: '',
+					amenities: ['Марка и объём в заявке', 'Чек с АЗС'],
+					href: contactsUrl,
+				},
+				{
+					image: '/images/fleets-image-2.jpg',
+					label: 'Бензин Premium',
+					price: 'АИ-95',
+					priceUnit: '',
+					amenities: ['Без замены марки', 'Адрес до выезда'],
+					href: contactsUrl,
+				},
+				{
+					image: '/images/fleets-image-3.jpg',
+					label: 'Высокооктановый бензин',
+					price: 'АИ-100',
+					priceUnit: '',
+					amenities: ['По запросу водителя', 'Согласованная АЗС'],
+					href: contactsUrl,
+				},
+				{
+					image: '/images/fleets-image-4.jpg',
+					label: 'Дизельное топливо',
+					price: 'ДТ',
+					priceUnit: '',
+					amenities: ['Сезонность уточняется', 'Объём подтверждается'],
+					href: contactsUrl,
+				},
+			]}
+			footerText="Готовы доставлять одну или несколько марок топлива —"
+			footerLinkText="указать в анкете"
+			footerLinkHref={contactsUrl}
+		/>
+
+		<HomeWhyChoose
+			city={city}
+			subtitle="Требования к курьеру"
+			title="Что нужно указать до получения заявки"
+			description={replaceCityPlaceholders(
+				'Для подбора заявки нужны город, районы {ofCity}, данные автомобиля, доступные марки топлива, допустимый радиус и время готовности. Чем точнее анкета, тем меньше неподходящих обращений.',
+				city,
+			)}
+			items={[
+				{
+					icon: '/images/icon-why-choose-body-1-gold.svg',
+					title: 'Исправный автомобиль и связь',
+					text: 'Курьер самостоятельно отвечает за законность управления автомобилем, его исправность, связь и соблюдение правил безопасной перевозки.',
+				},
+				{
+					icon: '/images/icon-why-choose-body-2-gold.svg',
+					title: 'Точные условия до выезда',
+					text: 'Марка, объём, АЗС, адрес, расстояние, срок и расчёт подтверждаются с заказчиком до покупки топлива и начала маршрута.',
+				},
+			]}
+			ctaText="Заполнить анкету"
+			ctaHref={contactsUrl}
+			authorName="Za-Rulem.org"
+			authorText="Агрегатор поиска курьеров"
+		/>
+
+		<HomeDrivers
+			subtitle="Дополнительная автотехпомощь"
+			title="Какие навыки можно добавить к анкете курьера"
+			drivers={[
+				{
+					image: '/images/driver/ekip-1.jpg',
+					title: 'Курьер по топливу',
+					text: 'Доставляет согласованные АИ-92, АИ-95, АИ-100 или ДТ к автомобилю в отмеченных районах.',
+					href: contactsUrl,
+				},
+				{
+					image: '/images/driver/ekip-2.jpg',
+					title: 'Водитель с бустером',
+					text: 'Помимо топлива может принять заявку на запуск двигателя, если умеет безопасно работать с пусковым устройством.',
+					href: contactsUrl,
+				},
+				{
+					image: '/images/driver/ekip-3.jpg',
+					title: 'Специалист автопомощи',
+					text: 'Указывает замену колеса или другие дорожные работы только при наличии опыта, инструмента и подходящего оснащения.',
+					href: contactsUrl,
+				},
+			]}
+			footerText="Есть дополнительные навыки и оборудование —"
+			footerLinkText="добавить в анкету"
+			footerLinkHref={contactsUrl}
+		/>
+
+		<HomeHowItWork
+			city={city}
+			subtitle="Подключение курьера"
+			title="Как начать получать подходящие заявки в своём городе"
+			steps={steps}
+			footerList={[
+				'Город и районы',
+				'Автомобиль и телефон',
+				'Марки топлива',
+				'Время готовности',
+			]}
+			footerText="Za-Rulem передаёт контакт только при подходящем обращении; постоянная занятость и число заявок не гарантируются."
+			footerLinkText="Оставить анкету курьера"
+			footerLinkHref={contactsUrl}
+		/>
+
+		<HubFaqs
+			subtitle="Вопросы курьеров"
+			title={replaceCityPlaceholders('FAQ о доставке топлива {inCity}', city)}
+			description="Условия конкретной заявки согласуются до выезда. Ниже — ответы о роли агрегатора, географии и доступных направлениях."
+			faqs={faqs}
+			benefits={[
+				'Анкета не гарантирует трудоустройство или заказы',
+				'Курьер сам подтверждает подходящий выезд',
+			]}
+			buttonLabel="Оставить анкету"
+			buttonHref={contactsUrl}
+			class="partners-faq"
+		/>
+	</div>
+
+	<PartnersOtherCities city={city} />
 	<Footer city={city} />
 </Layout>

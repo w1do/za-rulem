@@ -8,6 +8,7 @@ export type OpenVoiceRequestDetail = {
 	service?: string;
 	subject?: string;
 	title?: string;
+	city?: string;
 };
 
 /**
@@ -22,6 +23,7 @@ export default function VoiceRequestModal() {
 	const [heading, setHeading] = useState('Как вам удобнее?');
 	const [subject, setSubject] = useState('Голосовая заявка — za-rulem');
 	const [service, setService] = useState<string | undefined>();
+	const [city, setCity] = useState<string | undefined>();
 
 	const [status, setStatus] = useState<'idle' | 'recording' | 'transcribing' | 'reviewing' | 'submitting' | 'success' | 'error'>('idle');
 	const [transcription, setTranscription] = useState('');
@@ -30,6 +32,7 @@ export default function VoiceRequestModal() {
 	const [recordingTime, setRecordingTime] = useState(0);
 	const isCarSelection = service === 'vladivostok-car-selection';
 	const isPartsSelection = service === 'vladivostok-contract-parts';
+	const isPartnerApplication = service === 'partner-fuel-courier';
 
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const chunksRef = useRef<Blob[]>([]);
@@ -40,8 +43,10 @@ export default function VoiceRequestModal() {
 		setHeading(detail?.title || 'Как вам удобнее?');
 		setSubject(detail?.subject || 'Голосовая заявка — za-rulem');
 		setService(detail?.service);
+		setCity(detail?.city);
 		setStatus('idle');
 		setTranscription('');
+		setPhone('');
 		setError('');
 		setOpen(true);
 	}, []);
@@ -228,10 +233,14 @@ export default function VoiceRequestModal() {
 			<div className="service-request-modal__dialog">
 				<div className="service-request-modal__header">
 					<div>
-						<span className="service-request-modal__eyebrow">Связь с мастером</span>
+						<span className="service-request-modal__eyebrow">
+							{isPartnerApplication ? 'Анкета курьера' : 'Поиск исполнителя'}
+						</span>
 						<h2 id={titleId}>{heading}</h2>
 						<p>
-							Вы можете позвонить или описать проблему
+							{isPartnerApplication
+								? 'Расскажите, где и какие заявки готовы выполнять'
+								: 'Опишите, где и какая помощь вам нужна'}
 						</p>
 					</div>
 					<button
@@ -245,10 +254,35 @@ export default function VoiceRequestModal() {
 				</div>
 
 				<div className="service-request-modal__body" style={{ padding: '30px' }}>
+					<div className="voice-modal-disclosure mb-4" role="note">
+						<p>
+							{isPartnerApplication ? (
+								<>
+									Вы оставляете анкету курьера{city ? ` для города ${city}` : ''}. Za-Rulem
+									сопоставляет её с подходящими обращениями, но не гарантирует трудоустройство,
+									количество или регулярность заявок.
+								</>
+							) : isCarSelection || isPartsSelection ? (
+								<>
+									Вы оставляете заявку, а Za-Rulem как агрегатор подбирает подходящего исполнителя по
+									параметрам и местоположению. Если исполнитель найдётся, он свяжется с вами.
+								</>
+							) : (
+								<>
+									Вы оставляете заявку, а мы подбираем курьера по вашему местоположению. Если
+									подходящий курьер найдётся, он свяжется с вами. Сервис Za-Rulem выступает агрегатором
+									поиска курьеров.
+								</>
+							)}
+						</p>
+					</div>
+
 					{status === 'success' ? (
 						<div className="text-center">
 							<p className="ajax-response success mb-4" style={{ color: '#28a745', fontWeight: '600' }}>
-								Заявка успешно отправлена! Я свяжусь с вами по указанному номеру.
+								{isPartnerApplication
+									? 'Анкета отправлена. Если в указанном городе появится подходящая заявка, мы свяжемся с вами.'
+									: 'Заявка отправлена на подбор. Если подходящий курьер или исполнитель найдётся, он свяжется с вами.'}
 							</p>
 							<button type="button" className="btn-default" onClick={closeModal}>
 								Закрыть
@@ -266,7 +300,14 @@ export default function VoiceRequestModal() {
 								<>
 									<div className="voice-modal-instructions mb-4" style={{ textAlign: 'left', fontSize: '14px', background: '#f9f9f9', padding: '15px', borderRadius: '8px', borderLeft: '4px solid #ffb700' }}>
 										<p style={{ margin: 0, color: '#555', lineHeight: '1.6' }}>
-											{isCarSelection ? (
+											{isPartnerApplication ? (
+												<>
+													Включите запись и назовите <strong>город</strong>, <strong>автомобиль</strong>,
+													<strong> АИ-92, АИ-95, АИ-100 или ДТ</strong>, которые готовы доставлять,
+													<strong> районы выезда</strong>, время готовности и дополнительные навыки
+													автотехпомощи.
+												</>
+											) : isCarSelection ? (
 												<>Включите запись и назовите <strong>бюджет</strong>, <strong>параметры автомобиля</strong> и <strong>город получения</strong>. После распознавания текст можно проверить и дополнить.</>
 											) : isPartsSelection ? (
 												<>Включите запись и назовите <strong>VIN, frame или OEM</strong>, <strong>нужную деталь</strong> и <strong>город доставки</strong>. После распознавания текст можно проверить и дополнить.</>
@@ -323,13 +364,19 @@ export default function VoiceRequestModal() {
 							{(status === 'reviewing' || status === 'submitting') && (
 								<form onSubmit={handleSubmit} noValidate>
 									<div className="form-group mb-4">
-										<label className="service-request-modal__label">Ваша проблема (распознано):</label>
+										<label className="service-request-modal__label">
+											{isPartnerApplication ? 'Данные анкеты (распознано):' : 'Ваша заявка (распознано):'}
+										</label>
 										<textarea 
 											className="form-control" 
 											rows={5} 
 											value={transcription}
 											onChange={(e) => setTranscription(e.target.value)}
-											placeholder="Опишите ситуацию..."
+											placeholder={
+												isPartnerApplication
+													? 'Расскажите об автомобиле, городе и доступных заявках...'
+													: 'Опишите ситуацию...'
+											}
 											required
 										/>
 									</div>
@@ -366,8 +413,20 @@ export default function VoiceRequestModal() {
 					)}
 				</div>
 			</div>
-			
+
 			<style dangerouslySetInnerHTML={{ __html: `
+				.voice-modal-disclosure {
+					padding: 15px;
+					border: 1px solid rgba(255, 183, 0, 0.45);
+					border-radius: 8px;
+					background: #fffaf0;
+				}
+				.voice-modal-disclosure p {
+					margin: 0;
+					color: #3f3f3f;
+					font-size: 14px;
+					line-height: 1.6;
+				}
 				.voice-record-btn {
 					width: 90px;
 					height: 90px;

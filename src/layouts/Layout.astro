@@ -19,6 +19,7 @@ export interface Props {
 	jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
 	city?: ChatCity;
 	isNational?: boolean;
+	robots?: string;
 }
 
 const {
@@ -32,6 +33,7 @@ const {
 	jsonLd,
 	city,
 	isNational = false,
+	robots,
 } = Astro.props;
 
 const effectiveCity = city ?? defaultCity;
@@ -59,6 +61,7 @@ const structuredData = {
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
 		<meta name="theme-color" content="#F5B754" />
 		<meta name="description" content={description} />
+		{robots && <meta name="robots" content={robots} />}
 		{keywords && <meta name="keywords" content={keywords} />}
 		<meta name="author" content={isNational ? SITE.name : `${site.name} — техпомощь ${site.addressLocality}`} />
 
@@ -203,7 +206,7 @@ const structuredData = {
 					try {
 						var url = new URL(href, window.location.origin);
 						var path = url.pathname.replace(/\/+$/, '') || '/';
-						return path === '/contacts';
+						return path === '/contacts' || /\/contacts$/.test(path);
 					} catch (e) {
 						return href === '/contacts' || /\/contacts\/?(\?|#|$)/.test(href);
 					}
@@ -215,14 +218,13 @@ const structuredData = {
 					if (anchor.hasAttribute('data-skip-service-request')) return false;
 
 					var href = anchor.getAttribute('href') || '';
+					var requestContext = anchor.closest
+						? anchor.closest('[data-selection-voice-request]')
+						: null;
 					if (href.indexOf('tel:') === 0) return true;
 					if (/wa\.me|api\.whatsapp\.com/i.test(href)) return true;
 					if (anchor.hasAttribute('data-service-request')) return true;
-					if (
-						isContactsHref(href) &&
-						anchor.closest &&
-						anchor.closest('[data-selection-voice-request]')
-					) return true;
+					if (isContactsHref(href) && requestContext) return true;
 
 					var isBtn =
 						anchor.classList.contains('btn-default') ||
@@ -264,6 +266,10 @@ const structuredData = {
 							anchor.getAttribute('data-service-title') ||
 							(requestContext && requestContext.getAttribute('data-request-title')) ||
 							(isTel || isWhatsApp ? 'Сначала заявка — потом звонок' : 'Заявка на выезд'),
+						city:
+							anchor.getAttribute('data-service-city') ||
+							(requestContext && requestContext.getAttribute('data-request-city')) ||
+							undefined,
 					};
 
 					if (typeof window.openServiceRequest === 'function') {
