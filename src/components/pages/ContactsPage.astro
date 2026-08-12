@@ -125,17 +125,33 @@ const jsonLd = [
 					<div class="contact-us-form">
 						<!-- Section Title Start -->
 						<div class="section-title">
-							<span class="section-sub-title wow fadeInUp">Оставить заявку</span>
-							<h2 class="text-anime-style-3" data-cursor="-opaque">Свяжитесь со мной</h2>
+							<span class="section-sub-title wow fadeInUp">
+								<span data-contact-default>Оставить заявку</span>
+								<span data-contact-courier hidden>Анкета водителя</span>
+							</span>
+							<h2 class="text-anime-style-3" data-cursor="-opaque">
+								<span data-contact-default>Свяжитесь со мной</span>
+								<span data-contact-courier hidden>Стать курьером по доставке топлива</span>
+							</h2>
 							<p class="wow fadeInUp" data-wow-delay="0.2s">
-								{replaceCityPlaceholders("Опишите ситуацию на дороге и оставьте номер — я перезвоню в течение пары минут и выеду к вам {inCity} или области. Работаю круглосуточно.", city)}
+								<span data-contact-default>
+									{replaceCityPlaceholders("Опишите ситуацию на дороге и оставьте номер — я перезвоню в течение пары минут и выеду к вам {inCity} или области. Работаю круглосуточно.", city)}
+								</span>
+								<span data-contact-courier hidden>
+									Укажите город, автомобиль и сколько времени ежедневно готовы уделять доставке
+									топлива. Оставьте номер телефона для связи.
+								</span>
 							</p>
 						</div>
 						<!-- Section Title End -->
 
 						<!-- Contact Form Start -->
 						<div class="contact-form wow fadeInUp" data-wow-delay="0.4s">
-							<ContactForm client:visible subject={replaceCityPlaceholders("Заявка со страницы контактов {city}", city)} />
+							<ContactForm
+								client:visible
+								subject={replaceCityPlaceholders('Заявка со страницы контактов {city}', city)}
+								courierSubject={replaceCityPlaceholders('Анкета курьера по доставке топлива — {city}', city)}
+							/>
 						</div>
 						<!-- Contact Form End -->
 					</div>
@@ -145,6 +161,20 @@ const jsonLd = [
 		</div>
 	</div>
 	<!-- Page Contact Us End -->
+
+	<script>
+		const isFuelCourierApplication =
+			new URLSearchParams(window.location.search).get('intent') === 'fuel-courier';
+
+		if (isFuelCourierApplication) {
+			document.querySelectorAll<HTMLElement>('[data-contact-default]').forEach((element) => {
+				element.hidden = true;
+			});
+			document.querySelectorAll<HTMLElement>('[data-contact-courier]').forEach((element) => {
+				element.hidden = false;
+			});
+		}
+	</script>
 
 	<!-- Google Map Start -->
 	<div class="google-map">

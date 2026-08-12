@@ -19,6 +19,7 @@ export default function VoiceRequestModal() {
 	const titleId = useId();
 	const [open, setOpen] = useState(false);
 	const [mounted, setMounted] = useState(false);
+	const [courierInfoOpen, setCourierInfoOpen] = useState(false);
 
 	const [heading, setHeading] = useState('Как вам удобнее?');
 	const [subject, setSubject] = useState('Голосовая заявка — za-rulem');
@@ -50,11 +51,13 @@ export default function VoiceRequestModal() {
 		setTranscription('');
 		setPhone('');
 		setError('');
+		setCourierInfoOpen(false);
 		setOpen(true);
 	}, []);
 
 	const closeModal = useCallback(() => {
 		setOpen(false);
+		setCourierInfoOpen(false);
 		if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
 			mediaRecorderRef.current.stop();
 		}
@@ -233,7 +236,79 @@ export default function VoiceRequestModal() {
 			/>
 
 			<div className="service-request-modal__dialog">
-				<div className="service-request-modal__header">
+				{courierInfoOpen ? (
+					<>
+						<div className="service-request-modal__header">
+							<div>
+								<span className="service-request-modal__eyebrow">Для водителей</span>
+								<h2 id={titleId}>Стать курьером по доставке топлива</h2>
+								<p>Оставьте заявку, если готовы помогать водителям в своём городе.</p>
+							</div>
+							<button
+								type="button"
+								className="service-request-modal__close"
+								aria-label="Закрыть"
+								onClick={closeModal}
+							>
+								×
+							</button>
+						</div>
+
+						<div className="service-request-modal__body courier-info-modal">
+							<div className="courier-info-modal__intro">
+								<span className="courier-info-modal__icon" aria-hidden="true">
+									<i className="fa-solid fa-truck-fast"></i>
+								</span>
+								<p>
+									Нам нужны ответственные водители, которые готовы доставлять топливо и помогать
+									людям на дороге.
+								</p>
+							</div>
+
+							<div className="courier-info-modal__details">
+								<strong>В заявке расскажите:</strong>
+								<ul>
+									<li>
+										<i className="fa-solid fa-location-dot" aria-hidden="true"></i>
+										<span>в каком городе вы готовы оказывать помощь;</span>
+									</li>
+									<li>
+										<i className="fa-solid fa-car-side" aria-hidden="true"></i>
+										<span>какой у вас автомобиль;</span>
+									</li>
+									<li>
+										<i className="fa-solid fa-clock" aria-hidden="true"></i>
+										<span>сколько времени ежедневно готовы уделять заявкам.</span>
+									</li>
+								</ul>
+							</div>
+
+							<p className="courier-info-modal__note">
+								После перехода заполните форму на странице контактов. Мы рассмотрим информацию и
+								свяжемся с вами, если сможем предложить подходящий формат сотрудничества.
+							</p>
+
+							<div className="courier-info-modal__actions">
+								<a
+									href="/contacts?intent=fuel-courier#contactForm"
+									className="btn-default btn-highlighted"
+									data-skip-service-request
+								>
+									Перейти к заявке
+								</a>
+								<button
+									type="button"
+									className="courier-info-modal__back"
+									onClick={() => setCourierInfoOpen(false)}
+								>
+									Вернуться назад
+								</button>
+							</div>
+						</div>
+					</>
+				) : (
+					<>
+						<div className="service-request-modal__header">
 					<div>
 						<span className="service-request-modal__eyebrow">
 							{isPartnerApplication
@@ -302,6 +377,14 @@ export default function VoiceRequestModal() {
 									<span>Telegram</span>
 								</a>
 							</div>
+							<button
+								type="button"
+								className="voice-load-alert__courier"
+								onClick={() => setCourierInfoOpen(true)}
+							>
+								<i className="fa-solid fa-truck-fast" aria-hidden="true"></i>
+								<span>Хочу стать курьером по доставке топлива</span>
+							</button>
 						</div>
 					)}
 
@@ -478,7 +561,9 @@ export default function VoiceRequestModal() {
 							)}
 						</>
 					)}
-				</div>
+						</div>
+					</>
+				)}
 			</div>
 
 			<style dangerouslySetInnerHTML={{ __html: `
@@ -581,6 +666,116 @@ export default function VoiceRequestModal() {
 				}
 				.voice-load-alert__link--telegram {
 					background: #229ed9;
+				}
+				.voice-load-alert__courier {
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					gap: 8px;
+					width: 100%;
+					min-height: 42px;
+					margin-top: 8px;
+					padding: 9px 12px;
+					border: 1px solid #c2410c;
+					border-radius: 8px;
+					background: #fff;
+					color: #9a3412;
+					font-size: 13px;
+					font-weight: 700;
+					line-height: 1.25;
+					cursor: pointer;
+					transition: background 0.2s ease, color 0.2s ease;
+				}
+				.voice-load-alert__courier:hover {
+					background: #9a3412;
+					color: #fff;
+				}
+				.voice-load-alert__courier:focus-visible {
+					outline: 3px solid rgba(234, 88, 12, 0.3);
+					outline-offset: 2px;
+				}
+				.courier-info-modal__intro {
+					display: flex;
+					align-items: center;
+					gap: 12px;
+					padding: 14px;
+					border-radius: 10px;
+					background: #fff7ed;
+				}
+				.courier-info-modal__intro p {
+					margin: 0;
+					color: #431407;
+					font-size: 14px;
+					line-height: 1.5;
+				}
+				.courier-info-modal__icon {
+					flex: 0 0 auto;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					width: 40px;
+					height: 40px;
+					border-radius: 50%;
+					background: #ffedd5;
+					color: #c2410c;
+				}
+				.courier-info-modal__details {
+					margin-top: 18px;
+				}
+				.courier-info-modal__details strong {
+					display: block;
+					margin-bottom: 10px;
+					color: #0f172a;
+					font-size: 15px;
+				}
+				.courier-info-modal__details ul {
+					display: grid;
+					gap: 8px;
+					margin: 0;
+					padding: 0;
+					list-style: none;
+				}
+				.courier-info-modal__details li {
+					display: flex;
+					align-items: flex-start;
+					gap: 9px;
+					padding: 10px 12px;
+					border: 1px solid #e2e8f0;
+					border-radius: 8px;
+					color: #334155;
+					font-size: 14px;
+					line-height: 1.4;
+				}
+				.courier-info-modal__details li i {
+					width: 16px;
+					margin-top: 3px;
+					color: #c2410c;
+					text-align: center;
+				}
+				.courier-info-modal__note {
+					margin: 16px 0 0;
+					color: #64748b;
+					font-size: 13px;
+					line-height: 1.5;
+				}
+				.courier-info-modal__actions {
+					display: grid;
+					gap: 8px;
+					margin-top: 18px;
+				}
+				.courier-info-modal__actions .btn-default {
+					width: 100%;
+					text-align: center;
+				}
+				.courier-info-modal__back {
+					padding: 8px;
+					border: 0;
+					background: transparent;
+					color: #64748b;
+					font-size: 13px;
+					text-decoration: underline;
+					text-underline-offset: 3px;
+					cursor: pointer;
 				}
 				.voice-modal-disclosure {
 					padding: 15px;
