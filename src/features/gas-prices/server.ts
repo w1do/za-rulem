@@ -37,12 +37,32 @@ const optional = async <T>(operation: () => Promise<T>, fallback: T, label: stri
 	}
 };
 
-const loadBrands = (): Promise<GasBrand[]> => optional(readGasBrands, [], 'brand registry unavailable');
+let brandsCache: GasBrand[] | undefined;
+let brandsInFlight: Promise<GasBrand[]> | undefined;
+
+/**
+ * Реестр брендов читается многими страницами во время одной сборки. Держим
+ * один in-flight запрос и кешируем только успешный ответ, чтобы временный
+ * таймаут не превращался в серию одинаковых запросов к Directus.
+ */
+const loadBrands = async (): Promise<GasBrand[]> => {
+	if (brandsCache) return brandsCache;
+	if (brandsInFlight) return brandsInFlight;
+
+	brandsInFlight = optional(readGasBrands, [], 'brand registry unavailable');
+	try {
+		const brands = await brandsInFlight;
+		if (brands.length > 0) brandsCache = brands;
+		return brands;
+	} finally {
+		brandsInFlight = undefined;
+	}
+};
 const loadHistory = (citySlug: string): Promise<GasPriceSnapshot[]> =>
 	optional(() => readCitySnapshots(citySlug), [], `history unavailable for ${citySlug}`);
 
 export const getPopularGasBrands = async (): Promise<GasBrand[]> =>
-	(await readGasBrands())
+	(await loadBrands())
 		.filter((brand) => brand.isIndexable && brand.verificationStatus === 'verified')
 		.sort((first, second) => first.name.localeCompare(second.name, 'ru'));
 
@@ -171,8 +191,12 @@ export const collectGasPriceSnapshotBatch = async (
 export const getGasPriceSitemapUrls = async (site: string): Promise<string[]> => {
 	const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 	const [brands, entries] = await Promise.all([
-		readGasBrands(),
-		readGasPriceSitemapEntries(since),
+		loadBrands(),
+		optional(
+			() => readGasPriceSitemapEntries(since),
+			[],
+			'sitemap entries unavailable',
+		),
 	]);
 	const registry = mergeBrandRegistry(brands);
 	const urls: string[] = [];
