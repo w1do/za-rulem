@@ -184,6 +184,7 @@ export const getGasPriceSitemapUrls = async (site: string): Promise<string[]> =>
 			sourceUpdatedAt: latest.sourceUpdatedAt,
 			snapshotDate: latest.snapshotDate,
 			fuels: [],
+			history,
 		};
 		if (isBrandReadyForIndexing(summary, history)) {
 			urls.push(new URL(gasPricesUrl(city.slug, brand.slug), site).href);

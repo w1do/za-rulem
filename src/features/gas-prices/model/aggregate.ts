@@ -217,8 +217,11 @@ export const buildBrandSummaries = (
 			sourceUpdatedAt,
 			fuels,
 		};
-		const previous = history
-			.filter((item) => item.brandSlug === brand.slug && item.snapshotDate < snapshot.snapshotDate)
+		const brandHistory = history
+			.filter((item) => item.brandSlug === brand.slug)
+			.sort((left, right) => left.snapshotDate.localeCompare(right.snapshotDate));
+		const previous = brandHistory
+			.filter((item) => item.snapshotDate.slice(0, 10) < snapshot.snapshotDate.slice(0, 10))
 			.sort((left, right) => right.snapshotDate.localeCompare(left.snapshotDate))[0];
 		return {
 			brand,
@@ -226,6 +229,7 @@ export const buildBrandSummaries = (
 			sourceUpdatedAt: snapshot.sourceUpdatedAt,
 			snapshotDate: snapshot.snapshotDate,
 			fuels: addPriceTrends(snapshot.fuels, previous),
+			history: brandHistory.slice(-30),
 		};
 	});
 };
@@ -238,5 +242,5 @@ export const isBrandReadyForIndexing = (
 	if (!summary.brand.isIndexable || summary.brand.verificationStatus !== 'verified') return false;
 	const sourceUpdatedAt = Date.parse(summary.sourceUpdatedAt);
 	if (!Number.isFinite(sourceUpdatedAt) || now - sourceUpdatedAt > MAX_FUEL_PRICE_AGE_MS) return false;
-	return new Set(history.map((snapshot) => snapshot.snapshotDate)).size >= 2;
+	return new Set(history.map((snapshot) => snapshot.snapshotDate.slice(0, 10))).size >= 2;
 };

@@ -18,16 +18,27 @@ const values = chartHistory.flatMap((item) => item.fuels.map((fuel) => fuel.aver
 const min = values.length ? Math.min(...values) : 0;
 const max = values.length ? Math.max(...values) : 0;
 const span = Math.max(max - min, 1);
-const pointsFor = (fuelType: string): string => chartHistory
+const chartTop = max + span * .08;
+const chartBottom = Math.max(0, min - span * .08);
+const chartSpan = Math.max(chartTop - chartBottom, 1);
+const xFor = (index: number): number => chartHistory.length === 1
+	? 400
+	: 70 + index * (690 / (chartHistory.length - 1));
+const yFor = (value: number): number => 205 - ((value - chartBottom) / chartSpan) * 155;
+const valuesFor = (fuelType: string) => chartHistory
 	.map((item, index) => {
 		const value = item.fuels.find((fuel) => fuel.fuelType === fuelType)?.average;
 		if (value === undefined) return null;
-		const x = chartHistory.length === 1 ? 50 : 20 + index * (760 / (chartHistory.length - 1));
-		const y = 180 - ((value - min) / span) * 140;
-		return `${x},${y}`;
+		return { x: xFor(index), y: yFor(value), value, snapshotDate: item.snapshotDate };
 	})
-	.filter(Boolean)
+	.filter((item): item is { x: number; y: number; value: number; snapshotDate: string } => item !== null);
+const pointsFor = (fuelType: string): string => valuesFor(fuelType)
+	.map((point) => `${point.x},${point.y}`)
 	.join(' ');
+const yTicks = [chartTop, chartBottom + chartSpan / 2, chartBottom];
+const dateLabels = chartHistory.length > 1
+	? [chartHistory[0], chartHistory[Math.floor((chartHistory.length - 1) / 2)], chartHistory.at(-1)].filter(Boolean)
+	: chartHistory;
 const pageUrl = (target: number): string => target === 1 ? baseUrl : `${baseUrl}?page=${target}`;
 ---
 
@@ -44,10 +55,28 @@ const pageUrl = (target: number): string => target === 1 ? baseUrl : `${baseUrl}
 					<div class="chart-legend">
 						{chartFuels.map((fuel, index) => <span><i style={`background:${colors[index]}`}></i>{formatFuelLabel(fuel)}</span>)}
 					</div>
-					<svg viewBox="0 0 800 210" role="img" aria-label="График средней стоимости топлива">
-						<line x1="20" y1="180" x2="780" y2="180" stroke="#ddd" />
-						{chartFuels.map((fuel, index) => <polyline points={pointsFor(fuel)} fill="none" stroke={colors[index]} stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />)}
+					<svg viewBox="0 0 800 250" role="img" aria-label="График средней стоимости топлива">
+						<title>Средняя стоимость топлива по ежедневным снимкам</title>
+						{yTicks.map((tick, index) => {
+							const y = 50 + index * 77.5;
+							return <g><line x1="70" y1={y} x2="760" y2={y} stroke="#e7e7e7" /><text x="8" y={y + 4}>{tick.toFixed(2)} ₽</text></g>;
+						})}
+						{chartFuels.map((fuel, index) => (
+							<g>
+								{valuesFor(fuel).length > 1 && <polyline points={pointsFor(fuel)} fill="none" stroke={colors[index]} stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />}
+								{valuesFor(fuel).map((point) => (
+									<circle cx={point.x} cy={point.y} r={chartHistory.length === 1 ? 7 : 4.5} fill={colors[index]} stroke="#fff" stroke-width="2">
+										<title>{formatFuelLabel(fuel)}, {formatGasDate(point.snapshotDate)}: {formatPrice(point.value)}</title>
+									</circle>
+								))}
+							</g>
+						))}
+						{dateLabels.map((snapshot) => {
+							const index = chartHistory.indexOf(snapshot);
+							return <text class="chart-date" x={xFor(index)} y="238" text-anchor="middle">{formatGasDate(snapshot.snapshotDate).replace(` ${new Date(snapshot.snapshotDate).getFullYear()} г.`, '')}</text>;
+						})}
 					</svg>
+					{chartHistory.length === 1 && <p class="chart-notice">Первый снимок уже показан точками. Линии динамики появятся автоматически после сохранения следующего дня.</p>}
 				</div>
 				<div class="table-wrap">
 					<table>
@@ -77,6 +106,9 @@ const pageUrl = (target: number): string => target === 1 ? baseUrl : `${baseUrl}
 	.chart-card, .table-wrap { padding: 24px; border-radius: 18px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.05); }
 	.chart-card { margin-bottom: 24px; overflow-x: auto; }
 	.chart-card svg { width: 100%; min-width: 600px; }
+	.chart-card :global(text) { fill: #667085; font-family: inherit; font-size: 11px; }
+	.chart-card :global(.chart-date) { font-size: 12px; }
+	.chart-notice { margin: 8px 0 0; padding: 12px 14px; border-radius: 10px; color: #755600; background: #fff5d6; font-size: 13px; }
 	.chart-legend { display: flex; flex-wrap: wrap; gap: 18px; }
 	.chart-legend span { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; }
 	.chart-legend i { width: 12px; height: 12px; border-radius: 50%; }

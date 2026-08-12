@@ -1,0 +1,61 @@
+---
+import type { GasPriceSnapshot } from '../model/types';
+import { formatFuelLabel, formatPrice } from '../model/format';
+
+interface Props {
+	history: GasPriceSnapshot[];
+	fuelType?: string;
+}
+
+const { history, fuelType: requestedFuelType } = Astro.props;
+const snapshots = [...history]
+	.sort((left, right) => left.snapshotDate.localeCompare(right.snapshotDate))
+	.slice(-14);
+const fuelType = requestedFuelType
+	?? ['AI_92', 'AI_95', 'DT'].find((type) => snapshots.some((item) => item.fuels.some((fuel) => fuel.fuelType === type)))
+	?? snapshots.flatMap((item) => item.fuels)[0]?.fuelType;
+const values = fuelType
+	? snapshots.flatMap((item) => {
+		const fuel = item.fuels.find((entry) => entry.fuelType === fuelType);
+		return fuel ? [{ date: item.snapshotDate.slice(0, 10), value: fuel.average }] : [];
+	})
+	: [];
+const min = values.length > 0 ? Math.min(...values.map((item) => item.value)) : 0;
+const max = values.length > 0 ? Math.max(...values.map((item) => item.value)) : 0;
+const span = Math.max(max - min, 1);
+const xFor = (index: number): number => values.length === 1 ? 110 : 8 + index * (204 / (values.length - 1));
+const yFor = (value: number): number => 57 - ((value - min) / span) * 42;
+const points = values.map((item, index) => `${xFor(index)},${yFor(item.value)}`).join(' ');
+const latest = values.at(-1);
+---
+
+<div class="sparkline" aria-label={fuelType ? `Динамика цены ${formatFuelLabel(fuelType)}` : 'История цены ещё не накоплена'}>
+	{latest && fuelType ? (
+		<>
+			<div class="sparkline__meta">
+				<span>{formatFuelLabel(fuelType)} · {values.length} {values.length === 1 ? 'снимок' : 'снимков'}</span>
+				<strong>{formatPrice(latest.value)}</strong>
+			</div>
+			<svg viewBox="0 0 220 66" role="img">
+				<title>Динамика {formatFuelLabel(fuelType)} за последние {values.length} снимков</title>
+				<line x1="8" y1="58" x2="212" y2="58" stroke="#e7e7e7" stroke-width="1" />
+				{values.length > 1 && <polyline points={points} fill="none" stroke="#f5b754" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />}
+				{values.map((item, index) => (
+					<circle cx={xFor(index)} cy={yFor(item.value)} r={values.length === 1 ? 5 : 3.5} fill="#f5b754">
+						<title>{item.date}: {formatPrice(item.value)}</title>
+					</circle>
+				))}
+			</svg>
+			{values.length === 1 && <small>Линия появится после следующего дневного снимка</small>}
+		</>
+	) : <p>История пока не накоплена</p>}
+</div>
+
+<style>
+	.sparkline { margin: 0 0 20px; padding: 14px; border-radius: 14px; background: #f8f8f8; }
+	.sparkline__meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12px; }
+	.sparkline__meta span { color: #667085; }
+	.sparkline__meta strong { color: var(--primary-color); }
+	.sparkline svg { display: block; width: 100%; height: 66px; overflow: visible; }
+	.sparkline small, .sparkline p { display: block; margin: 2px 0 0; color: #777; font-size: 11px; line-height: 1.4; }
+</style>

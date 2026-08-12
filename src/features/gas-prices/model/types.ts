@@ -44,6 +44,7 @@ export interface GasBrandSummary {
 	sourceUpdatedAt: string;
 	snapshotDate: string;
 	fuels: FuelPriceView[];
+	history: GasPriceSnapshot[];
 }
 
 export interface GasBrandStationGroup {
