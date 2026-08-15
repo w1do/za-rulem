@@ -1,6 +1,7 @@
 ---
 import GasBrandPricesPage from '../../../components/pages/GasBrandPricesPage.astro';
 import { findCity } from '../../../lib/cities';
+import { gasPricesUrl } from '../../../features/gas-prices';
 import { GasBrandNotFoundError, getGasBrandPrices } from '../../../features/gas-prices/server';
 
 export const prerender = false;
@@ -15,6 +16,11 @@ try {
 } catch (error) {
 	if (error instanceof GasBrandNotFoundError) return new Response('Сеть АЗС не найдена', { status: 404 });
 	throw error;
+}
+
+const canonicalSlug = data.summary.brand.slug;
+if (canonicalSlug !== brandSlug) {
+	return Astro.redirect(gasPricesUrl(city.slug, canonicalSlug), 301);
 }
 ---
 

@@ -59,6 +59,15 @@
       "schema": { "is_nullable": false }
     },
     {
+      "field": "slug",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "note": "Latin slug of the station, unique"
+      },
+      "schema": { "is_unique": true }
+    },
+    {
       "field": "brand",
       "type": "string",
       "meta": { "width": "half", "interface": "input" },

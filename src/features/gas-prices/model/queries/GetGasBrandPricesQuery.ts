@@ -1,5 +1,6 @@
 import { readBrandAreaSlugs, readBrandHistory } from '../../api/directusGasPrices';
 import { optional } from '../../lib/optional';
+import { decodeSlug, toLatinBrandSlug } from '../brandSlug';
 import type { GasBrandPriceData } from '../types';
 import { loadCityBrandSummaries } from './GetGasCityPricesQuery';
 
@@ -13,17 +14,23 @@ export const getGasBrandPrices = async (
 	page = 1,
 ): Promise<GasBrandPriceData> => {
 	const summaries = await loadCityBrandSummaries(citySlug);
-	const summary = summaries.find((item) => item.brand.slug === brandSlug);
+	const requestedSlug = decodeSlug(brandSlug);
+	const publicSlug = toLatinBrandSlug(requestedSlug) || requestedSlug;
+	const summary = summaries.find(
+		(item) => item.brand.slug === publicSlug || item.brand.sourceSlug === requestedSlug,
+	);
 	if (!summary) throw new GasBrandNotFoundError(`АЗС ${brandSlug} не найдена в городе ${citySlug}`);
+
+	const sourceSlug = summary.brand.sourceSlug ?? summary.brand.slug;
 
 	const safePage = Math.max(1, Math.floor(page));
 	const [history, otherAreaSlugs] = await Promise.all([
 		optional(
-			() => readBrandHistory(citySlug, brandSlug, safePage, HISTORY_PER_PAGE),
+			() => readBrandHistory(citySlug, sourceSlug, safePage, HISTORY_PER_PAGE),
 			{ items: [], total: 0 },
-			`brand history unavailable for ${citySlug}/${brandSlug}`,
+			`brand history unavailable for ${citySlug}/${sourceSlug}`,
 		),
-		optional(() => readBrandAreaSlugs(brandSlug), [], `city links unavailable for ${brandSlug}`),
+		optional(() => readBrandAreaSlugs(sourceSlug), [], `city links unavailable for ${sourceSlug}`),
 	]);
 
 	return {
@@ -32,7 +39,7 @@ export const getGasBrandPrices = async (
 		historyTotal: history.total,
 		page: safePage,
 		perPage: HISTORY_PER_PAGE,
-		relatedBrands: summaries.filter((item) => item.brand.slug !== brandSlug).slice(0, 8),
+		relatedBrands: summaries.filter((item) => item.brand.slug !== summary.brand.slug).slice(0, 8),
 		otherAreaSlugs,
 		fetchedAt: new Date().toISOString(),
 	};

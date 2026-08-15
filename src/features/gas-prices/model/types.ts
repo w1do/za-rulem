@@ -3,7 +3,10 @@ export const PRIMARY_FUEL_TYPES = ['AI_92', 'AI_95', 'DT'] as const;
 export type PriceTrend = 'up' | 'down' | 'stable' | 'unknown';
 
 export interface GasBrand {
+	/** Латинский slug для публичного URL. */
 	slug: string;
+	/** Исходный slug сети в Directus, может быть кириллическим. */
+	sourceSlug?: string;
 	name: string;
 	aliases: string[];
 	isIndexable: boolean;

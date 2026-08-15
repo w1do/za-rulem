@@ -9,7 +9,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "directus:slugs": "node --experimental-strip-types scripts/directus-slugs.ts"
   },
   "dependencies": {
     "@astrojs/node": "^11.0.2",

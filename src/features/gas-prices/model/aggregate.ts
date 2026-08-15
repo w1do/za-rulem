@@ -1,3 +1,4 @@
+import { decodeSlug, toLatinBrandSlug } from './brandSlug.ts';
 import { DEFAULT_GAS_BRANDS } from './defaultBrands.ts';
 import type {
 	FuelPriceSummary,
@@ -12,9 +13,21 @@ export const MAX_FUEL_PRICE_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 const HISTORY_POINTS = 30;
 
+/** Реестр всегда живёт в латинских slug: они же используются в публичных URL. */
+const toPublicBrand = (brand: GasBrand): GasBrand => ({
+	...brand,
+	slug: toLatinBrandSlug(brand.slug) || brand.slug,
+	sourceSlug: brand.sourceSlug ?? brand.slug,
+});
+
 export const mergeBrandRegistry = (brands: GasBrand[]): GasBrand[] => {
-	const merged = new Map(DEFAULT_GAS_BRANDS.map((brand) => [brand.slug, { ...brand }]));
-	for (const brand of brands) merged.set(brand.slug, brand);
+	const merged = new Map(
+		DEFAULT_GAS_BRANDS.map(toPublicBrand).map((brand) => [brand.slug, brand]),
+	);
+	for (const brand of brands) {
+		const publicBrand = toPublicBrand(brand);
+		merged.set(publicBrand.slug, publicBrand);
+	}
 	return [...merged.values()];
 };
 
@@ -22,17 +35,24 @@ const nameFromSlug = (slug: string): string =>
 	slug.split('-').filter(Boolean).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ') || 'АЗС';
 
 /**
- * Directus хранит снимки по slug сети. Незнакомая сеть остаётся видимой на
- * сайте, но не индексируется, пока её не подтвердили в реестре брендов.
+ * Directus хранит снимки по slug сети, который может быть кириллическим.
+ * Публичный URL всегда латинский, поэтому исходный slug сохраняем отдельно.
+ * Незнакомая сеть остаётся видимой на сайте, но не индексируется, пока её
+ * не подтвердили в реестре брендов.
  */
-export const resolveGasBrand = (slug: string, registry: readonly GasBrand[]): GasBrand =>
-	registry.find((brand) => brand.slug === slug) ?? {
-		slug,
-		name: nameFromSlug(slug),
+export const resolveGasBrand = (slug: string, registry: readonly GasBrand[]): GasBrand => {
+	const publicSlug = toLatinBrandSlug(slug) || slug;
+	const known = registry.find((brand) => brand.slug === publicSlug || brand.sourceSlug === slug);
+	if (known) return { ...known, slug: known.slug, sourceSlug: slug };
+	return {
+		slug: publicSlug,
+		sourceSlug: slug,
+		name: nameFromSlug(decodeSlug(slug)),
 		aliases: [],
 		isIndexable: false,
 		verificationStatus: 'unverified',
 	};
+};
 
 const isFreshPrice = (updatedAt: string, now: number): boolean => {
 	const timestamp = Date.parse(updatedAt);

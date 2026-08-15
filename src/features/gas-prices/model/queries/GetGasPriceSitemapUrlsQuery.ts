@@ -1,7 +1,7 @@
 import { cities } from '../../../../lib/cities';
 import { readGasPriceSitemapEntries } from '../../api/directusGasPrices';
 import { optional } from '../../lib/optional';
-import { isGasPriceHistoryReadyForIndexing, mergeBrandRegistry } from '../aggregate';
+import { isGasPriceHistoryReadyForIndexing, mergeBrandRegistry, resolveGasBrand } from '../aggregate';
 import { gasPricesUrl } from '../urls';
 import { loadGasBrands } from './brandRegistry';
 
@@ -19,8 +19,8 @@ export const getGasPriceSitemapUrls = async (site: string): Promise<string[]> =>
 	const urls: string[] = [];
 	for (const entry of entries) {
 		const city = cities.find((item) => item.slug === entry.citySlug && item.isIndexable !== false);
-		const brand = registry.find((item) => item.slug === entry.brandSlug);
-		if (!city || !brand) continue;
+		const brand = resolveGasBrand(entry.brandSlug, registry);
+		if (!city) continue;
 		if (isGasPriceHistoryReadyForIndexing(brand, entry.sourceUpdatedAt, entry.snapshotCount)) {
 			urls.push(new URL(gasPricesUrl(city.slug, brand.slug), site).href);
 		}

@@ -5,9 +5,11 @@ import {
 	buildBrandSummaries,
 	isBrandReadyForIndexing,
 	isGasPriceHistoryReadyForIndexing,
+	mergeBrandRegistry,
 	resolveGasBrand,
 	selectFreshFuels,
 } from '../src/features/gas-prices/model/aggregate.ts';
+import { toLatinBrandSlug } from '../src/features/gas-prices/model/brandSlug.ts';
 import { toGasPriceSnapshot } from '../src/features/gas-prices/api/dto.ts';
 import type { GasBrand, GasPriceSnapshot } from '../src/features/gas-prices/model/types.ts';
 
@@ -101,4 +103,21 @@ test('SEO readiness requires a verified brand, fresh source and two distinct sna
 		isGasPriceHistoryReadyForIndexing(verifiedBrand, NOW.toISOString(), 1, NOW.getTime()),
 		false,
 	);
+});
+
+test('cyrillic brand slug becomes a latin url and keeps the directus source slug', () => {
+	assert.equal(toLatinBrandSlug('крайснефть'), 'kraysneft');
+	assert.equal(toLatinBrandSlug('брк'), 'brk');
+	assert.equal(toLatinBrandSlug('%D0%B1%D1%80%D0%BA'), 'brk');
+
+	const registry = mergeBrandRegistry([]);
+	const known = resolveGasBrand('башнефть', registry);
+	assert.equal(known.slug, 'bashneft');
+	assert.equal(known.sourceSlug, 'башнефть');
+	assert.equal(known.name, 'Башнефть');
+
+	const unknown = resolveGasBrand('крайснефть', registry);
+	assert.equal(unknown.slug, 'kraysneft');
+	assert.equal(unknown.sourceSlug, 'крайснефть');
+	assert.equal(unknown.isIndexable, false);
 });
