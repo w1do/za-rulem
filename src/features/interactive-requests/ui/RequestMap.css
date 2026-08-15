@@ -498,31 +498,16 @@
 	color: #059669;
 }
 
-/* --- Карточка просмотра заявки --- */
+/* --- Модальное окно заявки --- */
 
 .request-details {
-	position: absolute;
-	right: 16px;
-	bottom: 88px;
-	z-index: 600;
-	width: min(320px, calc(100% - 32px));
-	padding: 16px;
-	border-radius: 16px;
+	width: min(480px, 100%);
 	border-top: 4px solid var(--details-color, #0f172a);
-	background: #fff;
 	box-shadow: 0 18px 40px rgba(15, 23, 42, 0.28);
 }
 
-.request-details__close {
-	position: absolute;
-	top: 10px;
-	right: 10px;
-	width: 28px;
-	height: 28px;
-	border: none;
-	border-radius: 50%;
-	background: #f1f5f9;
-	cursor: pointer;
+.request-details .request-modal__header {
+	margin-bottom: 12px;
 }
 
 .request-details__price {
@@ -557,37 +542,13 @@
 	line-height: 1.45;
 }
 
-.request-details__call {
-	display: block;
-	width: 100%;
-	padding: 12px;
-	border: none;
-	border-radius: 12px;
-	background: #16a34a;
-	color: #fff;
-	font-size: 15px;
-	font-weight: 700;
-	text-align: center;
-	text-decoration: none;
-	cursor: pointer;
-}
-
-.request-details__call:hover {
-	background: #15803d;
-	color: #fff;
-}
-
 .request-details__no-phone {
 	margin: 0;
 	color: #64748b;
 	font-size: 12px;
 }
 
-/* --- Модальное окно звонка --- */
-
-.call-modal {
-	width: min(480px, 100%);
-}
+/* --- Блок звонка в окне заявки --- */
 
 .call-modal__button {
 	display: flex;
@@ -622,14 +583,8 @@
 	line-height: 1.2;
 }
 
-.call-modal__hint {
-	margin: 14px 0 10px;
-	color: #475569;
-	font-size: 13px;
-}
-
 .call-modal__rules {
-	margin: 0;
+	margin: 12px 0 0;
 	padding: 0;
 	list-style: none;
 	display: grid;
@@ -669,9 +624,5 @@
 		bottom: 88px;
 		left: 16px;
 		max-height: 42%;
-	}
-
-	.request-details {
-		bottom: 16px;
 	}
 }
