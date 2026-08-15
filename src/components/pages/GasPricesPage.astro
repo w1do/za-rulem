@@ -6,6 +6,7 @@ import PageHeader from '../../components/shared/PageHeader.astro';
 import Alert from '../../components/shared/Alert.astro';
 import GasBrandGrid from '../../features/gas-prices/ui/GasBrandGrid.astro';
 import GasPricesMapSection from '../gas-prices/GasPricesMapSection.astro';
+import QueueBoardSection from '../../features/gas-queues/ui/QueueBoardSection.astro';
 import FuelDeliveryCalculator from '../../components/calculators/FuelDeliveryCalculator';
 import HomeHowItWork from '../../components/home/HomeHowItWork.astro';
 import HomeWhyChoose from '../../components/home/HomeWhyChoose.astro';
@@ -16,6 +17,7 @@ import { gasStationLabels, getQueueDrivers } from '../../data/queueDrivers';
 import { chatAppUrl, getCityUrl, replaceCityPlaceholders, type ChatCity } from '../../lib/cities';
 import { getGasCityPrices } from '../../features/gas-prices/server';
 import { fetchCityGasStations } from '../../lib/gasStations';
+import { buildQueueBoard } from '../../features/gas-queues';
 import {
 	buildGasPricesFaqs,
 	buildGasPricesMeta,
@@ -35,6 +37,9 @@ const priceData = await getGasCityPrices(city.slug);
 
 // АЗС города из снимков `gas_daily` (`area_type=point`) с карточками реестра `stations`.
 const stations = await fetchCityGasStations(city.slug);
+
+// Сводка очередей собирается из уже загруженных станций — без второго запроса к Directus.
+const queueBoard = buildQueueBoard(stations);
 
 const url = getCityUrl('/ceny-na-benzin', city.slug);
 const jsonLd = [
@@ -76,13 +81,17 @@ const queueGasStations = Object.values(gasStationLabels);
 		<Alert chatHref={chatAppUrl(city.slug)} title="Обсудите цены и наличие топлива с водителями" description="Проверяйте дату обновления цены перед поездкой." />
 	</div>
 
+	<QueueBoardSection board={queueBoard} city={city} mapHref="#gas-stations-map" />
+
 	<GasPricesMapSection
 		mode="prices"
 		stations={stations}
 		bounds={city.bounds}
 		chatUrl={chatAppUrl(city.slug)}
 		citySlug={city.slug}
+		id="gas-stations-map"
 	/>
+
 
 	<GasBrandGrid brands={priceData.brands} citySlug={city.slug} />
 

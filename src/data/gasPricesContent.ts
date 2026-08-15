@@ -1,4 +1,4 @@
-import { replaceCityPlaceholders, type ChatCity } from '../lib/cities';
+import { getCityUrl, replaceCityPlaceholders, type ChatCity } from '../lib/cities';
 
 /**
  * Тексты страницы «Цены на бензин»: метаданные, интро и FAQ.
@@ -90,6 +90,18 @@ export const buildGasPricesFaqs = (city: ChatCity): GasPricesFaq[] => [
 			'Используйте тип топлива и октановое число, указанные производителем автомобиля. Моя статистика поможет найти выгодную цену на АИ-92, АИ-95 или дизель, но не является оценкой качества топлива конкретной сети.',
 			city,
 		),
+	},
+	{
+		question: replaceCityPlaceholders('Где сейчас заправиться без очереди {inCity}?', city),
+		answer: replaceCityPlaceholders(
+			`В блоке «Где сейчас заправиться без очереди» АЗС разложены по загруженности: без очереди, небольшая и большая очередь. Полная сводка с адресами — на странице ${getCityUrl('/ochered-na-azs', city.slug)}.`,
+			city,
+		),
+	},
+	{
+		question: 'Откуда берутся данные об очередях на заправках?',
+		answer:
+			'Статус очереди приходит из реестра АЗС вместе с ценами и обновляется в течение дня. Заправки без свежих данных и закрытые АЗС я в карточках не показываю.',
 	},
 	{
 		question: replaceCityPlaceholders('Как сэкономить на бензине {inCity}?', city),

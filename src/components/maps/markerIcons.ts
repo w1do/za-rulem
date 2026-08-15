@@ -3,6 +3,7 @@
  * Зелёный — свободно, оранжевый — средняя очередь, красный — большая, серый — нет данных.
  */
 
+import { resolveQueueMarkerTone } from '../../features/gas-queues/model/queueLevels.ts';
 import type { StationData } from '../../lib/gasStations';
 
 export type QueueColorCategory = 'green' | 'orange' | 'red' | 'neutral';
@@ -23,23 +24,13 @@ const QUEUE_PALETTE: Record<QueueColorCategory, QueuePalette> = {
 	neutral: { fill: '#6b7280', stroke: '#1f2937', label: 'Нет данных' },
 };
 
-const GREEN_QUEUE_LEVELS = ['NONE', 'NO_QUEUE'];
-const ORANGE_QUEUE_LEVELS = ['UP_TO_25', 'FROM_10_TO_25', 'FROM_25_TO_50'];
-const RED_QUEUE_LEVELS = ['OVER_50', 'FROM_50', 'CRITICAL'];
-
 /** Сопоставляет `queue_level` станции с цветовой категорией маркера. */
 export const resolveQueueColorCategory = (
 	queueLevel: string | null | undefined,
 	isClosed = false,
 ): QueueColorCategory => {
 	if (isClosed) return 'neutral';
-
-	const level = (queueLevel ?? '').trim().toUpperCase();
-	if (GREEN_QUEUE_LEVELS.includes(level)) return 'green';
-	if (ORANGE_QUEUE_LEVELS.includes(level)) return 'orange';
-	if (RED_QUEUE_LEVELS.includes(level)) return 'red';
-
-	return 'neutral';
+	return resolveQueueMarkerTone(queueLevel) ?? 'neutral';
 };
 
 /** Цветовая категория маркера для конкретной станции. */

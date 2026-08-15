@@ -4,6 +4,13 @@
  * Модуль не зависит от UI и используется и на сервере (Astro), и в клиентской карте.
  */
 
+import {
+	getQueueLevelsForBuckets,
+	QUEUE_BUCKET_META,
+	resolveQueueBucket,
+	type QueueBucketId,
+} from '../features/gas-queues/model/queueLevels.ts';
+
 export interface FuelPrice {
 	station_id: string;
 	fuel_type: string;
@@ -119,8 +126,8 @@ export const FUEL_LIMIT_OPTIONS = [10, 20, 30, 40] as const;
 
 export const FUEL_FILTER_TYPES = ['AI_92', 'AI_95', 'DT', 'GAS'] as const;
 
-const SMALL_QUEUE_LEVELS = ['NONE', 'UP_TO_25', 'FROM_10_TO_25'];
-const LARGE_QUEUE_LEVELS = ['FROM_25_TO_50', 'OVER_50'];
+const SMALL_QUEUE_LEVELS = getQueueLevelsForBuckets(['free', 'small']);
+const LARGE_QUEUE_LEVELS = getQueueLevelsForBuckets(['large']);
 
 /** Клиентский URL карты АЗС: браузер ходит только в собственный endpoint. */
 export const buildStationsUrl = (bounds: MapBounds): string => {
@@ -311,20 +318,27 @@ export interface QueueInfo {
 	icon: string;
 }
 
+const QUEUE_INFO_BY_BUCKET: Record<QueueBucketId, QueueInfo> = {
+	free: { status: 'Свободно', color: QUEUE_BUCKET_META.free.color, icon: 'fa-check-circle' },
+	small: {
+		status: 'Маленькая очередь',
+		color: QUEUE_BUCKET_META.small.color,
+		icon: 'fa-exclamation-circle',
+	},
+	large: {
+		status: 'Большая очередь',
+		color: QUEUE_BUCKET_META.large.color,
+		icon: 'fa-exclamation-triangle',
+	},
+};
+
 export const getQueueInfo = (level: string): QueueInfo => {
-	switch (level) {
-		case 'NONE':
-			return { status: 'Свободно', color: '#059669', icon: 'fa-check-circle' };
-		case 'UP_TO_25':
-		case 'FROM_10_TO_25':
-			return { status: 'Маленькая очередь', color: '#f59e0b', icon: 'fa-exclamation-circle' };
-		case 'FROM_25_TO_50':
-			return { status: 'Средняя очередь', color: '#ea580c', icon: 'fa-exclamation-triangle' };
-		case 'OVER_50':
-			return { status: 'Большая очередь', color: '#dc2626', icon: 'fa-exclamation-triangle' };
-		default:
-			return { status: 'Нет данных', color: '#999', icon: 'fa-question-circle' };
+	const bucket = resolveQueueBucket(level);
+	if (bucket === 'unknown') {
+		return { status: 'Нет данных', color: '#999', icon: 'fa-question-circle' };
 	}
+
+	return QUEUE_INFO_BY_BUCKET[bucket];
 };
 
 export const getFuelName = (type: string): string => {

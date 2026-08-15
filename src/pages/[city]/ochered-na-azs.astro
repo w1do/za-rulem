@@ -1,0 +1,11 @@
+---
+import GasQueuesPage from '../../components/pages/GasQueuesPage.astro';
+import { findCity } from '../../lib/cities';
+
+export const prerender = false;
+
+const city = findCity(Astro.params.city);
+if (!city) return new Response('Город не найден', { status: 404 });
+---
+
+<GasQueuesPage city={city} />

@@ -11,12 +11,14 @@ interface Props {
 	citySlug: string;
 	/** Сценарий карты: городской лендинг чата или хаб цен на бензин. */
 	mode?: GasMapMode;
+	/** Якорь для ссылок вида «Показать на карте». */
+	id?: string;
 }
 
-const { stations, bounds, chatUrl, citySlug, mode = 'city' } = Astro.props;
+const { stations, bounds, chatUrl, citySlug, mode = 'city', id } = Astro.props;
 ---
 
-<div class="gas-map-section">
+<div class="gas-map-section" id={id}>
 	<div class="container">
 		<div class="gas-map-card">
 			<GasMap

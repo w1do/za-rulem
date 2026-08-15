@@ -1,0 +1,82 @@
+---
+import QueueStationCard from './QueueStationCard.astro';
+import type { QueueBucketView } from '../model/types';
+
+interface Props {
+	bucket: QueueBucketView;
+	mapHref: string;
+	queueHref: string;
+	chatHref: string;
+}
+
+const { bucket, mapHref, queueHref, chatHref } = Astro.props;
+
+const hiddenCount = bucket.total - bucket.stations.length;
+---
+
+<section class="queue-bucket" aria-label={`${bucket.title}: ${bucket.total} АЗС`}>
+	<header class="queue-bucket__header" style={`--queue-status-color: ${bucket.color};`}>
+		<h3>{bucket.title}<span class="queue-bucket__count">{bucket.total}</span></h3>
+		<p>{bucket.hint}</p>
+	</header>
+
+	<div class="queue-bucket__grid">
+		{
+			bucket.stations.map((station) => (
+				<QueueStationCard
+					station={station}
+					color={bucket.color}
+					mapHref={mapHref}
+					queueHref={queueHref}
+					chatHref={chatHref}
+				/>
+			))
+		}
+	</div>
+
+	{
+		hiddenCount > 0 && (
+			<p class="queue-bucket__more">
+				И ещё {hiddenCount} АЗС в этой категории — смотрите на <a href={mapHref}>карте города</a>.
+			</p>
+		)
+	}
+</section>
+
+<style>
+	.queue-bucket { margin-bottom: 46px; }
+	.queue-bucket:last-child { margin-bottom: 0; }
+
+	.queue-bucket__header {
+		margin-bottom: 20px;
+		padding-left: 14px;
+		border-left: 4px solid var(--queue-status-color);
+	}
+
+	.queue-bucket__header h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; font-size: 24px; }
+	.queue-bucket__header p { margin: 0; color: var(--text-color); font-size: 15px; }
+
+	.queue-bucket__count {
+		padding: 2px 12px;
+		border-radius: 999px;
+		background: var(--queue-status-color);
+		color: var(--white-color);
+		font-size: 14px;
+		font-weight: 700;
+	}
+
+	.queue-bucket__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+
+	.queue-bucket__more { margin: 16px 0 0; color: var(--text-color); font-size: 14px; }
+	.queue-bucket__more a { color: var(--accent-color); text-decoration: underline; }
+
+	@media (max-width: 991px) {
+		.queue-bucket__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	}
+
+	@media (max-width: 767px) {
+		.queue-bucket { margin-bottom: 34px; }
+		.queue-bucket__grid { grid-template-columns: 1fr; }
+		.queue-bucket__header h3 { font-size: 21px; }
+	}
+</style>

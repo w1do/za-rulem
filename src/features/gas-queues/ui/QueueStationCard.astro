@@ -1,0 +1,162 @@
+---
+import { formatFuelLabel, formatGasDate, formatPrice } from '../../gas-prices';
+import type { QueueStationCardModel } from '../model/types';
+
+interface Props {
+	station: QueueStationCardModel;
+	color: string;
+	mapHref: string;
+	queueHref: string;
+	chatHref: string;
+}
+
+const { station, color, mapHref, queueHref, chatHref } = Astro.props;
+
+const shortPrices = station.prices.slice(0, 3);
+const hasPrices = station.prices.length > 0;
+const detailsId = `queue-station-${station.id}`;
+---
+
+<article class="queue-station-card" style={`--queue-status-color: ${color};`}>
+	<p class="queue-station-card__status">
+		<span class="queue-station-card__dot" aria-hidden="true"></span>{station.statusLabel}
+	</p>
+
+	<h4 class="queue-station-card__name">{station.name}</h4>
+	<p class="queue-station-card__address">{station.address}</p>
+
+	{
+		hasPrices && (
+			<ul class="queue-station-card__prices" aria-label="Цены на топливо">
+				{shortPrices.map((price) => (
+					<li>
+						<span>{formatFuelLabel(price.fuelType)}</span>
+						<strong>{formatPrice(price.price)}</strong>
+					</li>
+				))}
+			</ul>
+		)
+	}
+
+	<details class="queue-station-card__details" id={detailsId}>
+		<summary>Подробнее об АЗС</summary>
+
+		<div class="queue-station-card__details-body">
+			{
+				hasPrices ? (
+					<dl class="queue-station-card__price-list">
+						{station.prices.map((price) => (
+							<div>
+								<dt>{formatFuelLabel(price.fuelType)}</dt>
+								<dd>{formatPrice(price.price)}</dd>
+							</div>
+						))}
+					</dl>
+				) : (
+					<p class="queue-station-card__note">Цены по этой АЗС ещё не поступили.</p>
+				)
+			}
+
+			<p class="queue-station-card__updated">
+				Данные обновлены: <time datetime={station.updatedAt}>{formatGasDate(station.updatedAt)}</time>
+			</p>
+
+			<div class="queue-station-card__actions">
+				<a href={mapHref}>Показать на карте</a>
+				<a href={queueHref}>Занять очередь</a>
+				<a href={chatHref}>Спросить в чате</a>
+			</div>
+		</div>
+	</details>
+</article>
+
+<style>
+	.queue-station-card {
+		display: flex;
+		min-width: 0;
+		flex-direction: column;
+		gap: 10px;
+		padding: 20px;
+		border: 1px solid var(--divider-color);
+		border-left: 4px solid var(--queue-status-color);
+		border-radius: 18px;
+		background: var(--white-color);
+		box-shadow: 0 12px 35px rgb(0 0 0 / 5%);
+	}
+
+	.queue-station-card__status {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin: 0;
+		color: var(--queue-status-color);
+		font-size: 14px;
+		font-weight: 700;
+	}
+
+	.queue-station-card__dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--queue-status-color);
+	}
+
+	.queue-station-card__name { margin: 0; font-size: 19px; }
+	.queue-station-card__address { margin: 0; color: var(--text-color); font-size: 15px; }
+
+	.queue-station-card__prices {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.queue-station-card__prices li {
+		display: flex;
+		align-items: baseline;
+		gap: 6px;
+		padding: 6px 12px;
+		border-radius: 999px;
+		background: var(--secondary-color);
+		font-size: 14px;
+	}
+
+	.queue-station-card__prices span { color: var(--text-color); }
+	.queue-station-card__prices strong { color: var(--primary-color); }
+
+	.queue-station-card__details { margin-top: auto; }
+
+	.queue-station-card__details summary {
+		cursor: pointer;
+		color: var(--primary-color);
+		font-size: 15px;
+		font-weight: 600;
+	}
+
+	.queue-station-card__details summary:focus-visible,
+	.queue-station-card__actions a:focus-visible {
+		outline: 2px solid var(--accent-color);
+		outline-offset: 3px;
+	}
+
+	.queue-station-card__details-body { margin-top: 14px; display: grid; gap: 12px; }
+
+	.queue-station-card__price-list { display: grid; gap: 6px; margin: 0; }
+	.queue-station-card__price-list div { display: flex; justify-content: space-between; gap: 12px; }
+	.queue-station-card__price-list dt { color: var(--text-color); }
+	.queue-station-card__price-list dd { margin: 0; font-weight: 600; }
+
+	.queue-station-card__note,
+	.queue-station-card__updated { margin: 0; color: var(--text-color); font-size: 14px; }
+
+	.queue-station-card__actions { display: flex; flex-wrap: wrap; gap: 14px; }
+
+	.queue-station-card__actions a {
+		color: var(--accent-color);
+		font-size: 14px;
+		font-weight: 600;
+		text-decoration: underline;
+	}
+</style>

@@ -1,0 +1,121 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../shared/header/Header.astro';
+import Footer from '../shared/footer/Footer.astro';
+import PageHeader from '../shared/PageHeader.astro';
+import HubFaqs from '../hub/HubFaqs.astro';
+import HubCta from '../hub/HubCta.astro';
+import QueueBoardSection from '../../features/gas-queues/ui/QueueBoardSection.astro';
+import { getCityQueueBoard } from '../../features/gas-queues/server';
+import {
+	buildGasQueuesFaqs,
+	buildGasQueuesIntro,
+	buildGasQueuesMeta,
+} from '../../data/gasQueuesContent';
+import { chatAppUrl, getCityUrl, type ChatCity } from '../../lib/cities';
+import { breadcrumbNode, faqNode, itemListNode, webPageNode } from '../../lib/seo';
+
+export interface Props {
+	city: ChatCity;
+}
+
+const { city } = Astro.props;
+
+const meta = buildGasQueuesMeta(city);
+const intro = buildGasQueuesIntro(city);
+const faqs = buildGasQueuesFaqs(city);
+const board = await getCityQueueBoard(city.slug);
+
+const url = getCityUrl('/ochered-na-azs', city.slug);
+const pricesUrl = getCityUrl('/ceny-na-benzin', city.slug);
+const mapHref = `${pricesUrl}#gas-stations-map`;
+const queueUrl = getCityUrl('/queue', city.slug);
+const chatUrl = chatAppUrl(city.slug);
+const robots = city.isIndexable === false ? 'noindex, follow' : undefined;
+
+const listedStations = board.buckets.flatMap((bucket) =>
+	bucket.stations.map((station) => ({
+		name: `${station.name} — ${station.statusLabel}`,
+		url: mapHref,
+	})),
+);
+
+const jsonLd = [
+	webPageNode({ name: meta.title, description: meta.description, url }),
+	breadcrumbNode([
+		{ name: 'Главная', url: getCityUrl('/', city.slug) },
+		{ name: 'Цены на бензин', url: pricesUrl },
+		{ name: 'Очереди на АЗС', url },
+	]),
+	faqNode(faqs),
+	...(listedStations.length > 0 ? [itemListNode(listedStations)] : []),
+];
+---
+
+<Layout
+	title={meta.title}
+	description={meta.description}
+	jsonLd={jsonLd}
+	city={city}
+	robots={robots}
+>
+	<Header city={city} />
+
+	<PageHeader
+		title={meta.h1}
+		items={[
+			{ label: 'главная', href: getCityUrl('/', city.slug) },
+			{ label: 'цены на бензин', href: pricesUrl },
+			{ label: 'очереди на АЗС' },
+		]}
+		showChatButton={true}
+		chatLink={chatUrl}
+	/>
+
+	<section class="gas-queues-intro">
+		<div class="container">
+			<p>{intro}</p>
+		</div>
+	</section>
+
+	<QueueBoardSection board={board} city={city} mapHref={mapHref} subtitle="Обстановка на заправках" />
+
+	<section class="gas-queues-links">
+		<div class="container">
+			<h2>Что ещё поможет заправиться быстрее</h2>
+			<ul>
+				<li><a href={pricesUrl}>Цены на бензин {city.inCity} и карта АЗС</a></li>
+				<li><a href={queueUrl}>Водители, которые займут очередь на заправке</a></li>
+				<li><a href={chatUrl}>Чат водителей {city.ofCity}: спросить обстановку прямо сейчас</a></li>
+			</ul>
+		</div>
+	</section>
+
+	<section class="gas-queues-faq">
+		<div class="container">
+			<HubFaqs faqs={faqs} title={`Частые вопросы об очередях на АЗС ${city.inCity}`} />
+		</div>
+	</section>
+
+	<HubCta city={city} />
+
+	<Footer city={city} />
+</Layout>
+
+<style>
+	.gas-queues-intro { padding: 50px 0 0; }
+	.gas-queues-intro p { max-width: 820px; margin: 0 auto; text-align: center; }
+
+	.gas-queues-links { padding: 40px 0 70px; }
+	.gas-queues-links h2 { margin-bottom: 18px; font-size: 26px; }
+	.gas-queues-links ul { margin: 0; padding-left: 20px; }
+	.gas-queues-links li { margin-bottom: 10px; }
+	.gas-queues-links a { color: var(--accent-color); text-decoration: underline; }
+
+	@media (max-width: 767px) {
+		.gas-queues-intro { padding: 35px 0 0; }
+		.gas-queues-intro p { text-align: left; }
+		.gas-queues-links { padding: 30px 0 50px; }
+		.gas-queues-links h2 { font-size: 22px; }
+	}
+</style>

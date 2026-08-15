@@ -9,6 +9,7 @@ import { cities, cityLandingUrl, defaultCity, fuelLandingUrl } from '../../lib/c
 const CITY_PATHS = [
 	'',
 	'/ceny-na-benzin',
+	'/ochered-na-azs',
 	'/queue',
 	'/drivers',
 	'/calculator',
@@ -24,6 +25,7 @@ const absolute = (site: string, path: string): string => new URL(path, site).hre
 export const getCitySitemapUrls = (site: string): string[] =>
 	[
 		absolute(site, '/ceny-na-benzin'),
+		absolute(site, '/ochered-na-azs'),
 		...cities
 		.filter((city) => city.isIndexable !== false)
 		.flatMap((city) => [

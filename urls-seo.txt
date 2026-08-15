@@ -13,6 +13,7 @@ https://za-rulem.org/queue
 https://za-rulem.org/partners
 https://za-rulem.org/benzin-tyumen
 https://za-rulem.org/ceny-na-benzin
+https://za-rulem.org/ochered-na-azs
 https://za-rulem.org/calculator
 https://za-rulem.org/chat-voditeley
 https://za-rulem.org/chat
@@ -457,5 +458,5 @@ https://za-rulem.org/zlatoust/partners
 # /{city}, /{city}/about, /{city}/contacts, /{city}/drivers, /{city}/queue,
 # /{city}/calculator,
 # /{city}/testimonials, /{city}/services/*,
-# /{city}/ceny-na-benzin, /{city}/chat, /{city}/chat-voditeley[/{fuel}].
+# /{city}/ceny-na-benzin, /{city}/ochered-na-azs, /{city}/chat, /{city}/chat-voditeley[/{fuel}].
 # Полный перечень адресов — в sitemap-index.xml после сборки.

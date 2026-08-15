@@ -1,0 +1,10 @@
+---
+import GasQueuesPage from '../components/pages/GasQueuesPage.astro';
+import { defaultCity } from '../lib/cities';
+
+export const prerender = false;
+
+const city = defaultCity;
+---
+
+<GasQueuesPage city={city} />
