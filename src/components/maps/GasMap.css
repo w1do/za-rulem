@@ -259,6 +259,150 @@
         .map-view {
           flex: 1;
           height: 100%;
+          position: relative;
+        }
+        .map-locate-btn {
+          position: absolute;
+          top: 15px;
+          right: 15px;
+          z-index: 99;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          min-height: 44px;
+          padding: 10px 16px;
+          border: none;
+          border-radius: 999px;
+          background: #111827;
+          color: #F5B754;
+          font-family: "Montserrat", sans-serif;
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+          box-shadow: 0 8px 22px rgba(17, 24, 39, 0.28);
+          transition: background 0.2s ease, color 0.2s ease;
+        }
+        .map-locate-btn:hover:not(:disabled) {
+          background: #F5B754;
+          color: #111827;
+        }
+        .map-locate-btn:focus-visible {
+          outline: 3px solid #F5B754;
+          outline-offset: 2px;
+        }
+        .map-locate-btn:disabled {
+          cursor: progress;
+          opacity: 0.75;
+        }
+        .map-locate-hint {
+          position: absolute;
+          top: 68px;
+          right: 15px;
+          z-index: 99;
+          max-width: 260px;
+          padding: 9px 13px;
+          border-radius: 10px;
+          border-bottom: 2px solid #F5B754;
+          background: #111827;
+          color: #fff;
+          font-family: "Montserrat", sans-serif;
+          font-size: 11px;
+          font-weight: 600;
+          line-height: 1.35;
+          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+        }
+        .map-locate-hint.is-error {
+          border-bottom-color: #ef4444;
+        }
+        .map-queue-legend {
+          position: absolute;
+          bottom: 15px;
+          right: 15px;
+          z-index: 99;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 4px 12px;
+          margin: 0;
+          padding: 9px 13px;
+          list-style: none;
+          border-radius: 10px;
+          background: rgba(255, 255, 255, 0.94);
+          font-family: "Montserrat", sans-serif;
+          font-size: 11px;
+          font-weight: 600;
+          color: #374151;
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+        }
+        .map-queue-legend__item {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .map-queue-legend__dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          border: 1px solid #111827;
+        }
+        .map-queue-legend__dot--green {
+          background: #10b981;
+        }
+        .map-queue-legend__dot--orange {
+          background: #f59e0b;
+        }
+        .map-queue-legend__dot--red {
+          background: #ef4444;
+        }
+        .map-queue-legend__dot--neutral {
+          background: #6b7280;
+        }
+        .gas-cluster {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          background: transparent;
+          border: none;
+          box-shadow: none;
+        }
+        /* Кольцо-прогресс: доли зелёного/оранжевого/красного = доли АЗС в кластере. */
+        .gas-cluster__ring {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          box-shadow: 0 6px 18px rgba(17, 24, 39, 0.35);
+        }
+        .gas-cluster__inner {
+          position: absolute;
+          inset: 5px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          background: #111827;
+          border: 1px solid rgba(17, 24, 39, 0.9);
+        }
+        .gas-cluster--medium .gas-cluster__inner {
+          inset: 6px;
+        }
+        .gas-cluster--large .gas-cluster__inner {
+          inset: 7px;
+        }
+        .gas-cluster__count {
+          font-family: "Montserrat", sans-serif;
+          font-weight: 800;
+          color: #ffffff;
+          line-height: 1;
+        }
+        .gas-cluster--small .gas-cluster__count {
+          font-size: 13px;
+        }
+        .gas-cluster--medium .gas-cluster__count {
+          font-size: 15px;
+        }
+        .gas-cluster--large .gas-cluster__count {
+          font-size: 17px;
         }
         .no-results {
           padding: 20px;
@@ -477,6 +621,27 @@
           .map-view {
             width: 100%;
             height: 100%;
+          }
+          .map-locate-btn {
+            top: 12px;
+            right: 12px;
+            padding: 10px 12px;
+          }
+          .map-locate-btn__label {
+            display: none;
+          }
+          .map-locate-hint {
+            top: 64px;
+            right: 12px;
+            left: 12px;
+            max-width: none;
+          }
+          .map-queue-legend {
+            bottom: 74px;
+            right: 12px;
+            left: 12px;
+            justify-content: center;
+            font-size: 10px;
           }
           .sidebar-search {
             padding: 12px 64px 12px 12px;

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import FuelPricesTable from '../../../components/gas-prices/FuelPricesTable';
-import GasMapView from '../../../components/maps/GasMapView';
+import GasMap from '../../../components/maps/GasMap';
 import '../../../components/maps/GasMap.css';
 import {
 	getFuelPricesFromStations,
@@ -153,12 +153,12 @@ const RoadGasStations = ({ slug, code, name, route, gasBrands }: Props) => {
 
 				{geometry && bounds && (
 					<div className="road-gas-map-card mb-5">
-						<GasMapView
+						<GasMap
+							mode="road"
 							stations={stations}
 							bounds={bounds}
 							action={action}
 							brandAliases={selectedBrand?.aliases ?? []}
-							fitToBounds
 						/>
 					</div>
 				)}

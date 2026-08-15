@@ -1,5 +1,5 @@
 ---
-import GasMap from '../maps/GasMap.tsx';
+import GasMap, { type GasMapMode } from '../maps/GasMap.tsx';
 import type { MapBounds, StationData } from '../../lib/gasStations';
 
 interface Props {
@@ -9,15 +9,24 @@ interface Props {
 	chatUrl: string;
 	/** Slug города для обновления станций из `gas_daily`. */
 	citySlug: string;
+	/** Сценарий карты: городской лендинг чата или хаб цен на бензин. */
+	mode?: GasMapMode;
 }
 
-const { stations, bounds, chatUrl, citySlug } = Astro.props;
+const { stations, bounds, chatUrl, citySlug, mode = 'city' } = Astro.props;
 ---
 
 <div class="gas-map-section">
 	<div class="container">
 		<div class="gas-map-card">
-   <GasMap client:only="react" initialStations={stations} bounds={bounds} chatUrl={chatUrl} citySlug={citySlug} />
+			<GasMap
+				client:only="react"
+				mode={mode}
+				initialStations={stations}
+				bounds={bounds}
+				chatUrl={chatUrl}
+				citySlug={citySlug}
+			/>
 		</div>
 	</div>
 </div>

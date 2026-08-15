@@ -9,7 +9,7 @@ import PageHeader from '../components/shared/PageHeader.astro';
 import ServiceSidebar from '../components/services/single/ServiceSidebar.astro';
 import ServiceWhyChoose from '../components/services/single/ServiceWhyChoose.astro';
 import FuelPricesTable from '../components/gas-prices/FuelPricesTable';
-import GasMapView from '../components/maps/GasMapView';
+import GasMap from '../components/maps/GasMap';
 import { getFuelPricesFromStations, type PriceRow } from '../lib/gasStations';
 import { breadcrumbNode } from '../lib/seo';
 import '../components/maps/GasMap.css';
@@ -135,12 +135,12 @@ const routeTips = [
 			<div id="yandex_rtb_R-A-19681102-2"></div>
 
 			<div class="road-gas-map-card mb-5">
-				<GasMapView
+				<GasMap
 					client:visible
+					mode="segment"
 					stations={segment.stations}
 					bounds={bounds}
 					action={action}
-					fitToBounds
 				/>
 			</div>
 
