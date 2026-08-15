@@ -8,15 +8,16 @@ import HubProcess from '../hub/HubProcess.astro';
 import HubFaqs from '../hub/HubFaqs.astro';
 import HubCta from '../hub/HubCta.astro';
 import ChatOtherLocations from './ChatOtherLocations.astro';
-import FuelPricesSection from '../gas-prices/FuelPricesSection.astro';
-import GasPricesMapSection from '../gas-prices/GasPricesMapSection.astro';
 import { webPageNode, breadcrumbNode, faqNode } from '../../lib/seo';
 import type { ChatCity } from '../../lib/cities';
 import { defaultCity, chatAppUrl, fuelLandingUrl, cityLandingUrl } from '../../lib/cities';
 import { districtOfRegion, formatPopulation, citySeoTitle, citySeoDescription } from '../../data/cityMeta';
 import { chatFuels } from '../../data/chatCluster';
 import Alert from "../shared/Alert.astro";
-import { fetchGasStations } from '../../lib/gasStations';
+import GasBrandGrid from '../../features/gas-prices/ui/GasBrandGrid.astro';
+import { getGasCityPrices } from '../../features/gas-prices/server';
+import GasPricesMapSection from '../gas-prices/GasPricesMapSection.astro';
+import { fetchCityGasStations } from '../../lib/gasStations';
 
 interface Props {
 	city: ChatCity;
@@ -37,11 +38,10 @@ const {
 } = Astro.props;
 
 // Load Gas Data
-let stations = [];
+const priceData = await getGasCityPrices(city.slug);
 
-if (city.bounds) {
-	stations = await fetchGasStations(city.bounds);
-}
+// АЗС города из снимков `gas_daily` (`area_type=point`) с карточками реестра `stations`.
+const stations = await fetchCityGasStations(city.slug);
 
 // SEO
 const region = city.region;
@@ -57,7 +57,7 @@ const h1 = propsH1 || (city.slug === defaultCity.slug
     : `Чат водителей ${city.name}: обстановка на АЗС, цены и очереди`);
 
 const description = propsDescription || (city.slug === defaultCity.slug
-    ? `Актуальные цены на бензин АИ-95, АИ-92 и дизель ${city.inCity} сегодня. Живой чат водителей: где сейчас есть топливо и какие очереди на АЗС. Смотрите карту заправок в реальном времени.`
+    ? `Актуальные цены на бензин АИ-95, АИ-92 и дизель ${city.inCity} сегодня. Живой чат водителей: где сейчас есть топливо и какие очереди на АЗС. Узнавайте обстановку от реальных людей.`
     : citySeoDescription(city));
 
 /** Подпись с административной привязкой: читателю видно, к какому региону относится город. */
@@ -145,12 +145,14 @@ const breadcrumbItems = [
 		</div>
 
 
-        {city.bounds && (
-            <>
-                <FuelPricesSection city={city} stations={stations} />
-                <GasPricesMapSection stations={stations} bounds={city.bounds} chatUrl={chatAppUrl(city.slug)} />
-            </>
-        )}
+        <GasPricesMapSection
+            stations={stations}
+            bounds={city.bounds}
+            chatUrl={chatAppUrl(city.slug)}
+            citySlug={city.slug}
+        />
+
+        <GasBrandGrid brands={priceData.brands} citySlug={city.slug} />
 
 		<!-- Yandex.RTB R-A-19681102-1 -->
 		<div id="yandex_rtb_R-A-19681102-2"></div>

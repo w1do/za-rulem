@@ -1,7 +1,7 @@
 ---
 import GasBrandPricesPage from '../../components/pages/GasBrandPricesPage.astro';
 import { defaultCity } from '../../lib/cities';
-import { GasBrandNotFoundError, getGasBrandPriceData } from '../../features/gas-prices/server';
+import { GasBrandNotFoundError, getGasBrandPrices } from '../../features/gas-prices/server';
 
 export const prerender = false;
 const brandSlug = Astro.params.brand || '';
@@ -9,7 +9,7 @@ const page = Number(Astro.url.searchParams.get('page') || 1);
 if (!Number.isInteger(page) || page < 1) return new Response('Страница не найдена', { status: 404 });
 let data;
 try {
-	data = await getGasBrandPriceData(defaultCity, brandSlug, page);
+	data = await getGasBrandPrices(defaultCity.slug, brandSlug, page);
 } catch (error) {
 	if (error instanceof GasBrandNotFoundError) return new Response('Сеть АЗС не найдена', { status: 404 });
 	throw error;

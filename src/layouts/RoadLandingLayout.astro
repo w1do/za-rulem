@@ -21,12 +21,19 @@ export type RoadLink = {
 	url: string;
 };
 
+export type SegmentLink = {
+	name: string;
+	slug: string;
+	url: string;
+};
+
 export interface Props {
 	entry: CollectionEntry<'routes'>;
 	relatedRoutes?: RoadLink[];
+	segments?: SegmentLink[];
 }
 
-const { entry, relatedRoutes = [] } = Astro.props;
+const { entry, relatedRoutes = [], segments = [] } = Astro.props;
 const road = entry.data;
 const firstCity = road.majorCities.at(0) ?? road.regions.at(0) ?? road.code;
 const lastCity = road.majorCities.at(-1) ?? road.regions.at(-1) ?? road.name;
@@ -36,8 +43,13 @@ const ogTitle = `${road.code} ${road.name}: карта АЗС и бензин с
 const ogDescription = `Проверьте заправки, цены и очереди на маршруте ${firstCity} — ${lastCity}. Выберите сеть АЗС или обсудите станцию в чате водителей.`;
 const voiceService = `route:${entry.id}`;
 const voiceSubject = `Голосовая заявка с трассы ${road.code} — za-rulem`;
+
 const sidebarLinks = [
 	{ title: 'Все федеральные трассы', url: '/route' },
+	...segments.map((segment) => ({
+		title: `Цены: ${segment.name}`,
+		url: segment.url,
+	})),
 	...relatedRoutes.map((relatedRoad) => ({
 		title: `${relatedRoad.code} «${relatedRoad.name}»`,
 		url: relatedRoad.url,

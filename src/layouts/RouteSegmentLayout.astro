@@ -1,0 +1,230 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { RoadSegment, RoadSegmentPrices, SegmentMapView } from '../features/road-segments';
+import { renderSegmentContent } from '../features/road-segments/lib/renderSegmentContent';
+import Layout from './Layout.astro';
+import Header from '../components/shared/header/Header.astro';
+import Footer from '../components/shared/footer/Footer.astro';
+import PageHeader from '../components/shared/PageHeader.astro';
+import ServiceSidebar from '../components/services/single/ServiceSidebar.astro';
+import ServiceWhyChoose from '../components/services/single/ServiceWhyChoose.astro';
+import FuelPricesTable from '../components/gas-prices/FuelPricesTable';
+import GasMapView from '../components/maps/GasMapView';
+import { getFuelPricesFromStations, type PriceRow } from '../lib/gasStations';
+import { breadcrumbNode } from '../lib/seo';
+import '../components/maps/GasMap.css';
+import '../features/road-gas-stations/ui/RoadGasStations.css';
+
+export interface Props {
+	segment: RoadSegment;
+	prices: RoadSegmentPrices[];
+	parentRoute: CollectionEntry<'routes'>;
+	routeSegments?: { name: string; slug: string; url: string }[];
+	mapView: SegmentMapView;
+}
+
+const { segment, prices, parentRoute, routeSegments = [], mapView } = Astro.props;
+const road = parentRoute.data;
+
+const breadcrumbs = [
+	{ label: 'Главная', href: '/' },
+	{ label: 'Федеральные трассы', href: '/route' },
+	{ label: road.code, href: `/route/${parentRoute.id}` },
+	{ label: segment.name },
+];
+
+const jsonLd = [
+	breadcrumbNode(breadcrumbs.map((item) => ({ name: item.label, url: item.href }))),
+].filter(Boolean);
+
+const latestPricesByBrand = new Map<string, RoadSegmentPrices>();
+prices.forEach((price) => {
+	if (!latestPricesByBrand.has(price.brandSlug)) latestPricesByBrand.set(price.brandSlug, price);
+});
+
+const formatPrice = (value: number | undefined): string =>
+	typeof value === 'number' ? `${value.toFixed(2)} ₽` : '—';
+
+let displayPrices: PriceRow[] = [];
+
+if (latestPricesByBrand.size > 0) {
+	displayPrices = Array.from(latestPricesByBrand.values()).map((price) => ({
+		brand: price.brandSlug,
+		ai92: formatPrice(price.fuels.find((fuel) => fuel.fuelType === 'AI_92')?.average),
+		ai95: formatPrice(price.fuels.find((fuel) => fuel.fuelType === 'AI_95')?.average),
+		diesel: formatPrice(price.fuels.find((fuel) => fuel.fuelType === 'DT')?.average),
+	}));
+} else {
+	displayPrices = getFuelPricesFromStations(segment.stations);
+}
+
+const { bounds } = mapView;
+
+const action = {
+	href: '/chat?topic=general',
+	label: 'Обсудить АЗС в чате',
+	draftContext: `Участок ${segment.name} (${road.code})`,
+};
+
+const voiceService = `route-segment:${segment.slug}`;
+const voiceSubject = `Голосовая заявка с участка ${segment.name} — za-rulem`;
+
+const nearbySegments = routeSegments.filter((item) => item.slug !== segment.slug);
+const sidebarLinks = [
+	{ title: `Вся помощь на ${road.code}`, url: `/route/${parentRoute.id}` },
+	{ title: 'Все федеральные трассы', url: '/route' },
+	...nearbySegments.slice(0, 12).map((item) => ({
+		title: `Цены: ${item.name}`,
+		url: item.url,
+	})),
+];
+
+const contentHtml = renderSegmentContent(segment.content);
+const dateLabel = new Date().toLocaleString('ru-RU', { month: 'long', year: 'numeric' });
+const seoTitle = segment.seoTitle || `Цены на бензин ${segment.name}: АЗС на карте трассы ${road.code}`;
+const seoDescription =
+	segment.seoDescription ||
+	`Актуальные цены на бензин и дизель на участке ${segment.name} трассы ${road.code}. Карта АЗС, наличие топлива и помощь на дороге.`;
+const routeTips = [
+	`Проверьте цены и наличие топлива до въезда на участок ${segment.name}`,
+	'Сравните сети АЗС по АИ-92, АИ-95 и ДТ на карте',
+	'Уточните очередь и обстановку в чате водителей',
+	`Вызовите помощь на дороге, если бензин закончился на ${road.code}`,
+];
+---
+
+<Layout
+	title={seoTitle}
+	description={seoDescription}
+	ogTitle={`${segment.name}: АЗС и цены на бензин`}
+	ogDescription={seoDescription}
+	keywords={[
+		`цены на бензин ${segment.name}`,
+		`АЗС ${segment.name}`,
+		`заправки ${road.code}`,
+		`где есть бензин ${road.code}`,
+	].join(', ')}
+	jsonLd={jsonLd}
+	isNational
+>
+	<Header isNational />
+
+	<PageHeader
+		title={`Цены на бензин и АЗС: ${segment.name}`}
+		items={breadcrumbs}
+		helpLabel="Рассказать голосом"
+		helpService={voiceService}
+		helpSubject={voiceSubject}
+		helpTitle={`Помощь на участке ${segment.name}`}
+	/>
+
+	<!-- Road Segment Gas Stations Start -->
+	<section class="road-gas-stations" aria-labelledby={`segment-gas-title-${segment.slug}`}>
+		<div class="container">
+			<div class="section-title text-center">
+				<span class="section-sub-title">Заправки на участке</span>
+				<h2 id={`segment-gas-title-${segment.slug}`}>
+					АЗС {segment.name}: карта и цены на трассе {road.code}
+				</h2>
+				<p>
+					На карте отмечены заправки участка {segment.name}. Используйте фильтры, чтобы
+					проверить топливо, цену и текущую очередь.
+				</p>
+			</div>
+
+			<div id="yandex_rtb_R-A-19681102-2"></div>
+
+			<div class="road-gas-map-card mb-5">
+				<GasMapView
+					client:visible
+					stations={segment.stations}
+					bounds={bounds}
+					action={action}
+					fitToBounds
+				/>
+			</div>
+
+			{segment.stations.length === 0 && (
+				<div class="road-gas-status mb-5" aria-live="polite">
+					По этому участку пока нет данных об АЗС — на карте показан сам отрезок трассы.
+					Спросите обстановку в чате водителей.
+				</div>
+			)}
+
+			{displayPrices.length > 0 && (
+				<div class="road-gas-prices">
+					<h3>Средние цены на АЗС на участке {segment.name}</h3>
+					<FuelPricesTable
+						client:visible
+						prices={displayPrices}
+						dateLabel={dateLabel}
+						disclaimer={`* Средние данные по станциям участка ${segment.name} на ${dateLabel}`}
+					/>
+				</div>
+			)}
+		</div>
+	</section>
+	<!-- Road Segment Gas Stations End -->
+
+	<!-- Page Service Single Start -->
+	<div class="page-service-single">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-4">
+					<ServiceSidebar
+						title={`Участки трассы ${road.code}`}
+						links={sidebarLinks}
+						reviewText={`Проверяем доступную помощь на участке ${segment.name}`}
+						ctaHref="/contacts"
+						ctaLabel="Рассказать голосом"
+						ctaService={voiceService}
+						ctaSubject={voiceSubject}
+						ctaTitle={`Помощь на участке ${segment.name}`}
+					/>
+				</div>
+
+				<div class="col-lg-8">
+					<!-- Service Single Content Start -->
+					<div class="service-single-content">
+						<!-- Service Entry Start -->
+						<div class="service-entry post-body">
+							<p>
+								<strong>{road.code} «{road.name}»:</strong> участок {segment.name}.
+							</p>
+
+							<Fragment set:html={contentHtml} />
+
+							<ServiceWhyChoose
+								title={`Что проверить на участке ${segment.name}`}
+								description="Короткий чек-лист перед заправкой на трассе."
+								items={routeTips}
+							/>
+
+							{nearbySegments.length > 0 && (
+								<>
+									<h2>Соседние участки трассы {road.code}</h2>
+									<ul>
+										{nearbySegments.map((item) => (
+											<li><a href={item.url}>Цены на бензин {item.name}</a></li>
+										))}
+									</ul>
+								</>
+							)}
+
+							<p>
+								<a href={`/route/${parentRoute.id}`}>
+									Вся помощь на дороге и карта АЗС трассы {road.code} «{road.name}»
+								</a>
+							</p>
+						</div>
+						<!-- Service Entry End -->
+					</div>
+					<!-- Service Single Content End -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Page Service Single End -->
+
+	<Footer isNational />
+</Layout>

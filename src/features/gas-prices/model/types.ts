@@ -1,5 +1,3 @@
-import type { StationData } from '../../../lib/gasStations.ts';
-
 export const PRIMARY_FUEL_TYPES = ['AI_92', 'AI_95', 'DT'] as const;
 
 export type PriceTrend = 'up' | 'down' | 'stable' | 'unknown';
@@ -27,9 +25,11 @@ export interface FuelPriceView extends FuelPriceSummary {
 	trend: PriceTrend;
 }
 
+/** Агрегированный снимок цен сети в городе, подготовленный внешним парсером. */
 export interface GasPriceSnapshot {
 	id?: string | number;
-	citySlug: string;
+	areaType: 'city' | 'road' | 'point';
+	areaSlug: string;
 	brandSlug: string;
 	snapshotDate: string;
 	stationCount: number;
@@ -40,7 +40,8 @@ export interface GasPriceSnapshot {
 
 /** Компактная проекция Directus, используемая только при сборке sitemap. */
 export interface GasPriceSitemapEntry {
-	citySlug: string;
+	areaType: 'city' | 'road';
+	areaSlug: string;
 	brandSlug: string;
 	snapshotCount: number;
 	latestSnapshotDate: string;
@@ -56,49 +57,18 @@ export interface GasBrandSummary {
 	history: GasPriceSnapshot[];
 }
 
-export interface GasBrandStationGroup {
-	brand: GasBrand;
-	stations: StationData[];
-}
-
 export interface GasCityPriceData {
 	brands: GasBrandSummary[];
-	stations: StationData[];
 	fetchedAt: string;
-	isPartial: boolean;
 }
 
 export interface GasBrandPriceData {
 	summary: GasBrandSummary;
-	stations: StationData[];
 	history: GasPriceSnapshot[];
 	historyTotal: number;
 	page: number;
 	perPage: number;
 	relatedBrands: GasBrandSummary[];
-	otherCitySlugs: string[];
+	otherAreaSlugs: string[];
 	fetchedAt: string;
-	isPartial: boolean;
-}
-
-export interface SnapshotBatchInput {
-	cursor: number;
-	limit: number;
-	dryRun: boolean;
-}
-
-export interface SnapshotCityResult {
-	citySlug: string;
-	brandCount: number;
-	snapshotCount: number;
-	status: 'processed' | 'skipped' | 'failed';
-	error?: string;
-}
-
-export interface SnapshotBatchResult {
-	cursor: number;
-	nextCursor: number | null;
-	totalCities: number;
-	dryRun: boolean;
-	results: SnapshotCityResult[];
 }

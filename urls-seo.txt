@@ -17,7 +17,7 @@ https://za-rulem.org/calculator
 https://za-rulem.org/chat-voditeley
 https://za-rulem.org/chat
 
-# Топливные карты (хаб и брендовые страницы из проверенного gas_brands)
+# Топливные карты (хаб и брендовые страницы)
 https://za-rulem.org/toplivnye-karty
 https://za-rulem.org/toplivnye-karty/bashneft
 https://za-rulem.org/toplivnye-karty/gazprom

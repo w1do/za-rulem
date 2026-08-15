@@ -1,0 +1,42 @@
+{
+  "collection": "gas_price_daily",
+  "note": "Только дополнительные поля к существующей коллекции. Позволяют хранить снимки цен и по городам, и по участкам трасс в одной коллекции (area_type = city | road).",
+  "fields": [
+    {
+      "field": "area_type",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            { "text": "Город", "value": "city" },
+            { "text": "Участок трассы", "value": "road" }
+          ]
+        },
+        "note": "Дискриминатор площади снимка"
+      },
+      "schema": { "default_value": "city", "is_indexed": true }
+    },
+    {
+      "field": "area_slug",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "input",
+        "note": "Слаг города (cities.slug) или участка (road_segments.slug)"
+      },
+      "schema": { "is_indexed": true }
+    },
+    {
+      "field": "area_parent_slug",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "input",
+        "note": "Для area_type=road — код трассы (route_code)"
+      },
+      "schema": {}
+    }
+  ]
+}

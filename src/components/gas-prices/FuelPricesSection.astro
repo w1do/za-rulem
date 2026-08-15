@@ -1,42 +1,36 @@
 ---
 import FuelPricesTable from './FuelPricesTable';
-import { fetchGasStations, getFuelPricesFromStations } from '../../lib/gasStations';
-import type { MapBounds, StationData } from '../../lib/gasStations';
+import { getGasCityPrices } from '../../features/gas-prices/server';
 import { defaultCity, type ChatCity } from '../../lib/cities';
+import { formatPrice } from '../../features/gas-prices/model/format';
 
 interface Props {
 	city?: ChatCity;
 	title?: string;
 	subtitle?: string;
-	stations?: StationData[];
 }
 
 const { 
 	city = defaultCity,
 	title,
-	subtitle = "Сводка по городу",
-	stations: initialStations
+	subtitle = "Сводка по городу"
 } = Astro.props;
 
-let prices = [];
-let stations = initialStations;
+const priceData = await getGasCityPrices(city.slug);
 
-if (!stations && city?.bounds) {
-	stations = await fetchGasStations(city.bounds);
-}
+const prices = priceData.brands.map(brandSummary => {
+	const findFuel = (type: string) => brandSummary.fuels.find(f => f.fuelType === type);
+	const ai92 = findFuel('AI_92');
+	const ai95 = findFuel('AI_95');
+	const dt = findFuel('DT');
 
-if (stations) {
-	prices = getFuelPricesFromStations(stations);
-}
-
-// Резервные цены относятся только к базовому городу, а не к справочнику городов.
-if (prices.length === 0 && city?.slug === defaultCity.slug) {
-	prices = [
-		{ brand: 'Газпромнефть', ai92: '63.60 ₽', ai95: '69.05 ₽', diesel: '80.80 ₽' },
-		{ brand: 'Лукойл', ai92: '65.20 ₽', ai95: '71.40 ₽', diesel: '81.90 ₽' },
-		{ brand: 'Роснефть', ai92: '63.50 ₽', ai95: '68.90 ₽', diesel: '80.50 ₽' },
-	];
-}
+	return {
+		brand: brandSummary.brand.name,
+		ai92: ai92 ? formatPrice(ai92.average) : '-',
+		ai95: ai95 ? formatPrice(ai95.average) : '-',
+		diesel: dt ? formatPrice(dt.average) : '-'
+	};
+}).filter(p => p.ai92 !== '-' || p.ai95 !== '-' || p.diesel !== '-').slice(0, 10);
 
 const displayTitle = title || `Цены на бензин ${city?.inCity || ''} сегодня`;
 ---
@@ -47,7 +41,7 @@ const displayTitle = title || `Цены на бензин ${city?.inCity || ''} 
 			<div class="section-title text-center mb-5">
 				<span class="section-sub-title">{subtitle}</span>
 				<h2>{displayTitle}</h2>
-				<p>Средние цены на популярных сетях АЗС. Точные данные смотрите на карте ниже или уточняйте в чате.</p>
+				<p>Средние цены на популярных сетях АЗС в городе {city.name}. Точные данные по каждой станции уточняйте в чате водителей.</p>
 			</div>
 			<FuelPricesTable prices={prices} client:load />
 		</div>

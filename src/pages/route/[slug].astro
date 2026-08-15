@@ -1,6 +1,7 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import RoadLandingLayout from '../../layouts/RoadLandingLayout.astro';
+import { readRoadSegments } from '../../features/road-segments';
 
 type Props = {
 	entry: CollectionEntry<'routes'>;
@@ -34,9 +35,20 @@ const relatedRoutes = entry.data.relatedRoutes
 		route: road.data.route,
 		url: `/route/${road.id}`,
 	}));
+
+// Получаем сегменты для данной трассы
+const allSegments = await readRoadSegments();
+const segments = allSegments
+	.filter(s => s.routeCode.toLowerCase() === entry.data.code.toLowerCase())
+	.map(s => ({
+		name: s.name,
+		slug: s.slug,
+		url: `/route/${entry.id}/${s.slug}`
+	}));
+
 const { Content } = await render(entry);
 ---
 
-<RoadLandingLayout entry={entry} relatedRoutes={relatedRoutes}>
+<RoadLandingLayout entry={entry} relatedRoutes={relatedRoutes} segments={segments}>
 	<Content />
 </RoadLandingLayout>

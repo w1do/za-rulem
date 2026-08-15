@@ -7,15 +7,17 @@ interface Props {
 	bounds: MapBounds;
 	/** Ссылка на чат города для кнопки в подсказке АЗС. */
 	chatUrl: string;
+	/** Slug города для обновления станций из `gas_daily`. */
+	citySlug: string;
 }
 
-const { stations, bounds, chatUrl } = Astro.props;
+const { stations, bounds, chatUrl, citySlug } = Astro.props;
 ---
 
 <div class="gas-map-section">
 	<div class="container">
 		<div class="gas-map-card">
-   <GasMap client:only="react" initialStations={stations} bounds={bounds} chatUrl={chatUrl} />
+   <GasMap client:only="react" initialStations={stations} bounds={bounds} chatUrl={chatUrl} citySlug={citySlug} />
 		</div>
 	</div>
 </div>

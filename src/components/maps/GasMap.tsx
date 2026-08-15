@@ -8,11 +8,13 @@ interface Props {
 	initialStations: StationData[];
 	bounds: MapBounds;
 	chatUrl: string;
+	/** Slug города: по нему обновляются станции из снимков `gas_daily`. */
+	citySlug: string;
 }
 
 /** Городская обёртка сохраняет прежний контракт и периодическое обновление данных. */
-const GasMap = ({ initialStations, bounds, chatUrl }: Props) => {
-	const stations = useGasStations(initialStations, bounds);
+const GasMap = ({ initialStations, bounds, chatUrl, citySlug }: Props) => {
+	const stations = useGasStations(initialStations, citySlug);
 	const action = useMemo(
 		() => ({ href: chatUrl, label: 'Перейти в чат' }),
 		[chatUrl],

@@ -1,0 +1,122 @@
+{
+  "collection": "stations",
+  "meta": {
+    "collection": "stations",
+    "icon": "local_gas_station",
+    "note": "Unified gas stations registry (cities and federal highways)",
+    "display_template": "{{brand}} — {{name}}",
+    "archive_field": "status",
+    "archive_value": "archived",
+    "unarchive_value": "published",
+    "singleton": false
+  },
+  "schema": {
+    "name": "stations"
+  },
+  "fields": [
+    {
+      "field": "id",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "readonly": true,
+        "note": "2GIS Station ID"
+      },
+      "schema": {
+        "is_primary_key": true,
+        "length": 64
+      }
+    },
+    {
+      "field": "status",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "select-dropdown",
+        "display": "labels",
+        "options": {
+          "choices": [
+            { "text": "Published", "value": "published" },
+            { "text": "Draft", "value": "draft" },
+            { "text": "Archived", "value": "archived" }
+          ]
+        },
+        "display_options": {
+          "showAsDot": true,
+          "choices": [
+            { "text": "Published", "value": "published", "foreground": "#FFFFFF", "background": "#2ECDA7" },
+            { "text": "Draft", "value": "draft", "foreground": "#18222F", "background": "#D3DAE4" },
+            { "text": "Archived", "value": "archived", "foreground": "#FFFFFF", "background": "#A2B5CD" }
+          ]
+        }
+      },
+      "schema": { "default_value": "published", "is_nullable": false }
+    },
+    {
+      "field": "name",
+      "type": "string",
+      "meta": { "interface": "input", "required": true },
+      "schema": { "is_nullable": false }
+    },
+    {
+      "field": "brand",
+      "type": "string",
+      "meta": { "width": "half", "interface": "input" },
+      "schema": {}
+    },
+    {
+      "field": "address",
+      "type": "string",
+      "meta": { "interface": "input" },
+      "schema": {}
+    },
+    {
+      "field": "lat",
+      "type": "float",
+      "meta": { "width": "half", "interface": "input" },
+      "schema": {}
+    },
+    {
+      "field": "lng",
+      "type": "float",
+      "meta": { "width": "half", "interface": "input" },
+      "schema": {}
+    },
+    {
+      "field": "fuel_assortment",
+      "type": "json",
+      "meta": { "interface": "input-code", "options": { "language": "json" } },
+      "schema": {}
+    },
+    {
+      "field": "fuel_statuses",
+      "type": "json",
+      "meta": { "interface": "input-code", "options": { "language": "json" } },
+      "schema": {}
+    },
+    {
+      "field": "prices",
+      "type": "json",
+      "meta": { "interface": "input-code", "options": { "language": "json" } },
+      "schema": {}
+    },
+    {
+      "field": "last_transaction_at",
+      "type": "timestamp",
+      "meta": { "interface": "datetime" },
+      "schema": {}
+    },
+    {
+      "field": "closed",
+      "type": "boolean",
+      "meta": { "width": "half", "interface": "boolean" },
+      "schema": { "default_value": false }
+    },
+    {
+      "field": "queue_level",
+      "type": "string",
+      "meta": { "width": "half", "interface": "input" },
+      "schema": {}
+    }
+  ]
+}

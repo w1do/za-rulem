@@ -1,16 +1,11 @@
-import {
-	fetchGasStationsResult,
-	isStationDataFresh,
-	type MapBounds,
-	type StationData,
-} from '../../../lib/gasStations';
+import { readStations } from '../../gas-stations';
+import type { StationData } from '../../../lib/gasStations';
 import { filterStationsByRoad, getRoadQueryBounds } from '../model/geometry';
 import { getRoadGeometry } from '../model/geometryRegistry';
 import type { RoadStationsResponse } from '../model/types';
 
 const FRESH_CACHE_TTL_MS = 5 * 60 * 1000;
 const STALE_CACHE_TTL_MS = 30 * 60 * 1000;
-const REQUEST_CONCURRENCY = 4;
 
 type CacheEntry = {
 	response: RoadStationsResponse;
@@ -32,15 +27,6 @@ const cache = (globalScope[CACHE_KEY] ??= {
 export class RoadNotFoundError extends Error {}
 export class RoadStationsUnavailableError extends Error {}
 
-const fetchInBatches = async (bounds: MapBounds[]) => {
-	const results = [];
-	for (let index = 0; index < bounds.length; index += REQUEST_CONCURRENCY) {
-		const batch = bounds.slice(index, index + REQUEST_CONCURRENCY);
-		results.push(...(await Promise.all(batch.map(fetchGasStationsResult))));
-	}
-	return results;
-};
-
 const deduplicateStations = (stations: StationData[]): StationData[] => [
 	...new Map(stations.map((station) => [station.station.id, station])).values(),
 ];
@@ -49,20 +35,30 @@ const requestRoadStations = async (slug: string): Promise<RoadStationsResponse> 
 	const geometry = getRoadGeometry(slug);
 	if (!geometry) throw new RoadNotFoundError(`Unknown road: ${slug}`);
 
-	const results = await fetchInBatches(getRoadQueryBounds(geometry));
-	const successfulResults = results.filter((result) => result.isSuccessful);
+	const queryBounds = getRoadQueryBounds(geometry);
+	// Единственный источник — Directus: реестр `stations` и цены `gas_daily`.
+	const allResults = await Promise.all(
+		queryBounds.map(async (bounds) => {
+			try {
+				return { stations: await readStations(bounds), isSuccessful: true };
+			} catch (error) {
+				console.error('[road-gas-stations] Directus stations request failed:', error);
+				return { stations: [] as StationData[], isSuccessful: false };
+			}
+		}),
+	);
+
+	const successfulResults = allResults.filter((result) => result.isSuccessful);
 	if (successfulResults.length === 0) {
-		throw new RoadStationsUnavailableError(`2GIS is unavailable for road ${slug}`);
+		throw new RoadStationsUnavailableError(`Data is unavailable for road ${slug}`);
 	}
 
-	const stations = deduplicateStations(successfulResults.flatMap((result) => result.stations)).filter(
-		(station) => isStationDataFresh(station),
-	);
+	const stations = deduplicateStations(successfulResults.flatMap((result) => result.stations));
 
 	return {
 		stations: filterStationsByRoad(stations, geometry),
 		fetchedAt: new Date().toISOString(),
-		isPartial: successfulResults.length !== results.length,
+		isPartial: successfulResults.length !== allResults.length,
 	};
 };
 

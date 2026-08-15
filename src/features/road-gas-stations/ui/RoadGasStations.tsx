@@ -158,7 +158,7 @@ const RoadGasStations = ({ slug, code, name, route, gasBrands }: Props) => {
 							bounds={bounds}
 							action={action}
 							brandAliases={selectedBrand?.aliases ?? []}
-							routeLines={geometry.coordinates}
+							fitToBounds
 						/>
 					</div>
 				)}

@@ -1,0 +1,217 @@
+{
+  "collection": "road_segments",
+  "meta": {
+    "collection": "road_segments",
+    "icon": "alt_route",
+    "note": "Участки федеральных трасс (~15 км) для посадочных страниц /route/[parent]/[slug]",
+    "display_template": "{{route_code}} — {{name}}",
+    "archive_field": "status",
+    "archive_value": "archived",
+    "unarchive_value": "published",
+    "sort_field": "sort",
+    "singleton": false
+  },
+  "schema": {
+    "name": "road_segments"
+  },
+  "fields": [
+    {
+      "field": "id",
+      "type": "uuid",
+      "meta": { "hidden": true, "readonly": true, "interface": "input", "special": ["uuid"] },
+      "schema": { "is_primary_key": true, "has_auto_increment": false, "length": 36 }
+    },
+    {
+      "field": "status",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "select-dropdown",
+        "display": "labels",
+        "options": {
+          "choices": [
+            { "text": "Published", "value": "published" },
+            { "text": "Draft", "value": "draft" },
+            { "text": "Archived", "value": "archived" }
+          ]
+        },
+        "display_options": {
+          "showAsDot": true,
+          "choices": [
+            { "text": "Published", "value": "published", "foreground": "#FFFFFF", "background": "#2ECDA7" },
+            { "text": "Draft", "value": "draft", "foreground": "#18222F", "background": "#D3DAE4" },
+            { "text": "Archived", "value": "archived", "foreground": "#FFFFFF", "background": "#A2B5CD" }
+          ]
+        }
+      },
+      "schema": { "default_value": "published", "is_nullable": false }
+    },
+    {
+      "field": "sort",
+      "type": "integer",
+      "meta": { "hidden": true, "interface": "input", "note": "Порядок участка вдоль трассы" },
+      "schema": {}
+    },
+    {
+      "field": "route_code",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "input",
+        "required": true,
+        "note": "Код трассы, как в src/content/routes (например M-7 или m-7)"
+      },
+      "schema": { "is_nullable": false }
+    },
+    {
+      "field": "slug",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "input",
+        "required": true,
+        "note": "URL участка, например pokrov-petushki"
+      },
+      "schema": { "is_nullable": false, "is_unique": true }
+    },
+    {
+      "field": "name",
+      "type": "string",
+      "meta": { "interface": "input", "required": true, "note": "Покров — Петушки" },
+      "schema": { "is_nullable": false }
+    },
+    {
+      "field": "city_slug",
+      "type": "string",
+      "meta": { "width": "half", "interface": "input", "note": "Слаг ближайшего города (SEO-связка)" },
+      "schema": {}
+    },
+    {
+      "field": "center",
+      "type": "json",
+      "meta": {
+        "interface": "input-code",
+        "options": { "language": "json" },
+        "note": "{ \"lat\": 55.9, \"lon\": 39.2 } — центр участка"
+      },
+      "schema": {}
+    },
+    {
+      "field": "start_lat",
+      "type": "float",
+      "meta": { "width": "half", "interface": "input", "note": "Начало участка" },
+      "schema": {}
+    },
+    {
+      "field": "start_lon",
+      "type": "float",
+      "meta": { "width": "half", "interface": "input" },
+      "schema": {}
+    },
+    {
+      "field": "end_lat",
+      "type": "float",
+      "meta": { "width": "half", "interface": "input", "note": "Конец участка" },
+      "schema": {}
+    },
+    {
+      "field": "end_lon",
+      "type": "float",
+      "meta": { "width": "half", "interface": "input" },
+      "schema": {}
+    },
+    {
+      "field": "bounds_min_lat",
+      "type": "float",
+      "meta": { "width": "half", "interface": "input", "note": "Рамка поиска АЗС (2GIS) и fitBounds карты" },
+      "schema": {}
+    },
+    { "field": "bounds_max_lat", "type": "float", "meta": { "width": "half", "interface": "input" }, "schema": {} },
+    { "field": "bounds_min_lon", "type": "float", "meta": { "width": "half", "interface": "input" }, "schema": {} },
+    { "field": "bounds_max_lon", "type": "float", "meta": { "width": "half", "interface": "input" }, "schema": {} },
+    {
+      "field": "corridor_km",
+      "type": "integer",
+      "meta": { "width": "half", "interface": "input", "note": "Полоса вокруг дороги в км" },
+      "schema": { "default_value": 5 }
+    },
+    {
+      "field": "geometry",
+      "type": "json",
+      "meta": {
+        "interface": "input-code",
+        "options": { "language": "json" },
+        "note": "Упрощённая полилиния участка: [[lat, lon], ...]"
+      },
+      "schema": {}
+    },
+    {
+      "field": "stations",
+      "type": "json",
+      "meta": {
+        "interface": "input-code",
+        "options": { "language": "json" },
+        "note": "Массив АЗС: [{ id, name, brand, lat, lon, address, prices: [{ fuelType, price, updatedAt }] }]"
+      },
+      "schema": {}
+    },
+    {
+      "field": "stations_updated_at",
+      "type": "timestamp",
+      "meta": { "width": "half", "interface": "datetime", "readonly": false },
+      "schema": {}
+    },
+    {
+      "field": "stations_locked",
+      "type": "boolean",
+      "meta": {
+        "width": "half",
+        "interface": "boolean",
+        "note": "Не перезаписывать stations автоматическим воркфлоу"
+      },
+      "schema": { "default_value": false }
+    },
+    {
+      "field": "seo_title",
+      "type": "string",
+      "meta": { "interface": "input", "note": "Уникальный title страницы участка" },
+      "schema": {}
+    },
+    {
+      "field": "seo_description",
+      "type": "text",
+      "meta": { "interface": "input-multiline" },
+      "schema": {}
+    },
+    {
+      "field": "content",
+      "type": "text",
+      "meta": { "interface": "input-rich-text-md", "note": "Уникальный Markdown-контент участка" },
+      "schema": {}
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "width": "half",
+        "interface": "datetime",
+        "special": ["date-created"]
+      },
+      "schema": {}
+    },
+    {
+      "field": "date_updated",
+      "type": "timestamp",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "width": "half",
+        "interface": "datetime",
+        "special": ["date-updated"]
+      },
+      "schema": {}
+    }
+  ]
+}

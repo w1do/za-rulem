@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import {
 	getBoundsCenter,
+	hasStationCoordinates,
 	type MapBounds,
 	type StationData,
 	type StationMapAction,
@@ -31,7 +32,6 @@ type DGGlobal = {
 	map: (container: HTMLElement, options: Record<string, unknown>) => DGMap;
 	marker: (position: [number, number], options: Record<string, unknown>) => DGMarker;
 	icon: (options: Record<string, unknown>) => unknown;
-	polyline: (positions: [number, number][][], options: Record<string, unknown>) => DGPolyline;
 };
 
 type DGMap = {
@@ -47,9 +47,6 @@ type DGMarker = {
 	openPopup: () => void;
 };
 
-type DGPolyline = {
-	addTo: (map: DGMap) => DGPolyline;
-};
 
 const getDG = (): DGGlobal | undefined => (window as unknown as { DG?: DGGlobal }).DG;
 
@@ -71,8 +68,8 @@ interface UseGasMapOptions {
 	stations: StationData[];
 	bounds: MapBounds;
 	action: StationMapAction;
-	/** GeoJSON-линии в порядке [longitude, latitude]. */
-	routeLines?: [number, number][][];
+	/** Подгонять карту под переданную рамку (участок трассы), а не показывать город. */
+	fitToBounds?: boolean;
 	/** Вызывается при клике по маркеру, чтобы синхронизировать выбор со списком. */
 	onMarkerClick: (stationId: string) => void;
 }
@@ -91,7 +88,7 @@ export const useGasMap = ({
 	stations,
 	bounds,
 	action,
-	routeLines,
+	fitToBounds = false,
 	onMarkerClick,
 }: UseGasMapOptions): UseGasMapResult => {
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -119,21 +116,15 @@ export const useGasMap = ({
 
 				const map = DG.map(containerRef.current, {
 					center,
-					zoom: routeLines ? 5 : CITY_ZOOM,
+					zoom: fitToBounds ? 5 : CITY_ZOOM,
 					zoomControl: true,
 					fullscreenControl: false,
 				});
 				mapRef.current = map;
 
-				if (routeLines) {
-					const positions = routeLines.map((line) =>
-						line.map(([longitude, latitude]): [number, number] => [latitude, longitude]),
-					);
-					DG.polyline(positions, {
-						color: '#F5B754',
-						weight: 5,
-						opacity: 0.9,
-					}).addTo(map);
+				// Собственная линия маршрута не рисуется: дорога уже есть на подложке 2GIS,
+				// от карты нужен только охват участка и метки АЗС.
+				if (fitToBounds) {
 					map.fitBounds(
 						[
 							[bounds.minLat, bounds.minLon],
@@ -150,15 +141,11 @@ export const useGasMap = ({
 					popupAnchor: [0, -48],
 				});
 
-				stations.forEach((item) => {
+				// АЗС без геоданных остаются в списке цен, но на карту не попадают.
+				stations.filter(hasStationCoordinates).forEach((item) => {
 					const { station } = item;
-					const lat = Number(station?.lat);
-					const lng = Number(station?.lng);
-
-					if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-						console.warn('2GIS Map: skipping station with invalid coordinates', item.station.id, lat, lng);
-						return;
-					}
+					const lat = Number(station.lat);
+					const lng = Number(station.lng);
 
 					const marker = DG.marker([lat, lng], { icon: gasIcon }).addTo(map);
 					marker.bindPopup(buildStationPopupHtml(item, action));
@@ -178,16 +165,14 @@ export const useGasMap = ({
 				mapRef.current = null;
 			}
 		};
-	}, [stations, bounds, action, routeLines, onMarkerClick]);
+	}, [stations, bounds, action, fitToBounds, onMarkerClick]);
 
 	const focusStation = (item: StationData) => {
 		const { station } = item;
-		const lat = Number(station?.lat);
-		const lng = Number(station?.lng);
 
-		if (!mapRef.current || !Number.isFinite(lat) || !Number.isFinite(lng)) return;
+		if (!mapRef.current || !hasStationCoordinates(item)) return;
 
-		mapRef.current.setView([lat, lng], STATION_ZOOM);
+		mapRef.current.setView([Number(station.lat), Number(station.lng)], STATION_ZOOM);
 		markersRef.current[station.id]?.openPopup();
 	};
 

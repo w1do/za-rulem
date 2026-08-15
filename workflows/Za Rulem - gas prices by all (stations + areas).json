@@ -1,0 +1,268 @@
+{
+  "name": "Za Rulem - gas prices by all (stations + areas)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/30 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "332d8422-9e81-4387-b94b-4b907da2123f",
+      "name": "Every 30 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -448,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "url",
+              "name": "directusUrl",
+              "value": "https://api.za-rulem.org",
+              "type": "string"
+            },
+            {
+              "id": "token",
+              "name": "directusToken",
+              "value": "=JHWzLW4a-y5eRpsrOmLMLX155nInh3Ca",
+              "type": "string"
+            },
+            {
+              "id": "limit",
+              "name": "cityLimit",
+              "value": 295,
+              "type": "number"
+            },
+            {
+              "id": "segmentLimit",
+              "name": "segmentLimit",
+              "value": 400,
+              "type": "number"
+            },
+            {
+              "id": "areaTypes",
+              "name": "areaTypes",
+              "value": "city,road",
+              "type": "string"
+            },
+            {
+              "id": "timeout",
+              "name": "requestTimeoutMs",
+              "value": 1000,
+              "type": "number"
+            },
+            {
+              "id": "stations",
+              "name": "stationsApiUrl",
+              "value": "https://benzin.api.2gis.ru/api/v1/stations",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9f6901b5-dbdf-4072-84b9-afcfd5e664e5",
+      "name": "Workflow config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const c = $input.first().json;\nconst get = async (path) => this.helpers.httpRequest({ method: 'GET', url: `${c.directusUrl}${path}`, headers: { Authorization: `Bearer ${c.directusToken}` }, json: true, timeout: 30000 });\nconst types = String(c.areaTypes || 'city,road').split(',').map(t => t.trim()).filter(Boolean);\nconst hasBounds = a => ['bounds_min_lat','bounds_max_lat','bounds_min_lon','bounds_max_lon'].every(k => Number.isFinite(Number(a[k])));\nconst areas = [];\nif (types.includes('city')) {\n  const r = await get('/items/cities?limit=-1&fields=slug,bounds_min_lat,bounds_max_lat,bounds_min_lon,bounds_max_lon&filter[status][_eq]=published');\n  for (const x of (r.data || []).filter(hasBounds).slice(0, Math.max(1, Number(c.cityLimit || 295)))) areas.push({ ...x, type: 'city', parent: null });\n}\nif (types.includes('road')) {\n  const r = await get('/items/road_segments?limit=-1&fields=id,slug,route_code,stations_locked,bounds_min_lat,bounds_max_lat,bounds_min_lon,bounds_max_lon&filter[status][_eq]=published');\n  for (const x of (r.data || []).filter(hasBounds).slice(0, Math.max(1, Number(c.segmentLimit || 400)))) areas.push({ ...x, type: 'road', parent: x.route_code || null });\n}\nreturn [{ json: { ...c, areas } }];"
+      },
+      "id": "44455851-435f-4cfa-9ad0-637e4f6f6ffd",
+      "name": "Load areas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const c = $input.first().json; return (c.areas || []).map(area => ({ json: { ...c, area } }));"
+      },
+      "id": "0e5b83e3-6f1a-4a6b-bba4-95c75421ce40",
+      "name": "Prepare area queue",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "id": "36bffd4b-0a7b-42ad-a1a2-01caca7f92bc",
+      "name": "One area at a time",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        640,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = [];\nfor (const input of $input.all()) {\n  const x = input.json, area = x.area;\n  const url = `${x.stationsApiUrl}?minLat=${area.bounds_min_lat}&maxLat=${area.bounds_max_lat}&minLon=${area.bounds_min_lon}&maxLon=${area.bounds_max_lon}`;\n  try {\n    const stations = await this.helpers.httpRequest({ method: 'GET', url, json: true, timeout: Number(x.requestTimeoutMs) || 15000 });\n    result.push({ json: { ...x, stations, fetchStatus: 'ok' } });\n  } catch (error) {\n    result.push({ json: { ...x, stations: [], fetchStatus: 'failed', fetchError: error instanceof Error ? error.message : String(error) } });\n  }\n}\nreturn result;"
+      },
+      "id": "4d7d1692-9b4c-4104-b82b-9a00093fa1b0",
+      "name": "Fetch 2GIS batch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const output=[];\nfor(const input of $input.all()){\n  const x=input.json, now=Date.now(), groups=new Map();\n  const clean=v=>String(v||'').toLocaleLowerCase('ru-RU').replaceAll('\\u0451','\\u0435').replace(/[\\u00ab\\u00bb\"']/g,'').replace(/,?\\s*(?:\\u0410\\u0417\\u0421|\\u0437\\u0430\\u043f\\u0440\\u0430\\u0432\\u043e\\u0447\\u043d\\u0430\\u044f \\u0441\\u0442\\u0430\\u043d\\u0446\\u0438\\u044f)$/iu,'').trim();\n  for(const it of (Array.isArray(x.stations)?x.stations:[])){\n    const s=it?.station;\n    if(!s||!Array.isArray(it.prices))continue;\n    const name=s.brand||String(s.name||'').split(',')[0]||'\\u0410\\u0417\\u0421';\n    const slug=clean(name).replace(/[^a-z0-9\\u0430-\\u044f]+/giu,'-');\n    const g=groups.get(slug)||{slug,name,count:0,tz:Number(s.timezone_offset)||3,p:new Map()};\n    g.count++;\n    for(const q of it.prices){\n      const v=Number(q.price), u=Date.parse(q.updated_at);\n      if(v>0&&Number.isFinite(u)&&now-u<=604800000){\n        const a=g.p.get(q.fuel_type)||[];\n        a.push({v,u:q.updated_at});\n        g.p.set(q.fuel_type,a);\n      }\n    }\n    groups.set(slug,g);\n  }\n  const snapshots=[];\n  for(const g of groups.values()){\n    const fuels=[...g.p].map(([fuelType,a])=>({\n      fuelType,\n      average:Number((a.reduce((s,q)=>s+q.v,0)/a.length).toFixed(2)),\n      min:Math.min(...a.map(q=>q.v)),\n      max:Math.max(...a.map(q=>q.v)),\n      sampleCount:a.length,\n      updatedAt:a.sort((u,v)=>Date.parse(v.u)-Date.parse(u.u))[0].u\n    }));\n    if(!fuels.length)continue;\n    const d=new Date(now+g.tz*3600000);\n    d.setUTCMinutes(d.getUTCMinutes()<30?0:30,0,0);\n    snapshots.push({\n      area_type:x.area.type,\n      area_slug:x.area.slug,\n      area_parent_slug:x.area.parent||null,\n      brand_slug:g.slug,\n      snapshot_date:d.toISOString().slice(0,19)+'Z',\n      station_count:g.count,\n      source_updated_at:fuels.map(f=>f.updatedAt).sort().at(-1),\n      fuel_prices:fuels\n    });\n  }\n  output.push({json:{...x,snapshots}});\n}\nreturn output;"
+      },
+      "id": "90dbe17b-0ed8-4178-bd09-7195e86e507b",
+      "name": "Aggregate snapshots",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\nconst c = $input.first().json;\nconst headers = { Authorization: `Bearer ${c.directusToken}`, \"Content-Type\": \"application/json\" };\n\nconst upsert = async (collection, data) => {\n  if (!data || data.length === 0) return;\n  for (let i = 0; i < data.length; i += 100) {\n    const batch = data.slice(i, i + 100);\n    const res = await this.helpers.httpRequest({\n      method: \"PATCH\",\n      url: `${c.directusUrl}/items/${collection}`,\n      headers,\n      body: batch,\n      json: true\n    });\n    const updatedIds = new Set((res.data || []).map(item => String(item.id)));\n    const toPost = batch.filter(item => !updatedIds.has(String(item.id)));\n    if (toPost.length > 0) {\n      await this.helpers.httpRequest({\n        method: \"POST\",\n        url: `${c.directusUrl}/items/${collection}`,\n        headers,\n        body: toPost,\n        json: true\n      });\n    }\n  }\n};\n\nfor (const input of $input.all()) {\n  const x = input.json;\n  const areaSnapshots = [];\n  const pointSnapshots = [];\n  const stationUpdates = [];\n\n  if (Array.isArray(x.snapshots)) {\n    for (const s of x.snapshots) {\n      areaSnapshots.push({\n        id: `${s.area_type}:${s.area_slug}:${s.brand_slug}:${s.snapshot_date}`,\n        station: null,\n        area_type: s.area_type,\n        area_slug: s.area_slug,\n        area_parent_slug: s.area_parent_slug,\n        brand_slug: s.brand_slug,\n        snapshot_date: s.snapshot_date,\n        station_count: s.station_count,\n        source_updated_at: s.source_updated_at,\n        fuel_prices: s.fuel_prices\n      });\n    }\n  }\n\n  if (Array.isArray(x.stations)) {\n    const now = new Date();\n    const clean = v => String(v || \"\").toLocaleLowerCase(\"ru-RU\").replace(/[\\u00ab\\u00bb\"']/g, \"\").trim();\n    for (const it of x.stations) {\n      const s = it.station;\n      if (!s || s.id === undefined || s.id === null) continue;\n      const stationId = String(s.id);\n      const tz = Number(s.timezone_offset || 3);\n      const snapshotDate = new Date(now.getTime() + tz * 3600000);\n      snapshotDate.setUTCMinutes(snapshotDate.getUTCMinutes() < 30 ? 0 : 30, 0, 0);\n      const snapshotDateStr = snapshotDate.toISOString().slice(0, 19) + \"Z\";\n\n      const name = s.brand || String(s.name || \"\").split(\",\")[0] || \"\\u0410\\u0417\\u0421\";\n      const brandSlug = clean(name).replace(/[^a-z0-9\\u0430-\\u044f]+/giu, \"-\");\n      const queue_level = (it.fuel_statuses || []).find(f => f.queue_level)?.queue_level || null;\n\n      stationUpdates.push({\n        id: stationId,\n        name: s.name,\n        brand: brandSlug,\n        address: s.address,\n        lat: Number(s.lat),\n        lng: Number(s.lng ?? s.lon),\n        fuel_assortment: s.fuel_assortment || s.fuel_types || [],\n        prices: it.prices || [],\n        fuel_statuses: it.fuel_statuses || [],\n        last_transaction_at: it.updated_at,\n        status: it.status || \"open\",\n        closed: it.status === \"closed\",\n        queue_level\n      });\n\n      if (Array.isArray(it.prices) && it.prices.length > 0) {\n        pointSnapshots.push({\n          id: `point:${stationId}:${snapshotDateStr}`,\n          station: stationId,\n          brand_slug: brandSlug,\n          area_type: \"point\",\n          area_slug: stationId,\n          area_parent_slug: x.area?.slug || null,\n          snapshot_date: snapshotDateStr,\n          fuel_prices: it.prices.map(p => ({\n            fuelType: p.fuel_type,\n            average: Number(p.price),\n            min: Number(p.price),\n            max: Number(p.price),\n            sampleCount: 1,\n            updatedAt: p.updated_at\n          })),\n          station_count: 1,\n          source_updated_at: it.updated_at\n        });\n      }\n    }\n  }\n\n  try {\n    // stations must exist before gas_daily rows reference them via M2O\n    await upsert(\"stations\", stationUpdates);\n    await upsert(\"gas_daily\", areaSnapshots);\n    await upsert(\"gas_daily\", pointSnapshots);\n    output.push({ json: { area: x.area.slug, status: \"ok\", stations: stationUpdates.length, snapshots: areaSnapshots.length, points: pointSnapshots.length } });\n  } catch (e) {\n    output.push({ json: { area: x.area.slug, status: \"error\", message: e.message } });\n  }\n}\nreturn output;"
+      },
+      "id": "381f7fd2-c428-44e8-a220-74a3008cf953",
+      "name": "Save snapshots and stations",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        48
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Every 30 minutes": {
+      "main": [
+        [
+          {
+            "node": "Workflow config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow config": {
+      "main": [
+        [
+          {
+            "node": "Load areas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load areas": {
+      "main": [
+        [
+          {
+            "node": "Prepare area queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare area queue": {
+      "main": [
+        [
+          {
+            "node": "One area at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One area at a time": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Fetch 2GIS batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch 2GIS batch": {
+      "main": [
+        [
+          {
+            "node": "Aggregate snapshots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate snapshots": {
+      "main": [
+        [
+          {
+            "node": "Save snapshots and stations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save snapshots and stations": {
+      "main": [
+        [
+          {
+            "node": "One area at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "94e25eee-8861-4c68-9142-1c8c2dcfe2ea",
+  "meta": {
+    "instanceId": "e69b3aef00a9063c6fc0479b7ab99199d6d957ad0bc716f7decf824b4a1d94eb"
+  },
+  "nodeGroups": [],
+  "id": "7n5Qc5QScYxrguDv",
+  "tags": []
+}

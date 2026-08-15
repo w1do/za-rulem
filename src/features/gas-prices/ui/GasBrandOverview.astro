@@ -2,13 +2,12 @@
 import type { GasBrandSummary } from '../model/types';
 import { formatDelta, formatFuelLabel, formatPrice } from '../model/format';
 
-interface Props { summary: GasBrandSummary; cityName: string; isPartial: boolean; }
-const { summary, cityName, isPartial } = Astro.props;
+interface Props { summary: GasBrandSummary; cityName: string; }
+const { summary, cityName } = Astro.props;
 ---
 
 <section class="brand-overview">
 	<div class="container">
-		{isPartial && <div class="data-warning">Источник временно недоступен: показаны последние данные из краткосрочного кеша.</div>}
 		<div class="brand-overview__grid">
 			<div>
 				<span class="section-sub-title">Сводка по сети</span>
@@ -40,8 +39,7 @@ const { summary, cityName, isPartial } = Astro.props;
 	.price-tile small { margin-bottom: 8px; font-weight: 700; }
 	.price-tile em { color: #777; font-size: 12px; font-style: normal; }
 	.trend--up { color: #b42318; } .trend--down { color: #067647; } .trend--stable, .trend--unknown { color: #667085; }
-	.price-empty, .data-warning { padding: 18px; border-radius: 12px; background: #fff5d6; }
-	.data-warning { margin-bottom: 24px; }
+	.price-empty { padding: 18px; border-radius: 12px; background: #fff5d6; }
 	@media (max-width: 991px) { .brand-overview__grid { grid-template-columns: 1fr; } }
 	@media (max-width: 600px) { .price-grid { grid-template-columns: 1fr; } }
 </style>

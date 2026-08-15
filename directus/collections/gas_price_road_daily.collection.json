@@ -1,0 +1,94 @@
+{
+  "collection": "gas_price_road_daily",
+  "meta": {
+    "collection": "gas_price_road_daily",
+    "icon": "local_gas_station",
+    "note": "Снимки цен на топливо по участкам трасс (аналог gas_price_daily для городов)",
+    "display_template": "{{segment_slug}} · {{brand_slug}} · {{snapshot_date}}",
+    "singleton": false
+  },
+  "schema": {
+    "name": "gas_price_road_daily"
+  },
+  "fields": [
+    {
+      "field": "id",
+      "type": "uuid",
+      "meta": { "hidden": true, "readonly": true, "interface": "input", "special": ["uuid"] },
+      "schema": { "is_primary_key": true, "has_auto_increment": false, "length": 36 }
+    },
+    {
+      "field": "segment_slug",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "input",
+        "required": true,
+        "note": "Слаг участка из road_segments.slug"
+      },
+      "schema": { "is_nullable": false, "is_indexed": true }
+    },
+    {
+      "field": "route_code",
+      "type": "string",
+      "meta": { "width": "half", "interface": "input", "note": "Код трассы участка, например M-7" },
+      "schema": { "is_indexed": true }
+    },
+    {
+      "field": "brand_slug",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "input",
+        "required": true,
+        "note": "Слаг сети АЗС"
+      },
+      "schema": { "is_nullable": false, "is_indexed": true }
+    },
+    {
+      "field": "snapshot_date",
+      "type": "timestamp",
+      "meta": {
+        "width": "half",
+        "interface": "datetime",
+        "required": true,
+        "note": "Момент снимка (используется для сортировки и дедупликации)"
+      },
+      "schema": { "is_nullable": false, "is_indexed": true }
+    },
+    {
+      "field": "station_count",
+      "type": "integer",
+      "meta": { "width": "half", "interface": "input", "note": "Сколько АЗС сети попало в снимок" },
+      "schema": { "default_value": 0 }
+    },
+    {
+      "field": "source_updated_at",
+      "type": "timestamp",
+      "meta": { "width": "half", "interface": "datetime", "note": "Время обновления данных у источника" },
+      "schema": {}
+    },
+    {
+      "field": "fuel_prices",
+      "type": "json",
+      "meta": {
+        "interface": "input-code",
+        "options": { "language": "json" },
+        "note": "[{ \"fuel_type\": \"AI_95\", \"average\": 61.4, \"min\": 60.9, \"max\": 62.1, \"station_count\": 4 }]"
+      },
+      "schema": {}
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "width": "half",
+        "interface": "datetime",
+        "special": ["date-created"]
+      },
+      "schema": {}
+    }
+  ]
+}

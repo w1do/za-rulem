@@ -52,9 +52,9 @@
 
 ### Цены АЗС
 
-`/ceny-na-benzin` и `/{city}/ceny-na-benzin` показывают сети из текущего среза 2GIS. Страницы сети доступны по `/ceny-na-benzin/{brand}` для базового города и `/{city}/ceny-na-benzin/{brand}` для остальных городов. Получасовая история хранится в Directus (`gas_brands`, `gas_price_daily`) и собирается защищённым `POST /api/internal/gas-prices/snapshot`, который n8n вызывает пачками до 10 городов. Поле `gas_price_daily.snapshot_date` должно иметь тип `datetime`; уникальный ключ — город, сеть и получасовой интервал.
+`/ceny-na-benzin` и `/{city}/ceny-na-benzin` показывают сети по данным Directus. Astro только читает: снимки цен собирает n8n и складывает в `gas_price_daily`, текущей ценой считается самый свежий снимок города и сети, динамика — разница с предыдущим снимком. Страницы сети доступны по `/ceny-na-benzin/{brand}` для базового города и `/{city}/ceny-na-benzin/{brand}` для остальных городов. Поле `gas_price_daily.snapshot_date` должно иметь тип `datetime`; уникальный ключ — город, сеть и получасовой интервал.
 
-Server-only переменные: `DIRECTUS_GAS_PRICES_TOKEN` и `GAS_PRICE_CRON_SECRET`. Дополнительно можно изменить `GAS_PRICE_CACHE_TTL_MS` и `GAS_PRICE_STALE_TTL_MS`. Полная схема коллекций, правила индексации и импортируемый workflow описаны в [docs/gas-prices-seo.md](./docs/gas-prices-seo.md).
+Карта и адреса отдельных станций на страницах цен не показываются: в Directus пока нет station-слоя. Server-only переменная — `DIRECTUS_GAS_PRICES_TOKEN`. Полная схема коллекций, правила индексации и импортируемый workflow описаны в [docs/gas-prices-seo.md](./docs/gas-prices-seo.md).
 
 ### Рендеринг городских страниц
 
@@ -108,14 +108,14 @@ Server-only переменные: `DIRECTUS_GAS_PRICES_TOKEN` и `GAS_PRICE_CRON
 
 - Каждая страница — посадочная под запрос из папки `seo/`.
 - Все тексты пишутся на русском языке от первого лица (я, меня), без «вы/компания».
-- Правила написания контента и заполнения страниц — в навыках `.codex/skills/seo-write`, `.codex/skills/cluster-pilar-page`, `.codex/skills/source-copy`.
+- Правила написания контента и заполнения страниц — в навыках `.junie/skills/seo-write`, `.junie/skills/cluster-pilar-page`, `.junie/skills/source-copy`.
 - Актуальная карта страниц ведётся в `urls-seo.txt`.
 
 ## 📝 Документация
 
 - **[SUMMARY.md](./SUMMARY.md)** — сжатый контекст текущего состояния проекта (статус, изменения, tech debt, следующие шаги).
 - **[idea.md](./idea.md)** — идея и стратегия наполнения сайта.
-- Правила документирования — `.codex/skills/documentation/SKILL.md`.
+- Правила документирования — `.junie/skills/documentation/SKILL.md`.
 
 ## Контакты
 

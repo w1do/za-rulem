@@ -4,8 +4,8 @@ import Header from '../../components/shared/header/Header.astro';
 import Footer from '../../components/shared/footer/Footer.astro';
 import PageHeader from '../../components/shared/PageHeader.astro';
 import Alert from '../../components/shared/Alert.astro';
-import GasPricesMapSection from '../../components/gas-prices/GasPricesMapSection.astro';
 import GasBrandGrid from '../../features/gas-prices/ui/GasBrandGrid.astro';
+import GasPricesMapSection from '../gas-prices/GasPricesMapSection.astro';
 import FuelDeliveryCalculator from '../../components/calculators/FuelDeliveryCalculator';
 import HomeHowItWork from '../../components/home/HomeHowItWork.astro';
 import HomeWhyChoose from '../../components/home/HomeWhyChoose.astro';
@@ -14,7 +14,8 @@ import HubCta from '../../components/hub/HubCta.astro';
 import QueueDriversPreview from '../../components/queues/QueueDriversPreview.astro';
 import { gasStationLabels, getQueueDrivers } from '../../data/queueDrivers';
 import { chatAppUrl, getCityUrl, replaceCityPlaceholders, type ChatCity } from '../../lib/cities';
-import { getGasCityPriceData } from '../../features/gas-prices/server';
+import { getGasCityPrices } from '../../features/gas-prices/server';
+import { fetchCityGasStations } from '../../lib/gasStations';
 import {
 	buildGasPricesFaqs,
 	buildGasPricesMeta,
@@ -30,7 +31,10 @@ const { city } = Astro.props;
 
 const meta = buildGasPricesMeta(city);
 const faqs = buildGasPricesFaqs(city);
-const priceData = await getGasCityPriceData(city);
+const priceData = await getGasCityPrices(city.slug);
+
+// АЗС города из снимков `gas_daily` (`area_type=point`) с карточками реестра `stations`.
+const stations = await fetchCityGasStations(city.slug);
 
 const url = getCityUrl('/ceny-na-benzin', city.slug);
 const jsonLd = [
@@ -72,13 +76,14 @@ const queueGasStations = Object.values(gasStationLabels);
 		<Alert chatHref={chatAppUrl(city.slug)} title="Обсудите цены и наличие топлива с водителями" description="Проверяйте дату обновления цены перед поездкой." />
 	</div>
 
-	<GasBrandGrid brands={priceData.brands} citySlug={city.slug} />
+	<GasPricesMapSection
+		stations={stations}
+		bounds={city.bounds}
+		chatUrl={chatAppUrl(city.slug)}
+		citySlug={city.slug}
+	/>
 
-	{city.bounds && (
-		<>
-			<GasPricesMapSection stations={priceData.stations} bounds={city.bounds} chatUrl={chatAppUrl(city.slug)} />
-		</>
-	)}
+	<GasBrandGrid brands={priceData.brands} citySlug={city.slug} />
 
 	<section class="gas-prices-calculator bg-section">
 		<div class="container">

@@ -1,0 +1,128 @@
+{
+  "collection": "gas_daily",
+  "meta": {
+    "collection": "gas_daily",
+    "icon": "history",
+    "note": "Единая коллекция мониторинга цен (индивидуальные АЗС и агрегаты по городам/трассам)",
+    "display_template": "{{snapshot_date}} · {{brand_slug}} · {{area_slug}}",
+    "singleton": false
+  },
+  "schema": {
+    "name": "gas_daily"
+  },
+  "fields": [
+    {
+      "field": "id",
+      "type": "string",
+      "meta": { "hidden": false, "readonly": false, "interface": "input", "note": "Уникальный ключ снимка (area:brand:date)" },
+      "schema": { "is_primary_key": true, "has_auto_increment": false, "length": 255 }
+    },
+    {
+      "field": "station",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "select-relational-lookup",
+        "note": "Ссылка на конкретную АЗС (если это индивидуальный мониторинг)"
+      },
+      "schema": {
+        "is_nullable": true,
+        "foreign_key_column": "id",
+        "foreign_key_table": "stations"
+      }
+    },
+    {
+      "field": "brand_slug",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "input",
+        "required": true,
+        "note": "Слаг сети АЗС"
+      },
+      "schema": { "is_nullable": false, "is_indexed": true }
+    },
+    {
+      "field": "area_type",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            { "text": "Город", "value": "city" },
+            { "text": "Участок трассы", "value": "road" },
+            { "text": "Точка (АЗС)", "value": "point" }
+          ]
+        },
+        "note": "Тип области мониторинга"
+      },
+      "schema": { "default_value": "city", "is_indexed": true }
+    },
+    {
+      "field": "area_slug",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "input",
+        "note": "Слаг города, участка трассы или ID станции"
+      },
+      "schema": { "is_indexed": true }
+    },
+    {
+      "field": "area_parent_slug",
+      "type": "string",
+      "meta": {
+        "width": "half",
+        "interface": "input",
+        "note": "Код трассы (для road) или регион"
+      },
+      "schema": { "is_indexed": true }
+    },
+    {
+      "field": "snapshot_date",
+      "type": "timestamp",
+      "meta": {
+        "width": "half",
+        "interface": "datetime",
+        "required": true,
+        "note": "Дата и время снимка цен"
+      },
+      "schema": { "is_nullable": false, "is_indexed": true }
+    },
+    {
+      "field": "fuel_prices",
+      "type": "json",
+      "meta": {
+        "interface": "input-code",
+        "options": { "language": "json" },
+        "note": "Цены на топливо в формате JSON"
+      },
+      "schema": {}
+    },
+    {
+      "field": "station_count",
+      "type": "integer",
+      "meta": { "width": "half", "interface": "input", "note": "Количество АЗС в агрегате (1 для индивидуальных)" },
+      "schema": { "default_value": 1 }
+    },
+    {
+      "field": "source_updated_at",
+      "type": "timestamp",
+      "meta": { "width": "half", "interface": "datetime", "note": "Время обновления данных у источника" },
+      "schema": {}
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "width": "half",
+        "interface": "datetime",
+        "special": ["date-created"]
+      },
+      "schema": {}
+    }
+  ]
+}

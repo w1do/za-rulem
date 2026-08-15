@@ -15,13 +15,14 @@ interface Props {
 	bounds: MapBounds;
 	action: StationMapAction;
 	brandAliases?: string[];
-	routeLines?: [number, number][][];
+	/** Показать именно переданную рамку (участок трассы) вместо городского зума. */
+	fitToBounds?: boolean;
 }
 
 const MOBILE_MEDIA_QUERY = '(max-width: 767px)';
 
 /** Общее контролируемое представление списка, фильтров и карты АЗС. */
-const GasMapView = ({ stations, bounds, action, brandAliases = [], routeLines }: Props) => {
+const GasMapView = ({ stations, bounds, action, brandAliases = [], fitToBounds }: Props) => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [fuelTypes, setFuelTypes] = useState<string[]>([]);
 	const [fuelLimit, setFuelLimit] = useState<number | null>(null);
@@ -54,7 +55,7 @@ const GasMapView = ({ stations, bounds, action, brandAliases = [], routeLines }:
 		stations: filteredStations,
 		bounds,
 		action,
-		routeLines,
+		fitToBounds,
 		onMarkerClick: handleMarkerClick,
 	});
 

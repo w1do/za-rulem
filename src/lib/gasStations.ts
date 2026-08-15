@@ -1,5 +1,6 @@
 /**
- * Данные и правила по АЗС: загрузка станций из 2GIS, фильтрация и разбор статусов.
+ * Данные и правила по АЗС: загрузка станций из бэкенда, фильтрация и разбор статусов.
+ * Единственный источник станций и цен — Directus (`stations` + `gas_daily`).
  * Модуль не зависит от UI и используется и на сервере (Astro), и в клиентской карте.
  */
 
@@ -103,7 +104,7 @@ export const buildStationActionHref = (
 		: `${url.pathname}${url.search}${url.hash}`;
 };
 
-const STATIONS_API_URL = 'https://benzin.api.2gis.ru/api/v1/stations';
+const STATIONS_ENDPOINT = '/api/gas-stations';
 const STATIONS_REQUEST_TIMEOUT_MS = 8000;
 
 export interface StationsFetchResult {
@@ -121,10 +122,25 @@ export const FUEL_FILTER_TYPES = ['AI_92', 'AI_95', 'DT', 'GAS'] as const;
 const SMALL_QUEUE_LEVELS = ['NONE', 'UP_TO_25', 'FROM_10_TO_25'];
 const LARGE_QUEUE_LEVELS = ['FROM_25_TO_50', 'OVER_50'];
 
+/** Клиентский URL карты АЗС: браузер ходит только в собственный endpoint. */
 export const buildStationsUrl = (bounds: MapBounds): string => {
 	const { minLat, maxLat, minLon, maxLon } = bounds;
-	return `${STATIONS_API_URL}?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`;
+	return `${STATIONS_ENDPOINT}?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`;
 };
+
+/** URL станций города: состав берётся из снимков `gas_daily`, а не из границ карты. */
+export const buildCityStationsUrl = (citySlug: string): string =>
+	`${STATIONS_ENDPOINT}?city=${encodeURIComponent(citySlug)}`;
+
+/**
+ * Станция попадает на карту только с обеими координатами.
+ * В реестре есть записи без геоданных — их место в списке цен, но не на карте.
+ */
+export const hasStationCoordinates = (item: StationData): boolean =>
+	Number.isFinite(item.station.lat) &&
+	Number.isFinite(item.station.lng) &&
+	item.station.lat !== 0 &&
+	item.station.lng !== 0;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
 	typeof value === 'object' && value !== null;
@@ -136,8 +152,6 @@ export const isStationData = (value: unknown): value is StationData => {
 		typeof station.id === 'string' &&
 		typeof station.name === 'string' &&
 		typeof station.address === 'string' &&
-		Number.isFinite(Number(station.lat)) &&
-		Number.isFinite(Number(station.lng)) &&
 		Array.isArray(value.fuel_statuses) &&
 		Array.isArray(value.prices)
 	);
@@ -150,8 +164,8 @@ const mapStationData = (value: StationData): StationData => ({
 		name: value.station.name,
 		brand: typeof value.station.brand === 'string' ? value.station.brand : '',
 		address: value.station.address,
-		lat: Number(value.station.lat),
-		lng: Number(value.station.lng),
+		lat: Number(value.station.lat) || 0,
+		lng: Number(value.station.lng) || 0,
 		last_transaction_at:
 			typeof value.station.last_transaction_at === 'string'
 				? value.station.last_transaction_at
@@ -200,21 +214,60 @@ const mapStationData = (value: StationData): StationData => ({
 		typeof value.can_use_canister === 'boolean' ? value.can_use_canister : undefined,
 });
 
-/** Запрашивает и проверяет внешний ответ, сохраняя признак transport-ошибки. */
+const readStationsResponse = async (url: string): Promise<StationsFetchResult> => {
+	const response = await fetch(url, {
+		signal: AbortSignal.timeout(STATIONS_REQUEST_TIMEOUT_MS),
+	});
+
+	if (!response.ok) {
+		console.error(`Stations request failed with status ${response.status} for ${url}`);
+		return { stations: [], isSuccessful: false };
+	}
+
+	const data: unknown = await response.json();
+	if (!Array.isArray(data)) return { stations: [], isSuccessful: false };
+
+	return { stations: data.filter(isStationData).map(mapStationData), isSuccessful: true };
+};
+
+/**
+ * Запрашивает и проверяет станции.
+ * На сервере — напрямую из Directus, в браузере — через собственный endpoint `/api/gas-stations`.
+ * Внешние источники (в том числе 2GIS) фронтендом не запрашиваются.
+ */
 export const fetchGasStationsResult = async (bounds: MapBounds): Promise<StationsFetchResult> => {
 	try {
-		const response = await fetch(buildStationsUrl(bounds), {
-			signal: AbortSignal.timeout(STATIONS_REQUEST_TIMEOUT_MS),
-		});
-		if (!response.ok) {
-			console.error(`2GIS stations request failed with status ${response.status}`);
-			return { stations: [], isSuccessful: false };
+		if (typeof window === 'undefined') {
+			// Динамический импорт, чтобы серверный клиент Directus не попал в клиентский бандл.
+			const { readStations } = await import('../features/gas-stations/api/directusStations');
+			return { stations: await readStations(bounds), isSuccessful: true };
 		}
-		const data: unknown = await response.json();
-		if (!Array.isArray(data)) return { stations: [], isSuccessful: false };
-		return { stations: data.filter(isStationData).map(mapStationData), isSuccessful: true };
+
+		return await readStationsResponse(buildStationsUrl(bounds));
 	} catch (error) {
-		console.error('Error fetching gas stations from 2GIS:', error);
+		console.error('Error fetching gas stations:', error);
+		return { stations: [], isSuccessful: false };
+	}
+};
+
+/**
+ * Станции города со свежими ценами из `gas_daily`.
+ * Городские страницы не зависят от координат реестра: привязка идёт по `area_parent_slug`.
+ */
+export const fetchCityGasStationsResult = async (
+	citySlug: string,
+): Promise<StationsFetchResult> => {
+	if (!citySlug) return { stations: [], isSuccessful: false };
+
+	try {
+		if (typeof window === 'undefined') {
+			const { readCityStations } = await import('../features/gas-stations/api/directusStations');
+			return { stations: await readCityStations(citySlug), isSuccessful: true };
+		}
+
+		return await readStationsResponse(buildCityStationsUrl(citySlug));
+	} catch (error) {
+		console.error('Error fetching city gas stations:', error);
 		return { stations: [], isSuccessful: false };
 	}
 };
@@ -225,6 +278,12 @@ export const fetchGasStationsResult = async (bounds: MapBounds): Promise<Station
  */
 export const fetchGasStations = async (bounds: MapBounds): Promise<StationData[]> => {
 	const result = await fetchGasStationsResult(bounds);
+	return result.stations;
+};
+
+/** Загружает станции города; ошибка источника не ломает страницу. */
+export const fetchCityGasStations = async (citySlug: string): Promise<StationData[]> => {
+	const result = await fetchCityGasStationsResult(citySlug);
 	return result.stations;
 };
 

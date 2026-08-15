@@ -1,10 +1,8 @@
-import type { StationData } from '../../../lib/gasStations.ts';
 import { DEFAULT_GAS_BRANDS } from './defaultBrands.ts';
 import type {
 	FuelPriceSummary,
 	FuelPriceView,
 	GasBrand,
-	GasBrandStationGroup,
 	GasBrandSummary,
 	GasPriceSnapshot,
 	PriceTrend,
@@ -12,37 +10,7 @@ import type {
 
 export const MAX_FUEL_PRICE_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
-const BRAND_DESCRIPTOR = /,?\s*(?:автоматическая\s+)?(?:азс|заправочная станция)$/iu;
-
-const TRANSLITERATION: Record<string, string> = {
-	а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z',
-	и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r',
-	с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch',
-	ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya',
-};
-
-export const normalizeBrandName = (value: string): string =>
-	value
-		.toLocaleLowerCase('ru-RU')
-		.replaceAll('ё', 'е')
-		.replace(BRAND_DESCRIPTOR, '')
-		.replace(/[«»"']/g, '')
-		.replace(/\s+/g, ' ')
-		.trim();
-
-export const cleanBrandName = (value: string): string =>
-	value.replace(BRAND_DESCRIPTOR, '').replace(/\s+/g, ' ').trim();
-
-export const slugifyBrand = (value: string): string => {
-	const normalized = cleanBrandName(value).toLocaleLowerCase('ru-RU');
-	const transliterated = [...normalized]
-		.map((character) => TRANSLITERATION[character] ?? character)
-		.join('');
-	return transliterated
-		.replace(/[^a-z0-9]+/g, '-')
-		.replace(/^-+|-+$/g, '')
-		.slice(0, 80) || 'azs';
-};
+const HISTORY_POINTS = 30;
 
 export const mergeBrandRegistry = (brands: GasBrand[]): GasBrand[] => {
 	const merged = new Map(DEFAULT_GAS_BRANDS.map((brand) => [brand.slug, { ...brand }]));
@@ -50,89 +18,26 @@ export const mergeBrandRegistry = (brands: GasBrand[]): GasBrand[] => {
 	return [...merged.values()];
 };
 
-const stationBrandName = (station: StationData): string =>
-	cleanBrandName(station.station.brand || station.station.name.split(',')[0] || 'АЗС');
+const nameFromSlug = (slug: string): string =>
+	slug.split('-').filter(Boolean).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ') || 'АЗС';
 
-export const resolveGasBrand = (value: string, registry: readonly GasBrand[]): GasBrand => {
-	const normalized = normalizeBrandName(value);
-	const configured = registry.find((brand) =>
-		[brand.name, ...brand.aliases].some((alias) => normalizeBrandName(alias) === normalized),
-	);
-	if (configured) return configured;
-
-	const name = cleanBrandName(value) || 'АЗС';
-	const generatedSlug = slugifyBrand(name);
-	const slug = registry.some((brand) => brand.slug === generatedSlug)
-		? `${generatedSlug}-other`
-		: generatedSlug;
-	return {
+/**
+ * Directus хранит снимки по slug сети. Незнакомая сеть остаётся видимой на
+ * сайте, но не индексируется, пока её не подтвердили в реестре брендов.
+ */
+export const resolveGasBrand = (slug: string, registry: readonly GasBrand[]): GasBrand =>
+	registry.find((brand) => brand.slug === slug) ?? {
 		slug,
-		name,
-		aliases: [name],
+		name: nameFromSlug(slug),
+		aliases: [],
 		isIndexable: false,
 		verificationStatus: 'unverified',
 	};
-};
-
-export const groupStationsByBrand = (
-	stations: StationData[],
-	brands: GasBrand[] = [],
-): GasBrandStationGroup[] => {
-	const registry = mergeBrandRegistry(brands);
-	const groups = new Map<string, GasBrandStationGroup>();
-
-	for (const station of stations) {
-		const brand = resolveGasBrand(stationBrandName(station), registry);
-		const group = groups.get(brand.slug) ?? { brand, stations: [] };
-		group.stations.push(station);
-		groups.set(brand.slug, group);
-	}
-
-	return [...groups.values()].sort((left, right) => {
-		if (left.brand.isIndexable !== right.brand.isIndexable) {
-			return left.brand.isIndexable ? -1 : 1;
-		}
-		return right.stations.length - left.stations.length ||
-			left.brand.name.localeCompare(right.brand.name, 'ru');
-	});
-};
 
 const isFreshPrice = (updatedAt: string, now: number): boolean => {
 	const timestamp = Date.parse(updatedAt);
 	return Number.isFinite(timestamp) && timestamp <= now + 24 * 60 * 60 * 1000 &&
 		now - timestamp <= MAX_FUEL_PRICE_AGE_MS;
-};
-
-export const aggregateFuelPrices = (
-	stations: StationData[],
-	now = Date.now(),
-): FuelPriceSummary[] => {
-	const pricesByFuel = new Map<string, { prices: number[]; updatedAt: string }>();
-
-	for (const station of stations) {
-		for (const price of station.prices ?? []) {
-			if (!Number.isFinite(price.price) || price.price <= 0 || !isFreshPrice(price.updated_at, now)) {
-				continue;
-			}
-			const group = pricesByFuel.get(price.fuel_type) ?? { prices: [], updatedAt: '' };
-			group.prices.push(price.price);
-			if (!group.updatedAt || Date.parse(price.updated_at) > Date.parse(group.updatedAt)) {
-				group.updatedAt = price.updated_at;
-			}
-			pricesByFuel.set(price.fuel_type, group);
-		}
-	}
-
-	return [...pricesByFuel.entries()]
-		.map(([fuelType, group]) => ({
-			fuelType,
-			average: Number((group.prices.reduce((sum, price) => sum + price, 0) / group.prices.length).toFixed(2)),
-			min: Math.min(...group.prices),
-			max: Math.max(...group.prices),
-			sampleCount: group.prices.length,
-			updatedAt: group.updatedAt,
-		}))
-		.sort((left, right) => fuelSortIndex(left.fuelType) - fuelSortIndex(right.fuelType));
 };
 
 const fuelSortIndex = (fuelType: string): number => {
@@ -141,42 +46,14 @@ const fuelSortIndex = (fuelType: string): number => {
 	return index === -1 ? order.length : index;
 };
 
-/** Начало текущего получасового интервала в локальном времени города. */
-export const getSnapshotDate = (stations: StationData[], now = new Date()): string => {
-	const offset = stations.find((station) => Number.isFinite(station.station.timezone_offset))
-		?.station.timezone_offset ?? 3;
-	const localTimestamp = now.getTime() + offset * 60 * 60 * 1000;
-	const localDate = new Date(localTimestamp);
-	localDate.setUTCMinutes(localDate.getUTCMinutes() < 30 ? 0 : 30, 0, 0);
-	return localDate.toISOString().slice(0, 19);
-};
-
-export const createGasPriceSnapshots = (
-	citySlug: string,
-	stations: StationData[],
-	brands: GasBrand[] = [],
-	now = new Date(),
-): Array<{ brand: GasBrand; snapshot: GasPriceSnapshot }> =>
-	groupStationsByBrand(stations, brands)
-		.map((group) => {
-			const fuels = aggregateFuelPrices(group.stations, now.getTime());
-			const sourceUpdatedAt = fuels.reduce(
-				(latest, fuel) => (!latest || Date.parse(fuel.updatedAt) > Date.parse(latest) ? fuel.updatedAt : latest),
-				'',
-			);
-			return {
-				brand: group.brand,
-				snapshot: {
-					citySlug,
-					brandSlug: group.brand.slug,
-					snapshotDate: getSnapshotDate(group.stations, now),
-					stationCount: group.stations.length,
-					sourceUpdatedAt,
-					fuels,
-				},
-			};
-		})
-		.filter(({ snapshot }) => snapshot.fuels.length > 0);
+/** Устаревшие цены не показываем: лучше пустая карточка, чем цена недельной давности. */
+export const selectFreshFuels = (
+	fuels: FuelPriceSummary[],
+	now = Date.now(),
+): FuelPriceSummary[] =>
+	fuels
+		.filter((fuel) => fuel.average > 0 && isFreshPrice(fuel.updatedAt, now))
+		.sort((left, right) => fuelSortIndex(left.fuelType) - fuelSortIndex(right.fuelType));
 
 const trendFromDelta = (delta: number | null): PriceTrend => {
 	if (delta === null) return 'unknown';
@@ -198,42 +75,49 @@ export const addPriceTrends = (
 		return { ...fuel, previousAverage, delta, trend: trendFromDelta(delta) };
 	});
 
+const byBrandSlug = (snapshots: GasPriceSnapshot[]): Map<string, GasPriceSnapshot[]> => {
+	const groups = new Map<string, GasPriceSnapshot[]>();
+	for (const snapshot of snapshots) {
+		const group = groups.get(snapshot.brandSlug) ?? [];
+		group.push(snapshot);
+		groups.set(snapshot.brandSlug, group);
+	}
+	for (const group of groups.values()) {
+		group.sort((left, right) => left.snapshotDate.localeCompare(right.snapshotDate));
+	}
+	return groups;
+};
+
+/**
+ * Текущая цена сети — самый свежий снимок Directus, динамика считается
+ * относительно предыдущего снимка того же города и сети.
+ */
 export const buildBrandSummaries = (
-	citySlug: string,
-	stations: StationData[],
-	history: GasPriceSnapshot[],
+	snapshots: GasPriceSnapshot[],
 	brands: GasBrand[] = [],
 	now = new Date(),
 ): GasBrandSummary[] => {
-	const groups = groupStationsByBrand(stations, brands);
-	return groups.map(({ brand, stations: brandStations }) => {
-		const fuels = aggregateFuelPrices(brandStations, now.getTime());
-		const sourceUpdatedAt = fuels.reduce(
-			(latest, fuel) => (!latest || Date.parse(fuel.updatedAt) > Date.parse(latest) ? fuel.updatedAt : latest),
-			'',
-		);
-		const snapshot: GasPriceSnapshot = {
-			citySlug,
-			brandSlug: brand.slug,
-			snapshotDate: getSnapshotDate(brandStations, now),
-			stationCount: brandStations.length,
-			sourceUpdatedAt,
-			fuels,
-		};
-		const brandHistory = history
-			.filter((item) => item.brandSlug === brand.slug)
-			.sort((left, right) => left.snapshotDate.localeCompare(right.snapshotDate));
-		const previous = brandHistory
-			.filter((item) => item.snapshotDate < snapshot.snapshotDate)
-			.sort((left, right) => right.snapshotDate.localeCompare(left.snapshotDate))[0];
-		return {
-			brand,
-			stationCount: snapshot.stationCount,
-			sourceUpdatedAt: snapshot.sourceUpdatedAt,
-			snapshotDate: snapshot.snapshotDate,
-			fuels: addPriceTrends(snapshot.fuels, previous),
-			history: brandHistory.slice(-30),
-		};
+	const registry = mergeBrandRegistry(brands);
+	const summaries: GasBrandSummary[] = [];
+
+	for (const [brandSlug, history] of byBrandSlug(snapshots)) {
+		const latest = history[history.length - 1];
+		if (!latest) continue;
+		const previous = history[history.length - 2];
+		summaries.push({
+			brand: resolveGasBrand(brandSlug, registry),
+			stationCount: latest.stationCount,
+			sourceUpdatedAt: latest.sourceUpdatedAt,
+			snapshotDate: latest.snapshotDate,
+			fuels: addPriceTrends(selectFreshFuels(latest.fuels, now.getTime()), previous),
+			history: history.slice(-HISTORY_POINTS),
+		});
+	}
+
+	return summaries.sort((left, right) => {
+		if (left.brand.isIndexable !== right.brand.isIndexable) return left.brand.isIndexable ? -1 : 1;
+		return right.stationCount - left.stationCount ||
+			left.brand.name.localeCompare(right.brand.name, 'ru');
 	});
 };
 

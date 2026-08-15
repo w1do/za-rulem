@@ -1,0 +1,87 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { getRoadGeometry } from '../../../features/road-gas-stations';
+import { fetchGasStations } from '../../../lib/gasStations';
+import {
+	buildSegmentMapView,
+	readRoadSegments,
+	readSegmentPrices,
+	type RoadSegment,
+	type SegmentMapView,
+} from '../../../features/road-segments';
+import RouteSegmentLayout from '../../../layouts/RouteSegmentLayout.astro';
+
+export async function getStaticPaths() {
+	const allSegments = await readRoadSegments();
+	const allRoutes = await getCollection('routes');
+
+	// Подгружаем станции для каждого участка из единой коллекции Directus (параллельно)
+	await Promise.all(
+		allSegments.map(async (segment) => {
+			if (segment.bounds) {
+				segment.stations = await fetchGasStations(segment.bounds);
+			}
+		}),
+	);
+
+	const routeByCode = new Map<string, CollectionEntry<'routes'>>();
+	allRoutes.forEach((route) => routeByCode.set(route.data.code.toLowerCase(), route));
+
+	const segmentsByRoute = new Map<string, RoadSegment[]>();
+	allSegments.forEach((segment) => {
+		const key = segment.routeCode.toLowerCase();
+		segmentsByRoute.set(key, [...(segmentsByRoute.get(key) ?? []), segment]);
+	});
+
+	return allSegments
+		.map((segment) => {
+			const routeKey = segment.routeCode.toLowerCase();
+			const parentRoute = routeByCode.get(routeKey);
+			if (!parentRoute) {
+				console.warn(
+					`[road-segments] Parent route not found for segment ${segment.slug} (routeCode: ${segment.routeCode})`,
+				);
+				return null;
+			}
+
+			const siblings = segmentsByRoute.get(routeKey) ?? [];
+			const index = siblings.findIndex((item) => item.slug === segment.slug);
+			const mapView = buildSegmentMapView({
+				segment,
+				roadLines: getRoadGeometry(parentRoute.id)?.coordinates,
+				previousCenter: index > 0 ? siblings[index - 1].center : null,
+				nextCenter: index >= 0 && index < siblings.length - 1 ? siblings[index + 1].center : null,
+			});
+
+			const routeSegments = siblings.map((item) => ({
+				name: item.name,
+				slug: item.slug,
+				url: `/route/${parentRoute.id}/${item.slug}`,
+			}));
+
+			return {
+				params: { parent: parentRoute.id, slug: segment.slug },
+				props: { segment, parentRoute, routeSegments, mapView },
+			};
+		})
+		.filter(Boolean);
+}
+
+interface Props {
+	segment: RoadSegment;
+	parentRoute: CollectionEntry<'routes'>;
+	routeSegments: { name: string; slug: string; url: string }[];
+	mapView: SegmentMapView;
+}
+
+const { segment, parentRoute, routeSegments, mapView } = Astro.props;
+const prices = await readSegmentPrices(segment.slug);
+---
+
+<RouteSegmentLayout
+	segment={segment}
+	prices={prices}
+	parentRoute={parentRoute}
+	routeSegments={routeSegments}
+	mapView={mapView}
+/>
