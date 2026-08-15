@@ -2,231 +2,311 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/shared/header/Header.astro';
 import Footer from '../../components/shared/footer/Footer.astro';
-import PageHeaderHelpButton from '../../components/shared/PageHeaderHelpButton.astro';
-import PageHeaderChatButton from '../../components/shared/PageHeaderChatButton.astro';
+import PageHeader from '../../components/shared/PageHeader.astro';
+import ReasonsSlider from '../../components/shared/ReasonsSlider.astro';
 import ServiceFaqs from '../../components/services/single/ServiceFaqs.astro';
 import AboutCta from '../../components/about/AboutCta.astro';
-import QueueFilters from '../../components/queues/QueueFilters.astro';
-import QueueDriverCard from '../../components/queues/QueueDriverCard.astro';
-import Alert from '../../components/shared/Alert.astro';
-import { getQueueDrivers } from '../../data/queueDrivers';
-import { chatAppUrl, getCityUrl, replaceCityPlaceholders, type ChatCity } from '../../lib/cities';
+import InteractiveRequestMap from '../../features/interactive-requests/ui/InteractiveRequestMap';
+import QueueAnalytics from '../../features/interactive-requests/ui/QueueAnalytics.astro';
+import { QUEUE_TARIFFS, URGENCY_META, URGENCY_ORDER } from '../../features/interactive-requests/model/constants';
+import { applyUrgencyMarkup, formatPrice } from '../../features/interactive-requests/model/pricing';
+import { toMapStations } from '../../features/interactive-requests/model/mapStations';
+import { fetchCityGasStations, getBoundsCenter } from '../../lib/gasStations';
+import { getCityUrl, replaceCityPlaceholders, type ChatCity } from '../../lib/cities';
 
 export interface Props {
 	city: ChatCity;
 }
 
 const { city } = Astro.props;
-const queueDrivers = getQueueDrivers(city);
-const locations = [...new Set(queueDrivers.map((driver) => driver.location))];
+const [cityLat, cityLng] = getBoundsCenter(city.bounds);
 
-const title = replaceCityPlaceholders("Занять очередь на АЗС {inCity} — Лукойл, Газпромнефть, Роснефть", city);
-const description = replaceCityPlaceholders("Маркетплейс водителей, которые займут для вас очередь на заправке {inCity}. Экономьте свое время!", city);
+// АЗС города из снимков `gas_daily` — тот же источник, что у карты цен на бензин.
+const stations = toMapStations(await fetchCityGasStations(city.slug));
+
+const title = replaceCityPlaceholders('Занять очередь на АЗС {inCity} — живая карта заявок', city);
+const description = replaceCityPlaceholders(
+	'Поставьте метку на карте {ofCity}, укажите срочность — и свободный водитель займёт для вас очередь на заправке. Тарифы от 3 800 ₽.',
+	city,
+);
+
+const queueReasons = [
+	{
+		icon: '⏰',
+		title: 'Опаздываете на работу',
+		text: 'Очередь на колонку растянулась на пару часов, а вам к началу смены. Поставьте метку — водитель отстоит за вас.',
+	},
+	{
+		icon: '👨‍👩‍👧',
+		title: 'В машине дети или пожилые',
+		text: 'Стоять в очереди с ребёнком или пожилым родственником тяжело. Оставьте заявку и подъезжайте к своему времени.',
+	},
+	{
+		icon: '🚚',
+		title: 'Работаете за рулём',
+		text: 'Такси, доставка, грузоперевозки: каждый час в очереди — потерянные заказы. Дешевле передать место напарнику.',
+	},
+	{
+		icon: '❄️',
+		title: 'Мороз или непогода',
+		text: 'Не хочется жечь топливо и мёрзнуть в очереди зимой — заявку заберёт тот, кто уже рядом с заправкой.',
+	},
+	{
+		icon: '🏥',
+		title: 'Срочные дела',
+		text: 'Больница, поезд, самолёт, встреча с клиентом — когда ждать просто нельзя, выбирайте красную срочность.',
+	},
+	{
+		icon: '🌙',
+		title: 'Ночная заправка',
+		text: 'Ночью топливо привозят по графику. Заявка держит ваше место в очереди, пока вы отдыхаете дома.',
+	},
+	{
+		icon: '💼',
+		title: 'Автопарк и служебные авто',
+		text: 'Нужно заправить несколько машин — распределите заявки по заправкам города и не снимайте водителей с рейсов.',
+	},
+	{
+		icon: '💰',
+		title: 'Хотите заработать',
+		text: 'Свободны и стоите рядом с АЗС? Берите горячие заявки с карты: чем срочнее, тем выше оплата — до +80%.',
+	},
+];
 
 const faqs = [
-	{ question: 'Как это работает?', answer: 'Вы выбираете водителя в маркетплейсе. Он приезжает на АЗС и занимает очередь. Когда подходит время заправки, он звонит вам, и вы подъезжаете.' },
-	{ question: 'На каких заправках можно занять очередь?', answer: 'Наши водители работают со всеми крупными сетями: Лукойл, Газпромнефть, Роснефть, НТП и другие.' },
-	{ question: 'Сколько стоит услуга?', answer: 'Стоимость зависит от времени ожидания и удаленности АЗС, в среднем от 800 до 1500 рублей. Договариваетесь напрямую с водителем.' },
-	{ question: 'Можно ли занять очередь к определенному времени?', answer: 'Да, в фильтрах можно выбрать водителей, готовых занять очередь с 4 или 5 утра.' },
+	{
+		question: 'Как разместить заявку на карте?',
+		answer:
+			'Нажмите на карту в том месте, где стоит очередь, выберите время ожидания и уровень срочности, укажите телефон и комментарий. Метка с ценой сразу появится на карте города.',
+	},
+	{
+		question: 'Из чего складывается цена?',
+		answer:
+			'Базовый тариф зависит от времени ожидания: до 3 часов — 3 800 ₽, до 5 часов — 4 100 ₽, до 8 часов — 4 900 ₽. Итоговая сумма зависит от срочности: +80% для срочных заявок, +65% если можно немного подождать и +30% когда время терпит.',
+	},
+	{
+		question: 'Почему метки пульсируют по-разному?',
+		answer:
+			'Красная метка пульсирует часто — помощь нужна прямо сейчас. Жёлтая пульсирует умеренно, зелёная — еле заметно. Так исполнитель сразу видит самые горячие заявки.',
+	},
+	{
+		question: 'Как связаться с водителем?',
+		answer:
+			'Нажмите на метку на карте: откроется карточка со стоимостью, описанием ситуации и кнопкой прямого звонка. Оплата и детали обсуждаются напрямую, без посредников.',
+	},
 ];
 ---
 
 <Layout title={title} description={description} city={city}>
 	<Header city={city} />
 
-	<!-- Page Header Section Start -->
-	<div class="page-header parallaxie">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="page-header-box">
-						<h1 class="text-anime-style-3" data-cursor="-opaque">{replaceCityPlaceholders("Очередь на АЗС {inCity}", city)}</h1>
-						<nav class="wow fadeInUp">
-							<ol class="breadcrumb">
-								<li class="breadcrumb-item"><a href={getCityUrl('/', city.slug)}>Главная</a></li>
-								<li class="breadcrumb-item active" aria-current="page">Занять очередь</li>
-							</ol>
-						</nav>
-						<PageHeaderHelpButton />
-						<PageHeaderChatButton />
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Page Header Section End -->
+	<PageHeader
+		title={replaceCityPlaceholders('Очередь на АЗС {inCity} — живая карта заявок', city)}
+		items={[
+			{ label: 'Главная', href: getCityUrl('/', city.slug) },
+			{ label: 'Занять очередь' },
+		]}
+		helpLabel="Занять очередь"
+		helpService="Занять очередь на АЗС"
+		helpSubject="Заявка на очередь на АЗС"
+	/>
 
-	<!-- Page Fleets Section Start -->
-	<div class="page-fleets">
-		<Alert chatHref={chatAppUrl(city.slug)} />
-
-		<div class="container mt-5">
-
-			<div class="row fuel-delivery-layout">
-				<div class="col-lg-3">
-					<QueueFilters city={city} locations={locations} />
-				</div>
-
-				<div class="col-lg-9">
-					<!-- Info Box Start -->
-					<div class="fuel-delivery-intro wow fadeInUp">
-						<div class="service-content">
-							<span class="section-sub-title">Маркетплейс услуг</span>
-							<h2>Водители, готовые занять очередь</h2>
-							<p>{replaceCityPlaceholders("Выберите подходящее предложение. Наши специалисты займут очередь на любой АЗС {ofCity}. Прямая связь с водителем без посредников.", city)}</p>
-						</div>
-					</div>
-					<!-- Info Box End -->
-
-
-					<!-- Fleet Item List Start -->
-					<div class="driver-grid" id="queue-options">
-						{queueDrivers.map((driver) => <QueueDriverCard driver={driver} />)}
-					</div>
-					<p class="driver-grid__empty" id="drivers-empty" hidden>По выбранным параметрам водителей пока нет. Попробуйте изменить фильтры.</p>
-					<nav class="driver-pagination" id="driver-pagination" aria-label="Страницы водителей"></nav>
-					<!-- Fleet Item List End -->
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Page Fleets Section End -->
-
-	<section class="fuel-delivery-faq-section">
-		<div class="container"><ServiceFaqs faqs={faqs} title="Частые вопросы об очереди на АЗС" /></div>
+	<section class="queue-map-section mt-5" aria-label="Карта заявок на очередь">
+		<InteractiveRequestMap
+			client:only="react"
+			kind="queue"
+			citySlug={city.slug}
+			cityName={city.name}
+			cityLat={cityLat}
+			cityLng={cityLng}
+			stations={stations}
+		/>
 	</section>
-	<section class="fuel-delivery-cta-section">
+
+	<ReasonsSlider
+		title="Когда пригодится заявка на очередь"
+		lead={replaceCityPlaceholders(
+			'Отметьте заправку на карте, назовите срочность — заявку с ценником увидят все свободные водители {ofCity}.',
+			city,
+		)}
+		slides={queueReasons}
+	/>
+
+	<QueueAnalytics cityName={city.name} stations={stations} />
+
+
+	<section class="queue-tariffs">
+		<div class="container">
+			<h2>Сколько стоит занять очередь</h2>
+			<p class="queue-tariffs__lead">
+				Базовый тариф зависит от времени ожидания, итоговая цена — от того, насколько срочно нужна помощь.
+			</p>
+
+			<div class="queue-tariffs__grid">
+				{QUEUE_TARIFFS.map((tariff) => (
+					<article class="queue-tariff-card">
+						<h3>{tariff.label}</h3>
+						<p class="queue-tariff-card__base">Базовый тариф {formatPrice(tariff.basePrice)}</p>
+						<ul>
+							{URGENCY_ORDER.map((level) => (
+								<li>
+									<span class="queue-tariff-card__dot" style={`background:${URGENCY_META[level].color}`} aria-hidden="true"></span>
+									<span>{URGENCY_META[level].label} (+{URGENCY_META[level].markupPercent}%)</span>
+									<strong>{formatPrice(applyUrgencyMarkup(tariff.basePrice, level))}</strong>
+								</li>
+							))}
+						</ul>
+					</article>
+				))}
+			</div>
+
+			<div class="queue-urgency">
+				{URGENCY_ORDER.map((level) => (
+					<article class="queue-urgency__item" style={`--urgency-color:${URGENCY_META[level].color}`}>
+						<h3>{URGENCY_META[level].label} · +{URGENCY_META[level].markupPercent}%</h3>
+						<p>{URGENCY_META[level].hint}</p>
+					</article>
+				))}
+			</div>
+		</div>
+	</section>
+
+	<section class="queue-faq-section">
+		<div class="container">
+			<ServiceFaqs faqs={faqs} title="Частые вопросы об очереди на АЗС" />
+		</div>
+	</section>
+
+	<section class="queue-cta-section">
 		<AboutCta city={city} />
 	</section>
 
 	<Footer city={city} />
 
-	<script>
-		const cards = [...document.querySelectorAll<HTMLElement>('[data-driver-card]')];
-		const pagination = document.querySelector<HTMLElement>('#driver-pagination');
-		const empty = document.querySelector<HTMLElement>('#drivers-empty');
-		let page = 1;
-		const pageSize = 12;
-
-		const filter = () => {
-			const selectedStations = [...document.querySelectorAll<HTMLInputElement>('.station-filter:checked')].map((input) => input.value);
-			const location = (document.querySelector<HTMLSelectElement>('#location')?.value ?? 'all');
-			const time = (document.querySelector<HTMLInputElement>('.time-filter:checked')?.value ?? 'all');
-			
-			const matches = cards.filter((card) => {
-				const cardStation = card.dataset.gasStation;
-				const cardLocation = card.dataset.location;
-				const cardTime = card.dataset.time;
-
-				return (location === 'all' || cardLocation === location)
-					&& (selectedStations.length === 0 || selectedStations.includes(cardStation ?? ''))
-					&& (time === 'all' || cardTime === time);
-			});
-			
-			const pages = Math.ceil(matches.length / pageSize);
-			page = Math.min(page, Math.max(pages, 1));
-			cards.forEach((card) => card.hidden = true);
-			matches.slice((page - 1) * pageSize, page * pageSize).forEach((card) => card.hidden = false);
-			
-			if (empty) empty.hidden = matches.length > 0;
-			
-			if (pagination) {
-				pagination.innerHTML = Array.from({ length: pages }, (_, index) => `<button type="button" class="${page === index + 1 ? 'is-active' : ''}" data-page="${index + 1}" aria-label="Страница ${index + 1}">${index + 1}</button>`).join('');
-			}
-		};
-
-		document.querySelectorAll('.station-filter, .time-filter, #location').forEach((input) => input.addEventListener('change', () => { page = 1; filter(); }));
-		document.querySelector('#filter-submit')?.addEventListener('click', () => { page = 1; filter(); });
-		
-		pagination?.addEventListener('click', (event) => {
-			const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-page]');
-			if (!button) return;
-			page = Number(button.dataset.page);
-			filter();
-			document.querySelector('#queue-options')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-		});
-		
-		filter();
-	</script>
-
 	<style>
-		.fuel-delivery-layout {
-			row-gap: 40px;
+		.queue-map-section {
+			width: 100%;
 		}
 
-		.fuel-delivery-intro {
-			margin-bottom: 36px;
-			padding: 32px;
-			background: var(--secondary-color);
-			border-radius: 20px;
+		.queue-tariffs {
+			padding: 72px 0;
 		}
 
-		.fuel-delivery-intro .section-sub-title {
-			display: inline-block;
+		.queue-tariffs h2 {
 			margin-bottom: 12px;
 		}
 
-		.fuel-delivery-intro h2 {
-			margin-bottom: 16px;
+		.queue-tariffs__lead {
+			max-width: 720px;
+			margin-bottom: 36px;
 		}
 
-		.fuel-delivery-intro p {
+		.queue-tariffs__grid {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 20px;
+		}
+
+		.queue-tariff-card {
+			padding: 28px;
+			border-radius: 20px;
+			background: var(--secondary-color);
+		}
+
+		.queue-tariff-card h3 {
+			margin-bottom: 8px;
+			font-size: 20px;
+		}
+
+		.queue-tariff-card__base {
+			margin-bottom: 16px;
+			font-weight: 600;
+		}
+
+		.queue-tariff-card ul {
+			margin: 0;
+			padding: 0;
+			list-style: none;
+		}
+
+		.queue-tariff-card li {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 8px 0;
+			border-top: 1px solid rgba(17, 24, 39, 0.08);
+		}
+
+		.queue-tariff-card li strong {
+			margin-left: auto;
+			white-space: nowrap;
+		}
+
+		.queue-tariff-card__dot {
+			display: inline-block;
+			flex: none;
+			width: 10px;
+			height: 10px;
+			border-radius: 50%;
+		}
+
+		.queue-urgency {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 20px;
+			margin-top: 32px;
+		}
+
+		.queue-urgency__item {
+			padding: 24px;
+			border-left: 4px solid var(--urgency-color);
+			border-radius: 16px;
+			background: var(--secondary-color);
+		}
+
+		.queue-urgency__item h3 {
+			margin-bottom: 8px;
+			font-size: 18px;
+		}
+
+		.queue-urgency__item p {
 			margin-bottom: 0;
 		}
 
-		.driver-grid {
-			display: grid;
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-			gap: 18px;
+		.queue-faq-section {
+			padding-bottom: 100px;
 		}
 
-		.driver-grid__empty { padding: 30px; border-radius: 16px; background: var(--secondary-color); text-align: center; }
-		.driver-pagination { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 36px; }
-		.driver-pagination :global(button) { width: 42px; height: 42px; border: 0; border-radius: 50%; background: var(--secondary-color); color: var(--primary-color); font-weight: 700; transition: .3s ease; }
-		.driver-pagination :global(button:hover), .driver-pagination :global(button.is-active) { background: var(--accent-color); }
-
-		.fuel-delivery-faq-section {
-			padding: 120px 0;
-		}
-
-		.fuel-delivery-cta-section {
-			padding-bottom: 120px;
-		}
-
-		.fuel-delivery-faq-section :global(.page-single-faqs) {
+		.queue-faq-section :global(.page-single-faqs) {
 			max-width: 980px;
 			margin: 0 auto;
 		}
 
-		.fuel-delivery-faq-section :global(.section-title) {
+		.queue-faq-section :global(.section-title) {
 			margin-bottom: 40px;
 			text-align: center;
 		}
 
-		@media (max-width: 991px) {
-			.driver-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-			.fuel-delivery-faq-section {
-				padding: 80px 0;
-			}
-
-			.fuel-delivery-cta-section {
-				padding-bottom: 80px;
-			}
+		.queue-cta-section {
+			padding-bottom: 120px;
 		}
 
-		@media (max-width: 767px) {
-			.driver-grid { grid-template-columns: 1fr; }
-			.fuel-delivery-intro {
-				margin-bottom: 24px;
-				padding: 24px 20px;
+		@media (max-width: 991px) {
+			.queue-tariffs__grid,
+			.queue-urgency {
+				grid-template-columns: 1fr;
 			}
 
-			.fuel-delivery-faq-section {
-				padding: 60px 0;
+			.queue-tariffs {
+				padding: 56px 0;
 			}
 
-			.fuel-delivery-cta-section {
-				padding-bottom: 60px;
+			.queue-faq-section {
+				padding-bottom: 72px;
+			}
+
+			.queue-cta-section {
+				padding-bottom: 80px;
 			}
 		}
 	</style>

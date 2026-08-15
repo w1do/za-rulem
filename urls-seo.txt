@@ -10,6 +10,7 @@ https://za-rulem.org/testimonials
 https://za-rulem.org/contacts
 https://za-rulem.org/drivers
 https://za-rulem.org/queue
+https://za-rulem.org/avtopomoshch
 https://za-rulem.org/partners
 https://za-rulem.org/benzin-tyumen
 https://za-rulem.org/ceny-na-benzin
@@ -456,6 +457,7 @@ https://za-rulem.org/zlatoust/partners
 # Городские разделы формируются для всех опубликованных городов из Directus
 # через единый публичный модуль src/lib/cities:
 # /{city}, /{city}/about, /{city}/contacts, /{city}/drivers, /{city}/queue,
+# /{city}/avtopomoshch,
 # /{city}/calculator,
 # /{city}/testimonials, /{city}/services/*,
 # /{city}/ceny-na-benzin, /{city}/ochered-na-azs, /{city}/chat, /{city}/chat-voditeley[/{fuel}].

@@ -9,15 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "directus:schema": "node scripts/directus-apply-collections.mjs",
-    "segments:geometry": "node scripts/build-segment-geometry.mjs",
-    "test:road-stations": "node --experimental-strip-types --test tests/road-gas-stations.test.ts",
-    "test:gas-prices": "node --experimental-strip-types --test tests/gas-prices.test.ts",
-    "test:fuel-cards": "node --experimental-strip-types --test tests/fuel-cards.test.ts",
-    "test:gas-stations": "node --experimental-strip-types --test tests/gas-stations.test.ts",
-    "test:map-icons-cluster": "node --experimental-strip-types --test tests/map-icons-cluster.test.ts",
-    "test:gas-queues": "node --experimental-strip-types --test tests/gas-queues.test.ts"
+    "astro": "astro"
   },
   "dependencies": {
     "@astrojs/node": "^11.0.2",

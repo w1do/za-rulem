@@ -1,0 +1,677 @@
+/* Полноширинная карта заявок: метки с ценником, пульсация по срочности и плавающие панели. */
+
+.request-map {
+	position: relative;
+	width: 100%;
+	height: clamp(520px, 72vh, 820px);
+	overflow: hidden;
+	/* Светлая подложка под тайлами: пока карта грузится, блок не выглядит «чёрным экраном». */
+	background: #e6eaf0;
+}
+
+.request-map__canvas {
+	width: 100%;
+	height: 100%;
+	cursor: crosshair;
+}
+
+.request-map__hint {
+	position: absolute;
+	top: 16px;
+	left: 50%;
+	z-index: 500;
+	transform: translateX(-50%);
+	padding: 10px 18px;
+	border-radius: 999px;
+	background: rgba(15, 23, 42, 0.88);
+	color: #f8fafc;
+	font-size: 14px;
+	line-height: 1.3;
+	text-align: center;
+	pointer-events: none;
+}
+
+.request-map__stations-hint {
+	position: absolute;
+	top: 72px;
+	right: 16px;
+	z-index: 500;
+	max-width: min(300px, calc(100% - 32px));
+	margin: 0;
+	padding: 10px 14px;
+	border-radius: 14px;
+	background: rgba(255, 255, 255, 0.94);
+	box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+	color: #0f172a;
+	font-size: 13px;
+	line-height: 1.4;
+	pointer-events: none;
+}
+
+@media (max-width: 767px) {
+	.request-map__stations-hint {
+		display: none;
+	}
+}
+
+.request-map__panel {
+	position: absolute;
+	top: 72px;
+	left: 16px;
+	z-index: 500;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	width: min(340px, calc(100% - 32px));
+	max-height: calc(100% - 96px);
+	padding: 16px;
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.96);
+	box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+	overflow: hidden;
+}
+
+.request-map__panel-title {
+	margin: 0;
+	font-size: 16px;
+	font-weight: 700;
+	color: #0f172a;
+}
+
+.request-map__filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.request-map__filter {
+	padding: 6px 12px;
+	border: 1px solid #e2e8f0;
+	border-radius: 999px;
+	background: #fff;
+	color: #334155;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.request-map__filter:hover {
+	border-color: #cbd5f5;
+}
+
+.request-map__filter[aria-pressed='true'] {
+	border-color: transparent;
+	background: var(--filter-color, #0f172a);
+	color: #fff;
+	font-weight: 600;
+}
+
+.request-map__list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	overflow-y: auto;
+}
+
+.request-map__empty {
+	margin: 0;
+	color: #64748b;
+	font-size: 14px;
+}
+
+.request-card {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid #e2e8f0;
+	border-left: 4px solid var(--card-color, #94a3b8);
+	border-radius: 12px;
+	background: #fff;
+	text-align: left;
+	cursor: pointer;
+}
+
+.request-card:hover {
+	border-color: #cbd5f5;
+	box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
+
+.request-card__top {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.request-card__price {
+	font-size: 16px;
+	font-weight: 700;
+	color: #0f172a;
+	white-space: nowrap;
+}
+
+.request-card__urgency {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--card-color, #64748b);
+}
+
+.request-card__tariff {
+	font-size: 13px;
+	color: #334155;
+}
+
+.request-card__message {
+	margin: 0;
+	color: #64748b;
+	font-size: 12px;
+	line-height: 1.4;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.request-map__cta {
+	position: absolute;
+	right: 16px;
+	bottom: 24px;
+	z-index: 500;
+	padding: 14px 22px;
+	border: none;
+	border-radius: 999px;
+	background: #f5b754;
+	color: #111827;
+	font-size: 15px;
+	font-weight: 700;
+	box-shadow: 0 12px 28px rgba(15, 23, 42, 0.3);
+	cursor: pointer;
+}
+
+.request-map__cta:hover {
+	background: #eaa63c;
+}
+
+/* --- Метки на карте --- */
+
+.request-pin-icon {
+	background: none;
+	border: none;
+}
+
+.request-pin {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 132px;
+}
+
+.request-pin__wave {
+	position: absolute;
+	bottom: 4px;
+	left: 50%;
+	width: 34px;
+	height: 34px;
+	margin-left: -17px;
+	border-radius: 50%;
+	background: var(--pin-color);
+	opacity: 0.55;
+}
+
+.request-pin__dot {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	order: 2;
+	width: 34px;
+	height: 34px;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	background: var(--pin-color);
+	font-size: 16px;
+	line-height: 1;
+	box-shadow: 0 4px 10px rgba(15, 23, 42, 0.35);
+}
+
+.request-pin__price {
+	position: relative;
+	order: 1;
+	margin-bottom: 4px;
+	padding: 4px 10px;
+	border-radius: 999px;
+	background: var(--pin-color);
+	color: #fff;
+	font-size: 13px;
+	font-weight: 700;
+	white-space: nowrap;
+	box-shadow: 0 4px 10px rgba(15, 23, 42, 0.28);
+}
+
+.request-pin--draft .request-pin__price {
+	background: #0f172a;
+}
+
+/* Три уровня пульсации: чем срочнее заявка, тем заметнее метка. */
+
+.pulse-urgent-red {
+	animation: pulseRed 1.2s infinite;
+}
+
+.pulse-medium-yellow {
+	animation: pulseYellow 2s infinite;
+}
+
+.pulse-subtle-green {
+	animation: pulseGreen 3.2s infinite;
+}
+
+@keyframes pulseRed {
+	0% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8);
+	}
+	70% {
+		transform: scale(1.08);
+		box-shadow: 0 0 0 16px rgba(239, 68, 68, 0);
+	}
+	100% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+	}
+}
+
+@keyframes pulseYellow {
+	0% {
+		transform: scale(0.97);
+		box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6);
+	}
+	70% {
+		transform: scale(1.04);
+		box-shadow: 0 0 0 11px rgba(245, 158, 11, 0);
+	}
+	100% {
+		transform: scale(0.97);
+		box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+	}
+}
+
+@keyframes pulseGreen {
+	0% {
+		transform: scale(0.99);
+		box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.35);
+	}
+	70% {
+		transform: scale(1.02);
+		box-shadow: 0 0 0 7px rgba(34, 197, 94, 0);
+	}
+	100% {
+		transform: scale(0.99);
+		box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pulse-urgent-red,
+	.pulse-medium-yellow,
+	.pulse-subtle-green {
+		animation: none;
+	}
+}
+
+/* --- Модальное окно заявки --- */
+
+.request-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 2000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 16px;
+	background: rgba(15, 23, 42, 0.6);
+}
+
+.request-modal__dialog {
+	width: min(560px, 100%);
+	max-height: 92vh;
+	padding: 24px;
+	border-radius: 20px;
+	background: #fff;
+	overflow-y: auto;
+}
+
+.request-modal__header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+
+.request-modal__title {
+	margin: 0;
+	font-size: 20px;
+	font-weight: 700;
+	color: #0f172a;
+}
+
+.request-modal__subtitle {
+	margin: 4px 0 0;
+	color: #64748b;
+	font-size: 13px;
+}
+
+.request-modal__close {
+	flex: none;
+	width: 36px;
+	height: 36px;
+	border: none;
+	border-radius: 50%;
+	background: #f1f5f9;
+	color: #334155;
+	font-size: 18px;
+	cursor: pointer;
+}
+
+.request-modal__field {
+	margin-bottom: 16px;
+}
+
+.request-modal__label {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #334155;
+}
+
+.request-modal__options {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 8px;
+}
+
+.request-modal__option {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 10px 12px;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	background: #fff;
+	text-align: left;
+	cursor: pointer;
+}
+
+.request-modal__option[aria-pressed='true'] {
+	border-color: var(--option-color, #0f172a);
+	background: color-mix(in srgb, var(--option-color, #0f172a) 8%, #fff);
+}
+
+.request-modal__option-title {
+	font-size: 14px;
+	font-weight: 600;
+	color: #0f172a;
+}
+
+.request-modal__option-note {
+	font-size: 12px;
+	color: #64748b;
+}
+
+.request-modal__input,
+.request-modal__textarea {
+	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid #cbd5e1;
+	border-radius: 10px;
+	font-size: 14px;
+	color: #0f172a;
+}
+
+.request-modal__textarea {
+	min-height: 96px;
+	resize: vertical;
+}
+
+.request-modal__error {
+	margin: 6px 0 0;
+	color: #dc2626;
+	font-size: 12px;
+}
+
+.request-modal__total {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 16px;
+	padding: 14px 16px;
+	border-radius: 14px;
+	background: #f8fafc;
+}
+
+.request-modal__total-price {
+	font-size: 24px;
+	font-weight: 800;
+	color: #0f172a;
+}
+
+.request-modal__total-note {
+	font-size: 12px;
+	color: #64748b;
+}
+
+.request-modal__submit {
+	width: 100%;
+	padding: 14px;
+	border: none;
+	border-radius: 12px;
+	background: #f5b754;
+	color: #111827;
+	font-size: 16px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.request-modal__submit:disabled {
+	opacity: 0.6;
+	cursor: progress;
+}
+
+.request-modal__status {
+	margin: 12px 0 0;
+	font-size: 14px;
+}
+
+.request-modal__status--error {
+	color: #dc2626;
+}
+
+.request-modal__status--success {
+	color: #059669;
+}
+
+/* --- Карточка просмотра заявки --- */
+
+.request-details {
+	position: absolute;
+	right: 16px;
+	bottom: 88px;
+	z-index: 600;
+	width: min(320px, calc(100% - 32px));
+	padding: 16px;
+	border-radius: 16px;
+	border-top: 4px solid var(--details-color, #0f172a);
+	background: #fff;
+	box-shadow: 0 18px 40px rgba(15, 23, 42, 0.28);
+}
+
+.request-details__close {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	width: 28px;
+	height: 28px;
+	border: none;
+	border-radius: 50%;
+	background: #f1f5f9;
+	cursor: pointer;
+}
+
+.request-details__price {
+	margin: 0;
+	font-size: 22px;
+	font-weight: 800;
+	color: #0f172a;
+}
+
+.request-details__urgency {
+	display: inline-block;
+	margin: 6px 0;
+	padding: 3px 10px;
+	border-radius: 999px;
+	background: var(--details-color, #0f172a);
+	color: #fff;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.request-details__tariff {
+	margin: 0 0 6px;
+	font-size: 14px;
+	font-weight: 600;
+	color: #334155;
+}
+
+.request-details__message {
+	margin: 0 0 12px;
+	color: #475569;
+	font-size: 13px;
+	line-height: 1.45;
+}
+
+.request-details__call {
+	display: block;
+	width: 100%;
+	padding: 12px;
+	border: none;
+	border-radius: 12px;
+	background: #16a34a;
+	color: #fff;
+	font-size: 15px;
+	font-weight: 700;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.request-details__call:hover {
+	background: #15803d;
+	color: #fff;
+}
+
+.request-details__no-phone {
+	margin: 0;
+	color: #64748b;
+	font-size: 12px;
+}
+
+/* --- Модальное окно звонка --- */
+
+.call-modal {
+	width: min(480px, 100%);
+}
+
+.call-modal__button {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	padding: 18px 20px;
+	border-radius: 16px;
+	background: #16a34a;
+	color: #fff;
+	text-align: center;
+	text-decoration: none;
+	box-shadow: 0 12px 28px rgba(22, 163, 74, 0.32);
+}
+
+.call-modal__button:hover,
+.call-modal__button:focus-visible {
+	background: #15803d;
+	color: #fff;
+}
+
+.call-modal__button-label {
+	font-size: 15px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+}
+
+.call-modal__button-phone {
+	font-size: 26px;
+	font-weight: 800;
+	line-height: 1.2;
+}
+
+.call-modal__hint {
+	margin: 14px 0 10px;
+	color: #475569;
+	font-size: 13px;
+}
+
+.call-modal__rules {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 8px;
+}
+
+.call-modal__rules li {
+	position: relative;
+	padding: 10px 12px 10px 34px;
+	border-radius: 12px;
+	background: #f8fafc;
+	color: #334155;
+	font-size: 13px;
+	line-height: 1.45;
+}
+
+.call-modal__rules li::before {
+	content: '✓';
+	position: absolute;
+	top: 10px;
+	left: 12px;
+	color: #16a34a;
+	font-weight: 700;
+}
+
+@media (max-width: 767px) {
+	.call-modal__button-phone {
+		font-size: 22px;
+	}
+
+	.request-map {
+		height: clamp(460px, 78vh, 720px);
+	}
+
+	.request-map__panel {
+		top: auto;
+		bottom: 88px;
+		left: 16px;
+		max-height: 42%;
+	}
+
+	.request-details {
+		bottom: 16px;
+	}
+}

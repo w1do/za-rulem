@@ -1,0 +1,145 @@
+---
+/**
+ * Слайдер карточек «в каких ситуациях пригодится сервис».
+ * Инициализируется глобальным Swiper из `public/js/swiper-bundle.min.js`.
+ */
+
+export interface ReasonSlide {
+	icon: string;
+	title: string;
+	text: string;
+}
+
+export interface Props {
+	title: string;
+	lead?: string;
+	slides: ReasonSlide[];
+}
+
+const { title, lead, slides } = Astro.props;
+---
+
+<section class="reasons-slider-section">
+	<div class="container">
+		<div class="reasons-slider-head">
+			<h2>{title}</h2>
+			{lead && <p>{lead}</p>}
+		</div>
+
+		<div class="reasons-slider">
+			<div class="swiper" data-cursor-text="Перетащить">
+				<div class="swiper-wrapper">
+					{slides.map((slide) => (
+						<div class="swiper-slide">
+							<article class="reason-card">
+								<span class="reason-card__icon" aria-hidden="true">{slide.icon}</span>
+								<h3>{slide.title}</h3>
+								<p>{slide.text}</p>
+							</article>
+						</div>
+					))}
+				</div>
+			</div>
+			<div class="reasons-pagination"></div>
+		</div>
+	</div>
+</section>
+
+<script is:inline>
+	(function () {
+		var initReasonsSlider = function () {
+			var root = document.querySelector('.reasons-slider .swiper');
+			if (!root || !window.Swiper) return false;
+
+			new window.Swiper(root, {
+				slidesPerView: 1,
+				spaceBetween: 24,
+				speed: 700,
+				loop: true,
+				autoplay: { delay: 4500 },
+				pagination: { el: '.reasons-pagination', clickable: true },
+				breakpoints: {
+					576: { slidesPerView: 2 },
+					992: { slidesPerView: 3 },
+					1300: { slidesPerView: 4 },
+				},
+			});
+
+			return true;
+		};
+
+		if (!initReasonsSlider()) {
+			// Swiper подключён с `defer`, поэтому ждём готовности страницы.
+			var attempts = 0;
+			var timer = window.setInterval(function () {
+				attempts += 1;
+				if (initReasonsSlider() || attempts > 40) window.clearInterval(timer);
+			}, 150);
+		}
+	})();
+</script>
+
+<style>
+	.reasons-slider-section {
+		padding: 48px 0 8px;
+		margin-bottom: 56px;
+	}
+
+	.reasons-slider-head {
+		max-width: 760px;
+		margin-bottom: 28px;
+	}
+
+	.reasons-slider-head h2 {
+		margin-bottom: 10px;
+		font-size: 32px;
+	}
+
+	.reasons-slider-head p {
+		margin-bottom: 0;
+	}
+
+	.reasons-slider .swiper-slide {
+		height: auto;
+	}
+
+	.reason-card {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		height: 100%;
+		padding: 26px 24px;
+		border-radius: 20px;
+		background: var(--secondary-color);
+		box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+	}
+
+	.reason-card__icon {
+		font-size: 30px;
+		line-height: 1;
+	}
+
+	.reason-card h3 {
+		margin: 0;
+		font-size: 19px;
+	}
+
+	.reason-card p {
+		margin: 0;
+		font-size: 15px;
+		line-height: 1.55;
+	}
+
+	.reasons-pagination {
+		display: flex;
+		justify-content: center;
+		gap: 8px;
+		margin-top: 24px;
+	}
+
+	@media (max-width: 767px) {
+		.reasons-slider-head h2 {
+			font-size: 26px;
+		}
+	}
+</style>

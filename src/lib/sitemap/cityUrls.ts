@@ -11,6 +11,7 @@ const CITY_PATHS = [
 	'/ceny-na-benzin',
 	'/ochered-na-azs',
 	'/queue',
+	'/avtopomoshch',
 	'/drivers',
 	'/calculator',
 	'/partners',
