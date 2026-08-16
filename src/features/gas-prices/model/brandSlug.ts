@@ -18,6 +18,52 @@ export const toLatinBrandSlug = (value: string): string => {
 		.replace(/^-+|-+$/g, '');
 };
 
+/**
+ * Родовые слова в названии точки 2GIS («АЗС», «заправочная станция») не являются
+ * частью бренда и мешают собрать один slug для всей сети.
+ */
+const GENERIC_SUFFIX =
+	/[\s,-]*(?:азс|азк|агзс|агнкс|автозаправочная станция|автозаправочный комплекс|заправочная станция|заправка)$/iu;
+
+/**
+ * Транслитерация даёт технически верный, но неанглийский slug («lukoyl», «gazoyl»).
+ * Для известных сетей фиксируем принятое латинское написание бренда.
+ */
+const CANONICAL_BRAND_SLUGS: Record<string, string> = {
+	лукойл: 'lukoil',
+	lukoyl: 'lukoil',
+	теболойл: 'teboil',
+	газойл: 'gazoil',
+	'калина-ойл': 'kalina-oil',
+	'калина ойл': 'kalina-oil',
+	топлайн: 'topline',
+	флэш: 'flash',
+	флеш: 'flash',
+	ирбис: 'irbis',
+	атан: 'atan',
+	кондор: 'kondor',
+	сигнал: 'signal',
+	'нефтьмагистраль-ойл': 'neftmagistral-oil',
+	газпромнефть: 'gazpromneft',
+	'газпром нефть': 'gazpromneft',
+};
+
+/**
+ * Единый английский slug сети: используется и как `stations.brand`,
+ * и как `gas_daily.brand_slug`, поэтому вычисляется только здесь.
+ */
+export const canonicalBrandSlug = (value: string): string => {
+	const cleaned = decodeSlug(value)
+		.toLowerCase()
+		.replaceAll('ё', 'е')
+		.replace(/[«»"']/g, '')
+		.replace(GENERIC_SUFFIX, '')
+		.trim();
+	if (!cleaned) return '';
+	const canonical = CANONICAL_BRAND_SLUGS[cleaned] ?? CANONICAL_BRAND_SLUGS[toLatinBrandSlug(cleaned)];
+	return canonical ?? toLatinBrandSlug(cleaned);
+};
+
 /** Astro отдаёт параметр маршрута percent-encoded, если пользователь пришёл по кириллическому URL. */
 export const decodeSlug = (value: string): string => {
 	try {

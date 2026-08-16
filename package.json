@@ -10,7 +10,10 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "directus:slugs": "node --experimental-strip-types scripts/directus-slugs.ts"
+    "directus:slugs": "node --experimental-strip-types scripts/directus-slugs.ts",
+    "workflow:sync": "node scripts/sync-workflow-nodes.mjs",
+    "workflow:check": "node scripts/sync-workflow-nodes.mjs --check",
+    "test": "node --experimental-strip-types --test tests/*.test.ts"
   },
   "dependencies": {
     "@astrojs/node": "^11.0.2",

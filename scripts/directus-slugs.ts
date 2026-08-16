@@ -1,6 +1,7 @@
 /**
  * Проставляет латинские slug в Directus:
  * - `stations.slug` — уникальный латинский идентификатор конкретной АЗС;
+ * - `stations.brand` — английский slug сети (кириллица приводится к канону);
  * - `gas_daily.brand_slug` — латинский slug сети (кириллица транслитерируется).
  *
  * Скрипт идемпотентен: уже латинские значения не переписываются.
@@ -13,7 +14,7 @@
  *   npm run directus:slugs
  */
 import { readFileSync } from 'node:fs';
-import { toLatinBrandSlug } from '../src/features/gas-prices/model/brandSlug.ts';
+import { canonicalBrandSlug, toLatinBrandSlug } from '../src/features/gas-prices/model/brandSlug.ts';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const BATCH_SIZE = 100;
@@ -141,26 +142,37 @@ const syncStationSlugs = async (): Promise<void> => {
 	await patchBatch('stations', updates);
 };
 
+/** Бренд станции — технический slug сети, поэтому хранится по-английски. */
+const syncStationBrands = async (): Promise<void> => {
+	const stations = await readItems('stations', 'id,brand');
+	const updates = stations.flatMap((station) => {
+		const current = stringValue(station.brand);
+		const brand = canonicalBrandSlug(current);
+		return brand && brand !== current ? [{ id: station.id, data: { brand } }] : [];
+	});
+
+	console.log(`stations: требуют английского бренда ${updates.length}`);
+	await patchBatch('stations', updates);
+};
+
 const syncBrandSlugs = async (): Promise<void> => {
 	const snapshots = await readItems('gas_daily', 'id,brand_slug');
-	const updates = snapshots
-		.filter((snapshot) => stringValue(snapshot.brand_slug) && !isLatinSlug(snapshot.brand_slug))
-		.map((snapshot) => ({
-			id: snapshot.id,
-			data: { brand_slug: toLatinBrandSlug(stringValue(snapshot.brand_slug)) },
-		}))
-		.filter((update) => stringValue(update.data.brand_slug));
-
+	/** Slug сети в снимках и в `stations.brand` обязан совпадать: по нему строятся страницы сетей. */
 	const mapping = new Map<string, string>();
-	for (const snapshot of snapshots) {
+	const updates = snapshots.flatMap((snapshot) => {
 		const source = stringValue(snapshot.brand_slug);
-		if (source && !isLatinSlug(source)) mapping.set(source, toLatinBrandSlug(source));
-	}
-	console.log(`gas_daily: всего ${snapshots.length}, требуют транслитерации ${updates.length}`);
+		const brandSlug = canonicalBrandSlug(source);
+		if (!brandSlug || brandSlug === source) return [];
+		mapping.set(source, brandSlug);
+		return [{ id: snapshot.id, data: { brand_slug: brandSlug } }];
+	});
+
+	console.log(`gas_daily: всего ${snapshots.length}, требуют нормализации ${updates.length}`);
 	for (const [source, latin] of mapping) console.log(`  ${source} → ${latin}`);
 	await patchBatch('gas_daily', updates);
 };
 
 await syncStationSlugs();
+await syncStationBrands();
 await syncBrandSlugs();
 console.log(DRY_RUN ? 'Пробный прогон завершён, данные не изменены.' : 'Готово.');
