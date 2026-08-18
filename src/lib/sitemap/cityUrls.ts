@@ -3,8 +3,8 @@
 // как customPages, чтобы карта городов генерировалась той же интеграцией.
 
 import { readdir } from 'node:fs/promises';
-import { chatFuels } from '../../data/chatCluster';
-import { cities, cityLandingUrl, defaultCity, fuelLandingUrl } from '../../lib/cities';
+import { chatFuels } from '../../data/chatCluster.ts';
+import { cities, cityLandingUrl, defaultCity, fuelLandingUrl } from '../../lib/cities/index.ts';
 
 /** Локальные маршруты, у которых базовый город по-прежнему живёт в корне. */
 const CITY_PATHS = [

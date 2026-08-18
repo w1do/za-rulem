@@ -1,5 +1,5 @@
-import { toNumber, toText } from './parse';
-import type { ChatCity } from './types';
+import { toNumber, toText } from './parse.ts';
+import type { ChatCity } from './types.ts';
 
 /** Запись коллекции `cities` Directus: данные снаружи, поэтому все поля недоверенные. */
 export type CityDto = {

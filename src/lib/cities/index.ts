@@ -1,6 +1,6 @@
-import { fetchCities } from './api';
-import { buildCityUrl } from './routes';
-import type { ChatCity } from './types';
+import { fetchCities } from './api.ts';
+import { buildCityUrl } from './routes.ts';
+import type { ChatCity } from './types.ts';
 
 export type { ChatCity };
 export {
@@ -9,12 +9,12 @@ export {
 	isRootOnlyRoute,
 	CITY_PREFIX_REQUIRED_ROUTE_SEGMENTS,
 	ROOT_ONLY_ROUTE_SEGMENTS,
-} from './routes';
+} from './routes.ts';
 export {
 	localizeCityServiceLinks,
 	removeCityPlaceholders,
 	replaceCityPlaceholders,
-} from '../cityText';
+} from '../cityText.ts';
 
 /** Единственный публичный справочник городов, загруженный из Directus. */
 export const cities: ChatCity[] = await fetchCities();

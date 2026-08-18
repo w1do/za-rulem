@@ -7,6 +7,7 @@ import {
 	toStationPricesSnapshot,
 	type StationPricesSnapshot,
 } from './dto';
+import { getOrFetchSwr, safeFetchWithTimeout } from '../../../shared/lib/cache/fileSwrCache';
 
 const DIRECTUS_URL = (
 	process.env.DIRECTUS_URL ||
@@ -16,7 +17,7 @@ const DIRECTUS_URL = (
 ).replace(/\/$/, '');
 
 const DIRECTUS_TOKEN = process.env.DIRECTUS_GAS_PRICES_TOKEN || '';
-const REQUEST_TIMEOUT_MS = 20_000;
+const REQUEST_TIMEOUT_MS = 3_500;
 /** Directus фильтрует по `_in` через query string, поэтому идентификаторы отправляются пачками. */
 const PRICE_ID_CHUNK_SIZE = 100;
 /** Реестр отвечает тем дольше, чем больше id в фильтре, поэтому пачки мельче и идут параллельно. */
@@ -25,9 +26,6 @@ const STATION_ID_CHUNK_SIZE = 50;
 const STATION_REQUEST_CONCURRENCY = 2;
 /** Страница цен и чат-лендинг одного города не должны дублировать выгрузку. */
 const CITY_CACHE_TTL_MS = Number(process.env.GAS_PRICE_CACHE_TTL_MS) || 5 * 60 * 1000;
-
-const cityStationsCache = new Map<string, { stations: StationData[]; fetchedAt: number }>();
-const cityStationsInFlight = new Map<string, Promise<StationData[]>>();
 
 const STATION_FIELDS =
 	'id,status,name,brand,address,lat,lng,fuel_assortment,fuel_statuses,prices,last_transaction_at,closed,queue_level';
@@ -46,7 +44,7 @@ const fetchWithRetry = async (url: string, headers: Headers): Promise<Response> 
 
 	for (let attempt = 0; attempt < 2; attempt += 1) {
 		try {
-			return await fetch(url, { headers, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+			return await safeFetchWithTimeout(url, { headers }, REQUEST_TIMEOUT_MS);
 		} catch (error) {
 			lastError = error;
 		}
@@ -121,19 +119,28 @@ export const readCityStationPriceHistory = async (
 	citySlug: string,
 	since?: string,
 ): Promise<StationPricesSnapshot[]> => {
-	const params = new URLSearchParams({
-		limit: '-1',
-		fields: STATION_PRICE_FIELDS,
-		sort: '-snapshot_date',
-	});
-	params.set('filter[area_type][_eq]', 'point');
-	params.set('filter[area_parent_slug][_eq]', citySlug);
-	if (since) params.set('filter[snapshot_date][_gte]', since);
+	const timeBucket = since ? since.slice(0, 13) : 'all';
+	return getOrFetchSwr<StationPricesSnapshot[]>({
+		key: `gas-stations:city-price-history:${citySlug}:${timeBucket}`,
+		ttlMs: CITY_CACHE_TTL_MS,
+		staleTtlMs: 7 * 24 * 60 * 60 * 1000,
+		fallback: [],
+		fetcher: async () => {
+			const params = new URLSearchParams({
+				limit: '-1',
+				fields: STATION_PRICE_FIELDS,
+				sort: '-snapshot_date',
+			});
+			params.set('filter[area_type][_eq]', 'point');
+			params.set('filter[area_parent_slug][_eq]', citySlug);
+			if (since) params.set('filter[snapshot_date][_gte]', since);
 
-	const payload = await request(`/items/gas_daily?${params.toString()}`);
-	return readDataItems(payload)
-		.map(toStationPricesSnapshot)
-		.filter((snapshot): snapshot is StationPricesSnapshot => snapshot !== null);
+			const payload = await request(`/items/gas_daily?${params.toString()}`);
+			return readDataItems(payload)
+				.map(toStationPricesSnapshot)
+				.filter((snapshot): snapshot is StationPricesSnapshot => snapshot !== null);
+		},
+	});
 };
 
 const readCityPriceSnapshots = async (
@@ -159,6 +166,7 @@ export const readStationCardsByIds = async (
 	stationIds: string[],
 ): Promise<Map<string, StationData>> => {
 	const stations = new Map<string, StationData>();
+	if (stationIds.length === 0) return stations;
 
 	const batches = chunk(stationIds, STATION_ID_CHUNK_SIZE);
 	const readBatch = async (ids: string[]): Promise<unknown[]> => {
@@ -204,32 +212,6 @@ const withLatestPrices = (
 	};
 };
 
-/**
- * Станции города с актуальными ценами.
- * Источник состава — `gas_daily` (`area_type=point`, `area_parent_slug=<город>`):
- * только там есть свежие цены и надёжная привязка АЗС к городу.
- * Карточки (название, адрес, координаты) добираются из реестра `stations` по `id`.
- */
-export const readCityStations = async (citySlug: string): Promise<StationData[]> => {
-	if (!citySlug) return [];
-
-	const cached = cityStationsCache.get(citySlug);
-	if (cached && Date.now() - cached.fetchedAt <= CITY_CACHE_TTL_MS) return cached.stations;
-
-	const pending = cityStationsInFlight.get(citySlug);
-	if (pending) return pending;
-
-	const request = readCityStationsFromDirectus(citySlug)
-		.then((stations) => {
-			cityStationsCache.set(citySlug, { stations, fetchedAt: Date.now() });
-			return stations;
-		})
-		.finally(() => cityStationsInFlight.delete(citySlug));
-
-	cityStationsInFlight.set(citySlug, request);
-	return request;
-};
-
 const readCityStationsFromDirectus = async (citySlug: string): Promise<StationData[]> => {
 	const snapshots = await readCityPriceSnapshots(citySlug);
 	if (snapshots.size === 0) return [];
@@ -243,28 +225,56 @@ const readCityStationsFromDirectus = async (citySlug: string): Promise<StationDa
 };
 
 /**
+ * Станции города с актуальными ценами.
+ * Источник состава — `gas_daily` (`area_type=point`, `area_parent_slug=<город>`):
+ * только там есть свежие цены и надёжная привязка АЗС к городу.
+ * Карточки (название, адрес, координаты) добираются из реестра `stations` по `id`.
+ */
+export const readCityStations = async (citySlug: string): Promise<StationData[]> => {
+	if (!citySlug) return [];
+
+	return getOrFetchSwr<StationData[]>({
+		key: `gas-stations:city:${citySlug}`,
+		ttlMs: CITY_CACHE_TTL_MS,
+		staleTtlMs: 7 * 24 * 60 * 60 * 1000,
+		fallback: [],
+		fetcher: () => readCityStationsFromDirectus(citySlug),
+	});
+};
+
+/**
  * Читает станции единого реестра Directus `stations` в границах карты
  * и дополняет их последними ценами из `gas_daily`. Используется там, где город неизвестен
  * (участки трасс). Для городских страниц предпочтителен `readCityStations`.
  */
 export const readStations = async (bounds: MapBounds): Promise<StationData[]> => {
-	const params = new URLSearchParams({
-		limit: '-1',
-		fields: STATION_FIELDS,
-		'filter[lat][_between]': `${bounds.minLat},${bounds.maxLat}`,
-		'filter[lng][_between]': `${bounds.minLon},${bounds.maxLon}`,
+	const boundsKey = `${bounds.minLat.toFixed(2)}:${bounds.maxLat.toFixed(2)}:${bounds.minLon.toFixed(2)}:${bounds.maxLon.toFixed(2)}`;
+
+	return getOrFetchSwr<StationData[]>({
+		key: `gas-stations:bounds:${boundsKey}`,
+		ttlMs: CITY_CACHE_TTL_MS,
+		staleTtlMs: 7 * 24 * 60 * 60 * 1000,
+		fallback: [],
+		fetcher: async () => {
+			const params = new URLSearchParams({
+				limit: '-1',
+				fields: STATION_FIELDS,
+				'filter[lat][_between]': `${bounds.minLat},${bounds.maxLat}`,
+				'filter[lng][_between]': `${bounds.minLon},${bounds.maxLon}`,
+			});
+
+			const payload = await request(`/items/stations?${params.toString()}`);
+			const stations = readDataItems(payload).filter(isDirectusStation).map(toStationData);
+			if (stations.length === 0) return stations;
+
+			try {
+				const prices = await readLatestStationPrices(stations.map((item) => item.station.id));
+				return stations.map((station) => withLatestPrices(station, prices.get(station.station.id)));
+			} catch (error) {
+				// Цены снимков — дополнение к реестру: без них карта показывает данные самой станции.
+				console.warn('[gas-stations] Failed to read gas_daily point prices:', error);
+				return stations;
+			}
+		},
 	});
-
-	const payload = await request(`/items/stations?${params.toString()}`);
-	const stations = readDataItems(payload).filter(isDirectusStation).map(toStationData);
-	if (stations.length === 0) return stations;
-
-	try {
-		const prices = await readLatestStationPrices(stations.map((item) => item.station.id));
-		return stations.map((station) => withLatestPrices(station, prices.get(station.station.id)));
-	} catch (error) {
-		// Цены снимков — дополнение к реестру: без них карта показывает данные самой станции.
-		console.warn('[gas-stations] Failed to read gas_daily point prices:', error);
-		return stations;
-	}
 };

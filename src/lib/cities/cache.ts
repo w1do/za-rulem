@@ -1,11 +1,10 @@
 import { CACHE_TTL_MS } from './config';
 import type { ChatCity } from './types';
+import { readSwrEntry, writeSwrEntry } from '../../shared/lib/cache/fileSwrCache';
+
+const SWR_CITIES_KEY = 'cities:published';
 
 type CitiesCache = {
-	/** Последний успешный ответ Directus. */
-	cities: ChatCity[] | null;
-	/** Момент записи `cities`, мс. */
-	storedAt: number;
 	/** Запрос в полёте: параллельные рендеры ждут его вместо своего запроса. */
 	inFlight: Promise<ChatCity[]> | null;
 };
@@ -15,23 +14,25 @@ type CitiesCache = {
 const CACHE_KEY = '__zaRulemCitiesCache';
 const globalScope = globalThis as typeof globalThis & { [CACHE_KEY]?: CitiesCache };
 const cache: CitiesCache = (globalScope[CACHE_KEY] ??= {
-	cities: null,
-	storedAt: 0,
 	inFlight: null,
 });
 
 /** Свежий список или null: null означает, что нужен новый запрос. */
 export const readFreshCities = (): ChatCity[] | null => {
-	if (cache.cities === null || CACHE_TTL_MS <= 0) return null;
-	return Date.now() - cache.storedAt < CACHE_TTL_MS ? cache.cities : null;
+	if (CACHE_TTL_MS <= 0) return null;
+	const entry = readSwrEntry<ChatCity[]>(SWR_CITIES_KEY);
+	if (!entry || !entry.data) return null;
+	return Date.now() - entry.storedAt < CACHE_TTL_MS ? entry.data : null;
 };
 
 /** Последний успешный список независимо от свежести: используется при ошибке Directus. */
-export const readStaleCities = (): ChatCity[] | null => cache.cities;
+export const readStaleCities = (): ChatCity[] | null => {
+	const entry = readSwrEntry<ChatCity[]>(SWR_CITIES_KEY);
+	return entry ? entry.data : null;
+};
 
 export const storeCities = (cities: ChatCity[]): void => {
-	cache.cities = cities;
-	cache.storedAt = Date.now();
+	writeSwrEntry(SWR_CITIES_KEY, cities);
 };
 
 export const readInFlight = (): Promise<ChatCity[]> | null => cache.inFlight;

@@ -1,5 +1,6 @@
 import type { RoadSegment, RoadSegmentPrices } from '../model/types';
 import { readDataItems, toRoadSegment, toRoadSegmentPrices } from './dto';
+import { getOrFetchSwr, safeFetchWithTimeout } from '../../../shared/lib/cache/fileSwrCache';
 
 const DIRECTUS_URL = (
 	process.env.DIRECTUS_URL ||
@@ -9,7 +10,8 @@ const DIRECTUS_URL = (
 ).replace(/\/$/, '');
 
 const DIRECTUS_TOKEN = process.env.DIRECTUS_GAS_PRICES_TOKEN || '';
-const REQUEST_TIMEOUT_MS = 10_000;
+const REQUEST_TIMEOUT_MS = 3_000;
+const CACHE_TTL_MS = 10 * 60 * 1000;
 
 /**
  * Directus обрывает соединение при массовой генерации участков, поэтому сетевая ошибка
@@ -19,7 +21,7 @@ const REQUEST_TIMEOUT_MS = 10_000;
 const requestWithRetry = async (url: string, headers: Headers): Promise<Response | null> => {
 	for (let attempt = 0; attempt < 2; attempt += 1) {
 		try {
-			return await fetch(url, { headers, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+			return await safeFetchWithTimeout(url, { headers }, REQUEST_TIMEOUT_MS);
 		} catch (error) {
 			console.warn(
 				`[road-segments] Directus request failed (attempt ${attempt + 1}):`,
@@ -51,15 +53,23 @@ const request = async (path: string): Promise<unknown> => {
  * полей приводил бы к 403 и потере всех страниц участков.
  */
 export const readRoadSegments = async (): Promise<RoadSegment[]> => {
-	const params = new URLSearchParams({
-		limit: '-1',
-		fields: '*',
-		'filter[status][_eq]': 'published',
+	return getOrFetchSwr<RoadSegment[]>({
+		key: 'road-segments:published',
+		ttlMs: CACHE_TTL_MS,
+		staleTtlMs: 7 * 24 * 60 * 60 * 1000,
+		fallback: [],
+		fetcher: async () => {
+			const params = new URLSearchParams({
+				limit: '-1',
+				fields: '*',
+				'filter[status][_eq]': 'published',
+			});
+			const payload = await request(`/items/road_segments?${params.toString()}`);
+			return readDataItems(payload)
+				.map(toRoadSegment)
+				.filter((segment): segment is RoadSegment => segment !== null);
+		},
 	});
-	const payload = await request(`/items/road_segments?${params.toString()}`);
-	return readDataItems(payload)
-		.map(toRoadSegment)
-		.filter((segment): segment is RoadSegment => segment !== null);
 };
 
 const parsePrices = (payload: unknown): RoadSegmentPrices[] =>
@@ -69,12 +79,21 @@ const parsePrices = (payload: unknown): RoadSegmentPrices[] =>
 
 /** Снимки цен участков хранятся в единой коллекции `gas_daily` (`area_type = road`). */
 export const readSegmentPrices = async (segmentSlug: string): Promise<RoadSegmentPrices[]> => {
-	const params = new URLSearchParams({
-		limit: '1000',
-		fields: 'id,area_type,area_slug,brand_slug,snapshot_date,station_count,source_updated_at,fuel_prices,date_created',
-		sort: '-snapshot_date',
-		'filter[area_type][_eq]': 'road',
-		'filter[area_slug][_eq]': segmentSlug,
+	return getOrFetchSwr<RoadSegmentPrices[]>({
+		key: `road-segments:prices:${segmentSlug}`,
+		ttlMs: 5 * 60 * 1000,
+		staleTtlMs: 7 * 24 * 60 * 60 * 1000,
+		fallback: [],
+		fetcher: async () => {
+			const params = new URLSearchParams({
+				limit: '1000',
+				fields:
+					'id,area_type,area_slug,brand_slug,snapshot_date,station_count,source_updated_at,fuel_prices,date_created',
+				sort: '-snapshot_date',
+				'filter[area_type][_eq]': 'road',
+				'filter[area_slug][_eq]': segmentSlug,
+			});
+			return parsePrices(await request(`/items/gas_daily?${params.toString()}`));
+		},
 	});
-	return parsePrices(await request(`/items/gas_daily?${params.toString()}`));
 };

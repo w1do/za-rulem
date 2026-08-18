@@ -10,35 +10,14 @@ import type {
 	CityStationRankingData,
 	RankingKind,
 } from './model/types';
+import { getOrFetchSwr } from '../../shared/lib/cache/fileSwrCache';
 
 const HISTORY_WINDOW_MS = 48 * 60 * 60 * 1000;
 const CACHE_TTL_MS = 5 * 60 * 1000;
-const EMPTY_CACHE_TTL_MS = 60 * 1000;
 const CATALOG_MAX_PRICE_AGE_MS = 24 * 60 * 60 * 1000;
 const CATALOG_MAX_FUTURE_SKEW_MS = 60 * 60 * 1000;
 const MIN_CORE_FUEL_SAMPLES = 3;
 const CATALOG_RANKING_CONCURRENCY = 3;
-
-interface RankingCacheEntry {
-	expiresAt: number;
-	data: CityStationRankingData;
-}
-
-interface RankingState {
-	cache: Map<string, RankingCacheEntry>;
-	pending: Map<string, Promise<CityStationRankingData>>;
-	catalog?: { expiresAt: number; data: AzsCityCatalogItem[] };
-	catalogPending?: Promise<AzsCityCatalogItem[]>;
-}
-
-const globalScope = globalThis as typeof globalThis & {
-	__zaRulemGasStationRankings?: RankingState;
-};
-
-const state = (globalScope.__zaRulemGasStationRankings ??= {
-	cache: new Map(),
-	pending: new Map(),
-});
 
 const buildRanking = async (
 	citySlug: string,
@@ -58,29 +37,21 @@ export const getCityStationRanking = async (
 	kind: RankingKind,
 	now = Date.now(),
 ): Promise<CityStationRankingData> => {
-	const key = `${citySlug}:${kind}`;
-	const cached = state.cache.get(key);
-	if (cached && cached.expiresAt > Date.now()) return cached.data;
-
-	const pending = state.pending.get(key);
-	if (pending) return pending;
-
-	const request = buildRanking(citySlug, kind, now)
-		.catch((error) => {
-			console.warn(`[gas-station-rankings] Ranking unavailable for ${key}:`, error);
-			return emptyCityStationRanking(citySlug, kind);
-		})
-		.then((data) => {
-			state.cache.set(key, {
-				expiresAt: Date.now() + (data.totalStations > 0 ? CACHE_TTL_MS : EMPTY_CACHE_TTL_MS),
-				data,
-			});
-			return data;
-		})
-		.finally(() => state.pending.delete(key));
-
-	state.pending.set(key, request);
-	return request;
+	const key = `gas-station-rankings:city:${citySlug}:${kind}`;
+	return getOrFetchSwr<CityStationRankingData>({
+		key,
+		ttlMs: CACHE_TTL_MS,
+		staleTtlMs: 7 * 24 * 60 * 60 * 1000,
+		fallback: emptyCityStationRanking(citySlug, kind),
+		fetcher: async () => {
+			try {
+				return await buildRanking(citySlug, kind, now);
+			} catch (error) {
+				console.warn(`[gas-station-rankings] Ranking unavailable for ${key}:`, error);
+				return emptyCityStationRanking(citySlug, kind);
+			}
+		},
+	});
 };
 
 const isRecent = (value: string, now: number): boolean => {
@@ -141,27 +112,20 @@ const buildAzsCityCatalog = async (now: number): Promise<AzsCityCatalogItem[]> =
 };
 
 export const getAzsCityCatalog = async (now = Date.now()): Promise<AzsCityCatalogItem[]> => {
-	if (state.catalog && state.catalog.expiresAt > Date.now()) return state.catalog.data;
-	if (state.catalogPending) return state.catalogPending;
-
-	const request = buildAzsCityCatalog(now)
-		.catch((error) => {
-			console.warn('[gas-station-rankings] City catalog unavailable:', error);
-			return [];
-		})
-		.then((data) => {
-			state.catalog = {
-				expiresAt: Date.now() + (data.length > 0 ? CACHE_TTL_MS : EMPTY_CACHE_TTL_MS),
-				data,
-			};
-			return data;
-		})
-		.finally(() => {
-			state.catalogPending = undefined;
-		});
-
-	state.catalogPending = request;
-	return request;
+	return getOrFetchSwr<AzsCityCatalogItem[]>({
+		key: 'gas-station-rankings:catalog',
+		ttlMs: CACHE_TTL_MS,
+		staleTtlMs: 7 * 24 * 60 * 60 * 1000,
+		fallback: [],
+		fetcher: async () => {
+			try {
+				return await buildAzsCityCatalog(now);
+			} catch (error) {
+				console.warn('[gas-station-rankings] City catalog unavailable:', error);
+				return [];
+			}
+		},
+	});
 };
 
 export const getGasStationRankingSitemapUrls = async (site: string): Promise<string[]> => {

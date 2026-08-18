@@ -4,18 +4,37 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import llms from 'astro-llms-md';
 import compress from 'astro-compress';
-
 import node from '@astrojs/node';
 
 const SITE = 'https://za-rulem.org';
 
-const { getCitySitemapUrls, isCitySitemapUrl } = await import('./src/lib/sitemap/cityUrls');
-const { getGasPriceSitemapUrls } = await import('./src/features/gas-prices/server');
-const { getGasStationRankingSitemapUrls } = await import('./src/features/gas-station-rankings/server');
-const { defaultCity } = await import('./src/lib/cities');
-const citySitemapUrls = await getCitySitemapUrls(SITE);
-const gasPriceSitemapUrls = await getGasPriceSitemapUrls(SITE);
-const gasStationRankingSitemapUrls = await getGasStationRankingSitemapUrls(SITE);
+let citySitemapUrls = [];
+let gasPriceSitemapUrls = [];
+let gasStationRankingSitemapUrls = [];
+let defaultCity = { slug: 'tyumen', inCity: 'в Тюмени' };
+let isCitySitemapUrl = (_url) => false;
+
+try {
+  const cityModule = await import('./src/lib/sitemap/cityUrls.ts');
+  const gasPriceModule = await import('./src/features/gas-prices/server.ts');
+  const rankingModule = await import('./src/features/gas-station-rankings/server.ts');
+  const citiesModule = await import('./src/lib/cities/index.ts');
+
+  defaultCity = citiesModule.defaultCity ?? defaultCity;
+  isCitySitemapUrl = cityModule.isCitySitemapUrl;
+
+  const results = await Promise.allSettled([
+    cityModule.getCitySitemapUrls(SITE),
+    gasPriceModule.getGasPriceSitemapUrls(SITE),
+    rankingModule.getGasStationRankingSitemapUrls(SITE),
+  ]);
+
+  if (results[0].status === 'fulfilled') citySitemapUrls = results[0].value;
+  if (results[1].status === 'fulfilled') gasPriceSitemapUrls = results[1].value;
+  if (results[2].status === 'fulfilled') gasStationRankingSitemapUrls = results[2].value;
+} catch (error) {
+  console.warn('[astro.config.mjs] Предупреждение при загрузке динамических URL для sitemap:', error);
+}
 
 // https://astro.build/config
 export default defineConfig({
