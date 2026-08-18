@@ -21,7 +21,12 @@ import HubTestimonials from '../components/hub/HubTestimonials.astro';
 import FuelDeliveryCalculator from '../components/calculators/FuelDeliveryCalculator.tsx';
 import LightChatBox from '../components/driver-chat/LightChatBox.astro';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
-import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../lib/cities';
+import {
+	defaultCity,
+	getCityUrl,
+	localizeCityServiceLinks,
+	replaceCityPlaceholders,
+} from '../lib/cities';
 import type { ChatCity } from '../lib/cities';
 
 export interface Props {
@@ -94,6 +99,12 @@ const pricingItems = (pricing?.items ?? []).map((item: any) => ({
 const approach = frontmatter.approach;
 const whyChoose = frontmatter.whyChoose;
 const showFuelCalculator = cluster === 'toplivo';
+
+const contentHtml = await Astro.slots.render('default');
+const localizedContentHtml = localizeCityServiceLinks(
+	replaceCityPlaceholders(contentHtml, city),
+	city.slug,
+);
 ---
 
 <Layout title={seoTitle} description={seoDescription} keywords={keywords} jsonLd={jsonLd} city={city}>
@@ -106,7 +117,7 @@ const showFuelCalculator = cluster === 'toplivo';
 	/>
 
 	<HubIntro title={replaceCityPlaceholders(frontmatter.title, city)} description={seoDescription} city={city}>
-		<slot />
+		<Fragment set:html={localizedContentHtml} />
 	</HubIntro>
 
 	{
@@ -131,7 +142,7 @@ const showFuelCalculator = cluster === 'toplivo';
 		)
 	}
 
-	<HubServices services={services} />
+	<HubServices services={services} city={city} />
 
 	<HubProcess title={replaceCityPlaceholders(process?.title, city)} steps={steps} />
 

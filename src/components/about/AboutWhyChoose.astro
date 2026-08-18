@@ -1,6 +1,4 @@
 ---
-import { defaultCity, replaceCityPlaceholders } from '../../lib/cities';
-import type { ChatCity } from '../../lib/cities';
 import { Image } from 'astro:assets';
 
 import whyChooseImg1 from '../../assets/images/why-choose-image-1.jpg';
@@ -9,12 +7,6 @@ import author1 from '../../assets/images/author-1.jpg';
 import author2 from '../../assets/images/author-2.jpg';
 import author3 from '../../assets/images/author-3.jpg';
 
-interface Props {
-	city?: ChatCity;
-}
-
-const { city: propCity } = Astro.props;
-const city = propCity ?? defaultCity;
 ---
 
 <!-- Why Choose Us Section Start -->
@@ -26,8 +18,8 @@ const city = propCity ?? defaultCity;
 				<div class="why-choose-content">
 					<!-- Section Title Start -->
 					<div class="section-title">
-						<span class="section-sub-title wow fadeInUp">Почему я</span>
-						<h2 class="text-anime-style-3" data-cursor="-opaque">{replaceCityPlaceholders("Почему мне доверяют техпомощь {inCity}", city)}</h2>
+						<span class="section-sub-title wow fadeInUp">Почему сервис</span>
+						<h2 class="text-anime-style-3" data-cursor="-opaque">Почему водители обращаются в «За рулём»</h2>
 					</div>
 					<!-- Section Title End -->
 
@@ -42,7 +34,7 @@ const city = propCity ?? defaultCity;
 								</div>
 								<div class="why-choose-item-content">
 									<h3>Понятные условия</h3>
-									<p>Я обсуждаю задачу до выезда и не навязываю лишние работы.</p>
+									<p>Условия и стоимость уточняются до подтверждения выезда.</p>
 								</div>
 							</div>
 							<!-- Why Choose Item End -->
@@ -54,7 +46,7 @@ const city = propCity ?? defaultCity;
 								</div>
 								<div class="why-choose-item-content">
 									<h3>Аккуратная работа</h3>
-									<p>Я использую подходящий инструмент и бережно отношусь к автомобилю.</p>
+									<p>Исполнитель получает описание задачи и заранее оценивает необходимое оборудование.</p>
 								</div>
 							</div>
 							<!-- Why Choose Item End -->
@@ -70,7 +62,7 @@ const city = propCity ?? defaultCity;
 								</div>
 								<div class="why-choose-item-content">
 									<h3>Нужные услуги</h3>
-									<p>Я прикуриваю авто, меняю аккумуляторы, отогреваю машины, работаю как автоэлектрик и провожу диагностику.</p>
+									<p>Поиск исполнителей для запуска двигателя, доставки топлива, диагностики и другой дорожной помощи.</p>
 								</div>
 							</div>
 							<!-- Why Choose Item End -->
@@ -81,8 +73,8 @@ const city = propCity ?? defaultCity;
 									<img src="/images/icon-why-choose-item-4.svg" alt="Выезд 24 7" />
 								</div>
 								<div class="why-choose-item-content">
-									<h3>Выезд 24/7</h3>
-									<p>{replaceCityPlaceholders("Я работаю круглосуточно {inCity} и области.", city)}</p>
+									<h3>Заявки 24/7</h3>
+									<p>Отправить обращение можно круглосуточно; доступность исполнителя подтверждается после поиска.</p>
 								</div>
 							</div>
 							<!-- Why Choose Item End -->

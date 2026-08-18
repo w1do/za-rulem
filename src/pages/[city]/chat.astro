@@ -1,11 +1,13 @@
 ---
-import ChatAppPage from '../../components/pages/ChatAppPage.astro';
 import { findCity } from '../../lib/cities';
 
 export const prerender = false;
 
 const city = findCity(Astro.params.city);
 if (!city) return new Response('Город не найден', { status: 404 });
----
 
-<ChatAppPage city={city} />
+const searchParams = new URLSearchParams(Astro.url.searchParams);
+searchParams.set('city', city.slug);
+
+return Astro.redirect(`/chat?${searchParams.toString()}`, 301);
+---

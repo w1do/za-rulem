@@ -12,7 +12,13 @@ import FuelPricesSection from '../components/gas-prices/FuelPricesSection.astro'
 import LightChatBox from '../components/driver-chat/LightChatBox.astro';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
 import type { ChatCity } from '../lib/cities';
-import { defaultCity, replaceCityPlaceholders, removeCityPlaceholders, getCityUrl } from '../lib/cities';
+import {
+	defaultCity,
+	getCityUrl,
+	localizeCityServiceLinks,
+	removeCityPlaceholders,
+	replaceCityPlaceholders,
+} from '../lib/cities';
 
 export interface Props {
 	frontmatter: any;
@@ -65,7 +71,10 @@ const jsonLd = [
 
 // Рендерим контент слота и заменяем плейсхолдеры города в HTML
 const contentHtml = await Astro.slots.render('default');
-const replacedContentHtml = replaceCityPlaceholders(contentHtml, city);
+const replacedContentHtml = localizeCityServiceLinks(
+	replaceCityPlaceholders(contentHtml, city),
+	city.slug,
+);
 ---
 
 <Layout title={seoTitle} description={seoDescription} jsonLd={jsonLd} city={city}>
@@ -74,6 +83,7 @@ const replacedContentHtml = replaceCityPlaceholders(contentHtml, city);
 	<ServicePageHeader
 		title={replaceCityPlaceholders(frontmatter.title, city)}
 		showChatButton={cluster === 'toplivo'}
+		city={city}
 	/>
 
 	{

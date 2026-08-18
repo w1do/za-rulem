@@ -1,12 +1,17 @@
 ---
 import type { ChatCity } from '../../../lib/cities';
-import { defaultCity, getCityUrl, replaceCityPlaceholders } from '../../../lib/cities';
+import {
+	defaultCity,
+	getCityUrl,
+	isCityPrefixRequiredRoute,
+	replaceCityPlaceholders,
+} from '../../../lib/cities';
 import { getSiteData } from '../../../lib/seo';
 
 export interface Props {
 	city?: ChatCity;
 	isNational?: boolean;
-	nationalVariant?: 'roads' | 'selection' | 'fuel-cards';
+	nationalVariant?: 'roads' | 'selection' | 'fuel-cards' | 'system';
 	selectionSubject?: string;
 	selectionService?: string;
 	fuelCardSubject?: string;
@@ -24,9 +29,13 @@ const {
 } = Astro.props;
 const effectiveCity = city ?? defaultCity;
 const site = getSiteData(effectiveCity);
-const pageUrl = (path: string): string => isNational ? path : getCityUrl(path, effectiveCity.slug);
+const pageUrl = (path: string): string =>
+	isNational && !isCityPrefixRequiredRoute(path)
+		? path
+		: getCityUrl(path, effectiveCity.slug);
 const isSelectionNational = isNational && nationalVariant === 'selection';
 const isFuelCardsNational = isNational && nationalVariant === 'fuel-cards';
+const isSystemNational = isNational && nationalVariant === 'system';
 const footerActionHref = pageUrl('/contacts');
 const footerRequestService = isSelectionNational
 	? selectionService
@@ -81,7 +90,7 @@ const serviceLinks = [
 
 					<!-- About Footer Content Start -->
 					<div class="about-footer-content-gold">
-						<p>{isFuelCardsNational ? 'Каталог топливных карт помогает бизнесу сравнивать покрытие АЗС, обслуживание, документы и инструменты контроля расходов.' : isSelectionNational ? 'Подбор автомобилей и контрактных запчастей во Владивостоке с согласованием проверки, покупки и отправки по России.' : isNational ? 'Сервис помогает найти доступную техпомощь или эвакуатор на федеральных трассах России. Возможность и условия выезда подтверждает диспетчер.' : `Я — мастер техпомощи на дороге ${site.inCity}. Приезжаю на вызов круглосуточно: прикурю автомобиль, заменю аккумулятор, отогрею машину в мороз и выручу в других дорожных ситуациях.`}</p>
+						<p>{isFuelCardsNational ? 'Каталог топливных карт помогает бизнесу сравнивать покрытие АЗС, обслуживание, документы и инструменты контроля расходов.' : isSelectionNational ? 'Подбор автомобилей и контрактных запчастей во Владивостоке с согласованием проверки, покупки и отправки по России.' : isSystemNational ? '«За рулём» объединяет информационные сервисы и заявки на помощь водителям в доступных городах и регионах России.' : isNational ? 'Сервис помогает найти доступную техпомощь или эвакуатор на федеральных трассах России. Возможность и условия выезда подтверждает диспетчер.' : `Я — мастер техпомощи на дороге ${site.inCity}. Приезжаю на вызов круглосуточно: прикурю автомобиль, заменю аккумулятор, отогрею машину в мороз и выручу в других дорожных ситуациях.`}</p>
 					</div>
 					<!-- About Footer Content End -->
 
@@ -139,7 +148,7 @@ const serviceLinks = [
 										{isFuelCardsNational ? 'Заказать топливную карту' : isSelectionNational ? 'Заявка на подбор' : 'Выезд только по заявке'}
 									</a>
 								</li>
-								<li><img src="/images/icon-location-accent.svg" alt="Адрес" width="20" height="20" />{isFuelCardsNational ? 'Предложения для бизнеса по России' : isSelectionNational ? 'Владивосток — отправка по России' : isNational ? 'Федеральные трассы России, по доступности партнёров' : `${site.addressLocality} и ${site.addressRegion}, выезд 24/7`}</li>
+								<li><img src="/images/icon-location-accent.svg" alt="Адрес" width="20" height="20" />{isFuelCardsNational ? 'Предложения для бизнеса по России' : isSelectionNational ? 'Владивосток — отправка по России' : isSystemNational ? 'Доступные города и регионы России' : isNational ? 'Федеральные трассы России, по доступности партнёров' : `${site.addressLocality} и ${site.addressRegion}, выезд 24/7`}</li>
 							</ul>
 						</div>
 					</div>
@@ -172,7 +181,7 @@ const serviceLinks = [
 				<div class="footer-copyright-gold">
 					<!-- Footer Copyright Text Start -->
 					<div class="footer-copyright-text-gold">
-						<p>© 2026 «За рулём» — {isFuelCardsNational ? 'каталог топливных карт для бизнеса' : isSelectionNational ? 'подбор автомобилей и запчастей из Владивостока' : isNational ? 'поиск техпомощи на федеральных трассах' : `техпомощь на дороге ${site.inCity}`}. Разработано <a href="https://w1do.ru" target="_blank" rel="noopener noreferrer">W1DO DIGITAL</a>.</p>
+						<p>© 2026 «За рулём» — {isFuelCardsNational ? 'каталог топливных карт для бизнеса' : isSelectionNational ? 'подбор автомобилей и запчастей из Владивостока' : isSystemNational ? 'сервис помощи водителям в регионах России' : isNational ? 'поиск техпомощи на федеральных трассах' : `техпомощь на дороге ${site.inCity}`}. Разработано <a href="https://w1do.ru" target="_blank" rel="noopener noreferrer">W1DO DIGITAL</a>.</p>
 					</div>
 					<!-- Footer Copyright Text End -->
 

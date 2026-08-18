@@ -1,11 +1,10 @@
 ---
-import PrivacyPolicyPage from '../../components/pages/PrivacyPolicyPage.astro';
 import { findCity } from '../../lib/cities';
 
 export const prerender = false;
 
 const city = findCity(Astro.params.city);
 if (!city) return new Response('Город не найден', { status: 404 });
----
 
-<PrivacyPolicyPage city={city} />
+return Astro.redirect(`/privacy-policy${Astro.url.search}`, 301);
+---

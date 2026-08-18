@@ -110,6 +110,7 @@ Allow: /
 # --- Все остальные боты ---
 User-agent: *
 Allow: /
+Allow: /chat?city=
 Disallow: /*?
 Disallow: /admin
 Disallow: /api/

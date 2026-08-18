@@ -7,6 +7,7 @@ import BlogSingleImage from '../components/blog/BlogSingleImage.astro';
 import BlogPostTagLinks from '../components/blog/BlogPostTagLinks.astro';
 import FuelPricesSection from '../components/gas-prices/FuelPricesSection.astro';
 import { articleNode, breadcrumbNode } from '../lib/seo';
+import { defaultCity, localizeCityServiceLinks } from '../lib/cities';
 
 const { frontmatter } = Astro.props;
 const showFuelPricesTable = frontmatter.showFuelPricesTable === true;
@@ -37,6 +38,8 @@ const jsonLd = [
 		{ name: frontmatter.title, url: Astro.url.pathname },
 	]),
 ];
+const contentHtml = await Astro.slots.render('default');
+const localizedContentHtml = localizeCityServiceLinks(contentHtml, defaultCity.slug);
 ---
 
 <Layout
@@ -68,7 +71,7 @@ const jsonLd = [
 					<div class="w-100">
 						<!-- Post Entry Start -->
 						<div class="post-entry">
-							<slot />
+							<Fragment set:html={localizedContentHtml} />
 							{
 								showFuelPricesTable && (
 									<FuelPricesSection 

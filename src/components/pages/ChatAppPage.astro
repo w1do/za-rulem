@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import DriverChatBox from '../../components/driver-chat/DriverChatBox.astro';
 import { breadcrumbNode, webPageNode } from '../../lib/seo';
 import type { ChatCity } from '../../lib/cities';
-import { replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
+import { getCityUrl } from '../../lib/cities';
 
 export interface Props {
 	city: ChatCity;
@@ -11,20 +11,20 @@ export interface Props {
 
 const { city } = Astro.props;
 
-const title = replaceCityPlaceholders('Чат водителей — где есть топливо сейчас | {city}', city);
-const description = replaceCityPlaceholders('Приложение-чат водителей {ofCity}: где сейчас есть бензин и дизель и какие очереди на АЗС. Вход по номеру без пароля, можно установить на телефон.', city);
-const url = getCityUrl('/chat', city.slug);
+const title = 'Чат водителей — где есть топливо сейчас | За рулём';
+const description = 'Приложение-чат водителей по городам: где сейчас есть бензин и дизель и какие очереди на АЗС. Выберите город и нужную категорию топлива.';
+const url = '/chat';
 
 const jsonLd = [
 	webPageNode({ name: title, description, url }),
 	breadcrumbNode([
-		{ name: 'Главная', url: getCityUrl('/', city.slug) },
+		{ name: 'Главная', url: '/' },
 		{ name: 'Чат водителей', url }
 	]),
 ];
 ---
 
-<Layout title={title} description={description} keywords={replaceCityPlaceholders("чат водителей, где есть топливо, чат азс {city}, есть бензин, очереди на азс, чат бензин", city)} jsonLd={jsonLd} city={city}>
+<Layout title={title} description={description} keywords="чат водителей, где есть топливо, чат АЗС, есть бензин, очереди на АЗС, чат бензин" jsonLd={jsonLd} isNational={true}>
 	<link slot="head" rel="manifest" href="/manifest.webmanifest" />
 	<meta slot="head" name="apple-mobile-web-app-capable" content="yes" />
 	<meta slot="head" name="apple-mobile-web-app-status-bar-style" content="default" />

@@ -1,3 +1,9 @@
+---
+import { getCityUrl } from '../../lib/cities';
+
+const servicesUrl = getCityUrl('/services');
+---
+
 <!-- Our Driver Section Start -->
 <div class="our-driver">
 	<div class="container">
@@ -18,7 +24,7 @@
 				<div class="driver-item wow fadeInUp">
 					<!-- Driver Item Image Start -->
 					<div class="driver-item-image">
-						<a href="/services" data-cursor-text="Подробнее">
+						<a href={servicesUrl} data-cursor-text="Подробнее">
 							<figure class="image-anime">
 								<img src="/images/driver-1.jpg" alt="Экипаж прикуривания авто" />
 							</figure>
@@ -39,7 +45,7 @@
 
 					<!-- Driver Item Content Start -->
 					<div class="driver-item-content">
-						<h2><a href="/services">Экипаж прикуривания</a></h2>
+						<h2><a href={servicesUrl}>Экипаж прикуривания</a></h2>
 						<p>Прикуриваю авто и запускаю двигатель</p>
 					</div>
 					<!-- Driver Item Content End -->
@@ -52,7 +58,7 @@
 				<div class="driver-item wow fadeInUp" data-wow-delay="0.2s">
 					<!-- Driver Item Image Start -->
 					<div class="driver-item-image">
-						<a href="/services" data-cursor-text="Подробнее">
+						<a href={servicesUrl} data-cursor-text="Подробнее">
 							<figure class="image-anime">
 								<img src="/images/driver-2.jpg" alt="Экипаж замены аккумулятора" />
 							</figure>
@@ -73,7 +79,7 @@
 
 					<!-- Driver Item Content Start -->
 					<div class="driver-item-content">
-						<h2><a href="/services">Экипаж отогрева</a></h2>
+						<h2><a href={servicesUrl}>Экипаж отогрева</a></h2>
 						<p>Отогреваю машину и меняю аккумулятор</p>
 					</div>
 					<!-- Driver Item Content End -->
@@ -86,7 +92,7 @@
 				<div class="driver-item wow fadeInUp" data-wow-delay="0.4s">
 					<!-- Driver Item Image Start -->
 					<div class="driver-item-image">
-						<a href="/services" data-cursor-text="Подробнее">
+						<a href={servicesUrl} data-cursor-text="Подробнее">
 							<figure class="image-anime">
 								<img src="/images/driver-3.jpg" alt="Автоэлектрик и диагностика авто" />
 							</figure>
@@ -107,7 +113,7 @@
 
 					<!-- Driver Item Content Start -->
 					<div class="driver-item-content">
-						<h2><a href="/services">Автоэлектрик и диагностика</a></h2>
+						<h2><a href={servicesUrl}>Автоэлектрик и диагностика</a></h2>
 						<p>Провожу диагностику и подвожу топливо</p>
 					</div>
 					<!-- Driver Item Content End -->
@@ -130,7 +136,7 @@
 						</div>
 					</div>
 					<!-- Satisfy Client Images End -->
-					<p>Я поддерживаю полный спектр техпомощи на дороге — <a href="/services">все услуги</a></p>
+					<p>Я поддерживаю полный спектр техпомощи на дороге — <a href={servicesUrl}>все услуги</a></p>
 				</div>
 				<!-- Section Footer Text End -->
 			</div>

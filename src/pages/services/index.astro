@@ -1,8 +1,7 @@
 ---
-import ServicesIndexPage from '../../components/pages/ServicesIndexPage.astro';
-import { defaultCity } from '../../lib/cities';
+import { getCityUrl } from '../../lib/cities';
 
-const city = defaultCity;
+export const prerender = false;
+
+return Astro.redirect(`${getCityUrl('/services')}${Astro.url.search}`, 301);
 ---
-
-<ServicesIndexPage city={city} />

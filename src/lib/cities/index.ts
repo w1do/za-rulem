@@ -1,8 +1,20 @@
 import { fetchCities } from './api';
+import { buildCityUrl } from './routes';
 import type { ChatCity } from './types';
 
 export type { ChatCity };
-export { removeCityPlaceholders, replaceCityPlaceholders } from '../cityText';
+export {
+	buildCityUrl,
+	isCityPrefixRequiredRoute,
+	isRootOnlyRoute,
+	CITY_PREFIX_REQUIRED_ROUTE_SEGMENTS,
+	ROOT_ONLY_ROUTE_SEGMENTS,
+} from './routes';
+export {
+	localizeCityServiceLinks,
+	removeCityPlaceholders,
+	replaceCityPlaceholders,
+} from '../cityText';
 
 /** Единственный публичный справочник городов, загруженный из Directus. */
 export const cities: ChatCity[] = await fetchCities();
@@ -21,11 +33,9 @@ export const defaultCity: ChatCity = defaultCityCandidate;
 export const findCity = (slug?: string): ChatCity | undefined =>
 	slug ? cities.find((city) => city.slug === slug) : undefined;
 
-/** Базовый город живёт в корне, остальные — под /{city}. */
+/** Базовый город живёт в корне, кроме разделов с обязательным городским префиксом. */
 export const getCityUrl = (path: string, citySlug = defaultCity.slug): string => {
-	const cleanPath = path.replace(/^\/+/, '');
-	if (citySlug === defaultCity.slug) return `/${cleanPath}`;
-	return cleanPath ? `/${citySlug}/${cleanPath}` : `/${citySlug}`;
+	return buildCityUrl(path, citySlug, defaultCity.slug);
 };
 
 export const fuelLandingUrl = (citySlug: string, fuelSlug: string): string =>

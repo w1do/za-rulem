@@ -31,16 +31,23 @@ export default function CourierUnavailableOffer({
 			</div>
 
 			<p className="courier-offer__text">
-				Вы можете внести предоплату и сразу попадёте в очередь: как только ваша заявка будет
-				обработана и бензин появится, к вам сразу приедет курьер и доставит топливо.
+				Вы можете внести предоплату и перевести заявку в приоритетную очередь. Мы расширим
+				поиск по доступным исполнителям, но срок и возможность доставки зависят от наличия
+				топлива и свободного курьера.
 			</p>
+			<a
+				className="courier-offer__details-link"
+				href="/pochemu-neobhodima-predoplata"
+				data-skip-service-request
+			>
+				Почему необходима предоплата
+			</a>
 
 			<div className="courier-offer__warning" role="alert">
 				<strong>Внимание!</strong>
 				<p>
-					Ожидание от 1 до 5 дней — всё зависит от поставки, но вы 100% получите свой заказ, как
-					только он будет в наличии. Клиенты, которые вносят предоплату, получают свой заказ
-					в приоритете.
+					Приоритетный поиск длится до 5 календарных дней с успешной оплаты. Если курьер не
+					найден, мы инициируем возврат остатка за вычетом подтверждаемых расходов на поиск.
 				</p>
 			</div>
 
@@ -57,7 +64,7 @@ export default function CourierUnavailableOffer({
 					onClick={onPrepayment}
 					disabled={isPrepaymentPending}
 				>
-					{isPrepaymentPending ? 'Готовим оплату...' : 'Внести предоплату — приоритетная очередь'}
+					{isPrepaymentPending ? 'Готовим оплату...' : 'Я согласен на предоплату и готов ждать'}
 				</button>
 				<button
 					type="button"
@@ -107,6 +114,18 @@ export default function CourierUnavailableOffer({
 					color: #334155;
 					font-size: 14px;
 					line-height: 1.55;
+				}
+				.courier-offer__details-link {
+					display: inline-block;
+					margin-top: 8px;
+					color: #9a3412;
+					font-size: 14px;
+					font-weight: 700;
+					text-decoration: underline;
+					text-underline-offset: 3px;
+				}
+				.courier-offer__details-link:hover {
+					color: #c2410c;
 				}
 				.courier-offer__warning {
 					margin-top: 16px;

@@ -1,13 +1,4 @@
 ---
-import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
-import type { ChatCity } from '../../lib/cities';
-
-interface Props {
-	city?: ChatCity;
-}
-
-const { city: propCity } = Astro.props;
-const city = propCity ?? defaultCity;
 ---
 
 <!-- Our Expertise Section Start -->
@@ -20,7 +11,7 @@ const city = propCity ?? defaultCity;
 					<!-- Expertise Image Start -->
 					<div class="expertise-image">
 						<figure class="image-anime">
-							<img src="/images/expertise-image.jpg" alt={replaceCityPlaceholders("Опыт техпомощи на дороге {inCity}", city)} />
+							<img src="/images/expertise-image.jpg" alt="Организация техпомощи на дороге" />
 						</figure>
 					</div>
 					<!-- Expertise Image End -->
@@ -28,10 +19,10 @@ const city = propCity ?? defaultCity;
 					<!-- Expertise Contact Info Start -->
 					<div class="expertise-contact-info">
 						<div class="expertise-contact-title">
-							<h2>Оставьте заявку — приеду на помощь и заведу автомобиль</h2>
+							<h2>Оставьте заявку — проверим, кто может помочь рядом</h2>
 						</div>
 						<div class="expertise-contact-btn">
-							<a href={getCityUrl("/contacts", city.slug)} data-service-request data-service-title="Вызвать помощь">Вызвать помощь</a>
+							<a href="/contacts" data-service-request data-service-title="Вызвать помощь">Вызвать помощь</a>
 						</div>
 					</div>
 					<!-- Expertise Contact Info End -->
@@ -44,9 +35,9 @@ const city = propCity ?? defaultCity;
 				<div class="expertise-content-box">
 					<!-- Section Title Start -->
 					<div class="section-title">
-						<span class="section-sub-title wow fadeInUp">Мой опыт</span>
-						<h2 class="text-anime-style-3" data-cursor="-opaque">Мой опыт в надёжной техпомощи на дороге</h2>
-						<p class="wow fadeInUp" data-wow-delay="0.2s">{replaceCityPlaceholders("Мой опыт выездной техпомощи помогает быстро понять причину поломки и безопасно вернуть автомобиль в движение {inCity} и области.", city)}</p>
+						<span class="section-sub-title wow fadeInUp">Как мы работаем</span>
+						<h2 class="text-anime-style-3" data-cursor="-opaque">Точная заявка помогает быстрее найти исполнителя</h2>
+						<p class="wow fadeInUp" data-wow-delay="0.2s">Местоположение, описание проблемы и данные автомобиля передаются исполнителю, чтобы он мог оценить задачу, подготовиться и подтвердить выезд.</p>
 					</div>
 					<!-- Section Title End -->
 
@@ -120,7 +111,7 @@ const city = propCity ?? defaultCity;
 
 					<!-- Expertise Button Start -->
 					<div class="expertise-btn wow fadeInUp" data-wow-delay="0.4s">
-						<a href={getCityUrl("/contacts", city.slug)} class="btn-default">Оставить заявку</a>
+					<a href="/contacts" class="btn-default">Оставить заявку</a>
 					</div>
 					<!-- Expertise Button End -->
 				</div>

@@ -1,19 +1,14 @@
 import { defineMiddleware } from 'astro:middleware';
 import { defaultCity } from './lib/cities';
+import { ROOT_ONLY_ROUTE_SEGMENTS } from './lib/cities/routes';
 
 const ROOT_MIRRORED_SECTIONS = new Set([
-	'about',
+	...ROOT_ONLY_ROUTE_SEGMENTS,
 	'calculator',
 	'ceny-na-benzin',
-	'chat',
-	'contacts',
 	'drivers',
 	'partners',
-	'privacy-policy',
 	'queue',
-	'services',
-	'terms',
-	'testimonials',
 ]);
 
 export const onRequest = defineMiddleware(({ redirect, url }, next) => {

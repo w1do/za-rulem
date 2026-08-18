@@ -10,7 +10,7 @@ import ServiceFeatures from '../components/services/single/ServiceFeatures.astro
 import ServiceProcess from '../components/services/single/ServiceProcess.astro';
 import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
-import { defaultCity, replaceCityPlaceholders } from '../lib/cities';
+import { defaultCity, getCityUrl, replaceCityPlaceholders } from '../lib/cities';
 
 const { frontmatter, spokes = [] } = Astro.props;
 const city = defaultCity;
@@ -35,7 +35,7 @@ const jsonLd = [
 	}),
 	breadcrumbNode([
 		{ name: 'Главная', url: '/' },
-		{ name: 'Услуги', url: '/services' },
+		{ name: 'Услуги', url: getCityUrl('/services', city.slug) },
 		{ name: frontmatter.title, url: Astro.url.pathname },
 	]),
 	faqNode(frontmatter.faqs),
@@ -57,7 +57,7 @@ const steps = process
 <Layout title={seoTitle} description={seoDescription} jsonLd={jsonLd} city={city}>
 	<Header city={city} />
 
-	<ServicePageHeader title={frontmatter.title} showChatButton={frontmatter.cluster === 'toplivo'} />
+	<ServicePageHeader title={frontmatter.title} showChatButton={frontmatter.cluster === 'toplivo'} city={city} />
 
 	<!-- Page Service Single Start -->
 	<div class="page-service-single">

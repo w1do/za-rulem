@@ -1,21 +1,21 @@
 ---
-import { getCollection, render } from 'astro:content';
-import ServiceLandingLayout from '../../../layouts/ServiceLandingLayout.astro';
-import { defaultCity } from '../../../lib/cities';
+import { getCollection } from 'astro:content';
+import { getCityUrl } from '../../../lib/cities';
 
-export async function getStaticPaths() {
-	const entries = await getCollection('serviceLanding');
-	return entries.map((entry) => ({
-		params: { cluster: entry.data.cluster, post: entry.id.split('/').pop() },
-		props: { entry },
-	}));
-}
+export const prerender = false;
 
-const { entry } = Astro.props;
-const city = defaultCity;
-const { Content } = await render(entry);
+const cluster = Astro.params.cluster;
+const post = Astro.params.post;
+const entry = cluster && post
+	? (await getCollection('serviceLanding')).find(
+			(item) => item.data.cluster === cluster && item.id.split('/').pop() === post,
+		)
+	: undefined;
+
+if (!entry) return new Response('Страница не найдена', { status: 404 });
+
+return Astro.redirect(
+	`${getCityUrl(`/services/${entry.data.cluster}/${post}`)}${Astro.url.search}`,
+	301,
+);
 ---
-
-<ServiceLandingLayout frontmatter={entry.data} city={city}>
-	<Content />
-</ServiceLandingLayout>

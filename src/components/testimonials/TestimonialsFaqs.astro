@@ -1,14 +1,4 @@
 ---
-import { defaultCity, replaceCityPlaceholders } from '../../lib/cities';
-import type { ChatCity } from '../../lib/cities';
-
-interface Props {
-	city?: ChatCity;
-}
-
-const { city: propCity } = Astro.props;
-const city = propCity ?? defaultCity;
-
 const faqs = [
 	{
 		question: 'Как вызвать техпомощь на дороге?',
@@ -22,10 +12,7 @@ const faqs = [
 	},
 	{
 		question: 'В какие районы вы выезжаете?',
-		answer: replaceCityPlaceholders(
-			'Я работаю по всей {inCity} и выезжаю в ближайшие районы {ofCity} области. Для загородного вызова отдельно уточняю расстояние и время в пути.',
-			city,
-		),
+		answer: 'Заявки принимаются из опубликованных на сайте городов, ближайших районов и с трасс. Для каждого обращения отдельно проверяются расстояние, доступность исполнителя и время в пути.',
 	},
 	{
 		question: 'Какие неисправности можно устранить на месте?',

@@ -2,7 +2,7 @@
 // Блок «О чате водителей» для посадочной страницы.
 // Рассказывает от первого лица, зачем нужен чат и как он устроен.
 import type { ChatCity } from '../../lib/cities';
-import { defaultCity, getCityUrl } from '../../lib/cities';
+import { chatAppUrl, defaultCity } from '../../lib/cities';
 
 interface Props {
 	class?: string;
@@ -72,7 +72,7 @@ const features = [
 
 					<div class="chat-about-footer wow fadeInUp" data-wow-delay="0.4s">
 						<a href="#chat" class="btn-default">Войти в чат</a>
-						<a href={getCityUrl('/chat', city.slug)} class="btn-default btn-highlighted">Открыть как приложение</a>
+						<a href={chatAppUrl(city.slug)} class="btn-default btn-highlighted">Открыть как приложение</a>
 					</div>
 				</div>
 				<!-- Chat About Content End -->

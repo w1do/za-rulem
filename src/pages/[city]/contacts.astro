@@ -1,11 +1,10 @@
 ---
-import ContactsPage from '../../components/pages/ContactsPage.astro';
 import { findCity } from '../../lib/cities';
 
 export const prerender = false;
 
 const city = findCity(Astro.params.city);
 if (!city) return new Response('Город не найден', { status: 404 });
----
 
-<ContactsPage city={city} />
+return Astro.redirect(`/contacts${Astro.url.search}`, 301);
+---

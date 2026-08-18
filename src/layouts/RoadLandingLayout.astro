@@ -14,7 +14,7 @@ import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 import { roadSituations } from '../data/roadAssistance';
 import { breadcrumbNode, faqNode, serviceNode } from '../lib/seo';
 import { RoadGasStations } from '../features/road-gas-stations';
-import { defaultCity } from '../lib/cities';
+import { defaultCity, localizeCityServiceLinks } from '../lib/cities';
 
 export type RoadLink = {
 	code: string;
@@ -92,6 +92,8 @@ const jsonLd = [
 	]),
 	faqNode(road.faqs),
 ].filter(Boolean);
+const contentHtml = await Astro.slots.render('default');
+const localizedContentHtml = localizeCityServiceLinks(contentHtml, defaultCity.slug);
 ---
 
 <Layout
@@ -173,7 +175,7 @@ const jsonLd = [
 							<p><strong>Основные города:</strong> {road.majorCities.join(', ')}.</p>
 							<p><strong>Регионы маршрута:</strong> {road.regions.join(', ')}.</p>
 
-							<slot />
+							<Fragment set:html={localizedContentHtml} />
 
 							{road.conditions.length > 0 && (
 								<>

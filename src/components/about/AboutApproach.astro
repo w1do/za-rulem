@@ -1,13 +1,5 @@
 ---
-import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
-import type { ChatCity } from '../../lib/cities';
-
-interface Props {
-	city?: ChatCity;
-}
-
-const { city: propCity } = Astro.props;
-const city = propCity ?? defaultCity;
+import { getCityUrl } from '../../lib/cities';
 ---
 
 <!-- Our Approach Section Start -->
@@ -17,8 +9,8 @@ const city = propCity ?? defaultCity;
 			<div class="col-xl-12">
 				<!-- Section Title Start -->
 				<div class="section-title section-title-center">
-					<span class="section-sub-title wow fadeInUp">Мой подход</span>
-					<h2 class="text-anime-style-3" data-cursor="-opaque">Мой подход к техпомощи без лишнего ожидания</h2>
+					<span class="section-sub-title wow fadeInUp">Наш подход</span>
+					<h2 class="text-anime-style-3" data-cursor="-opaque">Понятный поиск помощи без скрытых обещаний</h2>
 				</div>
 				<!-- Section Title End -->
 			</div>
@@ -35,13 +27,13 @@ const city = propCity ?? defaultCity;
 								<img src="/images/icon-approach-item-1.svg" alt="Задача мастера" />
 							</div>
 							<div class="approach-item-content">
-								<h3>Моя задача</h3>
-								<p>Я возвращаю автомобилю возможность двигаться дальше безопасно и быстро.</p>
+								<h3>Наша задача</h3>
+								<p>Помочь водителю передать точные данные и найти подходящего исполнителя.</p>
 							</div>
 						</div>
 						<div class="approach-item-body-list">
 							<ul>
-								<li>{replaceCityPlaceholders("Выезжаю {inCity} и области", city)}</li>
+								<li>Работаем с заявками из доступных городов и регионов</li>
 								<li>Работаю с распространёнными дорожными ситуациями</li>
 							</ul>
 						</div>
@@ -55,14 +47,14 @@ const city = propCity ?? defaultCity;
 								<img src="/images/icon-approach-item-2.svg" alt="Принцип работы" />
 							</div>
 							<div class="approach-item-content">
-								<h3>Мой принцип</h3>
-								<p>Я заранее уточняю ситуацию, чтобы подготовиться к выезду.</p>
+								<h3>Наш принцип</h3>
+								<p>Сначала уточняем ситуацию, затем проверяем фактическую доступность помощи.</p>
 							</div>
 						</div>
 						<div class="approach-item-body-list">
 							<ul>
 								<li>Сообщаю порядок действий</li>
-								<li>Остаюсь на связи до решения задачи</li>
+								<li>Не обещаем выезд до подтверждения исполнителя</li>
 							</ul>
 						</div>
 					</div>
@@ -75,7 +67,7 @@ const city = propCity ?? defaultCity;
 				<!-- Approach Image Start -->
 				<div class="approach-image">
 					<figure class="image-anime reveal">
-						<img src="/images/approach-image.jpg" alt={replaceCityPlaceholders("Выездная автопомощь {inCity}", city)} />
+					<img src="/images/approach-image.jpg" alt="Поиск выездной автопомощи" />
 					</figure>
 				</div>
 				<!-- Approach Image End -->
@@ -96,7 +88,7 @@ const city = propCity ?? defaultCity;
 						</div>
 					</div>
 					<!-- Satisfy Client Images End -->
-					<p>Полный список дорожной помощи — <a href={getCityUrl("/services", city.slug)}>смотреть услуги</a></p>
+					<p>Полный список дорожной помощи — <a href={getCityUrl('/services')}>смотреть услуги</a></p>
 					<ul>
 						<li><span class="counter">24</span>/7</li>
 						<li>

@@ -6,28 +6,20 @@ import PageHeaderHelpButton from '../../components/shared/PageHeaderHelpButton.a
 import ContactForm from '../../components/forms/ContactForm.tsx';
 
 import { webPageNode, breadcrumbNode } from '../../lib/seo';
-import type { ChatCity } from '../../lib/cities';
-import { replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
 
-export interface Props {
-	city: ChatCity;
-}
-
-const { city } = Astro.props;
-
-const title = replaceCityPlaceholders("Контакты — техпомощь на дороге {inCity} | За рулём", city);
-const description = replaceCityPlaceholders("Свяжитесь со мной для вызова техпомощи {inCity} и области: выезд только по заявке, круглосуточно. Оставьте заявку — перезвоню в течение пары минут.", city);
+const title = 'Контакты сервиса «За рулём» — заявка на помощь водителю';
+const description = 'Контакты сервиса «За рулём»: оставьте заявку на дорожную помощь или анкету курьера. Город, местоположение и условия выезда уточняются для каждого обращения.';
 
 const jsonLd = [
 	webPageNode({
 		type: 'ContactPage',
-		name: replaceCityPlaceholders('Контакты — вызов автопомощи и техпомощи {inCity}', city),
+		name: 'Контакты сервиса «За рулём»',
 		description: description,
-		url: getCityUrl('/contacts', city.slug),
+		url: '/contacts',
 	}),
 	breadcrumbNode([
-		{ name: 'Главная', url: getCityUrl('/', city.slug) },
-		{ name: 'Контакты', url: getCityUrl('/contacts', city.slug) },
+		{ name: 'Главная', url: '/' },
+		{ name: 'Контакты', url: '/contacts' },
 	]),
 ];
 ---
@@ -35,11 +27,11 @@ const jsonLd = [
 <Layout
 	title={title}
 	description={description}
-	keywords={replaceCityPlaceholders("контакты техпомощь {city}, вызвать автопомощь {city}, телефон техпомощь на дороге", city)}
+	keywords="контакты За рулём, заявка на техпомощь, вызвать автопомощь, стать курьером доставки топлива"
 	jsonLd={jsonLd}
-    city={city}
+	isNational={true}
 >
-	<Header city={city} />
+	<Header isNational={true} />
 
 	<!-- Page Header Section Start -->
 	<div class="page-header parallaxie">
@@ -51,7 +43,7 @@ const jsonLd = [
 						<h1 class="text-anime-style-3" data-cursor="-opaque">Контакты</h1>
 						<nav class="wow fadeInUp">
 							<ol class="breadcrumb">
-								<li class="breadcrumb-item"><a href={getCityUrl('/', city.slug)}>главная</a></li>
+								<li class="breadcrumb-item"><a href="/">главная</a></li>
 								<li class="breadcrumb-item active" aria-current="page">Контакты</li>
 							</ol>
 						</nav>
@@ -74,7 +66,7 @@ const jsonLd = [
 						<!-- Contact us Image Start -->
 						<div class="contact-us-image">
 							<figure class="image-anime reveal">
-								<img src="/images/contact-us-image.jpg" alt={replaceCityPlaceholders("Техпомощь на дороге {inCity}", city)} />
+								<img src="/images/contact-us-image.jpg" alt="Связаться с сервисом помощи водителям" />
 							</figure>
 						</div>
 						<!-- Contact us Image End -->
@@ -83,7 +75,7 @@ const jsonLd = [
 						<div class="contact-info-content-box">
 							<!-- Contact Info Title Start -->
 							<div class="contact-info-title wow fadeInUp">
-								<h2>Как со мной связаться:</h2>
+								<h2>Как связаться с сервисом:</h2>
 							</div>
 							<!-- Contact Info Title End -->
 
@@ -96,7 +88,7 @@ const jsonLd = [
 									</div>
 									<div class="contact-info-item-content">
 										<p>Выезд только по заявке:</p>
-										<h3><a href={getCityUrl("/contacts", city.slug)} data-service-request data-service-title="Вызвать помощь">Оставить заявку 24/7</a></h3>
+										<h3><a href="/contacts" data-service-request data-service-title="Вызвать помощь">Оставить заявку 24/7</a></h3>
 									</div>
 								</div>
 								<!-- Contact Info Item End -->
@@ -108,7 +100,7 @@ const jsonLd = [
 									</div>
 									<div class="contact-info-item-content">
 										<p>Зона выезда:</p>
-										<h3>{replaceCityPlaceholders("{city} и область", city)}</h3>
+										<h3>Доступные города и регионы</h3>
 									</div>
 								</div>
 								<!-- Contact Info Item End -->
@@ -130,12 +122,12 @@ const jsonLd = [
 								<span data-contact-courier hidden>Анкета водителя</span>
 							</span>
 							<h2 class="text-anime-style-3" data-cursor="-opaque">
-								<span data-contact-default>Свяжитесь со мной</span>
+								<span data-contact-default>Свяжитесь с сервисом</span>
 								<span data-contact-courier hidden>Стать курьером по доставке топлива</span>
 							</h2>
 							<p class="wow fadeInUp" data-wow-delay="0.2s">
 								<span data-contact-default>
-									{replaceCityPlaceholders("Опишите ситуацию на дороге и оставьте номер — я перезвоню в течение пары минут и выеду к вам {inCity} или области. Работаю круглосуточно.", city)}
+									Опишите ситуацию, город и точное местоположение. Сервис проверит доступность исполнителя и свяжется с вами для согласования условий.
 								</span>
 								<span data-contact-courier hidden>
 									Укажите город, автомобиль и сколько времени ежедневно готовы уделять доставке
@@ -149,8 +141,8 @@ const jsonLd = [
 						<div class="contact-form wow fadeInUp" data-wow-delay="0.4s">
 							<ContactForm
 								client:visible
-								subject={replaceCityPlaceholders('Заявка со страницы контактов {city}', city)}
-								courierSubject={replaceCityPlaceholders('Анкета курьера по доставке топлива — {city}', city)}
+								subject="Заявка со страницы контактов — За рулём"
+								courierSubject="Анкета курьера по доставке топлива — За рулём"
 							/>
 						</div>
 						<!-- Contact Form End -->
@@ -183,10 +175,10 @@ const jsonLd = [
 				<div class="col-lg-12">
 					<!-- Section Title Start -->
 					<div class="section-title section-title-center">
-						<span class="section-sub-title wow fadeInUp">Зона выезда</span>
-						<h2 class="text-anime-style-3" data-cursor="-opaque">{replaceCityPlaceholders("Работаю {byCity} и области", city)}</h2>
+						<span class="section-sub-title wow fadeInUp">География работы</span>
+						<h2 class="text-anime-style-3" data-cursor="-opaque">Заявки из городов и с федеральных трасс</h2>
 						<p class="wow fadeInUp" data-wow-delay="0.2s">
-							{replaceCityPlaceholders("Выезжаю в любой район {ofCity} и по области. Оставьте заявку — доеду до вас, где бы вы ни остановились.", city)}
+							Выберите город на региональной странице или укажите местоположение в заявке. Возможность и срок выезда зависят от доступных исполнителей рядом.
 						</p>
 					</div>
 					<!-- Section Title End -->
@@ -198,7 +190,7 @@ const jsonLd = [
 					<!-- Google Map Start -->
 					<div class="google-map-iframe wow fadeInUp" data-wow-delay="0.4s">
 						<iframe
-							src={`https://www.google.com/maps?q=${encodeURIComponent(city.name)}&output=embed`}
+							src="https://www.google.com/maps?q=Россия&output=embed"
 							allowfullscreen=""
 							loading="lazy"
 							referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -210,5 +202,5 @@ const jsonLd = [
 	</div>
 	<!-- Google Map End -->
 
-	<Footer city={city} />
+	<Footer isNational={true} nationalVariant="system" />
 </Layout>

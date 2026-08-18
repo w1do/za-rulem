@@ -1,6 +1,4 @@
 ---
-import { defaultCity, replaceCityPlaceholders } from '../../lib/cities';
-import type { ChatCity } from '../../lib/cities';
 import { Image } from 'astro:assets';
 
 import whyChooseImg1 from '../../assets/images/why-choose-image-1.jpg';
@@ -8,13 +6,6 @@ import whyChooseImg2 from '../../assets/images/why-choose-image-2.jpg';
 import author1 from '../../assets/images/author-1.jpg';
 import author2 from '../../assets/images/author-2.jpg';
 import author3 from '../../assets/images/author-3.jpg';
-
-interface Props {
-	city?: ChatCity;
-}
-
-const { city: propCity } = Astro.props;
-const city = propCity ?? defaultCity;
 
 const authors = [author1, author2, author3];
 
@@ -36,7 +27,7 @@ const benefits = [
 	},
 	{
 		icon: '/images/icon-why-choose-item-4.svg',
-		title: replaceCityPlaceholders('{city} и область', city),
+		title: 'Город, пригород и трасса',
 		text: 'Выезжаю по городу, на трассу и в ближайшие населённые пункты.',
 	},
 ];
@@ -67,7 +58,7 @@ const benefits = [
 		</div>
 		<div class="col-xl-6">
 			<div class="why-choose-image-box wow fadeInUp" data-wow-delay="0.2s">
-					<div class="why-choose-image-box-1"><div class="why-choose-image"><figure class="image-anime"><Image src={whyChooseImg1} alt={replaceCityPlaceholders("Выездная помощь автомобилю {inCity}", city)} width={600} /></figure></div></div>
+					<div class="why-choose-image-box-1"><div class="why-choose-image"><figure class="image-anime"><Image src={whyChooseImg1} alt="Выездная помощь автомобилю" width={600} /></figure></div></div>
 				<div class="why-choose-image-box-2">
 					<div class="why-choose-counter-box">
 						<div class="why-choose-counter-no"><h2><span class="counter">24</span>/7</h2></div>

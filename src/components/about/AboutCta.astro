@@ -4,9 +4,10 @@ import type { ChatCity } from '../../lib/cities';
 
 interface Props {
 	city?: ChatCity;
+	isGlobal?: boolean;
 }
 
-const { city: propCity } = Astro.props;
+const { city: propCity, isGlobal = false } = Astro.props;
 const city = propCity ?? defaultCity;
 ---
 
@@ -18,17 +19,17 @@ const city = propCity ?? defaultCity;
 				<div class="cta-box-content">
 					<!-- Section Title Start -->
 					<div class="section-title">
-						<span class="section-sub-title wow fadeInUp">Связаться со мной</span>
+						<span class="section-sub-title wow fadeInUp">Связаться с сервисом</span>
 						<h2 class="text-anime-style-3" data-cursor="-opaque">Нужна техпомощь на дороге?</h2>
-						<p class="wow fadeInUp" data-wow-delay="0.2s">{replaceCityPlaceholders("Я принимаю заявки на выезд {inCity} и области круглосуточно. Оставьте заявку — уточню ситуацию и выеду.", city)}</p>
+						<p class="wow fadeInUp" data-wow-delay="0.2s">{isGlobal ? 'Опишите ситуацию и местоположение — сервис проверит доступность подходящего исполнителя и сообщит условия до подтверждения выезда.' : replaceCityPlaceholders("Я принимаю заявки на выезд {inCity} и области круглосуточно. Оставьте заявку — уточню ситуацию и выеду.", city)}</p>
 					</div>
 					<!-- Section Title End -->
 
 					<!-- CTA Body Start -->
 					<div class="cta-content-body wow fadeInUp" data-wow-delay="0.4s">
 						<ul>
-							<li>Выезжаю на место поломки</li>
-							<li>Работаю круглосуточно, 24/7</li>
+							<li>{isGlobal ? 'Поиск доступного исполнителя' : 'Выезжаю на место поломки'}</li>
+							<li>{isGlobal ? 'Приём заявок круглосуточно' : 'Работаю круглосуточно, 24/7'}</li>
 						</ul>
 					</div>
 					<!-- CTA Body End -->

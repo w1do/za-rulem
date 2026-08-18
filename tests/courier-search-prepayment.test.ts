@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 
 import {
@@ -129,4 +130,26 @@ test('строки местоположения содержат ссылку н
 	assert.ok(lines.some((line) => line.startsWith('Карта: https://yandex.ru/maps/')));
 	assert.ok(lines.includes('Источник местоположения: геолокация браузера'));
 	assert.equal(buildLocationLines(manualLocation).some((line) => line.startsWith('Карта:')), false);
+});
+
+test('страница предоплаты подробно объясняет условия и связана с формой заявки', async () => {
+	const [pageSource, offerSource, urls] = await Promise.all([
+		readFile('src/components/pages/FuelDeliveryPrepaymentPage.astro', 'utf8'),
+		readFile('src/components/forms/CourierUnavailableOffer.tsx', 'utf8'),
+		readFile('urls-seo.txt', 'utf8'),
+	]);
+
+	const content = pageSource.match(/<div class="post-entry">([\s\S]*?)<\/div>/)?.[1] ?? '';
+	const plainText = content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
+	assert.ok(plainText.length >= 5000, `ожидалось не менее 5000 знаков, получено ${plainText.length}`);
+	assert.equal((pageSource.match(/<h1\b/g) ?? []).length, 1);
+	assert.match(pageSource, /Почему необходима предоплата на доставку топлива/);
+	assert.match(pageSource, /пяти календарных дней/);
+	assert.match(pageSource, /фактически понесённые и подтверждаемые расходы/);
+	assert.match(offerSource, /href="\/pochemu-neobhodima-predoplata"/);
+	assert.match(offerSource, />\s*Почему необходима предоплата\s*</);
+	assert.match(offerSource, /Я согласен на предоплату и готов ждать/);
+	assert.doesNotMatch(offerSource, /100% получите/);
+	assert.match(urls, /https:\/\/za-rulem\.org\/pochemu-neobhodima-predoplata/);
 });

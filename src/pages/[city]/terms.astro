@@ -1,11 +1,10 @@
 ---
-import TermsPage from '../../components/pages/TermsPage.astro';
 import { findCity } from '../../lib/cities';
 
 export const prerender = false;
 
 const city = findCity(Astro.params.city);
 if (!city) return new Response('Город не найден', { status: 404 });
----
 
-<TermsPage city={city} />
+return Astro.redirect(`/terms${Astro.url.search}`, 301);
+---

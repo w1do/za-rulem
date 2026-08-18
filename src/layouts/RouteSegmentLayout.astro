@@ -13,7 +13,7 @@ import FuelPricesTable from '../components/gas-prices/FuelPricesTable';
 import GasMap from '../components/maps/GasMap';
 import { getFuelPricesFromStations, type PriceRow } from '../lib/gasStations';
 import { breadcrumbNode } from '../lib/seo';
-import { defaultCity } from '../lib/cities';
+import { defaultCity, localizeCityServiceLinks } from '../lib/cities';
 import '../components/maps/GasMap.css';
 import '../features/road-gas-stations/ui/RoadGasStations.css';
 
@@ -81,7 +81,10 @@ const sidebarLinks = [
 	})),
 ];
 
-const contentHtml = renderSegmentContent(segment.content);
+const contentHtml = localizeCityServiceLinks(
+	renderSegmentContent(segment.content),
+	defaultCity.slug,
+);
 const dateLabel = new Date().toLocaleString('ru-RU', { month: 'long', year: 'numeric' });
 const seoTitle = segment.seoTitle || `Цены на бензин ${segment.name}: АЗС на карте трассы ${road.code}`;
 const seoDescription =

@@ -31,3 +31,16 @@ export const removeCityPlaceholders = (text: string): string => {
 		.replace(/\s*{forCity}/g, '')
 		.trim();
 };
+
+/**
+ * Локализует абсолютные ссылки на услуги внутри доверенного HTML из Content Collections.
+ * Остальные URL, текст и атрибуты не изменяются.
+ */
+export const localizeCityServiceLinks = (html: string, citySlug: string): string => {
+	if (!html || !citySlug) return html;
+
+	return html.replace(
+		/href=(["'])\/services(?=\/|[?#]|\1)/g,
+		`href=$1/${citySlug}/services`,
+	);
+};

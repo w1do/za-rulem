@@ -1,36 +1,18 @@
 ---
-import { getCollection, render } from 'astro:content';
-import HubLayout from '../../../layouts/HubLayout.astro';
-import { defaultCity, removeCityPlaceholders, getCityUrl } from '../../../lib/cities';
+import { getCollection } from 'astro:content';
+import { getCityUrl } from '../../../lib/cities';
 
-export async function getStaticPaths() {
-	const hubs = await getCollection('services', ({ data }) => data.hub === true);
-	const spokes = await getCollection('serviceLanding');
-	const city = defaultCity;
-	return hubs.map((pillar) => ({
-		params: { cluster: pillar.id },
-		props: {
-			pillar,
-			spokes: spokes
-				.filter(({ data }) => data.cluster === pillar.id)
-				.sort((a, b) => a.data.order - b.data.order)
-				.map((entry) => ({
-					title: removeCityPlaceholders(entry.data.title),
-					description: removeCityPlaceholders(entry.data.description),
-					excerpt: removeCityPlaceholders(entry.data.excerpt),
-					icon: entry.data.icon,
-					tags: entry.data.tags,
-					url: getCityUrl(`/services/${pillar.id}/${entry.id.split('/').pop()}`, city.slug),
-				})),
-		},
-	}));
-}
+export const prerender = false;
 
-const { pillar, spokes } = Astro.props;
-const city = defaultCity;
-const { Content } = await render(pillar);
+const cluster = Astro.params.cluster;
+const pillar = cluster
+	? (await getCollection('services', ({ data, id }) => data.hub === true && id === cluster))[0]
+	: undefined;
+
+if (!pillar) return new Response('Страница не найдена', { status: 404 });
+
+return Astro.redirect(
+	`${getCityUrl(`/services/${pillar.id}`)}${Astro.url.search}`,
+	301,
+);
 ---
-
-<HubLayout frontmatter={pillar.data} spokes={spokes} cluster={pillar.id} city={city}>
-	<Content />
-</HubLayout>

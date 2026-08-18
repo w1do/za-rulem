@@ -1,14 +1,4 @@
 ---
-import { defaultCity, replaceCityPlaceholders } from '../../lib/cities';
-import type { ChatCity } from '../../lib/cities';
-
-interface Props {
-	city?: ChatCity;
-}
-
-const { city: propCity } = Astro.props;
-const city = propCity ?? defaultCity;
-
 const features = [
 	{
 		icon: '/images/icon-core-features-item-1.svg',
@@ -23,10 +13,7 @@ const features = [
 	{
 		icon: '/images/icon-core-features-item-3.svg',
 		title: 'Выезд круглосуточно',
-		text: replaceCityPlaceholders(
-			'Я принимаю заявки 24/7 {byCity} и заранее сообщаю ориентир по времени прибытия.',
-			city,
-		),
+		text: 'Заявки принимаются круглосуточно, а ориентир по времени сообщается после проверки доступного исполнителя.',
 	},
 ];
 ---

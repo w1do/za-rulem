@@ -1,6 +1,4 @@
 ---
-import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
-import type { ChatCity } from '../../lib/cities';
 import AppImage from '../shared/ui/AppImage.astro';
 
 import aboutImg from '../../assets/images/about-us-image.jpg';
@@ -9,12 +7,6 @@ import author1 from '../../assets/images/author-1.jpg';
 import author2 from '../../assets/images/author-2.jpg';
 import author3 from '../../assets/images/author-3.jpg';
 
-interface Props {
-	city?: ChatCity;
-}
-
-const { city: propCity } = Astro.props;
-const city = propCity ?? defaultCity;
 ---
 
 <!-- About Us Section Start -->
@@ -27,7 +19,7 @@ const city = propCity ?? defaultCity;
 					<!-- About Us Image Start -->
 					<div class="about-us-image">
 						<figure class="image-anime">
-							<AppImage src={aboutImg} alt={replaceCityPlaceholders("Техпомощь на дороге {inCity}", city)} />
+							<AppImage src={aboutImg} alt="Помощь водителям на дороге" />
 						</figure>
 					</div>
 					<!-- About Us Image End -->
@@ -91,8 +83,8 @@ const city = propCity ?? defaultCity;
 					<!-- Section Title Start -->
 					<div class="section-title">
 						<span class="section-sub-title wow fadeInUp">О сервисе</span>
-						<h2 class="text-anime-style-3" data-cursor="-opaque">Я помогаю решить проблему с автомобилем прямо на дороге</h2>
- 					<p class="wow fadeInUp" data-wow-delay="0.2s">{replaceCityPlaceholders("Я выезжаю на помощь {inCity} и области: запускаю автомобиль, меняю аккумулятор, отогреваю машину, подвожу топливо, работаю как автоэлектрик и провожу диагностику.", city)}</p>
+						<h2 class="text-anime-style-3" data-cursor="-opaque">Помогаем найти решение дорожной проблемы</h2>
+						<p class="wow fadeInUp" data-wow-delay="0.2s">Сервис принимает заявки водителей, уточняет местоположение и задачу, а затем помогает найти доступного исполнителя. Возможность, срок и стоимость выезда подтверждаются после поиска.</p>
 					</div>
 					<!-- Section Title End -->
 
@@ -104,8 +96,8 @@ const city = propCity ?? defaultCity;
 								<img src="/images/icon-about-body-item-1.svg" alt="Выезд на помощь" width="60" height="60" />
 							</div>
 							<div class="about-us-body-item-content">
-								<h3>Помощь с выездом</h3>
-								<p>Я приезжаю к месту поломки и берусь за задачу на месте.</p>
+								<h3>Поиск помощи по заявке</h3>
+								<p>Передаём исполнителю местоположение и описание ситуации, чтобы он оценил возможность выезда.</p>
 							</div>
 						</div>
 						<!-- About Us Body Item End -->
@@ -116,8 +108,8 @@ const city = propCity ?? defaultCity;
 								<img src="/images/icon-about-body-item-2.svg" alt="Круглосуточная работа" width="60" height="60" />
 							</div>
 							<div class="about-us-body-item-content">
-								<h3>Круглосуточно, 24/7</h3>
-								<p>Я принимаю вызовы днём и ночью, без выходных.</p>
+								<h3>Заявки круглосуточно</h3>
+								<p>Форму можно заполнить в любое время; фактическая доступность исполнителя проверяется отдельно.</p>
 							</div>
 						</div>
 						<!-- About Us Body Item End -->
@@ -129,7 +121,7 @@ const city = propCity ?? defaultCity;
 						<!-- About Us Button Start -->
 						<div class="about-us-btn">
 							<a
-								href={getCityUrl("/contacts", city.slug)}
+								href="/contacts"
 								class="btn-default"
 								data-service-request
 								data-service-title="Вызвать помощь"
@@ -152,7 +144,7 @@ const city = propCity ?? defaultCity;
 							<!-- About Author Content Start -->
 							<div class="about-us-author-content">
 								<h3>За рулём</h3>
-								<p>Мастер техпомощи</p>
+								<p>Сервис помощи водителям</p>
 							</div>
 							<!-- About Author Content End -->
 						</div>

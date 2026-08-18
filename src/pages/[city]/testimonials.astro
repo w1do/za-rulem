@@ -1,11 +1,10 @@
 ---
-import TestimonialsPage from '../../components/pages/TestimonialsPage.astro';
 import { findCity } from '../../lib/cities';
 
 export const prerender = false;
 
 const city = findCity(Astro.params.city);
 if (!city) return new Response('Город не найден', { status: 404 });
----
 
-<TestimonialsPage city={city} />
+return Astro.redirect(`/testimonials${Astro.url.search}`, 301);
+---

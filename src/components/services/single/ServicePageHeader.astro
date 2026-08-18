@@ -1,8 +1,16 @@
 ---
 import PageHeaderHelpButton from '../../shared/PageHeaderHelpButton.astro';
 import PageHeaderChatButton from '../../shared/PageHeaderChatButton.astro';
+import { defaultCity, getCityUrl, type ChatCity } from '../../../lib/cities';
 
-const { title, showChatButton = false, chatLink } = Astro.props;
+export interface Props {
+	title: string;
+	showChatButton?: boolean;
+	chatLink?: string;
+	city?: ChatCity;
+}
+
+const { title, showChatButton = false, chatLink, city = defaultCity } = Astro.props;
 ---
 
 <!-- Page Header Section Start -->
@@ -15,8 +23,8 @@ const { title, showChatButton = false, chatLink } = Astro.props;
 					<h1 class="text-anime-style-3" data-cursor="-opaque">{title}</h1>
 					<nav class="wow fadeInUp">
 						<ol class="breadcrumb">
-							<li class="breadcrumb-item"><a href="/">главная</a></li>
-							<li class="breadcrumb-item"><a href="/services">Услуги</a></li>
+							<li class="breadcrumb-item"><a href={getCityUrl('/', city.slug)}>главная</a></li>
+							<li class="breadcrumb-item"><a href={getCityUrl('/services', city.slug)}>Услуги</a></li>
 							<li class="breadcrumb-item active" aria-current="page">{title}</li>
 						</ol>
 					</nav>

@@ -1,12 +1,4 @@
 ---
-import type { ChatCity } from '../../lib/cities';
-import { defaultCity } from '../../lib/cities';
-
-interface Props {
-	city?: ChatCity;
-}
-
-const city = Astro.props.city ?? defaultCity;
 ---
 
 <!-- Our Testimonials Section Start -->
@@ -36,7 +28,7 @@ const city = Astro.props.city ?? defaultCity;
 									<!-- Testimonial Item Image Start -->
 									<div class="testimonial-item-image">
 										<figure>
-											<img src="/images/testimonial-image.jpg" alt={`Отзыв о техпомощи ${city.inCity}`} />
+										<img src="/images/testimonial-image.jpg" alt="Отзыв о техпомощи на дороге" />
 										</figure>
 									</div>
 									<!-- Testimonial Item Image End -->

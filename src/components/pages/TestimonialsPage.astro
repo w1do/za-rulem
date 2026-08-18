@@ -9,27 +9,19 @@ import TestimonialsWhyChoose from '../../components/testimonials/TestimonialsWhy
 import TestimonialsFaqs from '../../components/testimonials/TestimonialsFaqs.astro';
 import TestimonialsExpertise from '../../components/testimonials/TestimonialsExpertise.astro';
 import { breadcrumbNode, webPageNode } from '../../lib/seo';
-import type { ChatCity } from '../../lib/cities';
-import { replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
 
-export interface Props {
-	city: ChatCity;
-}
-
-const { city } = Astro.props;
-
-const title = replaceCityPlaceholders("Отзывы о доставке бензина {inCity} | За рулём", city);
-const description = replaceCityPlaceholders("Отзывы водителей о доставке бензина {inCity} и области: срочный подвоз топлива к автомобилю в городе, за городом и на трассе.", city);
+const title = 'Отзывы водителей о доставке топлива и дорожной помощи | За рулём';
+const description = 'Отзывы и истории обращений водителей за доставкой бензина и помощью на дороге в городе, за городом и на трассе.';
 
 const jsonLd = [
 	webPageNode({
-		name: replaceCityPlaceholders('Отзывы о доставке бензина {inCity}', city),
+		name: 'Отзывы о доставке топлива и дорожной помощи',
 		description: description,
-		url: getCityUrl('/testimonials', city.slug),
+		url: '/testimonials',
 	}),
 	breadcrumbNode([
-		{ name: 'Главная', url: getCityUrl('/', city.slug) },
-		{ name: 'Отзывы', url: getCityUrl('/testimonials', city.slug) },
+		{ name: 'Главная', url: '/' },
+		{ name: 'Отзывы', url: '/testimonials' },
 	]),
 ];
 ---
@@ -38,19 +30,19 @@ const jsonLd = [
 	title={title}
 	description={description}
 	ogTitle={title}
-	ogDescription={replaceCityPlaceholders("Истории водителей, которым я привёз бензин к остановившемуся автомобилю {inCity}, за городом или на трассе.", city)}
-	keywords={replaceCityPlaceholders("доставка бензина отзывы, подвоз бензина {city} отзывы, доставка топлива {city}, привезти бензин на дорогу, бензин на трассу", city)}
+	ogDescription="Истории обращений за доставкой топлива к остановившемуся автомобилю в городе, за городом или на трассе."
+	keywords="доставка бензина отзывы, подвоз бензина отзывы, доставка топлива, привезти бензин на дорогу, бензин на трассу"
 	jsonLd={jsonLd}
-    city={city}
+	isNational={true}
 >
-	<Header city={city} />
+	<Header isNational={true} />
 	<main>
-		<TestimonialsPageHeader city={city} />
-		<TestimonialsGrid city={city} />
-		<TestimonialsCoreFeatures city={city} />
-		<TestimonialsWhyChoose city={city} />
-		<TestimonialsFaqs city={city} />
-		<TestimonialsExpertise city={city} />
+		<TestimonialsPageHeader />
+		<TestimonialsGrid />
+		<TestimonialsCoreFeatures />
+		<TestimonialsWhyChoose />
+		<TestimonialsFaqs />
+		<TestimonialsExpertise />
 	</main>
-	<Footer city={city} />
+	<Footer isNational={true} nationalVariant="system" />
 </Layout>

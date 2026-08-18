@@ -228,8 +228,8 @@ const jsonLd = [
 		title="Как подготовиться к помощи на дороге"
 		description="Остановитесь в безопасном месте, включите аварийную сигнализацию, передайте геолокацию и не пытайтесь продолжать движение при риске повреждения двигателя или колеса."
 		posts={[
-			{ image: '/images/post-1.jpg', title: 'Как заказать доставку бензина или дизеля', href: '/services/toplivo', btnText: 'Условия доставки' },
-			{ image: '/images/post-2.jpg', title: 'Какая помощь возможна прямо на дороге', href: '/services/tehpomosch', btnText: 'Виды техпомощи' },
+			{ image: '/images/post-1.jpg', title: 'Как заказать доставку бензина или дизеля', href: getCityUrl('/services/toplivo', city.slug), btnText: 'Условия доставки' },
+			{ image: '/images/post-2.jpg', title: 'Какая помощь возможна прямо на дороге', href: getCityUrl('/services/tehpomosch', city.slug), btnText: 'Виды техпомощи' },
 			{ image: '/images/post-3.jpg', title: `Вызвать водителя ${driver.name} ${city.inCity}`, href: '/contacts', btnText: 'Оставить заявку' },
 		]}
 	/>

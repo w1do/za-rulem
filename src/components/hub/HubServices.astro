@@ -2,13 +2,33 @@
 // Блок карточек услуг хаба (перелинковка на посадочные страницы услуги).
 // Использует ту же карточку, что и каталог /services (ServiceCard → service-item).
 import ServiceCard from '../services/ServiceCard.astro';
+import { defaultCity, getCityUrl, localizeCityServiceLinks, type ChatCity } from '../../lib/cities';
+
+export interface Props {
+	subtitle?: string;
+	title?: string;
+	services?: Array<{
+		title: string;
+		description: string;
+		icon: string;
+		url: string;
+	}>;
+	footerText?: string;
+	city?: ChatCity;
+}
 
 const {
 	subtitle = 'Услуги техпомощи',
 	title = 'Выберите нужную услугу на дороге',
 	services = [],
-	footerText = 'Не нашли нужное? Я также работаю как автоэлектрик, провожу диагностику и подвожу топливо — <a href="/services">смотреть все услуги</a>',
+	footerText,
+	city = defaultCity,
 } = Astro.props;
+
+const localizedFooterText = localizeCityServiceLinks(
+	footerText ?? `Не нашли нужное? Я также работаю как автоэлектрик, провожу диагностику и подвожу топливо — <a href="${getCityUrl('/services', city.slug)}">смотреть все услуги</a>`,
+	city.slug,
+);
 ---
 
 <!-- Our Service Section Start -->
@@ -39,7 +59,7 @@ const {
 			}
 
 			{
-				footerText && (
+				localizedFooterText && (
 					<div class="col-lg-12">
 						<div class="section-footer-text section-satisfy-img wow fadeInUp" data-wow-delay="0.4s">
 							<div class="satisfy-client-images">
@@ -52,7 +72,7 @@ const {
 									<img src="/images/icon-phone-primary.svg" alt="Телефон" />
 								</div>
 							</div>
-							<p set:html={footerText} />
+							<p set:html={localizedFooterText} />
 						</div>
 					</div>
 				)

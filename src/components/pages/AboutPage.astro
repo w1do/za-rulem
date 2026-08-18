@@ -15,28 +15,20 @@ import AboutTestimonials from '../../components/about/AboutTestimonials.astro';
 import HomeDrivers from "../../components/home/HomeDrivers.astro";
 
 import { webPageNode, breadcrumbNode } from '../../lib/seo';
-import type { ChatCity } from '../../lib/cities';
-import { replaceCityPlaceholders, getCityUrl } from '../../lib/cities';
 
-export interface Props {
-	city: ChatCity;
-}
-
-const { city } = Astro.props;
-
-const title = replaceCityPlaceholders("О сервисе — техпомощь на дороге {inCity} 24/7 | За рулём", city);
-const description = replaceCityPlaceholders("Я оказываю круглосуточную техпомощь на дороге {inCity} и области: прикуриваю авто, меняю аккумуляторы, отогреваю машины, подвожу топливо, работаю как автоэлектрик и провожу диагностику.", city);
+const title = 'О сервисе «За рулём» — помощь водителям в регионах России';
+const description = 'Как работает сервис «За рулём»: заявки на дорожную помощь, поиск доступных исполнителей, локальные чаты, цены на топливо и поддержка водителей в регионах России.';
 
 const jsonLd = [
 	webPageNode({
 		type: 'AboutPage',
-		name: replaceCityPlaceholders('О сервисе — автопомощь и техпомощь на дороге {inCity} 24/7', city),
+		name: 'О сервисе «За рулём»',
 		description: description,
-		url: getCityUrl('/about', city.slug),
+		url: '/about',
 	}),
 	breadcrumbNode([
-		{ name: 'Главная', url: getCityUrl('/', city.slug) },
-		{ name: 'О сервисе', url: getCityUrl('/about', city.slug) },
+		{ name: 'Главная', url: '/' },
+		{ name: 'О сервисе', url: '/about' },
 	]),
 ];
 ---
@@ -44,24 +36,24 @@ const jsonLd = [
 <Layout
 	title={title}
 	description={description}
-	ogTitle={replaceCityPlaceholders("За рулём — о сервисе техпомощи на дороге {inCity}", city)}
-	ogDescription={replaceCityPlaceholders("Круглосуточная автопомощь {inCity} и области: прикурю, заведу автомобиль и проведу диагностику. Узнайте, как я работаю.", city)}
-	keywords={replaceCityPlaceholders("о сервисе техпомощи {city}, автопомощь на дороге {city}, прикурить авто, замена аккумулятора, отогрев автомобиля, подвоз топлива, автоэлектрик, диагностика авто", city)}
+	ogTitle="«За рулём» — о сервисе помощи водителям"
+	ogDescription="Заявки на дорожную помощь, локальные сервисы, поиск доступных исполнителей и информация о топливе в регионах России."
+	keywords="о сервисе За рулём, помощь водителям, техпомощь на дороге, доставка топлива, локальные чаты водителей"
 	jsonLd={jsonLd}
-    city={city}
+	isNational={true}
 >
-	<Header city={city} />
+	<Header isNational={true} />
 
-	<AboutPageHeader city={city} />
-	<AboutIntro city={city} />
-	<AboutApproach city={city} />
-	<AboutWhyChoose city={city} />
-	<AboutWhatWeDo city={city} />
-	<HomeDrivers city={city} />
-	<AboutCta city={city} />
-	<AboutExpertise city={city} />
-	<AboutFaqs city={city} />
-	<AboutTestimonials city={city} />
+	<AboutPageHeader />
+	<AboutIntro />
+	<AboutApproach />
+	<AboutWhyChoose />
+	<AboutWhatWeDo />
+	<HomeDrivers />
+	<AboutCta isGlobal={true} />
+	<AboutExpertise />
+	<AboutFaqs />
+	<AboutTestimonials />
 
-	<Footer city={city} />
+	<Footer isNational={true} nationalVariant="system" />
 </Layout>
