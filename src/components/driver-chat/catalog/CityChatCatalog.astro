@@ -18,11 +18,11 @@ const { cards, cities } = Astro.props;
 		<div class="row section-row">
 			<div class="col-xl-12">
 				<div class="section-title section-title-center">
-					<span class="section-sub-title">10 рекомендованных городов</span>
-					<h2 id="city-chat-catalog-title">Чаты с полным свежим срезом по топливу</h2>
+					<span class="section-sub-title">До 10 рекомендованных городов</span>
+					<h2 id="city-chat-catalog-title">Живые чаты с полным свежим срезом по топливу</h2>
 					<p>
 						Рейтинг учитывает число свежих наблюдений по АИ-92, АИ-95 и дополнительному виду топлива.
-						Это показатель полноты данных, а не гарантия остатка на конкретной АЗС.
+						Показываются только города с сообщениями. Полнота данных не гарантирует остаток на конкретной АЗС.
 					</p>
 				</div>
 			</div>
@@ -38,7 +38,7 @@ const { cards, cities } = Astro.props;
 					<div class="pricing-item-gold city-chat-catalog__empty" role="status">
 						<div class="pricing-item-list-gold">
 							<h3>Свежая сводка временно недоступна</h3>
-							<p>Города без достаточных свежих данных не попадают в рекомендации. Используйте поиск выше или откройте общий чат.</p>
+							<p>Сейчас нет городов, где одновременно доступны сообщения и достаточный свежий срез цен. Используйте поиск живых чатов выше или откройте общий чат.</p>
 							<a class="btn-default" href="/chat">Открыть общий чат</a>
 						</div>
 					</div>

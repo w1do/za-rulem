@@ -116,10 +116,10 @@ export default function CityChatJoinModal({ cities }: CityChatJoinModalProps) {
 						<div className="col-xl-5">
 							<div className="section-title">
 								<span className="section-sub-title">Полный справочник</span>
-								<h2 id="city-chat-search-title">Найдите чат своего города</h2>
+								<h2 id="city-chat-search-title">Найдите живой чат своего города</h2>
 								<p>
-									В карточках ниже показаны 10 городов с наиболее полным свежим срезом.
-									Поиск доступен по всем {cities.length} опубликованным городам и регионам.
+									В карточках ниже показаны до 10 живых городов с наиболее полным свежим срезом.
+									В поиске доступны {cities.length} городов, где уже есть хотя бы одно сообщение.
 								</p>
 							</div>
 						</div>

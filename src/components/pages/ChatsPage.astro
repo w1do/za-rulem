@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import CityChatCatalog from '../driver-chat/catalog/CityChatCatalog.astro';
-import { getCityChatCatalog, listCityChatSearchOptions } from '../driver-chat/catalog/server';
+import { getCityChatCatalog } from '../driver-chat/catalog/server';
 import HomeAbout from '../home/HomeAbout.astro';
 import HomeHowItWork from '../home/HomeHowItWork.astro';
 import HomeServices from '../home/HomeServices.astro';
@@ -26,8 +26,7 @@ const defaultPricesUrl = getCityUrl('/ceny-na-benzin', defaultCity.slug);
 const defaultQueuesUrl = getCityUrl('/ochered-na-azs', defaultCity.slug);
 const defaultDeliveryUrl = getCityUrl('/services/toplivo', defaultCity.slug);
 
-const cards = await getCityChatCatalog();
-const cityOptions = listCityChatSearchOptions();
+const { cards, cities: cityOptions } = await getCityChatCatalog();
 
 const chatTopics = [
 	{
@@ -55,8 +54,8 @@ const chatTopics = [
 
 const faqs = [
 	{
-		question: 'Почему на странице показано только 10 городов?',
-		answer: 'В рекомендованную десятку попадают города с наиболее полным свежим срезом по АИ-92, АИ-95 и как минимум ещё одному виду топлива. Любой другой опубликованный город можно найти через поиск над карточками.',
+		question: 'Почему на странице показано не больше 10 городов?',
+		answer: 'В рекомендации попадают только города, где уже есть сообщения и сформирован полный свежий срез по АИ-92, АИ-95 и как минимум ещё одному виду топлива. Остальные живые чаты доступны через поиск над карточками.',
 	},
 	{
 		question: 'Цены в карточке означают, что бензин точно есть?',
@@ -117,7 +116,7 @@ const jsonLd = [
 			principleText="Свежий ценовой срез помогает выбрать активный город, но наличие, очередь и лимиты на конкретной АЗС нужно подтвердить в чате перед поездкой."
 			counters={[
 				{ value: String(cards.length), label: 'Городов в текущей рекомендации' },
-				{ value: String(cityOptions.length), label: 'Городов доступно через поиск' },
+				{ value: String(cityOptions.length), label: 'Живых городов доступно через поиск' },
 				{ value: '4', label: 'Вида топлива в сравнении' },
 				{ value: '3', label: 'Последних сообщения в карточке' },
 			]}
@@ -205,7 +204,7 @@ const jsonLd = [
 			subtitle="Важные уточнения"
 			title="Частые вопросы о городских чатах АЗС"
 			description="Как формируется десятка городов, что означают цены и как безопасно договориться о помощи."
-			benefits={['Поиск по полному справочнику городов', 'Наличие на конкретной АЗС уточняется в чате']}
+			benefits={['В поиске только города с сообщениями', 'Наличие на конкретной АЗС уточняется в чате']}
 			buttonLabel="Открыть общий чат"
 			buttonHref="/chat"
 		/>

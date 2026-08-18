@@ -1,11 +1,13 @@
 import { loadRecentCityBrandSummaries } from '../../../features/gas-prices/server';
 import { cities } from '../../../lib/cities';
-import { readLatestCityChatMessages } from './api';
+import { readActiveCityChatSlugs, readLatestCityChatMessages } from './api';
 import {
 	buildCityChatCatalogCard,
+	attachCityChatMessages,
+	buildActiveCityChatSearchOptions,
 	selectCityChatCatalog,
 	type CityChatCatalogCard,
-	type CityChatSearchOption,
+	type CityChatCatalogData,
 } from './model';
 
 const CATALOG_HISTORY_MS = 48 * 60 * 60 * 1000;
@@ -13,8 +15,8 @@ export const CITY_CHAT_CATALOG_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const EMPTY_CATALOG_CACHE_TTL_MS = 5 * 60 * 1000;
 
 interface CatalogState {
-	cache: { expiresAt: number; cards: CityChatCatalogCard[] } | null;
-	pending: Promise<CityChatCatalogCard[]> | null;
+	cache: { expiresAt: number; data: CityChatCatalogData } | null;
+	pending: Promise<CityChatCatalogData> | null;
 }
 
 const catalogGlobal = globalThis as typeof globalThis & {
@@ -26,64 +28,68 @@ const getCatalogState = (): CatalogState => {
 	return catalogGlobal.__zaRulemCityChatCatalog;
 };
 
-const buildCityChatCatalog = async (now: number): Promise<CityChatCatalogCard[]> => {
-	const indexableCities = cities.filter((city) => city.isIndexable !== false);
+const buildCityChatCatalog = async (now: number): Promise<CityChatCatalogData> => {
+	let activeCitySlugs: Set<string>;
+	try {
+		activeCitySlugs = await readActiveCityChatSlugs();
+	} catch (error) {
+		console.warn('[city-chat-catalog] Active city list unavailable:', error);
+		return { cards: [], cities: [] };
+	}
+
+	const activeCities = cities.filter((city) =>
+		city.isIndexable !== false && activeCitySlugs.has(city.slug),
+	);
+	if (activeCities.length === 0) return { cards: [], cities: [] };
+
 	const since = new Date(now - CATALOG_HISTORY_MS).toISOString();
 	const summariesByCity = await loadRecentCityBrandSummaries(since, new Date(now));
-	const cards = indexableCities.map((city) =>
+	const cards = activeCities.map((city) =>
 		buildCityChatCatalogCard(city, summariesByCity.get(city.slug) ?? [], now),
 	);
-
 	const selected = selectCityChatCatalog(
 		cards.filter((card): card is CityChatCatalogCard => card !== null),
 	);
 
-	return Promise.all(
-		selected.map(async (card) => {
+	const cardsWithMessages = await Promise.all(
+		selected.map(async (card): Promise<CityChatCatalogCard | null> => {
 			try {
 				const messages = await readLatestCityChatMessages(card.city.slug);
-				return { ...card, messages };
+				return attachCityChatMessages(card, messages);
 			} catch (error) {
 				console.warn(
 					`[city-chat-catalog] Message preview unavailable for ${card.city.slug}:`,
 					error,
 				);
-				return card;
+				return null;
 			}
 		}),
 	);
+
+	return {
+		cards: cardsWithMessages.filter((card): card is CityChatCatalogCard => card !== null),
+		cities: buildActiveCityChatSearchOptions(cities, activeCitySlugs),
+	};
 };
 
-/** Готовит SSR-каталог без раскрытия SDK-моделей и персональных полей сообщений. */
-export const getCityChatCatalog = async (now = Date.now()): Promise<CityChatCatalogCard[]> => {
+/** Готовит SSR-каталог и поиск только по городам с непустыми сообщениями. */
+export const getCityChatCatalog = async (now = Date.now()): Promise<CityChatCatalogData> => {
 	const state = getCatalogState();
 	const currentTime = Date.now();
-	if (state.cache && state.cache.expiresAt > currentTime) return state.cache.cards;
+	if (state.cache && state.cache.expiresAt > currentTime) return state.cache.data;
 	if (state.pending) return state.pending;
 
 	state.pending = buildCityChatCatalog(now);
 	try {
-		const cards = await state.pending;
+		const data = await state.pending;
 		state.cache = {
-			expiresAt: currentTime + (cards.length > 0
+			expiresAt: currentTime + (data.cards.length > 0
 				? CITY_CHAT_CATALOG_CACHE_TTL_MS
 				: EMPTY_CATALOG_CACHE_TTL_MS),
-			cards,
+			data,
 		};
-		return cards;
+		return data;
 	} finally {
 		state.pending = null;
 	}
 };
-
-/** Полный опубликованный справочник для клиентского поиска, независимо от наличия цен. */
-export const listCityChatSearchOptions = (): CityChatSearchOption[] =>
-	cities
-		.filter((city) => city.isIndexable !== false)
-		.map((city) => ({
-			slug: city.slug,
-			name: city.name,
-			region: city.region,
-			hint: city.hint,
-		}))
-		.sort((left, right) => left.name.localeCompare(right.name, 'ru-RU'));

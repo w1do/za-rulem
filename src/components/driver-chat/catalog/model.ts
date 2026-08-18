@@ -40,6 +40,11 @@ export interface CityChatSearchOption {
 	hint: string;
 }
 
+export interface CityChatCatalogData {
+	cards: CityChatCatalogCard[];
+	cities: CityChatSearchOption[];
+}
+
 export const CITY_CHAT_MAX_DATA_AGE_MS = 24 * 60 * 60 * 1000;
 export const CITY_CHAT_MIN_GASOLINE_SAMPLES = 3;
 export const CITY_CHAT_MIN_ADDITIONAL_FUEL_SAMPLES = 2;
@@ -196,6 +201,26 @@ export const selectCityChatCatalog = (
 	limit = CITY_CHAT_CATALOG_LIMIT,
 ): CityChatCatalogCard[] => sortCityChatCatalog(cards).slice(0, limit);
 
+/** Карточка считается живой только после получения хотя бы одного сообщения. */
+export const attachCityChatMessages = (
+	card: CityChatCatalogCard,
+	messages: CityChatMessagePreview[],
+): CityChatCatalogCard | null => messages.length > 0 ? { ...card, messages } : null;
+
+export const buildActiveCityChatSearchOptions = (
+	cityList: ChatCity[],
+	activeCitySlugs: ReadonlySet<string>,
+): CityChatSearchOption[] =>
+	cityList
+		.filter((city) => city.isIndexable !== false && activeCitySlugs.has(city.slug))
+		.map((city) => ({
+			slug: city.slug,
+			name: city.name,
+			region: city.region,
+			hint: city.hint,
+		}))
+		.sort((left, right) => left.name.localeCompare(right.name, 'ru-RU'));
+
 const normalizeSearchValue = (value: string): string =>
 	value
 		.toLocaleLowerCase('ru-RU')
@@ -203,7 +228,7 @@ const normalizeSearchValue = (value: string): string =>
 		.replace(/[^a-zа-я0-9]+/gi, ' ')
 		.trim();
 
-/** Ищет по полному справочнику, а не только по рекомендованной десятке. */
+/** Ищет по справочнику живых чатов, а не только по рекомендованной десятке. */
 export const searchCityChatOptions = (
 	options: CityChatSearchOption[],
 	query: string,

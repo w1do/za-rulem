@@ -3,6 +3,8 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 import {
+	attachCityChatMessages,
+	buildActiveCityChatSearchOptions,
 	buildCityChatCatalogCard,
 	CITY_CHAT_CATALOG_LIMIT,
 	CITY_CHAT_SEARCH_RESULT_LIMIT,
@@ -150,7 +152,7 @@ test('catalog limits the rendered list after ranking', () => {
 	assert.equal(selected[0]?.city.slug, `city-${CITY_CHAT_CATALOG_LIMIT + 5}`);
 });
 
-test('catalog renders ten recommendations and searches the complete city directory', () => {
+test('catalog renders ten recommendations and searches the live city directory', () => {
 	assert.equal(CITY_CHAT_CATALOG_LIMIT, 10);
 	assert.equal(CITY_CHAT_SEARCH_RESULT_LIMIT, 10);
 
@@ -168,9 +170,36 @@ test('catalog renders ten recommendations and searches the complete city directo
 	assert.deepEqual(searchCityChatOptions(options, 'неизвестный'), []);
 });
 
+test('only cities with messages are exposed as live cards and search options', () => {
+	const card = buildCityChatCatalogCard(
+		city('live', 'Живой'),
+		[summary('a', [
+			fuel('AI_92', 60, 4, 59),
+			fuel('AI_95', 64, 4, 63),
+			fuel('DT', 72, 2, 71),
+		])],
+		NOW.getTime(),
+	);
+	assert.ok(card);
+	assert.equal(attachCityChatMessages(card, []), null);
+	assert.equal(
+		attachCityChatMessages(card, [{ id: 'message-1', text: 'АИ-95 есть', topic: 'ai95', createdAt: NOW.toISOString() }])?.messages.length,
+		1,
+	);
+
+	const hiddenCity = { ...city('hidden', 'Скрытый'), isIndexable: false };
+	const options = buildActiveCityChatSearchOptions(
+		[city('live', 'Живой'), city('empty', 'Пустой'), hiddenCity],
+		new Set(['live', 'hidden']),
+	);
+	assert.deepEqual(options.map((item) => item.slug), ['live']);
+});
+
 test('message preview requests only non-personal fields', async () => {
 	const source = await readFile('src/components/driver-chat/catalog/api.ts', 'utf8');
 	assert.match(source, /fields: 'id,text,topic,date_created'/);
+	assert.match(source, /aggregate\[count\].*id/);
+	assert.match(source, /groupBy\[\].*city/);
 	assert.doesNotMatch(source, /fields: '[^']*phone/);
 	assert.doesNotMatch(source, /fields: '[^']*sessionId/);
 });
@@ -183,7 +212,15 @@ test('catalog reads recent gas data in one cross-city request', async () => {
 	assert.match(catalogSource, /selectCityChatCatalog/);
 	assert.match(catalogSource, /24 \* 60 \* 60 \* 1000/);
 	assert.match(catalogSource, /__zaRulemCityChatCatalog/);
-	assert.match(catalogSource, /listCityChatSearchOptions/);
+	assert.match(catalogSource, /readActiveCityChatSlugs/);
+	assert.match(catalogSource, /attachCityChatMessages/);
 	assert.match(gasSource, /filter\[area_type\]\[_eq\].*'city'/s);
 	assert.match(gasSource, /filter\[snapshot_date\]\[_gte\]/);
+});
+
+test('chat card keeps the source pricing content at its natural height', async () => {
+	const source = await readFile('src/components/driver-chat/catalog/CityChatCard.astro', 'utf8');
+	assert.doesNotMatch(source, /\.city-chat-card \.pricing-item-content-gold \{ flex:/);
+	assert.doesNotMatch(source, /\.city-chat-card \.pricing-item-header-gold \{[^}]*flex:/);
+	assert.doesNotMatch(source, /\.city-chat-card \.pricing-item-btn-gold \{[^}]*margin-top: auto/);
 });

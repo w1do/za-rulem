@@ -31,6 +31,36 @@ const toMessagePreview = (value: unknown): CityChatMessagePreview | null => {
 	};
 };
 
+/** Одним агрегатным запросом определяет города, где уже есть непустые сообщения. */
+export const readActiveCityChatSlugs = async (): Promise<Set<string>> => {
+	const params = new URLSearchParams({ limit: '-1' });
+	params.append('aggregate[count]', 'id');
+	params.append('groupBy[]', 'city');
+	params.set('filter[city][_nempty]', 'true');
+	params.set('filter[text][_nempty]', 'true');
+
+	const response = await fetch(
+		`${DIRECTUS_URL}/items/driver_chat_messages?${params.toString()}`,
+		{
+			headers: { Accept: 'application/json' },
+			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+		},
+	);
+	if (!response.ok) throw new Error(`Directus chat activity request failed: ${response.status}`);
+
+	const payload: unknown = await response.json();
+	if (!isRecord(payload) || !Array.isArray(payload.data)) return new Set();
+
+	return new Set(
+		payload.data.flatMap((value) => {
+			if (!isRecord(value) || typeof value.city !== 'string') return [];
+			const citySlug = value.city.trim();
+			const count = isRecord(value.count) ? Number(value.count.id) : 0;
+			return citySlug && Number.isFinite(count) && count > 0 ? [citySlug] : [];
+		}),
+	);
+};
+
 /** Серверное превью не запрашивает phone и sessionId из публичной коллекции. */
 export const readLatestCityChatMessages = async (
 	citySlug: string,
