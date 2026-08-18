@@ -1,0 +1,49 @@
+---
+import type { GasStationRankingSection, RankingKind } from '../../features/gas-station-rankings';
+import AzsRankingCard from './AzsRankingCard.astro';
+
+interface Props {
+	section: GasStationRankingSection;
+	kind: RankingKind;
+	cityIn: string;
+	citySlug: string;
+}
+
+const { section, kind, cityIn, citySlug } = Astro.props;
+const adjective = kind === 'cheapest' ? 'дешёвых' : 'дорогих';
+---
+
+<!-- Page Pricing Section Start -->
+<section class="page-pricing" aria-labelledby={`ranking-${section.fuelType.toLowerCase()}`}>
+	<div class="container">
+		<div class="row section-row">
+			<div class="col-xl-12">
+				<div class="section-title section-title-center">
+					<span class="section-sub-title">{section.label}</span>
+					<h2 id={`ranking-${section.fuelType.toLowerCase()}`}>Топ-5 {adjective} АЗС: {section.label} {cityIn}</h2>
+					<p>Место определяется по свежей цене {section.label}. В карточке также показаны доступные цены остальных видов топлива и изменение к предыдущему получасовому снимку.</p>
+				</div>
+			</div>
+		</div>
+
+		{section.stations.length > 0 ? (
+			<div class="row">
+				{section.stations.map((station, index) => (
+					<AzsRankingCard station={station} fuelType={section.fuelType} citySlug={citySlug} index={index} />
+				))}
+			</div>
+		) : (
+			<div class="row">
+				<div class="col-xl-12">
+					<div class="pricing-item">
+						<div class="pricing-item-list">
+							<h3>Свежих цен {section.label} пока недостаточно</h3>
+							<p>Секция появится после получения актуальных адресных данных минимум от одной открытой АЗС.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		)}
+	</div>
+</section>
+<!-- Page Pricing Section End -->

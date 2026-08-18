@@ -14,7 +14,7 @@ export const ROOT_ONLY_ROUTE_SEGMENTS = [
 ] as const;
 
 /** Разделы, для которых городской префикс обязателен даже у базового города. */
-export const CITY_PREFIX_REQUIRED_ROUTE_SEGMENTS = ['services'] as const;
+export const CITY_PREFIX_REQUIRED_ROUTE_SEGMENTS = ['services', 'azs'] as const;
 
 const rootOnlyRouteSegments: ReadonlySet<string> = new Set(ROOT_ONLY_ROUTE_SEGMENTS);
 const cityPrefixRequiredRouteSegments: ReadonlySet<string> = new Set(

@@ -117,9 +117,10 @@ export const readLatestStationPrices = async (
  * Свежие снимки `gas_daily` (`area_type=point`) по всем АЗС города.
  * `area_parent_slug` заполняет парсер, поэтому город определяется без выборки по координатам.
  */
-const readCityPriceSnapshots = async (
+export const readCityStationPriceHistory = async (
 	citySlug: string,
-): Promise<Map<string, StationPricesSnapshot>> => {
+	since?: string,
+): Promise<StationPricesSnapshot[]> => {
 	const params = new URLSearchParams({
 		limit: '-1',
 		fields: STATION_PRICE_FIELDS,
@@ -127,12 +128,20 @@ const readCityPriceSnapshots = async (
 	});
 	params.set('filter[area_type][_eq]', 'point');
 	params.set('filter[area_parent_slug][_eq]', citySlug);
+	if (since) params.set('filter[snapshot_date][_gte]', since);
 
 	const payload = await request(`/items/gas_daily?${params.toString()}`);
+	return readDataItems(payload)
+		.map(toStationPricesSnapshot)
+		.filter((snapshot): snapshot is StationPricesSnapshot => snapshot !== null);
+};
+
+const readCityPriceSnapshots = async (
+	citySlug: string,
+): Promise<Map<string, StationPricesSnapshot>> => {
+	const snapshots = await readCityStationPriceHistory(citySlug);
 	const latest = new Map<string, StationPricesSnapshot>();
-	readDataItems(payload).forEach((item) => {
-		const snapshot = toStationPricesSnapshot(item);
-		if (!snapshot) return;
+	snapshots.forEach((snapshot) => {
 		const stored = latest.get(snapshot.stationId);
 		if (!stored || stored.snapshotDate < snapshot.snapshotDate) {
 			latest.set(snapshot.stationId, snapshot);
@@ -146,7 +155,9 @@ const readCityPriceSnapshots = async (
  * Карточки АЗС единого реестра по идентификаторам из снимков цен.
  * Неудавшаяся пачка не отменяет остальные: цены показываются и без карточки.
  */
-const readStationsByIds = async (stationIds: string[]): Promise<Map<string, StationData>> => {
+export const readStationCardsByIds = async (
+	stationIds: string[],
+): Promise<Map<string, StationData>> => {
 	const stations = new Map<string, StationData>();
 
 	const batches = chunk(stationIds, STATION_ID_CHUNK_SIZE);
@@ -223,7 +234,7 @@ const readCityStationsFromDirectus = async (citySlug: string): Promise<StationDa
 	const snapshots = await readCityPriceSnapshots(citySlug);
 	if (snapshots.size === 0) return [];
 
-	const stations = await readStationsByIds([...snapshots.keys()]);
+	const stations = await readStationCardsByIds([...snapshots.keys()]);
 
 	return [...snapshots.values()].map((snapshot) => {
 		const station = stations.get(snapshot.stationId);

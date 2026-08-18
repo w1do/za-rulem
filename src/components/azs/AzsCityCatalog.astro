@@ -1,0 +1,80 @@
+---
+import { azsRankingUrl, type AzsCityCatalogItem } from '../../features/gas-station-rankings';
+
+interface Props {
+	cities: AzsCityCatalogItem[];
+}
+
+const { cities } = Astro.props;
+
+const formatDate = (value: string): string => {
+	const date = new Date(value);
+	return Number.isNaN(date.getTime())
+		? value
+		: date.toLocaleString('ru-RU', {
+			day: 'numeric',
+			month: 'long',
+			hour: '2-digit',
+			minute: '2-digit',
+		});
+};
+---
+
+<!-- page Services Start -->
+<div class="page-services" aria-labelledby="azs-city-catalog-title">
+	<div class="container">
+		<div class="row section-row">
+			<div class="col-xl-12">
+				<div class="section-title section-title-center">
+					<span class="section-sub-title">Статистика по городам</span>
+					<h2 id="azs-city-catalog-title">Выберите город и сравните цены на АЗС</h2>
+					<p>В каталог попадают города со свежими наблюдениями минимум по АИ-92 и АИ-95. Наличие топлива на конкретной колонке уточняйте перед поездкой.</p>
+				</div>
+			</div>
+		</div>
+
+		{cities.length > 0 ? (
+			<div class="row">
+				{cities.map(({ city, updatedAt }, index) => (
+					<div class="col-xl-4 col-md-6">
+						<!-- Service Item Start -->
+						<div class="service-item wow fadeInUp" data-wow-delay={`${(index % 3) * 0.2}s`}>
+							<div class="icon-box">
+								<img src="/images/icon-service-1.svg" alt="" width="50" height="50" />
+							</div>
+							<div class="service-item-body">
+								<div class="service-item-content">
+									<h2>{city.name}</h2>
+									<p>{city.region}{city.hint ? ` · ${city.hint}` : ''}</p>
+									<p>Срез обновлён: <time datetime={updatedAt}>{formatDate(updatedAt)}</time></p>
+								</div>
+								<div class="service-item-btn">
+									<a href={azsRankingUrl(city.slug, 'cheapest')} class="readmore-btn">Дешёвые АЗС</a>
+									<a href={azsRankingUrl(city.slug, 'expensive')} class="readmore-btn">Дорогие АЗС</a>
+								</div>
+							</div>
+						</div>
+						<!-- Service Item End -->
+					</div>
+				))}
+			</div>
+		) : (
+			<div class="row">
+				<div class="col-xl-12">
+					<div class="service-item">
+						<div class="icon-box">
+							<img src="/images/icon-service-1.svg" alt="" width="50" height="50" />
+						</div>
+						<div class="service-item-body">
+							<div class="service-item-content">
+								<h2>Свежая статистика временно недоступна</h2>
+								<p>Directus не вернул достаточно свежий срез по городам. Рейтинги не заполняются устаревшими или выдуманными ценами.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		)}
+	</div>
+</div>
+<!-- page Services End -->

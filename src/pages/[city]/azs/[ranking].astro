@@ -1,0 +1,15 @@
+---
+import AzsRankingPage from '../../../components/pages/AzsRankingPage.astro';
+import { rankingKindBySlug } from '../../../features/gas-station-rankings';
+import { findCity } from '../../../lib/cities';
+
+export const prerender = false;
+
+const city = findCity(Astro.params.city);
+if (!city) return new Response('Город не найден', { status: 404 });
+
+const kind = rankingKindBySlug(Astro.params.ranking);
+if (!kind) return new Response('Страница не найдена', { status: 404 });
+---
+
+<AzsRankingPage city={city} kind={kind} />

@@ -1,0 +1,89 @@
+---
+import { formatPrice } from '../../features/gas-prices';
+import type {
+	RankedGasStation,
+	RankingFuelType,
+} from '../../features/gas-station-rankings';
+import { chatAppUrl } from '../../lib/cities';
+
+interface Props {
+	station: RankedGasStation;
+	fuelType: RankingFuelType;
+	citySlug: string;
+	index: number;
+}
+
+const { station, fuelType, citySlug, index } = Astro.props;
+const focusPrice = station.prices.find((price) => price.fuelType === fuelType);
+const topicByFuel: Record<RankingFuelType, string> = {
+	AI_92: 'ai92',
+	AI_95: 'ai95',
+	AI_100: 'ai100',
+	DT: 'dt',
+};
+const icon = `/images/icon-pricing-${(index % 3) + 1}.svg`;
+
+const formatDelta = (delta: number | null): string => {
+	if (delta === null) return 'нет истории';
+	if (delta === 0) return 'без изменений';
+	return `${delta > 0 ? '+' : '−'}${Math.abs(delta).toLocaleString('ru-RU', {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	})} ₽`;
+};
+
+const formatDate = (value: string): string => {
+	const date = new Date(value);
+	return Number.isNaN(date.getTime())
+		? value
+		: date.toLocaleString('ru-RU', {
+			day: 'numeric',
+			month: 'short',
+			hour: '2-digit',
+			minute: '2-digit',
+		});
+};
+---
+
+<div class="col-xl-4 col-md-6">
+	<!-- Pricing Item Start -->
+	<article id={`${fuelType.toLowerCase()}-${station.id}`} class="pricing-item wow fadeInUp" data-wow-delay={`${(index % 3) * 0.2}s`}>
+		<!-- Pricing Item Header Start -->
+		<div class="pricing-item-header">
+			<div class="icon-box">
+				<img src={icon} alt="" width="50" height="50" />
+			</div>
+			<div class="pricing-item-content">
+				<h2>№ {station.rank} · {station.name}</h2>
+				<p>{station.brand || 'АЗС'} · {station.address}</p>
+			</div>
+		</div>
+		<!-- Pricing Item Header End -->
+
+		<!-- Pricing Item Body Start -->
+		<div class="pricing-item-body">
+			<div class="pricing-item-price">
+				<h2>{focusPrice?.currentPrice === null || focusPrice?.currentPrice === undefined ? 'Нет данных' : formatPrice(focusPrice.currentPrice)} <sub>/литр</sub></h2>
+			</div>
+			<div class="pricing-item-btn">
+				<a href={chatAppUrl(citySlug, topicByFuel[fuelType])} class="btn-default">Спросить в чате</a>
+			</div>
+		</div>
+		<!-- Pricing Item Body End -->
+
+		<!-- Pricing Item List Start -->
+		<div class="pricing-item-list">
+			<h3>Цены и динамика:</h3>
+			<ul>
+				{station.prices.map((price) => (
+					<li>
+						{price.label}: {price.currentPrice === null ? 'нет данных' : formatPrice(price.currentPrice)} · {formatDelta(price.delta)}
+					</li>
+				))}
+			</ul>
+			<p>Обновлено: <time datetime={station.updatedAt}>{formatDate(station.updatedAt)}</time></p>
+		</div>
+		<!-- Pricing Item List End -->
+	</article>
+	<!-- Pricing Item End -->
+</div>

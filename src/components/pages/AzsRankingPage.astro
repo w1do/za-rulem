@@ -1,0 +1,99 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AzsRankingSection from '../azs/AzsRankingSection.astro';
+import AzsRelatedLinks from '../azs/AzsRelatedLinks.astro';
+import LightChatBox from '../driver-chat/LightChatBox.astro';
+import Footer from '../shared/footer/Footer.astro';
+import Header from '../shared/header/Header.astro';
+import PageHeader from '../shared/PageHeader.astro';
+import { buildAzsRankingMeta } from '../../data/azsAnalyticsContent';
+import {
+	azsRankingUrl,
+	type RankingKind,
+} from '../../features/gas-station-rankings';
+import { getCityStationRanking } from '../../features/gas-station-rankings/server';
+import { getCityUrl, type ChatCity } from '../../lib/cities';
+import { breadcrumbNode, datasetNode, itemListNode, webPageNode } from '../../lib/seo';
+
+interface Props {
+	city: ChatCity;
+	kind: RankingKind;
+}
+
+const { city, kind } = Astro.props;
+const meta = buildAzsRankingMeta(city, kind);
+const data = await getCityStationRanking(city.slug, kind);
+const url = azsRankingUrl(city.slug, kind);
+const stationItems = data.sections.flatMap((section) => section.stations.map((station) => ({
+	name: `${section.label}: ${station.name}, ${station.address}`,
+	url: `${url}#${section.fuelType.toLowerCase()}-${station.id}`,
+})));
+const robots = city.isIndexable !== false && data.isIndexable ? undefined : 'noindex, follow';
+const jsonLd = [
+	webPageNode({ name: meta.title, description: meta.description, url }),
+	datasetNode({
+		name: `${meta.shortTitle} ${city.inCity}`,
+		description: meta.description,
+		url,
+		dateModified: data.updatedAt ?? undefined,
+	}),
+	breadcrumbNode([
+		{ name: 'Главная', url: getCityUrl('/', city.slug) },
+		{ name: 'Аналитика АЗС', url: '/azs' },
+		{ name: meta.shortTitle, url },
+	]),
+	itemListNode(stationItems),
+];
+---
+
+<Layout
+	title={meta.title}
+	description={meta.description}
+	ogTitle={`${meta.shortTitle} ${city.inCity}`}
+	ogDescription={meta.intro}
+	keywords={`${meta.shortTitle.toLowerCase()} ${city.name}, где бензин ${city.name}, АЗС АИ-92, АЗС АИ-95, АИ-100, дизельное топливо`}
+	jsonLd={jsonLd}
+	city={city}
+	robots={robots}
+>
+	<Header city={city} />
+	<main>
+		<PageHeader
+			title={meta.h1}
+			items={[
+				{ label: 'Главная', href: getCityUrl('/', city.slug) },
+				{ label: 'Аналитика АЗС', href: '/azs' },
+				{ label: meta.shortTitle },
+			]}
+			showChatButton={true}
+			chatLink={`/chat?city=${encodeURIComponent(city.slug)}&topic=general`}
+		/>
+
+		<section class="page-pricing" aria-labelledby="azs-ranking-intro">
+			<div class="container">
+				<div class="row section-row">
+					<div class="col-xl-12">
+						<div class="section-title section-title-center">
+							<span class="section-sub-title">{meta.subtitle}</span>
+							<h2 id="azs-ranking-intro">Цены на АЗС по четырём видам топлива</h2>
+							<p>{meta.intro}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		{data.sections.map((section) => (
+			<AzsRankingSection section={section} kind={kind} cityIn={city.inCity} citySlug={city.slug} />
+		))}
+
+		<LightChatBox
+			city={city}
+			title={meta.chatTitle}
+			description="Уточните наличие нужного топлива, фактическую цену и очередь на конкретной АЗС перед поездкой."
+		/>
+
+		<AzsRelatedLinks city={city} kind={kind} />
+	</main>
+	<Footer city={city} />
+</Layout>

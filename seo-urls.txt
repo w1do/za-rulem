@@ -235,6 +235,7 @@ https://za-rulem.org/azov/drivers
 https://za-rulem.org/azov/partners
 https://za-rulem.org/azov/queue
 https://za-rulem.org/azov/services
+https://za-rulem.org/azs
 https://za-rulem.org/bakhchisaray
 https://za-rulem.org/bakhchisaray/avtopomoshch
 https://za-rulem.org/bakhchisaray/calculator
@@ -3336,6 +3337,8 @@ https://za-rulem.org/tver/queue
 https://za-rulem.org/tver/services
 https://za-rulem.org/tyumen
 https://za-rulem.org/tyumen/avtopomoshch
+https://za-rulem.org/tyumen/azs/deshevye-zapravki
+https://za-rulem.org/tyumen/azs/dorogie-zapravki
 https://za-rulem.org/tyumen/calculator
 https://za-rulem.org/tyumen/ceny-na-benzin
 https://za-rulem.org/tyumen/chat-voditeley

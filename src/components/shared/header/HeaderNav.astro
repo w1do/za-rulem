@@ -40,6 +40,15 @@ const menu = [
 	{ label: 'Отзывы', href: pageUrl('/testimonials') },
 	{ label: 'Бензин', href: pageUrl('/ceny-na-benzin') },
 	{
+		label: 'АЗС',
+		href: '/azs',
+		children: [
+			{ label: 'Дешёвые заправки', href: pageUrl('/azs/deshevye-zapravki') },
+			{ label: 'Дорогие заправки', href: pageUrl('/azs/dorogie-zapravki') },
+			{ label: 'Очереди на АЗС', href: pageUrl('/ochered-na-azs') },
+		],
+	},
+	{
 		label: 'Чат',
 		href: '/chats',
 		children: [

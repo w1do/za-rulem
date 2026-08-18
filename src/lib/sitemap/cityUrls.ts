@@ -56,6 +56,7 @@ export const getCitySitemapUrls = async (site: string): Promise<string[]> => {
 
 	return [
 		absolute(site, '/chats'),
+		absolute(site, '/azs'),
 		absolute(site, '/ceny-na-benzin'),
 		absolute(site, '/ochered-na-azs'),
 		...cities

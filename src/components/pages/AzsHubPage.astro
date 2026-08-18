@@ -1,0 +1,48 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AzsCityCatalog from '../azs/AzsCityCatalog.astro';
+import Footer from '../shared/footer/Footer.astro';
+import Header from '../shared/header/Header.astro';
+import PageHeader from '../shared/PageHeader.astro';
+import { getAzsCityCatalog } from '../../features/gas-station-rankings/server';
+import { breadcrumbNode, itemListNode, webPageNode } from '../../lib/seo';
+
+const title = 'АЗС по городам: дешёвые и дорогие заправки | За Рулём';
+const description = 'Сравните дешёвые и дорогие АЗС по городам: адреса, цены АИ-92, АИ-95, АИ-100 и ДТ, динамика по свежим снимкам Directus.';
+const h1 = 'Дешёвые и дорогие АЗС по городам';
+const url = '/azs';
+const cities = await getAzsCityCatalog();
+const jsonLd = [
+	webPageNode({ type: 'CollectionPage', name: title, description, url }),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Аналитика АЗС', url },
+	]),
+	itemListNode(cities.map(({ city }) => ({
+		name: `Аналитика АЗС — ${city.name}`,
+		url: `/${city.slug}/azs/deshevye-zapravki`,
+	}))),
+];
+---
+
+<Layout
+	title={title}
+	description={description}
+	ogTitle="Где бензин дешевле и дороже — аналитика АЗС по городам"
+	ogDescription="Адреса заправок, свежие цены АИ-92, АИ-95, АИ-100 и ДТ с получасовой динамикой."
+	keywords="АЗС по городам, дешевые заправки, дорогие заправки, цены АИ-92, АИ-95, АИ-100, ДТ"
+	jsonLd={jsonLd}
+	isNational={true}
+>
+	<Header isNational={true} />
+	<main>
+		<PageHeader
+			title={h1}
+			items={[{ label: 'Главная', href: '/' }, { label: 'Аналитика АЗС' }]}
+			showChatButton={true}
+			chatLink="/chat"
+		/>
+		<AzsCityCatalog cities={cities} />
+	</main>
+	<Footer isNational={true} nationalVariant="system" />
+</Layout>

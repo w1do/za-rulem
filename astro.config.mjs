@@ -11,9 +11,11 @@ const SITE = 'https://za-rulem.org';
 
 const { getCitySitemapUrls, isCitySitemapUrl } = await import('./src/lib/sitemap/cityUrls');
 const { getGasPriceSitemapUrls } = await import('./src/features/gas-prices/server');
+const { getGasStationRankingSitemapUrls } = await import('./src/features/gas-station-rankings/server');
 const { defaultCity } = await import('./src/lib/cities');
 const citySitemapUrls = await getCitySitemapUrls(SITE);
 const gasPriceSitemapUrls = await getGasPriceSitemapUrls(SITE);
+const gasStationRankingSitemapUrls = await getGasStationRankingSitemapUrls(SITE);
 
 // https://astro.build/config
 export default defineConfig({
@@ -60,7 +62,7 @@ export default defineConfig({
         return !isCompactRoadAlias && !isLegacyRoadAlias && !isRootServiceUrl && !isLegacyChatHub;
       },
       // Городские маршруты работают через SSR, поэтому в pages их нет.
-      customPages: [...citySitemapUrls, ...gasPriceSitemapUrls],
+      customPages: [...citySitemapUrls, ...gasPriceSitemapUrls, ...gasStationRankingSitemapUrls],
       // Две карты в одном индексе: sitemap-cities-0.xml и sitemap-pages-0.xml.
       chunks: {
         cities: (item) => (isCitySitemapUrl(item.url) ? item : undefined),

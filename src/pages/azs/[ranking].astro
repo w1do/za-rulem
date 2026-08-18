@@ -1,0 +1,12 @@
+---
+import { defaultCity } from '../../lib/cities';
+import { rankingKindBySlug, rankingSlugByKind } from '../../features/gas-station-rankings';
+
+export const prerender = false;
+
+const kind = rankingKindBySlug(Astro.params.ranking);
+if (!kind) return new Response('Страница не найдена', { status: 404 });
+
+const query = Astro.url.search;
+return Astro.redirect(`/${defaultCity.slug}/azs/${rankingSlugByKind[kind]}${query}`, 301);
+---
