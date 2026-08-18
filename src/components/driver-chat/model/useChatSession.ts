@@ -11,6 +11,7 @@ import {
 } from '../lib/chatPrefs';
 import { createId } from '../lib/id';
 import { isValidPhone, normalizePhone } from '../lib/phone';
+import { lockChatPrefsToCity } from './fixedCity';
 import type { ChatTopic } from './types';
 
 export interface ChatSession extends ChatPrefs {
@@ -24,13 +25,22 @@ export interface ChatSession extends ChatPrefs {
 	selectCity: (city: string) => boolean;
 }
 
+export interface ChatSessionOptions {
+	/** Фиксирует чат на городе страницы и отключает внешние переключения города. */
+	fixedCitySlug?: string;
+}
+
 /**
  * Кто участвует в чате и какой канал открыт: номер, топик, город.
  * Настройки читаются из URL/localStorage и туда же сохраняются.
  */
-export function useChatSession(defaultCitySlug: string): ChatSession {
+export function useChatSession(
+	defaultCitySlug: string,
+	{ fixedCitySlug }: ChatSessionOptions = {},
+): ChatSession {
+	const fixedCity = fixedCitySlug ? resolveCity(fixedCitySlug, defaultCitySlug) : undefined;
 	const [sessionId] = useState(createId);
-	const [prefs, setPrefs] = useState<ChatPrefs>({ phone: '', topic: 'general', city: defaultCitySlug });
+	const [prefs, setPrefs] = useState<ChatPrefs>({ phone: '', topic: 'general', city: fixedCity ?? defaultCitySlug });
 	const [isJoined, setIsJoined] = useState(false);
 	const [error, setError] = useState('');
 
@@ -51,7 +61,7 @@ export function useChatSession(defaultCitySlug: string): ChatSession {
 			setError('Укажи номер из 11 цифр.');
 			return;
 		}
-		persistPrefs(update({ phone }));
+		persistPrefs(update({ phone }), { persistGlobalCity: !fixedCity });
 		setIsJoined(true);
 		setError('');
 	};
@@ -59,12 +69,13 @@ export function useChatSession(defaultCitySlug: string): ChatSession {
 	const selectTopic = (topic: ChatTopic): boolean => {
 		if (topic === prefsRef.current.topic) return false;
 		const next = update({ topic });
-		persistPrefs(next);
+		persistPrefs(next, { persistGlobalCity: !fixedCity });
 		syncUrlPrefs(next.topic, next.city);
 		return true;
 	};
 
 	const selectCity = (citySlug: string): boolean => {
+		if (fixedCity) return false;
 		const city = resolveCity(citySlug, defaultCitySlug);
 		if (city === prefsRef.current.city) return false;
 		const next = update({ city });
@@ -74,14 +85,16 @@ export function useChatSession(defaultCitySlug: string): ChatSession {
 	};
 
 	useEffect(() => {
-		const initial = readInitialPrefs(defaultCitySlug);
+		const storedInitial = readInitialPrefs(defaultCitySlug);
+		const initial = fixedCity ? lockChatPrefsToCity(storedInitial, fixedCity) : storedInitial;
 		update(initial);
-		persistCity(initial.city);
+		if (!fixedCity) persistCity(initial.city);
 		if (initial.phone) {
-			persistPrefs(initial);
+			persistPrefs(initial, { persistGlobalCity: !fixedCity });
 			setIsJoined(true);
 		}
 
+		if (fixedCity) return undefined;
 		return subscribeToCityChange(selectCity);
 	}, []);
 

@@ -15,6 +15,7 @@ import HomeTestimonials from '../../../../components/home/HomeTestimonials.astro
 import HomePricing from '../../../../components/home/HomePricing.astro';
 import HomeBlog from '../../../../components/home/HomeBlog.astro';
 import ServiceFaqs from '../../../../components/services/single/ServiceFaqs.astro';
+import LightChatBox from '../../../../components/driver-chat/LightChatBox.astro';
 import { fuelLabels, getFuelDriverPath, getFuelDrivers, statusLabels } from '../../../../data/fuelDrivers';
 import { breadcrumbNode, faqNode, serviceNode } from '../../../../lib/seo';
 import { findCity, getCityUrl } from '../../../../lib/cities';
@@ -85,6 +86,11 @@ const jsonLd = [
 		counterValue={driver.deliveryTime.includes('1') ? '1' : '2'}
 		counterText="часа — минимальный ориентир прибытия."
 		benefits={benefits}
+	/>
+	<LightChatBox
+		city={city}
+		title={`Чат водителей ${city.inCity}`}
+		description={`Уточните наличие ${fuelText}, очереди на АЗС и текущую обстановку перед вызовом водителя.`}
 	/>
 	<HomeAbout
 		city={city}

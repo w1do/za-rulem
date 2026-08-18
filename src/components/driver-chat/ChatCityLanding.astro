@@ -14,6 +14,7 @@ import { defaultCity, chatAppUrl, fuelLandingUrl, cityLandingUrl } from '../../l
 import { districtOfRegion, formatPopulation, citySeoTitle, citySeoDescription } from '../../data/cityMeta';
 import { chatFuels } from '../../data/chatCluster';
 import Alert from "../shared/Alert.astro";
+import LightChatBox from './LightChatBox.astro';
 import GasBrandGrid from '../../features/gas-prices/ui/GasBrandGrid.astro';
 import { getGasCityPrices } from '../../features/gas-prices/server';
 import GasPricesMapSection from '../gas-prices/GasPricesMapSection.astro';
@@ -143,6 +144,11 @@ const breadcrumbItems = [
 				description={alertDescription}
 			/>
 		</div>
+
+		<LightChatBox
+			city={city}
+			title={`Чат водителей ${city.ofCity}`}
+		/>
 
 
         <GasPricesMapSection

@@ -19,6 +19,7 @@ import HubExpertise from '../components/hub/HubExpertise.astro';
 import HubFaqs from '../components/hub/HubFaqs.astro';
 import HubTestimonials from '../components/hub/HubTestimonials.astro';
 import FuelDeliveryCalculator from '../components/calculators/FuelDeliveryCalculator.tsx';
+import LightChatBox from '../components/driver-chat/LightChatBox.astro';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
 import { defaultCity, replaceCityPlaceholders, getCityUrl } from '../lib/cities';
 import type { ChatCity } from '../lib/cities';
@@ -107,6 +108,16 @@ const showFuelCalculator = cluster === 'toplivo';
 	<HubIntro title={replaceCityPlaceholders(frontmatter.title, city)} description={seoDescription} city={city}>
 		<slot />
 	</HubIntro>
+
+	{
+		showFuelCalculator && (
+			<LightChatBox
+				city={city}
+				title={`Чат о топливе ${city.inCity}`}
+				description="Уточните наличие бензина или дизеля, цены и очереди у водителей вашего города."
+			/>
+		)
+	}
 
 	<HubPricing title={replaceCityPlaceholders(pricing?.title, city)} items={pricingItems} />
 

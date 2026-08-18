@@ -4,6 +4,7 @@ import Layout from './Layout.astro';
 import Header from '../components/shared/header/Header.astro';
 import Footer from '../components/shared/footer/Footer.astro';
 import PageHeader from '../components/shared/PageHeader.astro';
+import LightChatBox from '../components/driver-chat/LightChatBox.astro';
 import ServiceSidebar from '../components/services/single/ServiceSidebar.astro';
 import ServiceSingleImage from '../components/services/single/ServiceSingleImage.astro';
 import ServiceWhyChoose from '../components/services/single/ServiceWhyChoose.astro';
@@ -13,6 +14,7 @@ import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 import { roadSituations } from '../data/roadAssistance';
 import { breadcrumbNode, faqNode, serviceNode } from '../lib/seo';
 import { RoadGasStations } from '../features/road-gas-stations';
+import { defaultCity } from '../lib/cities';
 
 export type RoadLink = {
 	code: string;
@@ -121,6 +123,12 @@ const jsonLd = [
 		helpService={voiceService}
 		helpSubject={voiceSubject}
 		helpTitle={`Помощь на трассе ${road.code}`}
+	/>
+
+	<LightChatBox
+		city={defaultCity}
+		title={`Чат водителей трассы ${road.code}`}
+		description={`Уточните наличие топлива и очереди на АЗС трассы ${road.code}. Укажите направление и ближайший километр.`}
 	/>
 
 

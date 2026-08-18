@@ -9,6 +9,7 @@ import FuelDeliveryCalculator from '../../components/calculators/FuelDeliveryCal
 import FuelDeliveryFilters from '../../components/fleets/FuelDeliveryFilters.astro';
 import FuelDriverCard from '../../components/fleets/FuelDriverCard.astro';
 import Alert from '../../components/shared/Alert.astro';
+import LightChatBox from '../../components/driver-chat/LightChatBox.astro';
 import { getFuelDrivers } from '../../data/fuelDrivers';
 import { chatAppUrl, getCityUrl, replaceCityPlaceholders, type ChatCity } from '../../lib/cities';
 
@@ -84,6 +85,12 @@ const faqs = [
 	<!-- Page Fleets Section Start -->
 	<div class="page-fleets">
 		<Alert chatHref={chatAppUrl(city.slug)} />
+
+		<LightChatBox
+			city={city}
+			title={`Чат водителей и доставщиков ${city.inCity}`}
+			description="Уточните наличие топлива, очереди на АЗС или договоритесь с водителями о текущей обстановке."
+		/>
 
 		<div class="container mt-5">
 			<div class="row fuel-delivery-layout">

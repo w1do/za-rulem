@@ -15,6 +15,10 @@ export interface ChatPrefs {
 	city: string;
 }
 
+interface PersistPrefsOptions {
+	persistGlobalCity?: boolean;
+}
+
 // Справочник городов живёт на сервере, поэтому в браузере проверяем только форму слага.
 const CITY_SLUG_PATTERN = /^[a-z0-9-]{2,50}$/;
 
@@ -69,10 +73,13 @@ export const readInitialPrefs = (defaultCitySlug: string): ChatPrefs => {
 	};
 };
 
-export const persistPrefs = ({ phone, topic, city }: ChatPrefs): void => {
+export const persistPrefs = (
+	{ phone, topic, city }: ChatPrefs,
+	{ persistGlobalCity = true }: PersistPrefsOptions = {},
+): void => {
 	try {
 		window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ phone, topic, city }));
-		saveCity(city);
+		if (persistGlobalCity) saveCity(city);
 	} catch (e) {
 		console.warn('Chat persistence failed:', e);
 	}

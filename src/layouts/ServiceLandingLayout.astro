@@ -9,6 +9,7 @@ import ServiceSingleImage from '../components/services/single/ServiceSingleImage
 import ServiceFaqs from '../components/services/single/ServiceFaqs.astro';
 import FuelDeliveryCalculator from '../components/calculators/FuelDeliveryCalculator.tsx';
 import FuelPricesSection from '../components/gas-prices/FuelPricesSection.astro';
+import LightChatBox from '../components/driver-chat/LightChatBox.astro';
 import { serviceNode, breadcrumbNode, faqNode } from '../lib/seo';
 import type { ChatCity } from '../lib/cities';
 import { defaultCity, replaceCityPlaceholders, removeCityPlaceholders, getCityUrl } from '../lib/cities';
@@ -74,6 +75,16 @@ const replacedContentHtml = replaceCityPlaceholders(contentHtml, city);
 		title={replaceCityPlaceholders(frontmatter.title, city)}
 		showChatButton={cluster === 'toplivo'}
 	/>
+
+	{
+		cluster === 'toplivo' && (
+			<LightChatBox
+				city={city}
+				title={`Чат о топливе ${city.inCity}`}
+				description="Спросите водителей о наличии топлива и очередях на АЗС перед заказом или поездкой."
+			/>
+		)
+	}
 
 	<!-- Page Service Single Start -->
 	<div class="page-service-single">

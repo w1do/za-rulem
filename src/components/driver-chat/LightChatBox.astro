@@ -1,0 +1,36 @@
+---
+import type { ChatCity } from '../../lib/cities';
+import LightChatPage from './LightChatPage';
+import './driver-chat.css';
+import './light-chat.css';
+
+interface Props {
+	city: ChatCity;
+	title?: string;
+	description?: string;
+	class?: string;
+}
+
+const {
+	city,
+	title = `Чат водителей ${city.ofCity}`,
+	description = 'Спросите, где сейчас есть нужное топливо и какие очереди на АЗС. История разделена по категориям и обновляется автоматически.',
+	class: className,
+} = Astro.props;
+
+const titleId = `light-chat-title-${city.slug}`;
+const cityOption = { slug: city.slug, name: city.name };
+---
+
+<section class:list={['light-chat-section', 'bg-section', className]} aria-labelledby={titleId}>
+	<div class="container">
+		<div class="section-title text-center">
+			<span class="section-sub-title">Общение в реальном времени</span>
+			<h2 id={titleId}>{title}</h2>
+			<p>{description}</p>
+		</div>
+		<div class="lc-container">
+			<LightChatPage client:visible city={cityOption} />
+		</div>
+	</div>
+</section>

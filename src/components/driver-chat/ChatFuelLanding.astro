@@ -8,6 +8,7 @@ import HubProcess from '../hub/HubProcess.astro';
 import HubFaqs from '../hub/HubFaqs.astro';
 import HubCta from '../hub/HubCta.astro';
 import ChatOtherLocations from './ChatOtherLocations.astro';
+import LightChatBox from './LightChatBox.astro';
 import { webPageNode, breadcrumbNode, faqNode } from '../../lib/seo';
 import { chatAppUrl, cityLandingUrl, defaultCity, fuelLandingUrl, type ChatCity } from '../../lib/cities';
 import { chatFuels, type ChatFuel } from '../../data/chatCluster';
@@ -93,6 +94,12 @@ breadcrumbItems.push({ label: fuel.name });
 					text: `Узнаю заранее, сколько времени придется провести в очереди за ${fuel.name}.`,
 				},
 			]}
+		/>
+
+		<LightChatBox
+			city={city}
+			title={`Спросить про ${fuel.name} ${city.inCity}`}
+			description={`Читайте сообщения водителей о наличии ${fuel.name}, ценах и очередях или задайте свой вопрос.`}
 		/>
 
 		<HubCta

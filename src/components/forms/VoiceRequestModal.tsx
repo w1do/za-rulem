@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useId, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import CourierSearchSimulation from './CourierSearchSimulation';
+import CourierUnavailableOffer from './CourierUnavailableOffer';
+import RequestLocationField from './RequestLocationField';
+import { isLocationReady, type RequestLocation } from '../../lib/geo/requestLocation';
+import {
+	LEADS_ENDPOINT,
+	buildCourierRequestLead,
+	type PrepaymentStatus,
+} from '../../lib/leads/courierRequestLead';
 
 export const VOICE_OPEN_EVENT = 'za-rulem:open-voice-request';
 export const SERVICE_OPEN_EVENT = 'za-rulem:open-service-request';
@@ -26,9 +35,22 @@ export default function VoiceRequestModal() {
 	const [service, setService] = useState<string | undefined>();
 	const [city, setCity] = useState<string | undefined>();
 
-	const [status, setStatus] = useState<'idle' | 'recording' | 'transcribing' | 'reviewing' | 'submitting' | 'success' | 'error'>('idle');
+	const [status, setStatus] = useState<
+		| 'idle'
+		| 'recording'
+		| 'transcribing'
+		| 'reviewing'
+		| 'submitting'
+		| 'searching_courier'
+		| 'courier_not_found'
+		| 'success'
+		| 'error'
+	>('idle');
+	const [queueMode, setQueueMode] = useState<'standard' | 'priority'>('standard');
+	const [isPrepaymentPending, setIsPrepaymentPending] = useState(false);
 	const [transcription, setTranscription] = useState('');
 	const [phone, setPhone] = useState('');
+	const [location, setLocation] = useState<RequestLocation | null>(null);
 	const [error, setError] = useState('');
 	const [recordingTime, setRecordingTime] = useState(0);
 	const isCarSelection = service === 'vladivostok-car-selection';
@@ -50,7 +72,10 @@ export default function VoiceRequestModal() {
 		setStatus('idle');
 		setTranscription('');
 		setPhone('');
+		setLocation(null);
 		setError('');
+		setQueueMode('standard');
+		setIsPrepaymentPending(false);
 		setCourierInfoOpen(false);
 		setOpen(true);
 	}, []);
@@ -177,7 +202,7 @@ export default function VoiceRequestModal() {
 				const data = await res.json();
 				if (data.ok) {
 					setTranscription(data.text);
-					setStatus('reviewing');
+					setStatus(showFuelDeliveryLoadAlert ? 'searching_courier' : 'reviewing');
 				} else {
 					setError(data.error || 'Не удалось распознать голос. Попробуйте еще раз или введите текст вручную.');
 					setTranscription('');
@@ -190,32 +215,119 @@ export default function VoiceRequestModal() {
 		};
 	};
 
+	const handleCourierSearchComplete = useCallback(() => {
+		setStatus('courier_not_found');
+	}, []);
+
+	const handleStayInQueue = useCallback(() => {
+		setError('');
+		setQueueMode('standard');
+		setStatus('reviewing');
+	}, []);
+
+	const handlePrepayment = useCallback(() => {
+		setError('');
+		setQueueMode('priority');
+		setStatus('reviewing');
+	}, []);
+
+	const sendQueueLead = useCallback(
+		async (
+			nextQueueMode: 'standard' | 'priority',
+			phoneValue: string,
+			locationValue: RequestLocation,
+		) => {
+			const prepaymentStatus: PrepaymentStatus =
+				nextQueueMode === 'priority' ? 'requested' : 'skipped';
+
+			const payload = buildCourierRequestLead({
+				subject,
+				phone: phoneValue,
+				message: transcription,
+				location: locationValue,
+				service,
+				queueMode: nextQueueMode,
+				prepaymentStatus,
+			});
+
+			const res = await fetch(LEADS_ENDPOINT, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload),
+			});
+
+			if (!res.ok) throw new Error(`Webhook HTTP ${res.status}`);
+		},
+		[subject, transcription, service],
+	);
+
+	/** Telegram — дополнительный канал уведомления: его сбой не должен ломать заявку. */
+	const notifyTelegram = useCallback(
+		async (phoneValue: string) => {
+			try {
+				await fetch('/api/voice-submit', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ text: transcription, phone: phoneValue, subject, service }),
+				});
+			} catch {
+				// заявка уже принята вебхуком
+			}
+		},
+		[transcription, subject, service],
+	);
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!phone) {
+		const phoneValue = phone.trim();
+		if (!phoneValue) {
 			setError('Введите номер телефона для связи');
 			return;
 		}
-		
+		if (!transcription.trim()) {
+			setError('Опишите заявку текстом или запишите голосом');
+			return;
+		}
+		if (!location || !isLocationReady(location)) {
+			setError('Укажите местоположение: разрешите геолокацию или введите город и адрес');
+			return;
+		}
+
+		setError('');
 		setStatus('submitting');
+
 		try {
-			const res = await fetch('/api/voice-submit', {
+			await sendQueueLead(queueMode, phoneValue, location);
+		} catch {
+			setError('Не удалось отправить заявку. Проверьте соединение и попробуйте ещё раз.');
+			setStatus('reviewing');
+			return;
+		}
+
+		void notifyTelegram(phoneValue);
+
+		if (queueMode !== 'priority') {
+			setStatus('success');
+			return;
+		}
+
+		try {
+			const res = await fetch('/api/billing/checkout', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ text: transcription, phone, subject, service }),
+				body: JSON.stringify({ phone: phoneValue, city: location.city }),
 			});
-			
-			const data = await res.json();
-			if (data.ok) {
-				setStatus('success');
-			} else {
-				setError(data.error || 'Ошибка при отправке заявки');
-				setStatus('reviewing');
+			const data = await res.json().catch(() => null);
+
+			if (res.ok && data?.ok && typeof data.redirectUrl === 'string') {
+				window.location.href = data.redirectUrl;
+				return;
 			}
-		} catch (err) {
-			setError('Ошибка соединения при отправке.');
-			setStatus('reviewing');
+		} catch {
+			// Оплата недоступна, но намерение уже зафиксировано в заявке.
 		}
+
+		setStatus('success');
 	};
 
 	if (!mounted || !open) return null;
@@ -337,7 +449,7 @@ export default function VoiceRequestModal() {
 				</div>
 
 				<div className="service-request-modal__body">
-					{showFuelDeliveryLoadAlert && (
+					{showFuelDeliveryLoadAlert && status !== 'searching_courier' && status !== 'courier_not_found' && (
 						<div className="voice-load-alert mb-4" role="alert">
 							<div className="voice-load-alert__heading">
 								<span className="voice-load-alert__icon" aria-hidden="true">
@@ -417,10 +529,22 @@ export default function VoiceRequestModal() {
 						</div>
 					)}
 
-					{status === 'success' ? (
+					{status === 'searching_courier' ? (
+						<CourierSearchSimulation city={city} onComplete={handleCourierSearchComplete} />
+					) : status === 'courier_not_found' ? (
+						<CourierUnavailableOffer
+							city={city}
+							isPrepaymentPending={isPrepaymentPending}
+							error={error || undefined}
+							onPrepayment={handlePrepayment}
+							onStayInQueue={handleStayInQueue}
+						/>
+					) : status === 'success' ? (
 						<div className="text-center">
 							<p className="ajax-response success mb-4" style={{ color: '#28a745', fontWeight: '600' }}>
-								{isPartnerApplication
+								{queueMode === 'priority'
+									? 'Предоплата зафиксирована как намерение: вы в приоритетной очереди. Как только топливо появится, курьер приедет к вам первым.'
+									: isPartnerApplication
 									? 'Анкета отправлена. Если в указанном городе появится подходящая заявка, мы свяжемся с вами.'
 									: isFuelCardRequest
 										? 'Заявка на топливную карту отправлена. С вами свяжутся по указанному номеру.'
@@ -507,6 +631,13 @@ export default function VoiceRequestModal() {
 							
 							{(status === 'reviewing' || status === 'submitting') && (
 								<form onSubmit={handleSubmit} noValidate>
+									{showFuelDeliveryLoadAlert && (
+										<div className="voice-queue-note mb-4" role="note">
+											{queueMode === 'priority'
+												? 'Вы выбрали приоритетную очередь с предоплатой. Проверьте заявку и укажите телефон — после этого перейдём к оплате.'
+												: 'Вы остаётесь в общей очереди. Проверьте заявку и укажите телефон для связи.'}
+										</div>
+									)}
 									<div className="form-group mb-4">
 										<label className="service-request-modal__label">
 											{isPartnerApplication
@@ -530,6 +661,11 @@ export default function VoiceRequestModal() {
 											required
 										/>
 									</div>
+									<RequestLocationField
+										fallbackCity={city}
+										value={location}
+										onChange={setLocation}
+									/>
 									<div className="form-group mb-4">
 										<label className="service-request-modal__label">Ваш номер телефона:</label>
 										<input 
@@ -547,7 +683,11 @@ export default function VoiceRequestModal() {
 											className="btn-default btn-highlighted w-100"
 											disabled={status === 'submitting'}
 										>
-											{status === 'submitting' ? 'Отправка...' : 'Отправить всё'}
+											{status === 'submitting'
+												? 'Отправка...'
+												: queueMode === 'priority'
+													? 'Отправить и перейти к оплате'
+													: 'Отправить всё'}
 										</button>
 										<button 
 											type="button" 
@@ -569,6 +709,16 @@ export default function VoiceRequestModal() {
 			<style dangerouslySetInnerHTML={{ __html: `
 				.service-request-modal__body {
 					padding: 30px;
+				}
+				.voice-queue-note {
+					padding: 10px 12px;
+					border: 1px solid #fed7aa;
+					border-radius: 8px;
+					background: #fffaf0;
+					color: #9a3412;
+					font-size: 13px;
+					font-weight: 600;
+					line-height: 1.45;
 				}
 				.voice-load-alert {
 					padding: 14px;

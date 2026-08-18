@@ -1,5 +1,5 @@
 import { useChatMessages } from './useChatMessages';
-import { useChatSession } from './useChatSession';
+import { useChatSession, type ChatSessionOptions } from './useChatSession';
 import type { ChatMessage, ChatTopic } from './types';
 
 export interface DriverChatState {
@@ -16,8 +16,11 @@ export interface DriverChatState {
 }
 
 /** Единая точка входа для UI: связывает сессию чата и ленту сообщений канала. */
-export function useDriverChat(defaultCitySlug: string): DriverChatState {
-	const session = useChatSession(defaultCitySlug);
+export function useDriverChat(
+	defaultCitySlug: string,
+	options: ChatSessionOptions = {},
+): DriverChatState {
+	const session = useChatSession(defaultCitySlug, options);
 	const { messages, error: sendError, send, resetMessages } = useChatMessages({
 		isJoined: session.isJoined,
 		phone: session.phone,

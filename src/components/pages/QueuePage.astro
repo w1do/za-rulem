@@ -6,6 +6,7 @@ import PageHeader from '../../components/shared/PageHeader.astro';
 import ReasonsSlider from '../../components/shared/ReasonsSlider.astro';
 import ServiceFaqs from '../../components/services/single/ServiceFaqs.astro';
 import AboutCta from '../../components/about/AboutCta.astro';
+import LightChatBox from '../../components/driver-chat/LightChatBox.astro';
 import InteractiveRequestMap from '../../features/interactive-requests/ui/InteractiveRequestMap';
 import QueueAnalytics from '../../features/interactive-requests/ui/QueueAnalytics.astro';
 import { QUEUE_TARIFFS, URGENCY_META, URGENCY_ORDER } from '../../features/interactive-requests/model/constants';
@@ -109,6 +110,12 @@ const faqs = [
 		helpLabel="Занять очередь"
 		helpService="Занять очередь на АЗС"
 		helpSubject="Заявка на очередь на АЗС"
+	/>
+
+	<LightChatBox
+		city={city}
+		title={`Обсудить очереди на АЗС ${city.inCity}`}
+		description="Спросите водителей, сколько машин сейчас на заправке, как движется очередь и где можно заправиться быстрее."
 	/>
 
 	<section class="queue-map-section mt-5" aria-label="Карта заявок на очередь">

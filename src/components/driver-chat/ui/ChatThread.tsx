@@ -4,6 +4,8 @@ import type { ChatMessage, ChatMessageStatus } from '../model/types';
 
 interface ChatThreadProps {
 	messages: ChatMessage[];
+	id?: string;
+	labelledBy?: string;
 }
 
 /** Пустая строка вместо «05:00», если у сообщения нет корректного времени. */
@@ -20,7 +22,7 @@ const statusLabel = (status?: ChatMessageStatus): string => {
 	return '';
 };
 
-export default function ChatThread({ messages }: ChatThreadProps) {
+export default function ChatThread({ messages, id, labelledBy }: ChatThreadProps) {
 	const endRef = useRef<HTMLDivElement>(null);
 
 	// Лента хронологическая: новые сообщения внизу, поэтому держим в фокусе конец списка.
@@ -29,7 +31,13 @@ export default function ChatThread({ messages }: ChatThreadProps) {
 	}, [messages]);
 
 	return (
-		<div className="dc-thread" aria-live="polite">
+		<div
+			className="dc-thread"
+			id={id}
+			role={labelledBy ? 'tabpanel' : undefined}
+			aria-labelledby={labelledBy}
+			aria-live="polite"
+		>
 			{messages.map((item) => (
 				<div key={item.id} className={`dc-msg dc-msg--${item.author}`}>
 					{item.author === 'system' ? (

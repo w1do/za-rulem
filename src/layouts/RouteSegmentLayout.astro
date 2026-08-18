@@ -6,12 +6,14 @@ import Layout from './Layout.astro';
 import Header from '../components/shared/header/Header.astro';
 import Footer from '../components/shared/footer/Footer.astro';
 import PageHeader from '../components/shared/PageHeader.astro';
+import LightChatBox from '../components/driver-chat/LightChatBox.astro';
 import ServiceSidebar from '../components/services/single/ServiceSidebar.astro';
 import ServiceWhyChoose from '../components/services/single/ServiceWhyChoose.astro';
 import FuelPricesTable from '../components/gas-prices/FuelPricesTable';
 import GasMap from '../components/maps/GasMap';
 import { getFuelPricesFromStations, type PriceRow } from '../lib/gasStations';
 import { breadcrumbNode } from '../lib/seo';
+import { defaultCity } from '../lib/cities';
 import '../components/maps/GasMap.css';
 import '../features/road-gas-stations/ui/RoadGasStations.css';
 
@@ -116,6 +118,12 @@ const routeTips = [
 		helpService={voiceService}
 		helpSubject={voiceSubject}
 		helpTitle={`Помощь на участке ${segment.name}`}
+	/>
+
+	<LightChatBox
+		city={defaultCity}
+		title={`Чат водителей: ${segment.name}`}
+		description={`Спросите про топливо и очереди на участке ${segment.name} трассы ${road.code}. Добавьте в сообщение направление и ближайший километр.`}
 	/>
 
 	<!-- Road Segment Gas Stations Start -->
