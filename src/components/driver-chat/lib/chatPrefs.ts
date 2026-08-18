@@ -29,14 +29,25 @@ export const resolveCity = (slug: unknown, defaultCitySlug: string): string =>
 	isKnownCity(slug) ? slug : defaultCitySlug;
 
 const readStoredPrefs = (): Partial<ChatPrefs> => {
-	const saved = window.localStorage.getItem(STORAGE_KEY);
-	if (!saved) return {};
 	try {
+		const saved = window.localStorage.getItem(STORAGE_KEY);
+		if (!saved) return {};
 		return JSON.parse(saved) as Partial<ChatPrefs>;
 	} catch {
-		window.localStorage.removeItem(STORAGE_KEY);
+		try {
+			window.localStorage.removeItem(STORAGE_KEY);
+		} catch {
+			// Browser storage может быть полностью недоступен в приватном режиме.
+		}
 		return {};
 	}
+};
+
+export const readPersistedChatPhone = (): string => {
+	const phone = readStoredPrefs().phone;
+	if (typeof phone !== 'string') return '';
+	const normalized = normalizePhone(phone);
+	return isValidPhone(normalized) ? normalized : '';
 };
 
 const readUrlPrefs = (): Partial<ChatPrefs> => {
@@ -76,12 +87,14 @@ export const readInitialPrefs = (defaultCitySlug: string): ChatPrefs => {
 export const persistPrefs = (
 	{ phone, topic, city }: ChatPrefs,
 	{ persistGlobalCity = true }: PersistPrefsOptions = {},
-): void => {
+): boolean => {
 	try {
 		window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ phone, topic, city }));
 		if (persistGlobalCity) saveCity(city);
+		return true;
 	} catch (e) {
 		console.warn('Chat persistence failed:', e);
+		return false;
 	}
 };
 

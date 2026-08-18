@@ -55,6 +55,7 @@ export const getCitySitemapUrls = async (site: string): Promise<string[]> => {
 	const servicePaths = await getServicePaths();
 
 	return [
+		absolute(site, '/chats'),
 		absolute(site, '/ceny-na-benzin'),
 		absolute(site, '/ochered-na-azs'),
 		...cities

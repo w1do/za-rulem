@@ -1,0 +1,226 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CityChatCatalog from '../driver-chat/catalog/CityChatCatalog.astro';
+import { getCityChatCatalog, listCityChatSearchOptions } from '../driver-chat/catalog/server';
+import HomeAbout from '../home/HomeAbout.astro';
+import HomeHowItWork from '../home/HomeHowItWork.astro';
+import HomeServices from '../home/HomeServices.astro';
+import HomeWhyChoose from '../home/HomeWhyChoose.astro';
+import HubCta from '../hub/HubCta.astro';
+import HubFaqs from '../hub/HubFaqs.astro';
+import Footer from '../shared/footer/Footer.astro';
+import Header from '../shared/header/Header.astro';
+import PageHeader from '../shared/PageHeader.astro';
+import { cityLandingUrl, defaultCity, getCityUrl } from '../../lib/cities';
+import { breadcrumbNode, faqNode, itemListNode, webPageNode } from '../../lib/seo';
+import gasStationImage from '../../assets/images/blog/benzin-tyumen-azs.jpg';
+import fuelCanisterImage from '../../assets/images/blog/kanistra-benzina.jpg';
+import driverInfoImage from '../../assets/images/driver-info-image.jpg';
+import roadImage from '../../assets/images/road-page-single-image.jpg';
+
+const title = 'Чаты по городам АЗС, очереди, где есть бензин, курьеры и доставка | За Рулём';
+const description = 'Найдите городской чат водителей: цены АИ-92, АИ-95, АИ-100 и ДТ с динамикой, сообщения о наличии бензина, очередях на АЗС, курьерах и доставке топлива.';
+const h1 = 'Чаты по городам о бензине и ситуации на АЗС';
+const url = '/chats';
+const defaultPricesUrl = getCityUrl('/ceny-na-benzin', defaultCity.slug);
+const defaultQueuesUrl = getCityUrl('/ochered-na-azs', defaultCity.slug);
+const defaultDeliveryUrl = getCityUrl('/services/toplivo', defaultCity.slug);
+
+const cards = await getCityChatCatalog();
+const cityOptions = listCityChatSearchOptions();
+
+const chatTopics = [
+	{
+		icon: '/images/icon-service-1.svg',
+		title: 'Где есть бензин и сколько он стоит',
+		text: 'Сравните средние цены АИ-92, АИ-95, АИ-100 и дизеля, затем уточните наличие на конкретной АЗС у водителей.',
+		href: '#city-chat-catalog',
+		linkText: 'Смотреть города',
+	},
+	{
+		icon: '/images/icon-service-2.svg',
+		title: 'Очереди, лимиты и работа колонок',
+		text: 'Спросите адрес заправки, длину очереди, действующие ограничения и время последнего наблюдения перед поездкой.',
+		href: defaultQueuesUrl,
+		linkText: 'Проверить очереди',
+	},
+	{
+		icon: '/images/icon-service-3.svg',
+		title: 'Курьеры и доставка топлива',
+		text: 'Если автомобиль остановился, обсудите район, вид и объём топлива, время выезда и итоговые условия доставки.',
+		href: defaultDeliveryUrl,
+		linkText: 'Условия доставки',
+	},
+];
+
+const faqs = [
+	{
+		question: 'Почему на странице показано только 10 городов?',
+		answer: 'В рекомендованную десятку попадают города с наиболее полным свежим срезом по АИ-92, АИ-95 и как минимум ещё одному виду топлива. Любой другой опубликованный город можно найти через поиск над карточками.',
+	},
+	{
+		question: 'Цены в карточке означают, что бензин точно есть?',
+		answer: 'Нет. Цена и число наблюдений показывают полноту свежего среза, но остаток на конкретной колонке может измениться после обновления. Перед поездкой откройте чат города и спросите о нужной АЗС, марке топлива и очереди.',
+	},
+	{
+		question: 'Зачем при входе нужен номер телефона?',
+		answer: 'Номер служит простой подписью участника и сохраняется в браузере на вашем устройстве. Пароль и SMS-код не нужны; со страницы каталога номер не передаётся в URL или серверный HTML.',
+	},
+	{
+		question: 'Можно ли найти в чате курьера или доставку топлива?',
+		answer: 'В городском чате можно уточнить, кто готов помочь, но сообщение не гарантирует свободного курьера. Объём, адрес, стоимость и время доставки нужно подтвердить напрямую до выезда.',
+	},
+];
+
+const jsonLd = [
+	webPageNode({ name: title, description, url }),
+	breadcrumbNode([
+		{ name: 'Главная', url: '/' },
+		{ name: 'Чаты по городам', url },
+	]),
+	faqNode(faqs),
+	...(cards.length > 0
+		? [itemListNode(cards.map((card) => ({
+			name: `Чат водителей — ${card.city.name}`,
+			url: cityLandingUrl(card.city.slug),
+		})))]
+		: []),
+];
+---
+
+<Layout
+	title={title}
+	description={description}
+	ogTitle="Городские чаты водителей о бензине и АЗС"
+	ogDescription="Цены на топливо с динамикой, сообщения об очередях, курьерах и доставке — найдите чат своего города."
+	keywords="чаты по городам АЗС, где есть бензин, чат водителей, очереди на заправках, цены на бензин, доставка топлива"
+	jsonLd={jsonLd}
+	isNational={true}
+>
+	<Header isNational={true} />
+
+	<main>
+		<PageHeader
+			title={h1}
+			items={[{ label: 'Главная', href: '/' }, { label: 'Чаты по городам' }]}
+			showChatButton={true}
+			chatLink="/chat"
+		/>
+
+		<!-- Семантический блок 1: назначение каталога -->
+		<HomeAbout
+			subtitle="Городская сводка водителей"
+			title="Найдите город, сравните цены и уточните обстановку на АЗС"
+			taskTitle="Что решает каталог"
+			taskText="Показывает рекомендованные городские чаты, средние цены на четыре вида топлива с динамикой и последние сообщения участников."
+			principleTitle="Как читать данные"
+			principleText="Свежий ценовой срез помогает выбрать активный город, но наличие, очередь и лимиты на конкретной АЗС нужно подтвердить в чате перед поездкой."
+			counters={[
+				{ value: String(cards.length), label: 'Городов в текущей рекомендации' },
+				{ value: String(cityOptions.length), label: 'Городов доступно через поиск' },
+				{ value: '4', label: 'Вида топлива в сравнении' },
+				{ value: '3', label: 'Последних сообщения в карточке' },
+			]}
+			footerText="Нужный город уже известен?"
+			footerLinkText="Открыть полный чат"
+			footerLinkHref="/chat"
+			imageOne={gasStationImage}
+			imageTwo={fuelCanisterImage}
+			imageOneAlt="Городская АЗС и цены на бензин"
+			imageTwoAlt="Топливо для доставки водителю"
+		/>
+
+		<CityChatCatalog cards={cards} cities={cityOptions} />
+
+		<!-- Семантический блок 2: пользовательские задачи -->
+		<HomeServices
+			subtitle="Что обсуждают в городских чатах"
+			title="Бензин, очереди на АЗС, курьеры и доставка"
+			services={chatTopics}
+			footerText="Все темы доступны после лёгкого входа —"
+			footerLinkText="перейти в чат"
+			footerLinkHref="/chat"
+			showRating={false}
+		/>
+
+		<!-- Семантический блок 3: проверка свежести и безопасности -->
+		<HomeWhyChoose
+			subtitle="Проверка перед поездкой"
+			title="Сводка помогает сориентироваться, чат — уточнить детали"
+			description="Цены и сообщения дополняют друг друга: сначала сравните дату и охват наблюдений, затем запросите свежую отметку по конкретной заправке."
+			items={[
+				{
+					icon: '/images/icon-why-choose-body-1-gold.svg',
+					title: 'Смотрите время обновления',
+					text: 'Карточка показывает только свежий широкий срез и отдельно выводит динамику цены для каждой марки топлива.',
+				},
+				{
+					icon: '/images/icon-why-choose-body-2-gold.svg',
+					title: 'Уточняйте АЗС и условия',
+					text: 'Спросите адрес, работающую колонку, длину очереди и лимит. Для доставки отдельно согласуйте объём, стоимость и время.',
+				},
+			]}
+			ctaText="Сравнить цены"
+			ctaHref={defaultPricesUrl}
+			authorName="За Рулём"
+			authorText="Городские чаты водителей"
+			imageOne={driverInfoImage}
+			imageTwo={roadImage}
+			imageOneAlt="Водитель проверяет информацию перед поездкой"
+			imageTwoAlt="Дорога к городской АЗС"
+		/>
+
+		<!-- Семантический блок 4: лёгкий вход -->
+		<HomeHowItWork
+			subtitle="Лёгкий вход в чат"
+			title="Найдите город и войдите без пароля и SMS"
+			steps={[
+				{
+					icon: '/images/icon-how-it-work-1-gold.svg',
+					number: '01',
+					title: 'Найдите город',
+					text: 'Введите название города или региона либо выберите одну из десяти рекомендованных карточек.',
+				},
+				{
+					icon: '/images/icon-how-it-work-2-gold.svg',
+					number: '02',
+					title: 'Сравните обстановку',
+					text: 'Посмотрите цены, динамику, время обновления и три последних сообщения без персональных данных автора.',
+				},
+				{
+					icon: '/images/icon-how-it-work-3-gold.svg',
+					number: '03',
+					title: 'Укажите номер',
+					text: 'Номер сохраняется на устройстве как подпись сообщений. Пароль, SMS-код и повторная регистрация не требуются.',
+				},
+			]}
+			footerList={['АИ-92', 'АИ-95', 'АИ-100', 'Дизельное топливо']}
+			footerText="Город и номер сохраняются на устройстве."
+			footerLinkText="Открыть чат"
+			footerLinkHref="/chat"
+		/>
+
+		<HubFaqs
+			faqs={faqs}
+			subtitle="Важные уточнения"
+			title="Частые вопросы о городских чатах АЗС"
+			description="Как формируется десятка городов, что означают цены и как безопасно договориться о помощи."
+			benefits={['Поиск по полному справочнику городов', 'Наличие на конкретной АЗС уточняется в чате']}
+			buttonLabel="Открыть общий чат"
+			buttonHref="/chat"
+		/>
+
+		<!-- Семантический блок 5: переход к действию -->
+		<HubCta
+			subtitle="Все города в одном чате"
+			title="Спросите, где сейчас есть нужное топливо"
+			description="Выберите город и тему — АИ-92, АИ-95, АИ-100, дизель или очереди. Сообщения водителей помогают уточнить ситуацию, но не заменяют проверку конкретной АЗС."
+			btnText="Открыть чат водителей"
+			btnHref="/chat"
+			features={['Поиск города и выбор категории', 'Вход по номеру без пароля и SMS']}
+			showContact={false}
+		/>
+	</main>
+
+	<Footer isNational={true} nationalVariant="system" />
+</Layout>

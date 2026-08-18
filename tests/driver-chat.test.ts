@@ -27,7 +27,6 @@ test('light chat is wired into every agreed page family', async () => {
 	const integrations = [
 		'src/components/pages/GasPricesPage.astro',
 		'src/components/pages/GasBrandPricesPage.astro',
-		'src/pages/chat-voditeley.astro',
 		'src/components/driver-chat/ChatCityLanding.astro',
 		'src/components/driver-chat/ChatFuelLanding.astro',
 		'src/layouts/HubLayout.astro',
@@ -49,4 +48,34 @@ test('light chat is wired into every agreed page family', async () => {
 	const serviceLayout = await readFile('src/layouts/ServiceLandingLayout.astro', 'utf8');
 	assert.match(hubLayout, /showFuelCalculator &&/);
 	assert.match(serviceLayout, /cluster === 'toplivo' &&/);
+});
+
+test('city chat catalog reuses the existing chat session and keeps the legacy hub as a redirect', async () => {
+	const [pageSource, modalSource, catalogSource, redirectSource, fuelLanding, cityLanding, pricesIntro] = await Promise.all([
+		readFile('src/components/pages/ChatsPage.astro', 'utf8'),
+		readFile('src/components/driver-chat/catalog/CityChatJoinModal.tsx', 'utf8'),
+		readFile('src/components/driver-chat/catalog/CityChatCatalog.astro', 'utf8'),
+		readFile('src/pages/chat-voditeley.astro', 'utf8'),
+		readFile('src/components/driver-chat/ChatFuelLanding.astro', 'utf8'),
+		readFile('src/components/driver-chat/ChatCityLanding.astro', 'utf8'),
+		readFile('src/components/gas-prices/GasPricesIntro.astro', 'utf8'),
+	]);
+
+	assert.match(pageSource, /CityChatCatalog/);
+	assert.match(modalSource, /persistPrefs/);
+	assert.match(modalSource, /searchCityChatOptions/);
+	assert.match(modalSource, /event\.key !== 'Tab'/);
+	assert.match(modalSource, /returnFocusRef\.current\?\.focus/);
+	assert.match(modalSource, /\/chat\?city=/);
+	assert.doesNotMatch(modalSource, /searchParams.*phone|phone=.*encodeURIComponent/);
+	assert.match(catalogSource, /pricing-item-gold/);
+	assert.match(catalogSource, /cities=\{cities\}/);
+	for (const component of ['HomeAbout', 'HomeServices', 'HomeWhyChoose', 'HomeHowItWork', 'HubCta']) {
+		assert.match(pageSource, new RegExp(`<${component}\\b`));
+	}
+	assert.match(redirectSource, /Astro\.redirect\(`\/chats\$\{Astro\.url\.search\}`, 301\)/);
+	for (const source of [fuelLanding, cityLanding, pricesIntro]) {
+		assert.doesNotMatch(source, /href="\/chat-voditeley"/);
+		assert.match(source, /href="\/chats"/);
+	}
 });

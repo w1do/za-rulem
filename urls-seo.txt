@@ -16,7 +16,7 @@ https://za-rulem.org/benzin-tyumen
 https://za-rulem.org/ceny-na-benzin
 https://za-rulem.org/ochered-na-azs
 https://za-rulem.org/calculator
-https://za-rulem.org/chat-voditeley
+https://za-rulem.org/chats
 https://za-rulem.org/chat
 https://za-rulem.org/pochemu-neobhodima-predoplata
 
@@ -461,6 +461,6 @@ https://za-rulem.org/zlatoust/partners
 # /{city}/calculator, /{city}/partners, /{city}/services/*,
 # /{city}/ceny-na-benzin, /{city}/ochered-na-azs, /{city}/chat-voditeley[/{fuel}].
 # Услуги всегда требуют префикс города, включая базовую Тюмень; /services/* — только 301.
-# Глобальные /about, /contacts, /testimonials, /privacy-policy, /terms и /chat
+# Глобальные /about, /contacts, /testimonials, /privacy-policy, /terms, /chat и /chats
 # доступны только в корне; прежние /{city}/... постоянно перенаправляются кодом 301.
 # Полный перечень индексируемых адресов — в sitemap-index.xml после сборки.

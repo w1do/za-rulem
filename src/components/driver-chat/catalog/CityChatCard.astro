@@ -1,0 +1,146 @@
+---
+import { formatPrice } from '../../../features/gas-prices';
+import { cityLandingUrl, getCityUrl } from '../../../lib/cities';
+import type { ChatTopic } from '../model/types';
+import type { CityChatCatalogCard } from './model';
+
+interface Props {
+	card: CityChatCatalogCard;
+}
+
+const { card } = Astro.props;
+const chatLandingUrl = cityLandingUrl(card.city.slug);
+const pricesUrl = getCityUrl('/ceny-na-benzin', card.city.slug);
+const queuesUrl = getCityUrl('/ochered-na-azs', card.city.slug);
+const deliveryUrl = getCityUrl('/services/toplivo', card.city.slug);
+
+const TOPIC_LABELS: Record<ChatTopic, string> = {
+	general: 'Общий',
+	ai95: 'АИ-95',
+	ai92: 'АИ-92',
+	ai100: 'АИ-100',
+	dt: 'ДТ',
+	queue: 'Очереди',
+};
+
+const normalizeDate = (value: string): string =>
+	/(Z|[+-]\d{2}:?\d{2})$/.test(value) ? value : `${value}Z`;
+
+const formatDate = (value: string): string => {
+	const date = new Date(normalizeDate(value));
+	return Number.isNaN(date.getTime())
+		? value
+		: date.toLocaleString('ru-RU', {
+			day: 'numeric',
+			month: 'short',
+			hour: '2-digit',
+			minute: '2-digit',
+			timeZone: 'UTC',
+		});
+};
+
+const formatDelta = (delta: number | null): string => {
+	if (delta === null) return 'нет истории';
+	if (delta === 0) return 'без изменений';
+	const value = Math.abs(delta).toLocaleString('ru-RU', {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	});
+	return `${delta > 0 ? '+' : '−'}${value} ₽`;
+};
+---
+
+<div class="col-xl-6">
+	<article class="pricing-item-gold city-chat-card wow fadeInUp">
+		<div class="pricing-item-header-gold">
+			<div class="icon-box">
+				<img src="/images/icon-pricing-1-gold.svg" alt="" width="50" height="50" />
+			</div>
+			<div class="pricing-item-content-gold">
+				<span class="pricing-item-title-gold"><a href={chatLandingUrl}>{card.city.name}</a></span>
+				<p>{card.city.region} · {card.city.hint}</p>
+				<p class="city-chat-card__evidence">
+					<i class="fa-solid fa-signal" aria-hidden="true"></i>
+					<strong>{card.stationCount}</strong> АЗС в свежем срезе ·
+					<time datetime={card.updatedAt}>{formatDate(card.updatedAt)}</time>
+				</p>
+			</div>
+
+			<dl class="city-chat-card__fuels" aria-label={`Средние цены на топливо в городе ${card.city.name}`}>
+				{card.fuels.map((fuel) => (
+					<div class:list={['city-chat-card__fuel', `is-${fuel.trend}`]}>
+						<dt>{fuel.label}</dt>
+						<dd>
+							<strong>{fuel.average === null ? 'Нет данных' : formatPrice(fuel.average)}</strong>
+							<span>{formatDelta(fuel.delta)}</span>
+						</dd>
+					</div>
+				))}
+			</dl>
+
+			<div class="pricing-item-btn-gold">
+				<button type="button" class="btn-default" data-open-city-chat data-city-slug={card.city.slug}>
+					Открыть чат {card.city.name}
+				</button>
+			</div>
+		</div>
+
+		<section class="pricing-item-list-gold city-chat-card__messages" aria-labelledby={`messages-${card.city.slug}`}>
+			<h3 id={`messages-${card.city.slug}`}>Последние 3 сообщения</h3>
+			{card.messages.length > 0 ? (
+				<ul>
+					{card.messages.map((message) => (
+						<li>
+							<div class="city-chat-card__message-meta">
+								<strong>{TOPIC_LABELS[message.topic]}</strong>
+								{message.createdAt && <time datetime={message.createdAt}>{formatDate(message.createdAt)}</time>}
+							</div>
+							<p>{message.text}</p>
+						</li>
+					))}
+				</ul>
+			) : (
+				<p class="city-chat-card__empty">Превью временно недоступно. Сам городской чат продолжает работать.</p>
+			)}
+			<nav class="city-chat-card__links" aria-label={`Полезные страницы города ${card.city.name}`}>
+				<a href={pricesUrl}>Цены и карта АЗС</a>
+				<a href={queuesUrl}>Очереди на АЗС</a>
+				<a href={deliveryUrl}>Курьеры и доставка</a>
+			</nav>
+		</section>
+	</article>
+</div>
+
+<style>
+	.city-chat-card { display: flex; flex-direction: column; }
+	.city-chat-card .pricing-item-header-gold { display: flex; flex: 1 1 auto; flex-direction: column; }
+	.city-chat-card .pricing-item-content-gold { flex: 1 1 auto; }
+	.city-chat-card .pricing-item-title-gold a { color: inherit; }
+	.city-chat-card__evidence { color: var(--text-color); font-size: 13px; }
+	.city-chat-card__evidence i { margin-right: 5px; color: var(--accent-color); }
+	.city-chat-card__evidence strong { color: var(--primary-color); }
+	.city-chat-card__fuels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 24px 0 0; }
+	.city-chat-card__fuel { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px; border-radius: 10px; background: var(--white-color); }
+	.city-chat-card__fuel dt { color: var(--primary-color); font-weight: 700; }
+	.city-chat-card__fuel dd { margin: 0; text-align: right; }
+	.city-chat-card__fuel strong { display: block; color: var(--primary-color); font-size: 14px; }
+	.city-chat-card__fuel span { display: block; color: var(--text-color); font-size: 11px; }
+	.city-chat-card__fuel.is-up span { color: #a63f2f; }
+	.city-chat-card__fuel.is-down span { color: #237a43; }
+	.city-chat-card .pricing-item-btn-gold { margin-top: auto; padding-top: 30px; }
+	.city-chat-card .pricing-item-btn-gold button { border: 0; cursor: pointer; }
+	.city-chat-card__messages ul li { margin-bottom: 20px; }
+	.city-chat-card__messages ul li::before { content: '\f4ad'; }
+	.city-chat-card__message-meta { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+	.city-chat-card__message-meta strong,
+	.city-chat-card__message-meta time { color: var(--text-color); font-size: 12px; }
+	.city-chat-card__messages p { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+	.city-chat-card__empty { margin: 0 0 20px; }
+	.city-chat-card__links { display: flex; flex-wrap: wrap; gap: 8px 18px; padding-top: 22px; border-top: 1px solid var(--divider-color); }
+	.city-chat-card__links a { color: var(--primary-color); font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+	@media (max-width: 575px) {
+		.city-chat-card__fuels { grid-template-columns: 1fr; }
+		.city-chat-card__message-meta { align-items: flex-start; flex-direction: column; gap: 2px; }
+	}
+</style>

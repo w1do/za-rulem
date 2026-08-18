@@ -16,6 +16,7 @@ const DIRECTUS_URL = (
 ).replace(/\/$/, '');
 const DIRECTUS_TOKEN = process.env.DIRECTUS_GAS_PRICES_TOKEN || '';
 const REQUEST_TIMEOUT_MS = 10_000;
+const CATALOG_REQUEST_TIMEOUT_MS = 20_000;
 /** Агрегация для sitemap идёт по всей двухнедельной истории и требует больше времени. */
 const SITEMAP_REQUEST_TIMEOUT_MS = 60_000;
 
@@ -59,6 +60,24 @@ export const readCitySnapshots = async (
 	params.set('filter[area_slug][_eq]', areaSlug);
 	params.set('filter[area_type][_eq]', 'city');
 	return mapSnapshots(await request(`/items/gas_daily?${params.toString()}`));
+};
+
+/**
+ * Один запрос для каталога городов вместо последовательного чтения истории
+ * каждого города. Ограничение по дате сохраняет ответ компактным, но оставляет
+ * предыдущий снимок, необходимый для расчёта динамики.
+ */
+export const readRecentCitySnapshots = async (since: string): Promise<GasPriceSnapshot[]> => {
+	const params = new URLSearchParams({
+		limit: '-1',
+		fields: SNAPSHOT_FIELDS,
+		sort: 'area_slug,brand_slug,snapshot_date',
+	});
+	params.set('filter[area_type][_eq]', 'city');
+	params.set('filter[snapshot_date][_gte]', since);
+	return mapSnapshots(
+		await request(`/items/gas_daily?${params.toString()}`, CATALOG_REQUEST_TIMEOUT_MS),
+	);
 };
 
 export const readBrandHistory = async (

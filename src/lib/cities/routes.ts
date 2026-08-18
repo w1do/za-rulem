@@ -6,6 +6,7 @@
 export const ROOT_ONLY_ROUTE_SEGMENTS = [
 	'about',
 	'chat',
+	'chats',
 	'contacts',
 	'privacy-policy',
 	'terms',

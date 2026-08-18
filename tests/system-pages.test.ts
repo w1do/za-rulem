@@ -19,6 +19,7 @@ test('глобальные страницы отделены от локальн
 	assert.deepEqual([...ROOT_ONLY_ROUTE_SEGMENTS].sort(), [
 		'about',
 		'chat',
+		'chats',
 		'contacts',
 		'privacy-policy',
 		'terms',
@@ -72,8 +73,10 @@ test('sitemap и URL-реестр не объявляют городские с�
 	]);
 
 	for (const segment of ROOT_ONLY_ROUTE_SEGMENTS) {
+		if (segment === 'chats') continue;
 		assert.doesNotMatch(sitemapSource, new RegExp(`['\"]\\/${segment}['\"]`));
 	}
+	assert.match(sitemapSource, /absolute\(site, '\/chats'\)/);
 
 	assert.doesNotMatch(urls, /# \/\{city\}.*\/(?:about|contacts|testimonials|privacy-policy|terms|chat)(?:[,\s]|$)/);
 	assert.match(robots, /Allow: \/chat\?city=/);

@@ -56,7 +56,8 @@ export default defineConfig({
         const isCompactRoadAlias = /^\/route\/[amr]\d+$/.test(path);
         const isLegacyRoadAlias = /^\/route\/m-(?:6|18|20|29|51|52|53|54|55|56|58|60)$/.test(path);
         const isRootServiceUrl = path === '/services' || path.startsWith('/services/');
-        return !isCompactRoadAlias && !isLegacyRoadAlias && !isRootServiceUrl;
+        const isLegacyChatHub = path === '/chat-voditeley';
+        return !isCompactRoadAlias && !isLegacyRoadAlias && !isRootServiceUrl && !isLegacyChatHub;
       },
       // Городские маршруты работают через SSR, поэтому в pages их нет.
       customPages: [...citySitemapUrls, ...gasPriceSitemapUrls],
